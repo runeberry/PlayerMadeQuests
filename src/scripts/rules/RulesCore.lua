@@ -1,5 +1,5 @@
 local _, addon = ...
-addon:traceFile("rules/_Core.lua")
+addon:traceFile("rules/RulesCore.lua")
 
 local rules = {
   definitions = {}

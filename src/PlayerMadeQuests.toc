@@ -14,8 +14,9 @@ scripts/PmqQuestLog.lua
 scripts/PmqCli.lua
 scripts/PmqStart.lua
 
-scripts/rules/_Core.lua
+scripts/rules/RulesCore.lua
 scripts/rules/KillMob.lua
 scripts/rules/TargetMob.lua
 
-frames/PmqEventFrame.xml
+frames/PMQ_EventFrame.xml
+frames/PMQ_QuestLogFrame.xml

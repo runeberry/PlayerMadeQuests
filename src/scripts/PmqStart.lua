@@ -1,7 +1,7 @@
 local _, addon = ...
 addon:traceFile("PmqStart.lua")
 
-function PmqEventFrame_OnLoad(self)
+function PMQ_EventFrame_OnLoad(self)
   if addon.events == nil then
     error("Addon events did not load, check PmqEvents.lua")
   end
@@ -10,7 +10,7 @@ function PmqEventFrame_OnLoad(self)
   addon:catch(addon.events.registerEventsToFrame, addon.events, self)
 end
 
-function PmqEventFrame_OnEvent(self, event, ...)
+function PMQ_EventFrame_OnEvent(self, event, ...)
   if addon.events == nil then
     error("Addon events did not load, check PmqEvents.lua")
   end
