@@ -104,7 +104,7 @@ function qlog:Load()
 
   qlog.list = {}
   for _, quest in pairs(PlayerMadeQuestsCache.QuestLog) do
-
+    qlog:LoadQuest(quest)
   end
   addon:trace("Quest log loaded from SavedVariables")
 end
