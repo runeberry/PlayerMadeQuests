@@ -1,0 +1,21 @@
+## Interface: 11304
+## Title: Player Made Quests
+## Author: dolphinspired
+## Notes: Create your own quests and share them with other players!
+## Version: 0.0.1
+## RequiredDeps:
+## OptionalDeps:
+## SavedVariables: PlayerMadeQuestsGlobalCache
+## SavedVariablesPerCharacter: PlayerMadeQuestsCache
+
+scripts/PmqCore.lua
+scripts/PmqEvents.lua
+scripts/PmqQuestLog.lua
+scripts/PmqCli.lua
+scripts/PmqStart.lua
+
+scripts/rules/_Core.lua
+scripts/rules/KillMob.lua
+scripts/rules/TargetMob.lua
+
+frames/PmqEventFrame.xml

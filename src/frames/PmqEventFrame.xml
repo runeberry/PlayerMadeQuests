@@ -1,0 +1,15 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script File="../scripts/PmqCore.lua"/>
+  <Script File="../scripts/PmqQuestObjectives.lua"/>
+  <Script File="../scripts/PmqQuestLog.lua"/>
+  <Script File="../scripts/PmqCombatLogEvents.lua"/>
+  <Script File="../scripts/PmqEvents.lua"/>
+  <Script File="../scripts/PmqCli.lua"/>
+  <Script File="../scripts/PmqStart.lua"/>
+  <Frame name="PmqEventFrame">
+    <Scripts>
+      <OnLoad function="PmqEventFrame_OnLoad"></OnLoad>
+      <OnEvent function="PmqEventFrame_OnEvent"></OnEvent>
+    </Scripts>
+  </Frame>
+</Ui>
