@@ -6,17 +6,21 @@ SLASH_PMQ1 = "/pmq"
 SlashCmdList.PMQ = function(msg, editbox)
   addon:catch(function()
     local args = { strsplit(" ", msg) }
-    local numargs = addon:tlen(args)
+    local cmd = args[1]
 
-    if args[1] == "reset" then
+    if cmd == "reset" then
       addon.qlog:Reset()
-    elseif args[1] == "add" then
+    elseif cmd == "add" then
       addon.qlog:AddQuest(args[2])
-    elseif args[1] == "list" then
+    elseif cmd == "list" then
       addon.qlog:PrintQuests()
-    elseif args[1] == "log" then
+    elseif cmd == "log" then
       addon.MinLogLevel = tonumber(args[2])
       addon:fatal("Log level set to", args[2])
+    elseif cmd == "show" then
+      PMQ_QuestLogFrame:Show()
+    elseif cmd == "hide" then
+      PMQ_QuestLogFrame:Hide()
     else
       addon:info("PMQ Version 0.0.1")
     end
