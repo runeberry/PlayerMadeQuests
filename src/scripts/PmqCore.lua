@@ -1,4 +1,5 @@
 local _, addon = ...
+addon.AceGUI = LibStub("AceGUI-3.0")
 
 -- Saved variables for persisting settings/quest log on logout
 PlayerMadeQuestsGlobalCache = PlayerMadeQuestsGlobalCache or {}
