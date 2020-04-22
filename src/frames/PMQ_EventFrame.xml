@@ -1,5 +1,4 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-  <Script File="../scripts/PmqStart.lua"/>
   <Frame name="PMQ_EventFrame">
     <Scripts>
       <OnLoad function="PMQ_EventFrame_OnLoad"></OnLoad>
