@@ -1,8 +1,17 @@
 local _, addon = ...
-addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests")
+addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", "AceEvent-3.0")
 addon.AceGUI = LibStub("AceGUI-3.0")
 
 function addon.Ace:OnInitialize()
+  addon:catch(addon.events.registerAceEvents, addon.events)
+
+  if PlayerMadeQuestsCache.QuestLog == nil then
+    PlayerMadeQuestsCache.QuestLog = {}
+    return
+  end
+
+  addon.qlog:Load()
+
   addon:info("PMQ Loaded")
 end
 
@@ -151,3 +160,4 @@ function addon:GetClog()
 
   return obj
 end
+

@@ -200,15 +200,4 @@ function qlog:TryCompleteQuest(id)
   end
 end
 
--- Loads the quest log from saved variables if it exists
--- Otherwise, initialize a new, empty quest log
-addon.events:addOnLoadHandler(function()
-  if PlayerMadeQuestsCache.QuestLog == nil then
-    PlayerMadeQuestsCache.QuestLog = {}
-    return
-  end
-
-  qlog:Load()
-end)
-
 addon.qlog = qlog

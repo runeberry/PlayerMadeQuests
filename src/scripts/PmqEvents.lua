@@ -16,6 +16,39 @@ local function makeHandlerTemplate(fn)
   }
 end
 
+-- Root handler for all game events
+local function onGameEvent(event, ...)
+  local handlers = events.gameEventsMap[event]
+  if addon:tlen(handlers) == 0 then
+    -- This shouldn't happen, but this condition would be reached if a game event
+    -- was registered to a frame without providing a handler
+    addon:warn("Attempted to handle", event, "event, but no handlers are registered")
+  else
+    -- Process the registered handlers in the order that they were added
+    for _, handler in pairs(handlers) do
+      addon:log(handler.logLevel, "Handling game event:", event)
+      addon:catch(handler.fn, ...)
+    end
+  end
+end
+
+-- Root handler for all COMBAT_LOG_EVENT_UNFILTERED events
+local function onCombatLogEvent(...)
+  local event = addon:GetClogEventType()
+  local handlers = events.combatLogEventsMap[event]
+  if addon:tlen(handlers) == 0 then
+    -- No handlers are registered for this combat log event, which is fine
+    return
+  else
+    local cl = addon:GetClog()
+    -- Process the registered handlers in the order that they were added
+    for _, handler in pairs(handlers) do
+      addon:log(handler.logLevel, "Handling combat event:", event)
+      handler.fn(cl) -- errors will be caught by the root game event handler
+    end
+  end
+end
+
 -- Adds a function handle the specified Event API event
 function events:addGameEventHandler(event, fn, options)
   if self.loaded then
@@ -64,62 +97,14 @@ function events:addCombatLogEventHandler(event, fn)
   addon:trace("Added handler for combat log event:", event)
 end
 
--- Wraps an ADDON_LOADED event handler in a function that ensures it will only
--- be run once when *this* addon is loaded
-function events:addOnLoadHandler(fn)
-  events:addGameEventHandler("ADDON_LOADED", function(...)
-    -- todo: don't like hard-coding the addon name here
-    local name = ...
-    if name == "PlayerMadeQuests" then
-      fn(...)
-    end
-  end, { logLevel = ll.none })
-end
-
--- This should be called once when the addon is loaded to attach
--- all registered game events to a game frame so they can be captured
-function events:registerEventsToFrame(...)
-  local frame = ...
-  for k, v in pairs(events.gameEventsMap) do
-    frame:RegisterEvent(k)
-    addon:trace("Registered event:", k)
+function events:registerAceEvents()
+  for event, _ in pairs(events.gameEventsMap) do
+    addon.Ace:RegisterEvent(event, onGameEvent)
+    addon:trace("Registered Ace event:", event)
   end
   events.loaded = true
 end
 
--- Root handler for all game events
-function events:onGameEvent(event, ...)
-  local handlers = events.gameEventsMap[event]
-  if addon:tlen(handlers) == 0 then
-    -- This shouldn't happen, but this condition would be reached if a game event
-    -- was registered to a frame without providing a handler
-    addon:warn("Attempted to handle", event, "event, but no handlers are registered")
-  else
-    -- Process the registered handlers in the order that they were added
-    for _, handler in pairs(handlers) do
-      addon:log(handler.logLevel, "Handling game event:", event)
-      addon:catch(handler.fn, ...)
-    end
-  end
-end
-
--- Root handler for all COMBAT_LOG_EVENT_UNFILTERED events
-function events:onCombatLogEvent(...)
-  local event = addon:GetClogEventType()
-  local handlers = events.combatLogEventsMap[event]
-  if addon:tlen(handlers) == 0 then
-    -- No handlers are registered for this combat log event, which is fine
-    return
-  else
-    local cl = addon:GetClog()
-    -- Process the registered handlers in the order that they were added
-    for _, handler in pairs(handlers) do
-      addon:log(handler.logLevel, "Handling combat event:", event)
-      handler.fn(cl) -- errors will be caught by the root game event handler
-    end
-  end
-end
-
-events:addGameEventHandler("COMBAT_LOG_EVENT_UNFILTERED", events.onCombatLogEvent, { logLevel = ll.none })
+events:addGameEventHandler("COMBAT_LOG_EVENT_UNFILTERED", onCombatLogEvent, { logLevel = ll.none })
 
 addon.events = events

@@ -19,6 +19,4 @@ scripts/rules/RulesCore.lua
 scripts/rules/KillMob.lua
 scripts/rules/TargetMob.lua
 
-frames/PMQ_EventFrame.lua
-frames/PMQ_EventFrame.xml
 frames/QuestLogFrame.lua
