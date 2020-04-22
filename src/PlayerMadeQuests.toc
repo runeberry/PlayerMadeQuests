@@ -8,6 +8,8 @@
 ## SavedVariables: PlayerMadeQuestsGlobalCache
 ## SavedVariablesPerCharacter: PlayerMadeQuestsCache
 
+embeds.xml
+
 scripts/PmqCore.lua
 scripts/PmqEvents.lua
 scripts/PmqQuestLog.lua
@@ -20,5 +22,4 @@ scripts/rules/TargetMob.lua
 
 frames/PMQ_EventFrame.lua
 frames/PMQ_EventFrame.xml
-frames/PMQ_QuestLogFrame.lua
-frames/PMQ_QuestLogFrame.xml
+frames/QuestLogFrame.lua
