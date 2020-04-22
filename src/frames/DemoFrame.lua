@@ -75,5 +75,10 @@ function addon:showDemoFrame()
   tabGroup:SelectTab("tab1")
   frame:AddChild(tabGroup)
 
+  -- Make window close when ESC is pressed
+  -- Adapted from: https://stackoverflow.com/a/61215014
+  _G["PMQ_DemoFrame"] = frame.frame
+  table.insert(UISpecialFrames, "PMQ_DemoFrame")
+
   PlayerMadeQuestsCache.ShowDemoFrame = true
 end
