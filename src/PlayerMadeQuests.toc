@@ -19,4 +19,5 @@ scripts/rules/RulesCore.lua
 scripts/rules/KillMob.lua
 scripts/rules/TargetMob.lua
 
+frames/DemoFrame.lua
 frames/QuestLogFrame.lua

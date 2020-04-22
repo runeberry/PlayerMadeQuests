@@ -12,6 +12,10 @@ function addon.Ace:OnInitialize()
 
   addon.qlog:Load()
 
+  if PlayerMadeQuestsCache.ShowDemoFrame then
+    addon:showDemoFrame()
+  end
+
   addon:info("PMQ Loaded")
 end
 
