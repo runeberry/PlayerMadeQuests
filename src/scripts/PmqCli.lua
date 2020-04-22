@@ -17,6 +17,8 @@ SlashCmdList.PMQ = function(msg, editbox)
     elseif cmd == "log" then
       addon.MinLogLevel = tonumber(args[2])
       addon:fatal("Log level set to", args[2])
+    elseif cmd == "show" then
+      addon:showQuestLog()
     elseif cmd == "demoframe" then
       addon:showDemoFrame()
     else
