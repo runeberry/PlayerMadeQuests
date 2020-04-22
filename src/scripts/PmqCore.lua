@@ -1,5 +1,18 @@
 local _, addon = ...
+addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests")
 addon.AceGUI = LibStub("AceGUI-3.0")
+
+function addon.Ace:OnInitialize()
+  addon:info("PMQ Loaded")
+end
+
+function addon.Ace:OnEnable()
+
+end
+
+function addon.Ace:OnDisable()
+
+end
 
 -- Saved variables for persisting settings/quest log on logout
 PlayerMadeQuestsGlobalCache = PlayerMadeQuestsGlobalCache or {}
