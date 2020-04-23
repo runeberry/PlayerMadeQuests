@@ -10,6 +10,9 @@ SlashCmdList.PMQ = function(msg, editbox)
 
     if cmd == "reset" then
       addon.qlog:Reset()
+      PlayerMadeQuestsCache = {}
+      PlayerMadeQuestsGlobalCache = {}
+      addon:info("Cache reset")
     elseif cmd == "add" then
       addon.qlog:AddQuest(args[2])
     elseif cmd == "list" then
@@ -18,9 +21,13 @@ SlashCmdList.PMQ = function(msg, editbox)
       addon.MinLogLevel = tonumber(args[2])
       addon:fatal("Log level set to", args[2])
     elseif cmd == "show" then
-      addon:showQuestLog()
+      addon:ShowQuestLog(true)
+    elseif cmd == "hide" then
+      addon:ShowQuestLog(false)
+    elseif cmd == "toggle" then
+      addon:ShowQuestLog(not(PlayerMadeQuestsCache.IsQuestLogShown))
     elseif cmd == "demoframe" then
-      addon:showDemoFrame()
+      addon:ShowDemoFrame()
     else
       addon:info("PMQ Version 0.0.1")
     end

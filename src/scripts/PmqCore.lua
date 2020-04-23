@@ -3,8 +3,6 @@ addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", "AceEvent-3.0")
 addon.AceGUI = LibStub("AceGUI-3.0")
 
 function addon.Ace:OnInitialize()
-  addon:catch(addon.events.registerAceEvents, addon.events)
-
   if PlayerMadeQuestsCache.QuestLog == nil then
     PlayerMadeQuestsCache.QuestLog = {}
     return
@@ -12,9 +10,17 @@ function addon.Ace:OnInitialize()
 
   addon.qlog:Load()
 
-  if PlayerMadeQuestsCache.ShowDemoFrame then
-    addon:showDemoFrame()
-  end
+  addon.events:addGameEventHandler("PLAYER_ENTERING_WORLD", function()
+    if PlayerMadeQuestsCache.IsDemoFrameShown then
+      addon:ShowDemoFrame()
+    end
+
+    if PlayerMadeQuestsCache.IsQuestLogShown then
+      addon:catch(addon.ShowQuestLog, addon, true)
+    end
+  end)
+
+  addon:catch(addon.events.registerAceEvents, addon.events)
 
   addon:info("PMQ Loaded")
 end

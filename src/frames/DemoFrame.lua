@@ -53,11 +53,15 @@ local function SelectGroup(container, event, group)
 end
 
 local function OnClose(widget)
-  PlayerMadeQuestsCache.ShowDemoFrame = nil
+  PlayerMadeQuestsCache.IsDemoFrameShown = nil
   AceGUI:Release(widget)
 end
 
-function addon:showDemoFrame()
+function addon:ShowDemoFrame()
+  if PlayerMadeQuestsCache.IsDemoFrameShown == true then
+    return
+  end
+
   local frame = AceGUI:Create("Frame")
   frame:SetTitle("AceGUI Demo Frame")
   frame:SetStatusText("AceGUI Example Container Frame")
@@ -80,5 +84,5 @@ function addon:showDemoFrame()
   _G["PMQ_DemoFrame"] = frame.frame
   table.insert(UISpecialFrames, "PMQ_DemoFrame")
 
-  PlayerMadeQuestsCache.ShowDemoFrame = true
+  PlayerMadeQuestsCache.IsDemoFrameShown = true
 end
