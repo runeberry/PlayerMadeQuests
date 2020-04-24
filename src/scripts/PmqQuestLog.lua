@@ -55,6 +55,16 @@ local demoQuests = {
       "TargetMob,0,5,Black Kingsnake"
     }
   },
+  dq5 = {
+    id = "dq5",
+    name = "Killing Stuff is Hard",
+    author = "Midna-Kirtonos",
+    objectives = {
+      "TargetMob,0,3,Bloodtalon Scythemaw",
+      "TargetMob,0,3,Elder Mottled Boar",
+      "TargetMob,0,3,Venomtail Scorpid"
+    }
+  },
 }
 
 -- Clears out the quest log
@@ -131,10 +141,6 @@ function qlog:AddQuest(id)
   loadedQuest.status = status.Active
   qlog:Save() -- Then save it back to file
   addon.QuestEvents:Publish("QuestAccepted", loadedQuest)
-
-  -- For demo purposes, show that the quest was accepted
-  addon:info("Accepted quest:")
-  qlog:PrintQuest(id)
 end
 
 function qlog:GetQuest(id)
@@ -145,31 +151,6 @@ function qlog:GetQuest(id)
   end
 
   return nil
-end
-
-function qlog:PrintQuests()
-  local numQuests = addon:tlen(qlog.list)
-  addon:info("You have", numQuests, addon:pluralize(numQuests, "quest"),"in your log.")
-
-  for i, q in pairs(qlog.list) do
-    qlog:PrintQuest(i)
-  end
-end
-
-function qlog:PrintQuest(id)
-  local q = qlog:GetQuest(id)
-  addon:info(q.name, "(", q.status, ")")
-
-  if q.status == status.Active then
-    for _, o in pairs(q.objectives) do
-      -- todo: pair this language up with the objective type itself
-      local marker = "  [ ]"
-      if o.progress == o.goal then
-        marker = "  [X]" -- mark the objective complete
-      end
-      addon:info(marker, o.rule.name, o.unitName, o.progress, "of", o.goal)
-    end
-  end
 end
 
 function qlog:TryCompleteQuest(id)
@@ -185,7 +166,6 @@ function qlog:TryCompleteQuest(id)
     quest.status = status.Completed
     qlog:Save()
     addon.QuestEvents:Publish("QuestStatusChanged", quest)
-    addon:info(quest.name, "- Quest Complete!")
   end
 end
 
