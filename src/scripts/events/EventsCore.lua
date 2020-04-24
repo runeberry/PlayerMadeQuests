@@ -90,6 +90,12 @@ function addon.Events:CreateBroker()
     end
 
     table.remove(handlers, key)
+
+    if addon:tlen(handlers) == 0 then
+      -- If this was the last subscriber for this event, remove the event from the handlersMap
+      table.remove(self.handlersMap, event)
+    end
+
     return true
   end
 

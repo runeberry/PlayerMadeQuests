@@ -11,6 +11,9 @@ function addon.Ace:OnInitialize()
 
     addon.qlog:Load()
 
+    addon.GameEvents:Start()
+    addon.CombatLogEvents:Start()
+
     addon.GameEvents:Subscribe("PLAYER_ENTERING_WORLD", function()
       if PlayerMadeQuestsCache.IsDemoFrameShown then
         addon:ShowDemoFrame()
@@ -20,9 +23,6 @@ function addon.Ace:OnInitialize()
         addon:ShowQuestLog(true)
       end
     end)
-
-    addon.CombatLogEvents:Start()
-    addon.GameEvents:Start()
 
     addon:info("PMQ Loaded")
   end)
