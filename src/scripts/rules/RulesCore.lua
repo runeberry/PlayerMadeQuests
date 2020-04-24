@@ -92,13 +92,13 @@ function rules:Define(rule)
   local numEvents = 0
   if rule.events ~= nil then
     for evt, handler in pairs(rule.events) do
-      addon.events:addGameEventHandler(evt, wrapRuleHandler(rule, handler))
+      addon.GameEvents:Subscribe(evt, wrapRuleHandler(rule, handler))
       numEvents = numEvents + 1
     end
   end
   if rule.combatLogEvents ~= nil then
     for evt, handler in pairs(rule.combatLogEvents) do
-      addon.events:addCombatLogEventHandler(evt, wrapRuleHandler(rule, handler))
+      addon.CombatLogEvents:Subscribe(evt, wrapRuleHandler(rule, handler))
       numEvents = numEvents + 1
     end
   end

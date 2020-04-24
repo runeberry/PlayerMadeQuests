@@ -1,28 +1,31 @@
 local _, addon = ...
-addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", "AceEvent-3.0")
+addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", "AceEvent-3.0", "AceSerializer-3.0")
 addon.AceGUI = LibStub("AceGUI-3.0")
 
 function addon.Ace:OnInitialize()
-  if PlayerMadeQuestsCache.QuestLog == nil then
-    PlayerMadeQuestsCache.QuestLog = {}
-    return
-  end
-
-  addon.qlog:Load()
-
-  addon.events:addGameEventHandler("PLAYER_ENTERING_WORLD", function()
-    if PlayerMadeQuestsCache.IsDemoFrameShown then
-      addon:ShowDemoFrame()
+  addon:catch(function()
+    if PlayerMadeQuestsCache.QuestLog == nil then
+      PlayerMadeQuestsCache.QuestLog = {}
+      return
     end
 
-    if PlayerMadeQuestsCache.IsQuestLogShown then
-      addon:catch(addon.ShowQuestLog, addon, true)
-    end
+    addon.qlog:Load()
+
+    addon.GameEvents:Subscribe("PLAYER_ENTERING_WORLD", function()
+      if PlayerMadeQuestsCache.IsDemoFrameShown then
+        addon:ShowDemoFrame()
+      end
+
+      if PlayerMadeQuestsCache.IsQuestLogShown then
+        addon:ShowQuestLog(true)
+      end
+    end)
+
+    addon.CombatLogEvents:Start()
+    addon.GameEvents:Start()
+
+    addon:info("PMQ Loaded")
   end)
-
-  addon:catch(addon.events.registerAceEvents, addon.events)
-
-  addon:info("PMQ Loaded")
 end
 
 function addon.Ace:OnEnable()
@@ -49,7 +52,7 @@ addon.LogLevel = {
   none = 7
 }
 local ll = addon.LogLevel
-addon.MinLogLevel = ll.info
+addon.MinLogLevel = ll.trace
 
 -- Prints a message to console with respect to MinLogLevel
 function addon:log(loglevel, str, ...)

@@ -11,7 +11,12 @@
 embeds.xml
 
 scripts/PmqCore.lua
-scripts/PmqEvents.lua
+
+scripts/events/EventsCore.lua
+scripts/events/GameEvents.lua
+scripts/events/CombatLogEvents.lua
+scripts/events/QuestEvents.lua
+
 scripts/PmqQuestLog.lua
 scripts/PmqCli.lua
 
