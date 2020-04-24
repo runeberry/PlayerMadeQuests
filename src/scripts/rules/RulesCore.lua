@@ -4,6 +4,12 @@ addon:traceFile("rules/RulesCore.lua")
 local rules = {
   definitions = {}
 }
+local oidCounter = 0
+
+local function getObjectiveId()
+  oidCounter = oidCounter + 1
+  return oidCounter
+end
 
 local function wrapRuleHandler(rule, handler)
   -- Given an arbitrary list of game event args, handle them as follows
@@ -45,12 +51,16 @@ local function wrapRuleHandler(rule, handler)
             rule.onUpdateObjective(obj)
           end
 
+          addon.QuestEvents:Publish("ObjectiveUpdated", obj)
+
           if obj.progress >= obj.goal then
             -- Mark objective for removal from further checks
             table.insert(completed, i)
             if rule.onCompleteObjective then
               rule.onCompleteObjective(obj)
             end
+
+            addon.QuestEvents:Publish("ObjectiveCompleted", obj)
 
             addon.qlog:TryCompleteQuest(obj.quest.id)
           end
@@ -131,9 +141,11 @@ function rules:AddObjective(name, goal, ...)
   end
 
   local objective = {
+    id = getObjectiveId(),
     rule = rule,
     progress = 0,
-    goal = goal
+    goal = goal,
+    args = { ... }
   }
 
   if rule.onAddObjective ~= nil then
@@ -152,16 +164,27 @@ end
 
 function rules:LoadObjective(str)
   -- todo: Can't use unitName, need a more generic approach to rule args
-  local ruleName, progress, goal, unitName = strsplit(",", str)
+  local ruleName, progress, goal, args = strsplit(",", str, 4)
+  local obj
+  if args == nil or args == "" then
+    obj = rules:AddObjective(ruleName, tonumber(goal))
+  else
+    local argsTable = { strsplit(",", args) }
+    obj = rules:AddObjective(ruleName, tonumber(goal), unpack(argsTable))
+  end
   -- todo: shouldn't technically add the objective if it's already completed
-  local obj = rules:AddObjective(ruleName, tonumber(goal), unitName)
   obj.progress = tonumber(progress)
   return obj
 end
 
 function rules:SerializeObjective(obj)
-  -- todo: Can't use unitName, need a more generic approach to rule args
-  return table.concat({ obj.rule.name, obj.progress, obj.goal, obj.unitName }, ",")
+  local serialized = obj.rule.name..","..tostring(obj.progress)..","..tostring(obj.goal)
+
+  for _, v in pairs(obj.args) do
+    serialized = serialized..","..v
+  end
+
+  return serialized
 end
 
 addon.rules = rules;

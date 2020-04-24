@@ -57,29 +57,15 @@ local demoQuests = {
   },
 }
 
-local function isObjectiveComplete(objective)
-  return objective.progress >= objective.goal
-end
-
-local function isQuestComplete(quest)
-  for _, obj in pairs(quest.objectives) do
-    if isObjectiveComplete(obj) == false then
-      -- At least one objective is not complete
-      return false
-    end
-  end
-
-  return true
-end
-
 -- Clears out the quest log
 function qlog:Reset()
   qlog.list = {}
   qlog:Save()
+  addon.QuestEvents:Publish("QuestLogLoaded", qlog)
   addon:info("Quest log reset")
 end
 
--- Writes the quest log back to saved variables
+-- Writes the quest log back to SavedVariables
 function qlog:Save()
   PlayerMadeQuestsCache.QuestLog = {}
   for _, quest in pairs(qlog.list) do
@@ -106,6 +92,7 @@ function qlog:Load()
   for _, quest in pairs(PlayerMadeQuestsCache.QuestLog) do
     qlog:LoadQuest(quest)
   end
+  addon.QuestEvents:Publish("QuestLogLoaded", qlog)
   addon:trace("Quest log loaded from SavedVariables")
 end
 
@@ -143,6 +130,7 @@ function qlog:AddQuest(id)
   local loadedQuest = qlog:LoadQuest(quest) -- Load quest from demo list into memory
   loadedQuest.status = status.Active
   qlog:Save() -- Then save it back to file
+  addon.QuestEvents:Publish("QuestAccepted", loadedQuest)
 
   -- For demo purposes, show that the quest was accepted
   addon:info("Accepted quest:")
@@ -196,6 +184,7 @@ function qlog:TryCompleteQuest(id)
 
     quest.status = status.Completed
     qlog:Save()
+    addon.QuestEvents:Publish("QuestStatusChanged", quest)
     addon:info(quest.name, "- Quest Complete!")
   end
 end
