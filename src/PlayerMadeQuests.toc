@@ -24,6 +24,7 @@ scripts/PmqCli.lua
 scripts/rules/RulesCore.lua
 scripts/rules/KillMob.lua
 scripts/rules/TargetMob.lua
+scripts/rules/TalkToNPC.lua
 
 frames/DemoFrame.lua
 frames/QuestLogFrame.lua

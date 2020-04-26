@@ -65,6 +65,17 @@ local demoQuests = {
       "TargetMob,0,3,Venomtail Scorpid"
     }
   },
+  dtalk = {
+    id = "dtalk",
+    name = "Talkin' to the Squad",
+    author = "Nekrage-Grobbulus",
+    objectives = {
+      "TalkToNPC,0,1,Brog Hamfist",
+      "TalkToNPC,0,1,Innkeeper Farley",
+      "TalkToNPC,0,1,William Pestle",
+      "TalkToNPC,0,1,Stormwind Guard"
+    }
+  }
 }
 
 -- Clears out the quest log
