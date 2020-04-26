@@ -1,7 +1,7 @@
 local _, addon = ...
 addon:traceFile("KillMob.lua")
 
-local rule = addon.Rules:CreateRule("KillMob")
+local rule = addon.QuestEngine:CreateRule("KillMob")
 rule.displayText = "Kill %1 %p/%g"
 
 function rule:CheckObjective(obj, unitName)

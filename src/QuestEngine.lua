@@ -1,11 +1,11 @@
 local _, addon = ...
-addon:traceFile("RulesCore.lua")
+addon:traceFile("QuestEngine.lua")
 
-local rules = {
-  definitions = {}
+addon.QuestEngine = {
+  _rules = {}
 }
-local oidCounter = 0
 
+local oidCounter = 0
 local function getObjectiveId()
   oidCounter = oidCounter + 1
   return oidCounter
@@ -100,12 +100,12 @@ local function wrapRuleHandler(rule)
   end
 end
 
-function rules:CreateRule(name)
+function addon.QuestEngine:CreateRule(name)
   if name == nil or name == "" then
     error("Cannot create rule - name is required")
   end
 
-  if self.definitions[name] ~= nil then
+  if self._rules[name] ~= nil then
     addon:warn("Skipping quest rule - '" .. name .. "' is already defined")
     return
   end
@@ -118,19 +118,19 @@ function rules:CreateRule(name)
 
   addon.RuleEvents:Subscribe(name, wrapRuleHandler(rule))
 
-  self.definitions[name] = rule
+  self._rules[name] = rule
   addon:trace("Registered quest rule: '" .. rule.name .. "'")
   return rule
 end
 
 -- Add a new objective for a given rule
 -- Additional parameters are passed to the OnCreate method of the rule
-function rules:CreateObjective(name, goal, ...)
+function addon.QuestEngine:CreateObjective(name, goal, ...)
   if name == nil then
     error("Unable to create quest objective - provided name is nil")
   end
 
-  local rule = self.definitions[name]
+  local rule = self._rules[name]
   if rule == nil then
     error("Unable to create quest objective - no rule exists with name '"..name.."'")
   end
@@ -161,21 +161,21 @@ function rules:CreateObjective(name, goal, ...)
   return objective
 end
 
-function rules:LoadObjective(str)
+function addon.QuestEngine:LoadObjective(str)
   local ruleName, progress, goal, args = strsplit(",", str, 4)
   local obj
   if args == nil or args == "" then
-    obj = rules:CreateObjective(ruleName, tonumber(goal))
+    obj = addon.QuestEngine:CreateObjective(ruleName, tonumber(goal))
   else
     local argsTable = { strsplit(",", args) }
-    obj = rules:CreateObjective(ruleName, tonumber(goal), unpack(argsTable))
+    obj = addon.QuestEngine:CreateObjective(ruleName, tonumber(goal), unpack(argsTable))
   end
   -- todo: shouldn't technically add the objective if it's already completed
   obj.progress = tonumber(progress)
   return obj
 end
 
-function rules:SerializeObjective(obj)
+function addon.QuestEngine:SerializeObjective(obj)
   local serialized = obj.rule.name..","..tostring(obj.progress)..","..tostring(obj.goal)
 
   for _, v in pairs(obj.args) do
@@ -184,5 +184,3 @@ function rules:SerializeObjective(obj)
 
   return serialized
 end
-
-addon.Rules = rules;

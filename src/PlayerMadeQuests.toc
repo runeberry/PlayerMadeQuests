@@ -21,7 +21,7 @@ events/RuleEvents.lua
 PmqQuestLog.lua
 PmqCli.lua
 
-rules/RulesCore.lua
+QuestEngine.lua
 rules/KillMob.lua
 rules/TargetMob.lua
 rules/TalkToNPC.lua

@@ -1,7 +1,7 @@
 local _, addon = ...
 addon:traceFile("TargetMob.lua")
 
-local rule = addon.Rules:CreateRule("TargetMob")
+local rule = addon.QuestEngine:CreateRule("TargetMob")
 rule.displayText = "Target %1 %p/%g"
 
 function rule:CheckObjective(obj, unitName)

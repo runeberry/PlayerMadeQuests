@@ -98,7 +98,7 @@ function qlog:Save()
       objectives = {}
     }
     for _, obj in pairs(quest.objectives) do
-      table.insert(saveQuest.objectives, addon.Rules:SerializeObjective(obj))
+      table.insert(saveQuest.objectives, addon.QuestEngine:SerializeObjective(obj))
     end
     table.insert(PlayerMadeQuestsCache.QuestLog, saveQuest)
   end
@@ -126,7 +126,7 @@ function qlog:LoadQuest(quest)
     objectives = {}
   }
   for _, ostr in pairs(quest.objectives) do
-    local obj = addon.Rules:LoadObjective(ostr);
+    local obj = addon.QuestEngine:LoadObjective(ostr);
     obj.quest = loadQuest -- give obj a ref back to its quest
     table.insert(loadQuest.objectives, obj)
   end

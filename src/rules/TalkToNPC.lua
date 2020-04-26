@@ -1,7 +1,7 @@
 local _, addon = ...
 addon:traceFile("TalkToNPC.lua")
 
-local rule = addon.Rules:CreateRule("TalkToNPC")
+local rule = addon.QuestEngine:CreateRule("TalkToNPC")
 rule.displayText = "Talk to %1 %p/%g"
 
 function rule:CheckObjective(obj, unitName)
