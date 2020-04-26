@@ -4,6 +4,8 @@ addon.AceGUI = LibStub("AceGUI-3.0")
 
 function addon.Ace:OnInitialize()
   addon:catch(function()
+    addon:load()
+
     if PlayerMadeQuestsCache.QuestLog == nil then
       PlayerMadeQuestsCache.QuestLog = {}
       return
@@ -154,6 +156,20 @@ function addon:pluralize(num, singular, plural)
     -- If no plural is provided, you get lazy pluralization
     return plural or singular.."s"
   end
+end
+
+-- Defer code execution until the addon is fully loaded
+local _onloadBuffer = {}
+function addon:onload(fn)
+  table.insert(_onloadBuffer, fn)
+end
+
+function addon:load()
+  if _onloadBuffer == nil then return end
+  for _, fn in pairs(_onloadBuffer) do
+    fn()
+  end
+  _onloadBuffer = nil
 end
 
 -- Returns only the event type of the current combat log event
