@@ -9,6 +9,10 @@ function addon.Ace:OnInitialize()
       return
     end
 
+    if PlayerMadeQuestsCache.MinLogLevel ~= nil then
+      addon.MinLogLevel = PlayerMadeQuestsCache.MinLogLevel
+    end
+
     addon.qlog:Load()
 
     addon.GameEvents:Start()
