@@ -52,7 +52,7 @@ addon.LogLevel = {
   none = 7
 }
 local ll = addon.LogLevel
-addon.MinLogLevel = ll.trace
+addon.MinLogLevel = ll.info
 
 -- Prints a message to console with respect to MinLogLevel
 function addon:log(loglevel, str, ...)
