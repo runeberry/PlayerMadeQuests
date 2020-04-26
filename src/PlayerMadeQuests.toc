@@ -10,21 +10,21 @@
 
 embeds.xml
 
-scripts/PmqCore.lua
+PmqCore.lua
 
-scripts/events/EventsCore.lua
-scripts/events/GameEvents.lua
-scripts/events/CombatLogEvents.lua
-scripts/events/AppEvents.lua
-scripts/events/RuleEvents.lua
+events/EventsCore.lua
+events/GameEvents.lua
+events/CombatLogEvents.lua
+events/AppEvents.lua
+events/RuleEvents.lua
 
-scripts/PmqQuestLog.lua
-scripts/PmqCli.lua
+PmqQuestLog.lua
+PmqCli.lua
 
-scripts/rules/RulesCore.lua
-scripts/rules/KillMob.lua
-scripts/rules/TargetMob.lua
-scripts/rules/TalkToNPC.lua
+rules/RulesCore.lua
+rules/KillMob.lua
+rules/TargetMob.lua
+rules/TalkToNPC.lua
 
 frames/DemoFrame.lua
 frames/QuestLogFrame.lua
