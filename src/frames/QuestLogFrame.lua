@@ -2,6 +2,7 @@ local _, addon = ...
 local AceGUI = addon.AceGUI
 
 local frames = {}
+local subscriptions = {}
 
 local function getDisplayText(obj)
   local text = obj.rule.displayText
@@ -43,6 +44,11 @@ local function OnClose(widget)
   addon:catch(SavePosition, widget)
   PlayerMadeQuestsCache.IsQuestLogShown = nil
   frames = {}
+  for event, key in pairs(subscriptions) do
+
+    addon.AppEvents:Unsubscribe(event, key)
+  end
+  subscriptions = {}
   AceGUI:Release(widget)
 end
 
@@ -119,6 +125,29 @@ local function BuildQuestLogFrame()
   SetQuestLogHeadingText(questHeading, addon.qlog)
   SetQuestLogText(questList, addon.qlog)
 
+  local subKey
+  subKey = addon.AppEvents:Subscribe("QuestLogLoaded", function(qlog)
+    SetQuestLogHeadingText(frames["heading"], qlog)
+    SetQuestLogText(frames["questList"], qlog)
+  end)
+  subscriptions["QuestLogLoaded"] = subKey
+
+  subKey = addon.AppEvents:Subscribe("QuestAccepted", function(quest)
+    SetQuestLogHeadingText(frames["heading"], addon.qlog)
+    AddQuest(frames["questList"], quest)
+  end)
+  subscriptions["QuestAccepted"] = subKey
+
+  subKey = addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
+    SetQuestText(frames["q:"..quest.id], quest)
+  end)
+  subscriptions["QuestStatusChanged"] = subKey
+
+  subKey = addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
+    SetObjectiveText(frames["o:"..obj.id], obj)
+  end)
+  subscriptions["ObjectiveUpdated"] = subKey
+
   OnOpen(container)
 end
 
@@ -133,20 +162,3 @@ function addon:ShowQuestLog(show)
   end
 end
 
-addon.AppEvents:Subscribe("QuestLogLoaded", function(qlog)
-  SetQuestLogHeadingText(frames["heading"], qlog)
-  SetQuestLogText(frames["questList"], qlog)
-end)
-
-addon.AppEvents:Subscribe("QuestAccepted", function(quest)
-  SetQuestLogHeadingText(frames["heading"], addon.qlog)
-  AddQuest(frames["questList"], quest)
-end)
-
-addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
-  SetQuestText(frames["q:"..quest.id], quest)
-end)
-
-addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
-  SetObjectiveText(frames["o:"..obj.id], obj)
-end)

@@ -75,6 +75,7 @@ function addon.Events:CreateBroker()
     local handlers = self.handlersMap[event]
     if handlers == nil then
       -- No handlers to unsubscribe
+      addon:log(self.loglevel, "No handlers to unsubscribe from event:", event)
       return false
     end
 
@@ -82,6 +83,7 @@ function addon.Events:CreateBroker()
 
     if handler == nil then
       -- No handler subscribed with that key
+      addon:log(self.loglevel, "No", event, "handlers to unsubscribe with key:", key)
       return false
     end
 
@@ -96,6 +98,7 @@ function addon.Events:CreateBroker()
       table.remove(self.handlersMap, event)
     end
 
+    addon:log(self.logLevel, "Unsubscribed from event:", event)
     return true
   end
 
