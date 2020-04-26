@@ -13,6 +13,9 @@ function addon.Ace:OnInitialize()
       addon.MinLogLevel = PlayerMadeQuestsCache.MinLogLevel
     end
 
+    addon._loaded = true
+    addon:flushLogs()
+
     addon.qlog:Load()
 
     addon.GameEvents:Start()
@@ -57,16 +60,25 @@ addon.LogLevel = {
 }
 local ll = addon.LogLevel
 addon.MinLogLevel = ll.info
+addon._logBuffer = {}
 
 -- Prints a message to console with respect to MinLogLevel
 function addon:log(loglevel, str, ...)
+  if addon._loaded == nil then
+    table.insert(addon._logBuffer, { loglevel = loglevel, str = str, args = { ... } })
+    return
+  end
   if loglevel > addon.MinLogLevel then
     return
   end
-  local ok, err = pcall(print, "[PMQ]", str, ...)
-  if (err) then
-    print("[PMQ] Error printing log:", err)
+  print("[PMQ]", str, ...)
+end
+
+function addon:flushLogs()
+  for _, log in pairs(addon._logBuffer) do
+    addon:log(log.loglevel, log.str, unpack(log.args))
   end
+  addon._logBuffer = {}
 end
 
 -- Shorthand methods for logging
