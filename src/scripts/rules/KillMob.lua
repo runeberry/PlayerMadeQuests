@@ -1,15 +1,14 @@
 local _, addon = ...
-addon:traceFile("rules/KillMob.lua")
+addon:traceFile("KillMob.lua")
 
-local rule = {
-  name = "KillMob",
-  displayText = "Kill %1 %p/%g",
-  combatLogEvents = {
-    PARTY_KILL = function(obj, cl)
-      -- Advance objective if killed unit name matches objective's unitName
-      return cl.destName == obj.args[1]
-    end
-  }
-}
+local rule = addon.Rules:CreateRule("KillMob")
+rule.displayText = "Kill %1 %p/%g"
 
-addon.rules:Define(rule)
+function rule:CheckObjective(obj, unitName)
+  -- Advance objective if killed unit name matches objective's unitName
+  return obj.args[1] == unitName
+end
+
+addon.CombatLogEvents:Subscribe("PARTY_KILL", function(cl)
+  addon.RuleEvents:Publish(rule.name, cl.destName)
+end)

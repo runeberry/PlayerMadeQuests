@@ -133,20 +133,20 @@ function addon:ShowQuestLog(show)
   end
 end
 
-addon.QuestEvents:Subscribe("QuestLogLoaded", function(qlog)
+addon.AppEvents:Subscribe("QuestLogLoaded", function(qlog)
   SetQuestLogHeadingText(frames["heading"], qlog)
   SetQuestLogText(frames["questList"], qlog)
 end)
 
-addon.QuestEvents:Subscribe("QuestAccepted", function(quest)
+addon.AppEvents:Subscribe("QuestAccepted", function(quest)
   SetQuestLogHeadingText(frames["heading"], addon.qlog)
   AddQuest(frames["questList"], quest)
 end)
 
-addon.QuestEvents:Subscribe("QuestStatusChanged", function(quest)
+addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
   SetQuestText(frames["q:"..quest.id], quest)
 end)
 
-addon.QuestEvents:Subscribe("ObjectiveUpdated", function(obj)
+addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
   SetObjectiveText(frames["o:"..obj.id], obj)
 end)

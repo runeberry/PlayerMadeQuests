@@ -71,7 +71,7 @@ local demoQuests = {
 function qlog:Reset()
   qlog.list = {}
   qlog:Save()
-  addon.QuestEvents:Publish("QuestLogLoaded", qlog)
+  addon.AppEvents:Publish("QuestLogLoaded", qlog)
   addon:info("Quest log reset")
 end
 
@@ -87,7 +87,7 @@ function qlog:Save()
       objectives = {}
     }
     for _, obj in pairs(quest.objectives) do
-      table.insert(saveQuest.objectives, addon.rules:SerializeObjective(obj))
+      table.insert(saveQuest.objectives, addon.Rules:SerializeObjective(obj))
     end
     table.insert(PlayerMadeQuestsCache.QuestLog, saveQuest)
   end
@@ -102,7 +102,7 @@ function qlog:Load()
   for _, quest in pairs(PlayerMadeQuestsCache.QuestLog) do
     qlog:LoadQuest(quest)
   end
-  addon.QuestEvents:Publish("QuestLogLoaded", qlog)
+  addon.AppEvents:Publish("QuestLogLoaded", qlog)
   addon:trace("Quest log loaded from SavedVariables")
 end
 
@@ -115,7 +115,7 @@ function qlog:LoadQuest(quest)
     objectives = {}
   }
   for _, ostr in pairs(quest.objectives) do
-    local obj = addon.rules:LoadObjective(ostr);
+    local obj = addon.Rules:LoadObjective(ostr);
     obj.quest = loadQuest -- give obj a ref back to its quest
     table.insert(loadQuest.objectives, obj)
   end
@@ -140,7 +140,7 @@ function qlog:AddQuest(id)
   local loadedQuest = qlog:LoadQuest(quest) -- Load quest from demo list into memory
   loadedQuest.status = status.Active
   qlog:Save() -- Then save it back to file
-  addon.QuestEvents:Publish("QuestAccepted", loadedQuest)
+  addon.AppEvents:Publish("QuestAccepted", loadedQuest)
 end
 
 function qlog:GetQuest(id)
@@ -165,7 +165,7 @@ function qlog:TryCompleteQuest(id)
 
     quest.status = status.Completed
     qlog:Save()
-    addon.QuestEvents:Publish("QuestStatusChanged", quest)
+    addon.AppEvents:Publish("QuestStatusChanged", quest)
   end
 end
 

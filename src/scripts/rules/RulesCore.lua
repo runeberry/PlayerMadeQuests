@@ -1,5 +1,5 @@
 local _, addon = ...
-addon:traceFile("rules/RulesCore.lua")
+addon:traceFile("RulesCore.lua")
 
 local rules = {
   definitions = {}
@@ -11,9 +11,21 @@ local function getObjectiveId()
   return oidCounter
 end
 
-local function wrapRuleHandler(rule, handler)
+local function wrapRuleHandler(rule)
   -- Given an arbitrary list of game event args, handle them as follows
   return function(...)
+    -- Before this rule is run for the first time, validate that it was setup correctly
+    if rule._validated == nil then
+      if rule.CheckObjective == nil or type(rule.CheckObjective) ~= "function" then
+        addon:error("Cannot run quest rule - must have a CheckObjective function")
+        rule._validated = false
+        return
+      end
+      rule._validated = true
+    elseif rule._validated == false then
+      return
+    end
+
     -- Completed objectives will be tracked and removed from the list
     local completed = {}
     local anychanged = false
@@ -25,11 +37,16 @@ local function wrapRuleHandler(rule, handler)
         table.insert(completed, i)
       else
         -- Run the handler for this event for this rule, passing through the event's varargs
-        local ok, result = addon:catch(handler, obj, ...)
+        local ok, result = addon:catch(rule.CheckObjective, rule, obj, ...)
         local changed = false
 
         if not(ok) then
           -- Something messed up, don't advance objective
+          if result then
+            addon:error("Error checking quest objective for rule", rule.name, "-", result)
+          else
+            addon:error("Error checking quest objective for rule", rule.name)
+          end
         elseif result == nil or result == false then
           -- No result == false result == no objective progress
         elseif result == true then
@@ -41,26 +58,28 @@ local function wrapRuleHandler(rule, handler)
           -- Note that this can be negative to "undo" objective progress
           obj.progress = obj.progress + result
           changed = true
+        else
+          addon:warn("Unexpected result from checking quest objective for rule", rule.name, "-", result)
         end
 
         if changed then
           -- Sanity checks: progress must be >= 0, and progress must be an integer
           obj.progress = math.max(math.floor(obj.progress), 0)
 
-          if rule.onUpdateObjective then
-            rule.onUpdateObjective(obj)
-          end
+          -- if rule.onUpdateObjective then
+          --   rule.onUpdateObjective(obj)
+          -- end
 
-          addon.QuestEvents:Publish("ObjectiveUpdated", obj)
+          addon.AppEvents:Publish("ObjectiveUpdated", obj)
 
           if obj.progress >= obj.goal then
             -- Mark objective for removal from further checks
             table.insert(completed, i)
-            if rule.onCompleteObjective then
-              rule.onCompleteObjective(obj)
-            end
+            -- if rule.onCompleteObjective then
+            --   rule.onCompleteObjective(obj)
+            -- end
 
-            addon.QuestEvents:Publish("ObjectiveCompleted", obj)
+            addon.AppEvents:Publish("ObjectiveCompleted", obj)
 
             addon.qlog:TryCompleteQuest(obj.quest.id)
           end
@@ -81,52 +100,32 @@ local function wrapRuleHandler(rule, handler)
   end
 end
 
--- Each rule must be Defined before objectives can be created from it
-function rules:Define(rule)
-  if rule == nil then
-    addon:error("Cannot define quest rule - rule is nil")
+function rules:CreateRule(name)
+  if name == nil or name == "" then
+    error("Cannot create rule - name is required")
+  end
+
+  if self.definitions[name] ~= nil then
+    addon:warn("Skipping quest rule - '" .. name .. "' is already defined")
     return
   end
 
-  if rule.name == nil then
-    addon:error("Cannot define quest rule - name is required")
-    return
-  end
+  local rule = {
+    name = name,
+    displayText = name.." %p/%g",
+    objectives = {}
+  }
 
-  if self.definitions[rule.name] ~= nil then
-    addon:warn("Skipping quest rule - name '" .. rule.name .. "' is already defined")
-    return
-  end
+  addon.RuleEvents:Subscribe(name, wrapRuleHandler(rule))
 
-  -- Listen to the appropriate game events to satisfy these rules
-  local numEvents = 0
-  if rule.events ~= nil then
-    for evt, handler in pairs(rule.events) do
-      addon.GameEvents:Subscribe(evt, wrapRuleHandler(rule, handler))
-      numEvents = numEvents + 1
-    end
-  end
-  if rule.combatLogEvents ~= nil then
-    for evt, handler in pairs(rule.combatLogEvents) do
-      addon.CombatLogEvents:Subscribe(evt, wrapRuleHandler(rule, handler))
-      numEvents = numEvents + 1
-    end
-  end
-
-  if numEvents == 0 then
-    addon:warn("Skipping quest rule - no game events were associated with rule '"..rule.name.."'")
-    return
-  end
-
-  -- Objectives created for this rule will be attached to the rule
-  rule.objectives = {}
-  self.definitions[rule.name] = rule
+  self.definitions[name] = rule
   addon:trace("Registered quest rule: '" .. rule.name .. "'")
+  return rule
 end
 
 -- Add a new objective for a given rule
 -- Additional parameters are passed to the OnCreate method of the rule
-function rules:AddObjective(name, goal, ...)
+function rules:CreateObjective(name, goal, ...)
   if name == nil then
     error("Unable to create quest objective - provided name is nil")
   end
@@ -148,11 +147,11 @@ function rules:AddObjective(name, goal, ...)
     args = { ... }
   }
 
-  if rule.onAddObjective ~= nil then
-    -- Optional hook for a rule to modify an objective on creation
-    -- Can be used to store additional data with each objective for this rule
-    rule.onAddObjective(objective, ...)
-  end
+  -- if rule.onAddObjective ~= nil then
+  --   -- Optional hook for a rule to modify an objective on creation
+  --   -- Can be used to store additional data with each objective for this rule
+  --   rule.onAddObjective(objective, ...)
+  -- end
 
   -- All objectives created for a rule are stored together
   -- so that they can be quickly evaluated together
@@ -163,14 +162,13 @@ function rules:AddObjective(name, goal, ...)
 end
 
 function rules:LoadObjective(str)
-  -- todo: Can't use unitName, need a more generic approach to rule args
   local ruleName, progress, goal, args = strsplit(",", str, 4)
   local obj
   if args == nil or args == "" then
-    obj = rules:AddObjective(ruleName, tonumber(goal))
+    obj = rules:CreateObjective(ruleName, tonumber(goal))
   else
     local argsTable = { strsplit(",", args) }
-    obj = rules:AddObjective(ruleName, tonumber(goal), unpack(argsTable))
+    obj = rules:CreateObjective(ruleName, tonumber(goal), unpack(argsTable))
   end
   -- todo: shouldn't technically add the objective if it's already completed
   obj.progress = tonumber(progress)
@@ -187,4 +185,4 @@ function rules:SerializeObjective(obj)
   return serialized
 end
 
-addon.rules = rules;
+addon.Rules = rules;
