@@ -11,10 +11,10 @@ Create and share your own custom quests in World of Warcraft: Classic!
   * Figure out a good way to save window size/position
   * Might be easier once there's a 2nd window in play
 * Add some basic objectives
-  * Talk to NPC
+  * ✔️ Talk to NPC
   * Go to location
   * Use emote (on unit, which might be a condition)
-* Simplify adding custom quests in Lua - since Quest Builder UI is pretty far off
+* ✔️ Simplify adding custom quests in Lua - since Quest Builder UI is pretty far off
 
 ### For Beta-ready
 
