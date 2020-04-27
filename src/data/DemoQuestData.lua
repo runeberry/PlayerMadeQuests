@@ -62,5 +62,16 @@ addon.DemoQuestData = {
       "TalkToNPC,0,1,William Pestle",
       "TalkToNPC,0,1,Stormwind Guard"
     }
+  },
+  {
+    id = "dtalk2",
+    name = "Tbluff Getaway",
+    author = "Midna-Kirtonos",
+    objectives = {
+      "TalkToNPC,0,1,Bulrug",
+      "TalkToNPC,0,1,Jyn Stonehoof",
+      "TalkToNPC,0,1,Atepa",
+      "TalkToNPC,0,3,Bluffwatcher"
+    }
   }
 }
