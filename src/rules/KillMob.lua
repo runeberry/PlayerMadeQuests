@@ -9,6 +9,8 @@ function rule:CheckObjective(obj, unitName)
   return obj.args[1] == unitName
 end
 
-addon.CombatLogEvents:Subscribe("PARTY_KILL", function(cl)
-  addon.RuleEvents:Publish(rule.name, cl.destName)
+addon:onload(function()
+  addon.CombatLogEvents:Subscribe("PARTY_KILL", function(cl)
+    addon.RuleEvents:Publish(rule.name, cl.destName)
+  end)
 end)
