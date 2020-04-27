@@ -16,6 +16,8 @@ local function publishEvent()
 end
 
 addon.GameEvents:Subscribe("AUCTION_HOUSE_SHOW", publishEvent)
+addon.GameEvents:Subscribe("BANKFRAME_OPENED", publishEvent)
 addon.GameEvents:Subscribe("GOSSIP_SHOW", publishEvent)
 addon.GameEvents:Subscribe("MERCHANT_SHOW", publishEvent)
+addon.GameEvents:Subscribe("PET_STABLE_SHOW", publishEvent)
 addon.GameEvents:Subscribe("QUEST_DETAIL", publishEvent)
