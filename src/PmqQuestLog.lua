@@ -123,28 +123,36 @@ end
 
 -- Writes the quest log back to SavedVariables
 function qlog:Save()
-  PlayerMadeQuestsCache.QuestLog = {}
+  local toSaveList = {}
   for _, quest in pairs(qlog.list) do
-    local toSave = getSaveQuest(quest)
-    table.insert(PlayerMadeQuestsCache.QuestLog, addon.Ace:Serialize(toSave))
+    table.insert(toSaveList, getSaveQuest(quest))
   end
+  local serialized = addon.Ace:Serialize(toSaveList)
+  local compressed = addon.LibCompress:CompressHuffman(serialized)
+  PlayerMadeQuestsCache.QuestLog = compressed
   addon.AppEvents:Publish("QuestLogSaved", qlog)
 end
 
 function qlog:Load()
-  if PlayerMadeQuestsCache.QuestLog == nil then
+  local compressed = PlayerMadeQuestsCache.QuestLog
+  if compressed == nil then
     return
   end
 
+  local serialized, msg = addon.LibCompress:Decompress(compressed)
+  if serialized == nil then
+    error("Error decompressing quest log: "..msg)
+  end
+
+  local ok, savedList = addon.Ace:Deserialize(serialized)
+  if not(ok) then
+    -- 2nd param is an error message if it failed
+    error("Error deserializing quest: "..savedList)
+  end
+
   qlog.list = {}
-  for _, serialized in pairs(PlayerMadeQuestsCache.QuestLog) do
-    local ok, saved = addon.Ace:Deserialize(serialized)
-    if ok then
-      local quest = loadSavedQuest(saved)
-      table.insert(qlog.list, quest)
-    else
-      error("Error deserializing quest: "..saved)
-    end
+  for _, saved in pairs(savedList) do
+    table.insert(qlog.list, loadSavedQuest(saved))
   end
   addon.AppEvents:Publish("QuestLogLoaded", qlog)
 end
