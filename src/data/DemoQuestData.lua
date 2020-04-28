@@ -21,6 +21,17 @@ addon.DemoQuestData = {
     }
   },
   {
+    id = "demote-horde",
+    name = "Dancin' is my to do",
+    level = 1,
+    objectives = {
+      "Emote dance",
+      "Emote hug Chepi",
+      "Emote salute 'Officer Thunderstrider'",
+      "Emote [2] roar Bluffwatcher"
+    }
+  },
+  {
     id = "dtalk-ally",
     name = "Talkin' to the Squad",
     objectives = {

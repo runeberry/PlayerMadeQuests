@@ -11,7 +11,7 @@ Create and share your own custom quests in World of Warcraft: Classic!
   * ✔️ Talk to NPC
   * Buy from / sell to merchant
   * Visit location
-  * Use emote on NPC
+  * ✔️ Use emote on NPC
   * Acquire a buff/debuff
   * Obtain an item
   * Equip an item
