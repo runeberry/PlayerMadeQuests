@@ -1,0 +1,19 @@
+{
+    "Lua.workspace.ignoreDir": [
+      "src/libs"
+    ],
+    "Lua.diagnostics.globals": [
+        "unpack",
+        "CombatLogGetCurrentEventInfo",
+        "strsplit",
+        "LibStub",
+        "UISpecialFrames",
+        "UIParent",
+        "strjoin",
+        "UnitGUID",
+        "GetUnitName",
+        "UnitIsFriend",
+        "UnitExists",
+        "SlashCmdList"
+    ]
+}
