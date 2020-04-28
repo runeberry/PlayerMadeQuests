@@ -1,6 +1,7 @@
 local _, addon = ...
 addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", "AceEvent-3.0", "AceSerializer-3.0")
 addon.AceGUI = LibStub("AceGUI-3.0")
+addon.LibCompress = LibStub("LibCompress")
 
 function addon.Ace:OnInitialize()
   addon:catch(function()
