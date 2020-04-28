@@ -14,6 +14,105 @@ local qlog = {
   list = {}
 }
 
+-- Gets only the fields that will be written to SavedVariables
+local function getSaveObjective(obj)
+  local toSave = {
+    name = obj.name,
+    progress = obj.progress,
+    goal = obj.goal,
+    args = obj.args
+  }
+
+  return toSave
+end
+
+-- Gets only the fields that will be written to SavedVariables
+local function getSaveQuest(quest)
+  local toSave = {
+    id = quest.id,
+    name = quest.name,
+    level = quest.level,
+    status = quest.status,
+    objectives = {}
+  }
+
+  for _, obj in pairs(quest.objectives) do
+    table.insert(toSave.objectives, getSaveObjective(obj))
+  end
+
+  return toSave
+end
+
+-- Hooks up an objective from SavedVariables with all required fields
+local function loadSavedObjective(saved)
+  local obj = addon.QuestEngine:CreateObjective(saved.name, saved.goal, unpack(saved.args))
+  obj.progress = saved.progress
+  return obj
+end
+
+-- Hooks up a quest from SavedVariables with all required fields
+local function loadSavedQuest(saved)
+  local quest = {
+    id = saved.id,
+    name = saved.name,
+    level = saved.level,
+    status = saved.status,
+    objectives = {}
+  }
+
+  for _, savedObj in pairs(saved.objectives) do
+    local obj = loadSavedObjective(savedObj)
+    obj.quest = quest
+    table.insert(quest.objectives, obj)
+  end
+
+  return quest
+end
+
+local function loadDemoObjective(str)
+  local obj = addon:strWords(str)
+
+  if #obj == 0 then
+    error("Unable to parse empty objective string.")
+  end
+
+  local ruleName
+  local goal = 1 -- Default goal is 1 if no goal is specified
+  local args = {}
+
+  for i, word in pairs(obj) do
+    if i == 1 then
+      -- First word is always the rule of the objective
+      ruleName = word
+    elseif i == 2 and word:match("%[%d+%]") then
+      -- Second word may be the goal, if the format is "[#]"
+      goal = tonumber(word:match("%d+"))
+    else
+      -- All other remaining words are the objective's args
+      table.insert(args, word)
+    end
+  end
+
+  return addon.QuestEngine:CreateObjective(ruleName, goal, unpack(args))
+end
+
+local function loadDemoQuest(demo)
+  local quest = {
+    id = demo.id,
+    name = demo.name,
+    level = demo.level,
+    objectives = {}
+  }
+
+  for _, demoObj in pairs(demo.objectives) do
+    local obj = loadDemoObjective(demoObj)
+    obj.quest = quest
+    table.insert(quest.objectives, obj)
+  end
+
+  return quest
+end
+
 -- Clears out the quest log
 function qlog:Reset()
   qlog.list = {}
@@ -26,18 +125,10 @@ end
 function qlog:Save()
   PlayerMadeQuestsCache.QuestLog = {}
   for _, quest in pairs(qlog.list) do
-    local saveQuest = {
-      id = quest.id,
-      name = quest.name,
-      author = quest.author,
-      status = quest.status,
-      objectives = {}
-    }
-    for _, obj in pairs(quest.objectives) do
-      table.insert(saveQuest.objectives, addon.QuestEngine:SerializeObjective(obj))
-    end
-    table.insert(PlayerMadeQuestsCache.QuestLog, saveQuest)
+    local toSave = getSaveQuest(quest)
+    table.insert(PlayerMadeQuestsCache.QuestLog, addon.Ace:Serialize(toSave))
   end
+  addon.AppEvents:Publish("QuestLogSaved", qlog)
 end
 
 function qlog:Load()
@@ -46,34 +137,22 @@ function qlog:Load()
   end
 
   qlog.list = {}
-  for _, quest in pairs(PlayerMadeQuestsCache.QuestLog) do
-    qlog:LoadQuest(quest)
+  for _, serialized in pairs(PlayerMadeQuestsCache.QuestLog) do
+    local ok, saved = addon.Ace:Deserialize(serialized)
+    if ok then
+      local quest = loadSavedQuest(saved)
+      table.insert(qlog.list, quest)
+    else
+      error("Error deserializing quest: "..saved)
+    end
   end
   addon.AppEvents:Publish("QuestLogLoaded", qlog)
-  addon:trace("Quest log loaded from SavedVariables")
-end
-
-function qlog:LoadQuest(quest)
-  local loadQuest = {
-    id = quest.id,
-    name = quest.name,
-    author = quest.author,
-    status = quest.status,
-    objectives = {}
-  }
-  for _, ostr in pairs(quest.objectives) do
-    local obj = addon.QuestEngine:LoadObjective(ostr);
-    obj.quest = loadQuest -- give obj a ref back to its quest
-    table.insert(loadQuest.objectives, obj)
-  end
-  qlog.list[loadQuest.id] = loadQuest
-  return loadQuest
 end
 
 -- Adds a quest from the demo list
 function qlog:AddQuest(id)
-  local quest = addon.DemoQuests:Get(id)
-  if quest == nil then
+  local demo = addon.DemoQuests:Get(id)
+  if demo == nil then
     addon:error("No demo quest exists with id -", id)
     return
   end
@@ -84,15 +163,16 @@ function qlog:AddQuest(id)
     return
   end
 
-  local loadedQuest = qlog:LoadQuest(quest) -- Load quest from demo list into memory
-  loadedQuest.status = status.Active
+  local quest = loadDemoQuest(demo)
+  quest.status = status.Active
+  table.insert(qlog.list, quest)
   qlog:Save() -- Then save it back to file
-  addon.AppEvents:Publish("QuestAccepted", loadedQuest)
+  addon.AppEvents:Publish("QuestAccepted", quest)
 end
 
 function qlog:GetQuest(id)
-  for i, q in pairs(qlog.list) do
-    if id == i then
+  for _, q in pairs(qlog.list) do
+    if q.id == id then
       return q
     end
   end

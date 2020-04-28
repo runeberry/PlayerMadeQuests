@@ -3,75 +3,41 @@ addon:traceFile("DemoQuestData.lua")
 
 addon.DemoQuestData = {
   {
-    id = "demo1",
+    id = "dkill-ally",
     name = "Babby's First Quest",
-    author = "Nekrage-Grobbulus",
+    level = 5,
     objectives = {
-      "TargetMob,0,5,Cow",
-      "KillMob,0,2,Mangy Wolf",
-      "KillMob,0,3,Chicken"
+      "Kill [2] 'Mangy Wolf'",
+      "Kill [3] 'Chicken'"
     }
   },
   {
-    id = "demo2",
-    name = "STONKS",
-    author = "Nekrage-Grobbulus",
-    objectives = {
-      "KillMob,0,3,Defias Prisoner",
-      "KillMob,0,3,Defias Inmate",
-      "KillMob,0,3,Defias Captive"
-    }
-  },
-  {
-    id = "demo3",
+    id = "dkill-horde",
     name = "Grob Has a Queue",
-    author = "Midna-Kirtonos",
+    level = 8,
     objectives = {
-      "KillMob,0,2,Bloodtalon Scythemaw",
-      "KillMob,0,3,Elder Mottled Boar",
-      "TargetMob,0,5,Venomtail Scorpid"
+      "Kill [3] 'Bloodtalon Scythemaw'",
+      "Kill [3] 'Elder Mottled Boar'",
     }
   },
   {
-    id = "demo4",
-    name = "More Blood for de Blood God",
-    author = "Midna-Kirtonos",
-    objectives = {
-      "KillMob,0,3,Bloodscalp Axe Thrower",
-      "KillMob,0,2,Bloodscalp Shaman",
-      "TargetMob,0,5,Black Kingsnake"
-    }
-  },
-  {
-    id = "demo5",
-    name = "Killing Stuff is Hard",
-    author = "Midna-Kirtonos",
-    objectives = {
-      "TargetMob,0,3,Bloodtalon Scythemaw",
-      "TargetMob,0,3,Elder Mottled Boar",
-      "TargetMob,0,3,Venomtail Scorpid"
-    }
-  },
-  {
-    id = "dtalk",
+    id = "dtalk-ally",
     name = "Talkin' to the Squad",
-    author = "Nekrage-Grobbulus",
     objectives = {
-      "TalkToNPC,0,1,Brog Hamfist",
-      "TalkToNPC,0,1,Innkeeper Farley",
-      "TalkToNPC,0,1,William Pestle",
-      "TalkToNPC,0,1,Stormwind Guard"
+      "TalkTo 'Brog Hamfist'",
+      "TalkTo 'Innkeeper Farley'",
+      "TalkTo 'William Pestle'",
+      "TalkTo [3] \"Stormwind Guard\""
     }
   },
   {
-    id = "dtalk2",
+    id = "dtalk-horde",
     name = "Tbluff Getaway",
-    author = "Midna-Kirtonos",
     objectives = {
-      "TalkToNPC,0,1,Bulrug",
-      "TalkToNPC,0,1,Jyn Stonehoof",
-      "TalkToNPC,0,1,Atepa",
-      "TalkToNPC,0,3,Bluffwatcher"
+      "TalkTo Bulrug",
+      "TalkTo \"Jyn Stonehoof\"",
+      "TalkTo Atepa",
+      "TalkTo [3] Bluffwatcher"
     }
   }
 }

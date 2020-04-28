@@ -20,12 +20,11 @@ events/RuleEvents.lua
 
 PmqQuestLog.lua
 PmqCli.lua
+QuestEngine.lua
 DemoQuests.lua
 
-QuestEngine.lua
-rules/KillMob.lua
-rules/TargetMob.lua
-rules/TalkToNPC.lua
+rules/Kill.lua
+rules/TalkTo.lua
 
 frames/DemoFrame.lua
 frames/QuestLogFrame.lua

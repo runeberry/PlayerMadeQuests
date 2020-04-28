@@ -10,9 +10,6 @@ SlashCmdList.PMQ = function(msg, editbox)
 
     if cmd == "reset" then
       addon.qlog:Reset()
-      PlayerMadeQuestsCache = {}
-      PlayerMadeQuestsGlobalCache = {}
-      addon:info("Cache reset")
     elseif cmd == "add" then
       addon.qlog:AddQuest(args[2])
     elseif cmd == "list" then
