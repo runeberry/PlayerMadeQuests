@@ -31,7 +31,7 @@ function addon.Events:CreateBroker()
           -- If the handler has a log level, then override the broker's default log level
           logLevel = handler.logLevel
         end
-        addon:log(logLevel, "Publishing event:", event)
+        addon:log(logLevel, "Handling event:", event)
         if self.OnPublish then
           -- todo: OnPublish is not wrapped in a catch
           addon:catch(handler.fn, self:OnPublish(...))
