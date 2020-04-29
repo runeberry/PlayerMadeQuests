@@ -173,6 +173,20 @@ function addon:load()
   _onloadBuffer = nil
 end
 
+-- Trims all extra whitespace from the string (beginning, end, and in-between)
+function addon:strtrimall(s)
+  s = s:gsub("^%s+", ""):gsub("%s+$", "")
+  local orig
+  while true do
+    orig = s
+    s = s:gsub("%s%s", " ")
+    if s == orig then
+      break
+    end
+  end
+  return s
+end
+
 -- Adapted from the CSV parser found here: http://lua-users.org/wiki/LuaCsv
 function addon:strWords(line)
   local res = {}
