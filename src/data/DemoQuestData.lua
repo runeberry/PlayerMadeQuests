@@ -7,8 +7,8 @@ addon.DemoQuestData = {
     name = "Babby's First Quest",
     level = 5,
     objectives = {
-      "Kill [2] 'Mangy Wolf'",
-      "Kill [3] 'Chicken'"
+      "kill 2 u='Mangy Wolf'",
+      "kill 3 u=Chicken"
     }
   },
   {
@@ -16,8 +16,8 @@ addon.DemoQuestData = {
     name = "Grob Has a Queue",
     level = 8,
     objectives = {
-      "Kill [3] 'Bloodtalon Scythemaw'",
-      "Kill [3] 'Elder Mottled Boar'",
+      "kill 3 u='Bloodtalon Scythemaw'",
+      "kill 3 u='Elder Mottled Boar'",
     }
   },
   {
@@ -25,30 +25,30 @@ addon.DemoQuestData = {
     name = "Dancin' is my to do",
     level = 1,
     objectives = {
-      "Emote dance",
-      "Emote hug Chepi",
-      "Emote salute 'Officer Thunderstrider'",
-      "Emote [2] roar Bluffwatcher"
+      "EMOTE em=dance",
+      "EMOTE em=hug u=Chepi",
+      "EMOTE em=salute u='Officer Thunderstrider'",
+      "EMOTE em=roar u='Bluffwatcher' g=2",
     }
   },
   {
     id = "dtalk-ally",
     name = "Talkin' to the Squad",
     objectives = {
-      "TalkTo 'Brog Hamfist'",
-      "TalkTo 'Innkeeper Farley'",
-      "TalkTo 'William Pestle'",
-      "TalkTo [3] \"Stormwind Guard\""
+      "talkto u='Brog Hamfist'",
+      "talkto u='Innkeeper Farley'",
+      "talkto u='William Pestle'",
+      "talkto 3 u=\"Stormwind Guard\""
     }
   },
   {
     id = "dtalk-horde",
     name = "Tbluff Getaway",
     objectives = {
-      "TalkTo Bulrug",
-      "TalkTo \"Jyn Stonehoof\"",
-      "TalkTo Atepa",
-      "TalkTo [3] Bluffwatcher"
+      "TalkTo u=Bulrug",
+      "TalkTo u=\"Jyn Stonehoof\"",
+      "TalkTo u=Atepa",
+      "TalkTo 3 u=Bluffwatcher"
     }
   }
 }
