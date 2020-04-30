@@ -165,3 +165,79 @@ function addon.QuestEngine:CreateObjective(name, goal, ...)
   -- Return the created objective so it can be attached to the quest as well
   return objective
 end
+
+local function dequote(str)
+  if str:match("\"[%w%s]+\"") then
+    str = str:gsub("\"", "")
+  elseif str:match("'[%w%s]+'") then
+    str = str:gsub("'", "")
+  end
+  return str
+end
+
+local function setNamedParam(tab, key, val)
+  if tab[key] then
+    table.insert(tab[key], val)
+  else
+    tab[key] = { val }
+  end
+end
+
+function addon.QuestEngine:ParseObjective(str)
+  if str == nil or str == "" then
+    error("Unable to parse objective - string is nil or empty")
+  end
+
+  local obj = {}
+
+  -- Remove all extra whitespace
+  str = addon:strtrimall(str)
+
+  -- The first three parameters (at most) may have special handling
+  local p1, p2, p3 = strsplit(str, " ")
+
+  -- The first parameter must be a valid rule
+  obj.rule = p1
+  if rules[p1] == nil then
+    error("Unable to parse objective - no rule exists with name: "..p1)
+  end
+
+  -- The second parameter may be either the goal or displayText
+  local check3 = false
+  local goal = tonumber(p2)
+  if goal then
+    obj.goal = goal
+    check3 = true -- Only check param #3 if param #2 was definitely the goal
+  else
+    local dequoted = dequote(p2)
+    if dequoted ~= p2 then
+      -- If the string was enquoted, then it is the displayText
+      obj.displayText = dequoted
+    end
+  end
+
+  if check3 then
+    local dequoted = dequote(p3)
+    if dequoted ~= p3 then
+      -- If the string was enquoted, then it is the displayText
+      obj.displayText = dequoted
+    end
+  end
+
+  local namedParams = {}
+  -- Only recognize the remaining parameters in this format: a=b, a='c', or a="d"
+  for word in str:gmatch("%w-=[^\"']%S+") do -- Unquoted format
+    local k, v = strsplit(word, "=")
+    setNamedParam(namedParams, k, v)
+  end
+  for word in str:gmatch("%w-='.-'") do -- Single-quoted format
+    local k, v = strsplit(word, "=")
+    setNamedParam(namedParams, k, dequote(v))
+  end
+  for word in str:gmatch('%w-=".-"') do -- Double-quoted format
+    local k, v = strsplit(word, "=")
+    setNamedParam(namedParams, k, dequote(v))
+  end
+
+  -- todo: objectives are parsed, where to go from here?
+end
