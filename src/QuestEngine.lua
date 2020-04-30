@@ -5,10 +5,40 @@ addon.QuestEngine = {}
 
 local rules = {}
 local oidCounter = 0
+local ruleNamePattern = "^%w+$"
 
 local function getObjectiveId()
   oidCounter = oidCounter + 1
   return oidCounter
+end
+
+local function validateRuleName(name)
+  if name == nil  then
+    error("Invalid rule - name must not be nil")
+  end
+
+  if type(name) ~= "string" or not(name:match(ruleNamePattern)) then
+    error("Invalid rule - name must match pattern: "..ruleNamePattern)
+  end
+
+  return name:lower()
+end
+
+local function dequote(str)
+  if str:match("\"[%w%s]+\"") then
+    str = str:gsub("\"", "")
+  elseif str:match("'[%w%s]+'") then
+    str = str:gsub("'", "")
+  end
+  return str
+end
+
+local function setNamedParam(tab, key, val)
+  if tab[key] then
+    table.insert(tab[key], val)
+  else
+    tab[key] = { val }
+  end
 end
 
 local function wrapRuleHandler(rule)
@@ -101,14 +131,7 @@ local function wrapRuleHandler(rule)
 end
 
 function addon.QuestEngine:CreateRule(name)
-  if name == nil or name == "" then
-    error("Cannot create rule - name is required")
-  end
-
-  if rules[name] ~= nil then
-    addon:warn("Skipping quest rule - '" .. name .. "' is already defined")
-    return
-  end
+  name = validateRuleName(name)
 
   local rule = {
     name = name,
@@ -126,13 +149,7 @@ end
 -- Add a new objective for a given rule
 -- Additional parameters are passed to the OnCreate method of the rule
 function addon.QuestEngine:CreateObjective(name, goal, ...)
-  if name == nil or type(name) ~= "string" then
-    error("Unable to create quest objective - provided name is nil or invalid")
-  end
-
-  if name:find(" ") then
-    error("Unable to create quest objective - name must not contain whitespace: "..name)
-  end
+  name = validateRuleName(name)
 
   local rule = rules[name]
   if rule == nil then
@@ -152,35 +169,12 @@ function addon.QuestEngine:CreateObjective(name, goal, ...)
     args = { ... }
   }
 
-  -- if rule.onAddObjective ~= nil then
-  --   -- Optional hook for a rule to modify an objective on creation
-  --   -- Can be used to store additional data with each objective for this rule
-  --   rule.onAddObjective(objective, ...)
-  -- end
-
   -- All objectives created for a rule are stored together
   -- so that they can be quickly evaluated together
   table.insert(rule.objectives, objective)
 
   -- Return the created objective so it can be attached to the quest as well
   return objective
-end
-
-local function dequote(str)
-  if str:match("\"[%w%s]+\"") then
-    str = str:gsub("\"", "")
-  elseif str:match("'[%w%s]+'") then
-    str = str:gsub("'", "")
-  end
-  return str
-end
-
-local function setNamedParam(tab, key, val)
-  if tab[key] then
-    table.insert(tab[key], val)
-  else
-    tab[key] = { val }
-  end
 end
 
 function addon.QuestEngine:ParseObjective(str)
