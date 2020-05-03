@@ -173,20 +173,6 @@ function addon:load()
   _onloadBuffer = nil
 end
 
--- Trims all extra whitespace from the string (beginning, end, and in-between)
-function addon:strtrimall(s)
-  s = s:gsub("^%s+", ""):gsub("%s+$", "")
-  local orig
-  while true do
-    orig = s
-    s = s:gsub("%s%s", " ")
-    if s == orig then
-      break
-    end
-  end
-  return s
-end
-
 -- Adapted from the CSV parser found here: http://lua-users.org/wiki/LuaCsv
 function addon:strWords(line)
   local res = {}
@@ -312,4 +298,15 @@ function addon:ParseGUID(guid)
   end
 
   return parsed
+end
+
+local idCounter = 0
+-- Returns an incrementing numeric id, or that same id in the string format specified
+function addon:CreateID(format)
+  idCounter = idCounter + 1
+  if format then
+    return string.format(format, idCounter)
+  else
+    return idCounter
+  end
 end
