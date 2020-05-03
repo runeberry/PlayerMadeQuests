@@ -1,5 +1,21 @@
 local _, addon = ...
 
+
+addon:onload(function()
+  function addon.EmoteData:FindByCommand(cmd)
+    -- todo: index to make this much faster
+    if not(cmd:match("^/")) then
+      cmd = "/"..cmd
+    end
+
+    for _, emoteData in pairs(addon.EmoteData) do
+      if emoteData.command == cmd then
+        return emoteData
+      end
+    end
+  end
+end)
+
 addon.EmoteData = {
   {
     ["command"] = "/agree",
