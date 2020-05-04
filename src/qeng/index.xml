@@ -1,0 +1,9 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="qeng/QuestEngine.lua"/>
+
+  <Script file="qeng/rules/emote.lua"/>
+  <Script file="qeng/rules/kill.lua"/>
+  <Script file="qeng/rules/talkto.lua"/>
+  <Script file="qeng/conditions/emote.lua"/>
+  <Script file="qeng/conditions/target.lua"/>
+</Ui>

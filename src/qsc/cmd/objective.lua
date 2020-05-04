@@ -1,4 +1,5 @@
 local _, addon = ...
+addon:traceFile("cmd/objective.lua")
 
 local conditions = {
   { "aura", "a" },
@@ -12,13 +13,21 @@ local conditions = {
 
 local cmd = addon.QuestScript:NewCommand("objective", "obj", "o")
 
-function cmd:Parse(quest, args)
+-- function cmd:Parse(quest, args)
+cmd.Parse = function(cmd, quest, args)
+  -- addon:info("Parsing objective command")
+  -- addon:logtable(args)
   local rule = args:GetValue(2)
   if rule == nil then
     error("Rule name is required")
   end
 
   rule = rule:lower()
+
+  if not addon.QuestEngine:IsValidRule(rule) then
+    error("Unrecognized rule: "..rule)
+  end
+
   local objective = {
     --id = addon:CreateID("objective:"..rule.."-%i"),
     --rule = rules[p1], -- The objective contains a reference to its backing rule
@@ -58,5 +67,6 @@ function cmd:Parse(quest, args)
   if not quest.objectives then
     quest.objectives = {}
   end
+
   table.insert(quest.objectives, objective)
 end

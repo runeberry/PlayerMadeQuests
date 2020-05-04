@@ -1,46 +1,39 @@
 local _, addon = ...
-addon:traceFile("PmqQuestLog.lua")
+addon:traceFile("QuestLog.lua")
 
-addon.QuestStatus = {
-  Invited = "Invited",
+-- In-memory quest log
+local qlog = {}
+
+addon.QuestLog = {}
+addon.QuestLogStatus = {
   Active = "Active",
   Failed = "Failed",
   Completed = "Completed",
-  Archived = "Archived"
 }
-local status = addon.QuestStatus
+local status = addon.QuestLogStatus
 
-local qlog = {
-  list = {}
-}
-
--- Gets only the fields that will be written to SavedVariables
-local function getSaveObjective(obj)
-  local toSave = {
-    name = obj.name,
-    progress = obj.progress,
-    goal = obj.goal,
-    args = obj.args
-  }
-
-  return toSave
-end
-
--- Gets only the fields that will be written to SavedVariables
-local function getSaveQuest(quest)
-  local toSave = {
-    id = quest.id,
+local function toSaveFormat(quest)
+  local questToSave = {
     name = quest.name,
-    level = quest.level,
+    description = quest.description,
     status = quest.status,
     objectives = {}
   }
 
   for _, obj in pairs(quest.objectives) do
-    table.insert(toSave.objectives, getSaveObjective(obj))
+    local objToSave = {
+      name = obj.name,
+      displayText = obj.displayText,
+      progress = obj.progress,
+      goal = obj.goal,
+      metadata = obj.metadata,
+      conditions = obj.conditions -- No translation
+    }
+
+    table.insert(questToSave.objectives, objToSave)
   end
 
-  return toSave
+  return questToSave
 end
 
 -- Hooks up an objective from SavedVariables with all required fields
@@ -113,29 +106,35 @@ local function loadDemoQuest(demo)
   return quest
 end
 
--- Clears out the quest log
-function qlog:Reset()
-  qlog.list = {}
-  qlog:Save()
-  addon.AppEvents:Publish("QuestLogLoaded", qlog)
-  addon:info("Quest log reset")
+function addon.QuestLog:AcceptFromDemo(demo)
+  local compiled = addon.QuestScript:Compile(demo.script)
+  self:AcceptFromCatalog(compiled)
 end
 
--- Writes the quest log back to SavedVariables
-function qlog:Save()
+function addon.QuestLog:AcceptFromCatalog(listing)
+  addon.QuestEngine:ActivateQuest(listing)
+  listing.status = status.Active
+  table.insert(qlog, listing)
+  self:Save()
+end
+
+function addon.QuestLog:Save()
   local toSaveList = {}
-  for _, quest in pairs(qlog.list) do
-    table.insert(toSaveList, getSaveQuest(quest))
+  for _, quest in pairs(qlog) do
+    table.insert(toSaveList, toSaveFormat(quest))
   end
   local serialized = addon.Ace:Serialize(toSaveList)
   local compressed = addon.LibCompress:CompressHuffman(serialized)
-  PlayerMadeQuestsCache.QuestLog = compressed
+  addon.SaveData:Save("QuestLog", compressed)
   addon.AppEvents:Publish("QuestLogSaved", qlog)
+  addon:debug("Quest log saved")
 end
 
-function qlog:Load()
-  local compressed = PlayerMadeQuestsCache.QuestLog
-  if compressed == nil then
+function addon.QuestLog:Load()
+  local compressed = addon.SaveData:LoadString("QuestLog")
+  -- For some reason the data becomes an empty table when I first access it?
+  if compressed == "" then
+    addon:debug("No QuestLog save data available")
     return
   end
 
@@ -144,64 +143,54 @@ function qlog:Load()
     error("Error decompressing quest log: "..msg)
   end
 
-  local ok, savedList = addon.Ace:Deserialize(serialized)
+  local ok, saved = addon.Ace:Deserialize(serialized)
   if not(ok) then
     -- 2nd param is an error message if it failed
-    error("Error deserializing quest: "..savedList)
+    error("Error deserializing quest: "..qlog)
   end
 
-  qlog.list = {}
-  for _, saved in pairs(savedList) do
-    table.insert(qlog.list, loadSavedQuest(saved))
+  qlog = saved
+  for _, q in pairs(qlog) do
+    if q.status == status.Active then
+      addon.QuestEngine:ActivateQuest(q)
+    end
   end
+
   addon.AppEvents:Publish("QuestLogLoaded", qlog)
+  addon:info("Quest log loaded")
 end
 
--- Adds a quest from the demo list
-function qlog:AddQuest(id)
-  local demo = addon.DemoQuests:Get(id)
-  if demo == nil then
-    addon:error("No demo quest exists with id -", id)
-    return
-  end
-
-  local existingQuest = qlog:GetQuest(id)
-  if existingQuest then
-    addon:error("You're already on that quest! (", existingQuest.name, "-", existingQuest.status, ")")
-    return
-  end
-
-  local quest = loadDemoQuest(demo)
-  quest.status = status.Active
-  table.insert(qlog.list, quest)
-  qlog:Save() -- Then save it back to file
-  addon.AppEvents:Publish("QuestAccepted", quest)
+function addon.QuestLog:Reset()
+  qlog = {}
+  self:Save()
+  addon.AppEvents:Publish("QuestLogLoaded", qlog)
+  addon:info("Quest log reset")
 end
 
-function qlog:GetQuest(id)
-  for _, q in pairs(qlog.list) do
-    if q.id == id then
-      return q
+function addon.QuestLog:SetStatus(quest, stat)
+  quest.status = stat
+  self:Save()
+  addon.AppEvents:Publish("QuestStatusChanged", quest) --todo: still necessary?
+end
+
+function addon.QuestLog:Get()
+  return qlog
+end
+
+function addon.QuestLog:Print()
+  -- addon:logtable(qlog)
+  addon:info("=== You have", addon:tlen(qlog), "quests in your log ===")
+  for _, q in pairs(qlog) do
+    addon:info(q.name, "(", q.status, ") [", q.id, "]")
+    for _, o in pairs(q.objectives) do
+      addon:info("    ", o.name, o.progress, "/",  o.goal)
     end
   end
-
-  return nil
 end
 
-function qlog:TryCompleteQuest(id)
-  local quest = qlog:GetQuest(id)
-  if quest and quest.status == status.Active then
-    for _, obj in pairs(quest.objectives) do
-      if obj.progress < obj.goal then
-        -- If any objective is not complete, then the quest is not complete
-        return
-      end
-    end
-
-    quest.status = status.Completed
-    qlog:Save()
-    addon.AppEvents:Publish("QuestStatusChanged", quest)
-  end
-end
-
-addon.qlog = qlog
+addon:onload(function()
+  addon.QuestLog:Load()
+  addon.AppEvents:Subscribe("QuestCompleted", function(quest)
+    addon.QuestLog:SetStatus(quest, status.Completed)
+  end)
+end)

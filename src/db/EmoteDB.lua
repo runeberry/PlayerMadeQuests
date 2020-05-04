@@ -1,14 +1,14 @@
 local _, addon = ...
-
+addon:traceFile("EmoteDB.lua")
 
 addon:onload(function()
-  function addon.EmoteData:FindByCommand(cmd)
+  function addon.EmoteDB:FindByCommand(cmd)
     -- todo: index to make this much faster
     if not(cmd:match("^/")) then
       cmd = "/"..cmd
     end
 
-    for _, emoteData in pairs(addon.EmoteData) do
+    for _, emoteData in pairs(addon.EmoteDB) do
       if emoteData.command == cmd then
         return emoteData
       end
@@ -16,7 +16,7 @@ addon:onload(function()
   end
 end)
 
-addon.EmoteData = {
+addon.EmoteDB = {
   {
     ["command"] = "/agree",
     ["targeted"] = "You agree with %t.",

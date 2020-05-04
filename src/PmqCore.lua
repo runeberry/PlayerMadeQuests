@@ -1,41 +1,44 @@
 local _, addon = ...
+
 addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", "AceEvent-3.0", "AceSerializer-3.0")
 addon.AceGUI = LibStub("AceGUI-3.0")
 addon.LibCompress = LibStub("LibCompress")
 
+local savedSettings
+
 function addon.Ace:OnInitialize()
-  addon:catch(function()
+  local ok, msg = addon:catch(function()
+    addon.SaveData:Init()
+
     addon:load()
 
-    if PlayerMadeQuestsCache.QuestLog == nil then
-      PlayerMadeQuestsCache.QuestLog = {}
-      return
-    end
+    savedSettings = addon.SaveData:LoadTable("Settings")
 
-    if PlayerMadeQuestsCache.MinLogLevel ~= nil then
-      addon.MinLogLevel = PlayerMadeQuestsCache.MinLogLevel
+    if savedSettings.MinLogLevel ~= nil then
+      addon.MinLogLevel = savedSettings.MinLogLevel
     end
 
     addon._loaded = true
     addon:flushLogs()
 
-    addon.qlog:Load()
-
     addon.GameEvents:Start()
     addon.CombatLogEvents:Start()
 
     addon.GameEvents:Subscribe("PLAYER_ENTERING_WORLD", function()
-      if PlayerMadeQuestsCache.IsDemoFrameShown then
+      if savedSettings.IsDemoFrameShown then
         addon:ShowDemoFrame()
       end
 
-      if PlayerMadeQuestsCache.IsQuestLogShown then
+      if savedSettings.IsQuestLogShown then
         addon:ShowQuestLog(true)
       end
     end)
 
     addon:info("PMQ Loaded")
   end)
+  if not ok then
+    print("[PMQ] Fatal error on startup:", msg)
+  end
 end
 
 function addon.Ace:OnEnable()
@@ -45,10 +48,6 @@ end
 function addon.Ace:OnDisable()
 
 end
-
--- Saved variables for persisting settings/quest log on logout
-PlayerMadeQuestsGlobalCache = PlayerMadeQuestsGlobalCache or {}
-PlayerMadeQuestsCache = PlayerMadeQuestsCache or {}
 
 -- Must provide a log level when using addon:log()
 -- Change the MinLogLevel to see more/fewer logs in the game console
@@ -94,7 +93,7 @@ function addon:trace(str, ...) self:log(ll.trace, str, ...) end
 
 -- Place at the top of a file to help debugging in trace mode
 function addon:traceFile(filename)
-  addon:trace("File loaded:", filename)
+  addon:trace("[PMQ] File loaded:", filename)
 end
 
 -- This is the earliest that this log statement can be called
@@ -113,6 +112,29 @@ function addon:pvargs(...)
     vals[#vals+1] = tostring(val)
   end
   addon:trace("Variadic args: [" .. table.concat(vals, ", ") .. "]")
+end
+
+function addon:logtable(t, key, indent, circtable)
+  indent = indent or ""
+  circtable = circtable or {}
+  if key then
+    addon:info(indent, key, "=", t, "(", self:tlen(t), "elements )")
+  else
+    addon:info(t, "(", self:tlen(t), "elements )")
+  end
+  indent = indent.."  "
+  for k, v in pairs(t) do
+    if type(v) == "table" then
+      if circtable[v] then
+        addon:info(indent, k, "=", v, "(Dupe)")
+      else
+        circtable[v] = true
+        self:logtable(v, k, indent, circtable)
+      end
+    else
+      addon:info(indent, k, "=", v)
+    end
+  end
 end
 
 -- Converts an array (1D table) to a string for quick logging
@@ -168,7 +190,7 @@ end
 function addon:load()
   if _onloadBuffer == nil then return end
   for _, fn in pairs(_onloadBuffer) do
-    fn()
+    addon:catch(fn)
   end
   _onloadBuffer = nil
 end
@@ -302,10 +324,10 @@ end
 
 local idCounter = 0
 -- Returns an incrementing numeric id, or that same id in the string format specified
-function addon:CreateID(format)
+function addon:CreateID(str)
   idCounter = idCounter + 1
-  if format then
-    return string.format(format, idCounter)
+  if str then
+    return string.gsub(str, "%%i", idCounter)
   else
     return idCounter
   end

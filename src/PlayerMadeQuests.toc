@@ -5,30 +5,7 @@
 ## Version: 0.0.1
 ## RequiredDeps:
 ## OptionalDeps:
-## SavedVariables: PlayerMadeQuestsGlobalCache
-## SavedVariablesPerCharacter: PlayerMadeQuestsCache
+## SavedVariables: PMQGlobalCache
+## SavedVariablesPerCharacter: PMQCache
 
-embeds.xml
-
-PmqCore.lua
-
-events/EventsCore.lua
-events/GameEvents.lua
-events/CombatLogEvents.lua
-events/AppEvents.lua
-events/RuleEvents.lua
-
-PmqQuestLog.lua
-PmqCli.lua
-QuestEngine.lua
-DemoQuests.lua
-
-rules/Kill.lua
-rules/TalkTo.lua
-rules/Emote.lua
-
-frames/DemoFrame.lua
-frames/QuestLogFrame.lua
-
-data/DemoQuestData.lua
-data/EmoteData.lua
+index.xml

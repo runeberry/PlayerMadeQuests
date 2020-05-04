@@ -1,7 +1,7 @@
 local _, addon = ...
-addon:traceFile("DemoQuestData.lua")
+addon:traceFile("DemoQuestDB.lua")
 
-addon.DemoQuestData = {
+addon.DemoQuestDB = {
   {
     id = "dkill-ally",
     script = [[

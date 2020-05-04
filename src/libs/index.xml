@@ -1,8 +1,11 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
   <Script file="libs\LibStub\LibStub.lua"/>
+
   <Include file="libs\LibCompress\LibCompress.xml"/>
   <Include file="libs\AceAddon-3.0\AceAddon-3.0.xml"/>
   <Include file="libs\AceEvent-3.0\AceEvent-3.0.xml"/>
   <Include file="libs\AceSerializer-3.0\AceSerializer-3.0.xml"/>
   <Include file="libs\AceGUI-3.0\AceGUI-3.0.xml"/>
+
+  <Script file="db\DemoQuestDB.lua"/>
 </Ui>

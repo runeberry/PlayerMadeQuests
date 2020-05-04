@@ -1,8 +1,10 @@
 local _, addon = ...
+addon:traceFile("QuestScript.lua")
 
 addon.QuestScript = {}
 
 local commands = {}
+local cleanNamePattern = "^[%l%d]+$"
 
 --[[
   Returns the string value of the requested arg
@@ -11,15 +13,17 @@ local commands = {}
   If no value was set, returns nil
 --]]
 local function args_GetValue(args, ...)
-  for _, key in ipairs({ unpack(...) }) do
+  for _, key in pairs({...}) do
     if type(key) == "number" then
       return args.ordered[key]
     else
       local value = args.named[key]
       if type(value) == "table" then
-        value = value[#value]
+        value = value[addon:tlen(value)]
       end
-      return value
+      if value ~= nil then
+        return value
+      end
     end
   end
 end
@@ -31,7 +35,7 @@ end
   If no value was set, returns nil
 --]]
 local function args_GetTable(args, ...)
-  for _, key in ipairs({ unpack(...) }) do
+  for _, key in pairs({...}) do
     if type(key) == "number" then
       return { args.ordered[key] }
     else
@@ -39,7 +43,9 @@ local function args_GetTable(args, ...)
       if type(value) == "string" then
         value = { value }
       end
-      return value
+      if value ~= nil then
+        return value
+      end
     end
   end
 end
@@ -52,16 +58,23 @@ end
 --]]
 local function args_GetSet(args, ...)
   local set = {}
-  for _, key in ipairs({ unpack(...) }) do
-    local value = args_GetTable(key)
-    for _, v in ipairs(value) do
-      set[v] = true
+  for _, key in pairs({...}) do
+    local value = args_GetTable(args, key)
+    if value ~= nil then
+      for _, v in ipairs(value) do
+        set[v] = true
+      end
     end
   end
-  if #set == 0 then
+  if addon:tlen(set) == 0 then
     return nil
   end
   return set
+end
+
+-- Default parse function for any command, should be overridden
+local function command_Parse(command, quest, args)
+  addon:warn("No Parse method is defined for command:", command.name)
 end
 
 local function parseArgs(line)
@@ -121,6 +134,8 @@ local function parseArgs(line)
     end
   end
   if buf then error("Missing matching quote for: "..buf) end
+
+  return args
 end
 
 local function runCommand(quest, args)
@@ -137,14 +152,14 @@ local function runCommand(quest, args)
   command:Parse(quest, args)
 end
 
--- Default parse function for any command, should be overridden
-local function command_Parse(command, quest, args)
-  addon:warn("No Parse method is defined for command:", command.name)
-end
-
 function addon.QuestScript:NewCommand(name, ...)
   if name == nil or name == "" then
     addon:error("Failed to build QuestScript command: at least one name is required")
+    return {}
+  end
+
+  if type(name) ~= "string" or not(name:match(cleanNamePattern)) then
+    addon:error("Failed to build QuestScript command: name '"..name.."'must contain only lowercase alphanumeric characters")
     return {}
   end
 
@@ -160,7 +175,7 @@ function addon.QuestScript:NewCommand(name, ...)
   commands[name] = command
 
   -- A condition can be registered with multiple aliases, index them here
-  local aliases = { unpack(...) }
+  local aliases = { ... }
   for _, alias in pairs(aliases) do
     if commands[alias] ~= nil then
       addon:error("Failed to build QuestScript alias: '"..alias.."' is already defined")
@@ -172,19 +187,38 @@ function addon.QuestScript:NewCommand(name, ...)
   return command
 end
 
-function addon.QuestScript:ParseQuest(script, quest)
-  quest = quest or {}
+--[[
+  Parses a QuestScript "file" (set of lines) into an unvalidated quest object.
+  The returned object takes on the following format:
+  {
+    name = "string",
+    description = "string",
+    objectives = {
+      {
+        name = "string",
+        displayText = "string",
+        goal = 1,
+        conditions = {
+          emote = { "val1": true },
+          target = { "val2": true, "val3": true }
+        }
+      }
+    }
+  }
+--]]
+function addon.QuestScript:Compile(script)
+  local quest = {}
   if script ~= nil and script ~= "" then
     for line in script:gmatch("[^\r\n]+") do
-      local ok, args = addon:catch(parseArgs, line)
-      if not ok then
-        addon:warn("Error parsing QuestScript:", args)
-      else
-        local result, err = addon:catch(runCommand, quest, args)
-        if not result then
-          addon:warn("Error running QuestScript command '"..args:GetValue(1).."':", err)
+      if not line:match("^%s*$") then
+        local ok, args = addon:catch(parseArgs, line)
+        if ok then
+          addon:catch(runCommand, quest, args)
         end
       end
     end
   end
+  addon:debug("Quest compiled")
+  -- addon:logtable(quest)
+  return quest
 end

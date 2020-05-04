@@ -1,0 +1,8 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="events/EventsCore.lua"/>
+
+  <Script file="events/AppEvents.lua"/>
+  <Script file="events/CombatLogEvents.lua"/>
+  <Script file="events/GameEvents.lua"/>
+  <Script file="events/RuleEvents.lua"/>
+</Ui>

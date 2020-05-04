@@ -1,7 +1,8 @@
 local _, addon = ...
 local AceGUI = addon.AceGUI
+addon:traceFile("DemoFrame.lua")
 
-local textStore
+local textStore, savedSettings
 
 local function DrawGroup1(container)
   local editbox = AceGUI:Create("EditBox")
@@ -53,12 +54,12 @@ local function SelectGroup(container, event, group)
 end
 
 local function OnClose(widget)
-  PlayerMadeQuestsCache.IsDemoFrameShown = nil
+  savedSettings.IsDemoFrameShown = nil
   AceGUI:Release(widget)
 end
 
 function addon:ShowDemoFrame()
-  if PlayerMadeQuestsCache.IsDemoFrameShown == true then
+  if savedSettings.IsDemoFrameShown == true then
     return
   end
 
@@ -84,5 +85,9 @@ function addon:ShowDemoFrame()
   _G["PMQ_DemoFrame"] = frame.frame
   table.insert(UISpecialFrames, "PMQ_DemoFrame")
 
-  PlayerMadeQuestsCache.IsDemoFrameShown = true
+  savedSettings.IsDemoFrameShown = true
 end
+
+addon:onload(function()
+  savedSettings = addon.SaveData:LoadTable("Settings")
+end)
