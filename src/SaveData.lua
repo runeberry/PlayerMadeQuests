@@ -22,17 +22,26 @@ function addon.SaveData:Init()
   loaded = true
 end
 
+-- Returns the value of the specified field from SavedVariables
+-- If the value is a table, then a copy of the saved table is returned
 function addon.SaveData:Load(field, global)
   if not loaded then
     error("Cannot Load: SaveData not ready")
   end
+  local value
   if global then
-    return files.PMQGlobalCache[field]
+    value = files.PMQGlobalCache[field]
   else
-    return files.PMQCache[field]
+    value = files.PMQCache[field]
   end
+  if type(value) == "table" then
+    value = addon:CopyTable(value)
+  end
+  return value
 end
 
+-- Same as Load, but ensures that the returned value is a table
+-- If the value is not a table, then a new empty table is returned
 function addon.SaveData:LoadTable(field, global)
   local saved = self:Load(field, global)
   if saved == nil or type(saved) ~= "table" then
@@ -42,6 +51,8 @@ function addon.SaveData:LoadTable(field, global)
   return saved
 end
 
+-- Same as Load, but ensures that the returned value is a string
+-- If the value is not a string, then an empty string is returned
 function addon.SaveData:LoadString(field, global)
   local saved = self:Load(field, global)
   if saved == nil or type(saved) ~= "string" then
@@ -51,9 +62,15 @@ function addon.SaveData:LoadString(field, global)
   return saved
 end
 
+-- Saves the value to the specified field in SavedVariables
+-- If the value is a table, it is copied and cleaned before saving
 function addon.SaveData:Save(field, value, global)
   if not loaded then
     error("Cannot Save: SaveData not ready")
+  end
+  if type(value) == "table" then
+    value = addon:CopyTable(value)
+    addon:CleanTable(value)
   end
   if global then
     files.PMQGlobalCache[field] = value

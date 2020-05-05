@@ -332,3 +332,50 @@ function addon:CreateID(str)
     return idCounter
   end
 end
+
+-- Removes all fields that are not of type: string, number, boolean, or table
+-- Removes all fields that begin with _
+-- May not play well with array tables... idk!
+function addon:CleanTable(t, circ)
+  circ = circ or {}
+  circ[t] = true -- Ensure the provided table won't get cleaned twice
+  local ktype, vtype
+  for k, v in pairs(t) do
+    ktype = type(k)
+    vtype = type(v)
+    if ktype == "string" and k:match("^_") then
+      -- Remove the value
+      t[k] = nil
+    elseif vtype == "table" then
+      if not circ[v] then
+        self:CleanTable(v, circ)
+      end
+    elseif vtype == "string" or vtype == "number" or vtype == "boolean" then
+      -- Leave the value alone
+    else
+      -- Remove the value
+      t[k] = nil
+    end
+  end
+end
+
+-- Performs a deep copy of the table and all subtables
+-- References to functions will not be changed
+function addon:CopyTable(t, circ)
+  circ = circ or {}
+  local copy = {}
+  circ[t] = copy -- Ensure the provided table won't get copied twice
+  for k, v in pairs(t) do
+    if type(v) == "table" then
+      if circ[v] then
+        -- Use the same copy for each instance of the same inner table
+        copy[k] = circ[v]
+      else
+        copy[k] = self:CopyTable(v, circ)
+      end
+    else
+      copy[k] = v
+    end
+  end
+  return copy
+end
