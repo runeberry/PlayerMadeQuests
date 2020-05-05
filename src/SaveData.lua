@@ -37,6 +37,7 @@ function addon.SaveData:Load(field, global)
   if type(value) == "table" then
     value = addon:CopyTable(value)
   end
+  addon:debug("SaveData loaded. ("..field..")")
   return value
 end
 
@@ -77,4 +78,5 @@ function addon.SaveData:Save(field, value, global)
   else
     files.PMQCache[field] = value
   end
+  addon:debug("SaveData saved. ("..field..")")
 end
