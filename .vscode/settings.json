@@ -1,6 +1,6 @@
 {
     "Lua.workspace.ignoreDir": [
-      "src/libs"
+        "src/libs"
     ],
     "Lua.diagnostics.globals": [
         "unpack",
@@ -14,6 +14,7 @@
         "GetUnitName",
         "UnitIsFriend",
         "UnitExists",
-        "SlashCmdList"
+        "SlashCmdList",
+        "time"
     ]
 }

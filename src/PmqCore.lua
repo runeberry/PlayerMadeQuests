@@ -323,14 +323,14 @@ function addon:ParseGUID(guid)
 end
 
 local idCounter = 0
--- Returns an incrementing numeric id, or that same id in the string format specified
+-- Returns a string ID based on an incrementing counter and the current time
 function addon:CreateID(str)
   idCounter = idCounter + 1
+  local id = idCounter.."-"..time()
   if str then
-    return string.gsub(str, "%%i", idCounter)
-  else
-    return idCounter
+    id = string.gsub(str, "%%i", id)
   end
+  return id
 end
 
 -- Removes all fields that are not of type: string, number, boolean, or table
