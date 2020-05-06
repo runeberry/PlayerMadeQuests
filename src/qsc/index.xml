@@ -1,7 +1,7 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
   <Script file="qsc/QuestScript.lua"/>
   <Script file="qsc/QuestDemos.lua"/>
-  <Script file="qsc/Questography.lua"/>
+  <Script file="qsc/QuestDrafts.lua"/>
 
   <Script file="qsc/cmd/objective.lua"/>
   <Script file="qsc/cmd/quest.lua"/>
