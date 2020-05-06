@@ -114,9 +114,10 @@ function addon:pvargs(...)
   addon:trace("Variadic args: [" .. table.concat(vals, ", ") .. "]")
 end
 
-function addon:logtable(t, key, indent, circtable)
+function addon:logtable(t, key, indent, circ)
   indent = indent or ""
-  circtable = circtable or {}
+  circ = circ or {}
+  circ[t] = true
   if key then
     addon:info(indent, key, "=", t, "(", self:tlen(t), "elements )")
   else
@@ -125,11 +126,10 @@ function addon:logtable(t, key, indent, circtable)
   indent = indent.."  "
   for k, v in pairs(t) do
     if type(v) == "table" then
-      if circtable[v] then
+      if circ[v] then
         addon:info(indent, k, "=", v, "(Dupe)")
       else
-        circtable[v] = true
-        self:logtable(v, k, indent, circtable)
+        self:logtable(v, k, indent, circ)
       end
     else
       addon:info(indent, k, "=", v)
@@ -378,4 +378,32 @@ function addon:CopyTable(t, circ)
     end
   end
   return copy
+end
+
+-- Performs a recursive table merge of t2 onto t1
+-- If any fields collide, t2 will overwrite t1
+-- Returns a new table - does not modify t1 or t2
+function addon:MergeTable(t1, t2, circ)
+  local merged = self:CopyTable(t1)
+  circ = circ or {}
+  circ[t1] = merged -- Ensure that both provided tables will only be merged once
+  circ[t2] = merged
+  circ[merged] = merged -- Ensure that any references to the merged table are not re-merged
+  for k, v in pairs(t2) do
+    if type(v) == "table" then
+      if circ[v] then
+        merged[k] = circ[v]
+      elseif type(merged[k]) == "table" then
+        -- If t1 and t2 both have tables at index k,
+        -- then merge the two subtables and assign the result
+        merged[k] = self:MergeTable(merged[k], v, circ)
+      else
+        -- Otherwise, t2's subtable simply overwrites t1's value
+        merged[k] = self:CopyTable(v, circ)
+      end
+    else
+      merged[k] = v
+    end
+  end
+  return merged
 end
