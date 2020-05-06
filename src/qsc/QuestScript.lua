@@ -72,11 +72,6 @@ function addon.QuestScript:GetArgsSet(args, ...)
   return set
 end
 
--- Default parse function for any command, should be overridden
-local function command_Parse(command, quest, args)
-  addon:warn("No Parse method is defined for command:", command.name)
-end
-
 local function parseArgs(line)
   --Normalize spacing around named arguments
   line = line:gsub([=[([^\])%s*=%s*(%S)]=], "%1= %2")
@@ -146,6 +141,10 @@ local function runCommand(quest, args)
     error("No command exists with name: "..commandName)
   end
 
+  if command.Parse == nil then
+    error("No Parse method is defined for command: "..commandName)
+  end
+
   command:Parse(quest, args)
 end
 
@@ -167,7 +166,6 @@ function addon.QuestScript:NewCommand(name, ...)
 
   local command = {
     name = name, -- All aliases for this command will reference the same "name"
-    Parse = command_Parse
   }
   commands[name] = command
 
