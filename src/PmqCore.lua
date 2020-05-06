@@ -195,6 +195,10 @@ function addon:load()
   _onloadBuffer = nil
 end
 
+function addon:OnSaveDataLoaded(fn)
+  addon.AppEvents:Subscribe("SaveDataLoaded", fn)
+end
+
 -- Adapted from the CSV parser found here: http://lua-users.org/wiki/LuaCsv
 function addon:strWords(line)
   local res = {}
