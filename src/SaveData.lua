@@ -10,6 +10,7 @@ local files = {
 addon.SaveData = {}
 
 function addon.SaveData:Init()
+  if loaded then return end
   -- Load all "files" from global variables
   for varname in pairs(files) do
     local saved = _G[varname]
@@ -20,6 +21,7 @@ function addon.SaveData:Init()
     files[varname] = saved
   end
   loaded = true
+  addon.AppEvents:Publish("SaveDataLoaded")
 end
 
 -- Returns the value of the specified field from SavedVariables
@@ -33,9 +35,6 @@ function addon.SaveData:Load(field, global)
     value = files.PMQGlobalCache[field]
   else
     value = files.PMQCache[field]
-  end
-  if type(value) == "table" then
-    value = addon:CopyTable(value)
   end
   addon:debug("SaveData loaded. ("..field..")")
   return value
@@ -68,10 +67,6 @@ end
 function addon.SaveData:Save(field, value, global)
   if not loaded then
     error("Cannot Save: SaveData not ready")
-  end
-  if type(value) == "table" then
-    value = addon:CopyTable(value)
-    addon:CleanTable(value)
   end
   if global then
     files.PMQGlobalCache[field] = value
