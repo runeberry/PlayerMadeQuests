@@ -12,7 +12,7 @@ local cleanNamePattern = "^[%l%d]+$"
   If multiple values were set, returns the last value specified
   If no value was set, returns nil
 --]]
-local function args_GetValue(args, ...)
+function addon.QuestScript:GetArgsValue(args, ...)
   for _, key in pairs({...}) do
     if type(key) == "number" then
       return args.ordered[key]
@@ -34,7 +34,7 @@ end
   If a single value was set, it's returned as a table with one element
   If no value was set, returns nil
 --]]
-local function args_GetTable(args, ...)
+function addon.QuestScript:GetArgsTable(args, ...)
   for _, key in pairs({...}) do
     if type(key) == "number" then
       return { args.ordered[key] }
@@ -56,10 +56,10 @@ end
   If a single value was set, it's returned as a table with one element
   If no value was set, returns nil
 --]]
-local function args_GetSet(args, ...)
+function addon.QuestScript:GetArgsSet(args, ...)
   local set = {}
   for _, key in pairs({...}) do
-    local value = args_GetTable(args, key)
+    local value = self:GetArgsTable(args, key)
     if value ~= nil then
       for _, v in ipairs(value) do
         set[v] = true
@@ -85,10 +85,7 @@ local function parseArgs(line)
   -- Solution adapted from: https://stackoverflow.com/a/28664691
   local args = {
     ordered = {},
-    named = {},
-    GetValue = args_GetValue,
-    GetTable = args_GetTable,
-    GetSet = args_GetSet
+    named = {}
   }
   local spat, epat, buf, quoted, pname = [=[^(['"])]=], [=[(['"])$]=]
   for str in line:gmatch("%S+") do

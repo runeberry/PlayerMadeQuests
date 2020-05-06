@@ -1,5 +1,6 @@
 local _, addon = ...
 addon:traceFile("cmd/objective.lua")
+local qs = addon.QuestScript
 
 local conditions = {
   { "aura", "a" },
@@ -11,13 +12,12 @@ local conditions = {
   { "zone", "z" }
 }
 
-local cmd = addon.QuestScript:NewCommand("objective", "obj", "o")
+local cmd = qs:NewCommand("objective", "obj", "o")
 
--- function cmd:Parse(quest, args)
-cmd.Parse = function(cmd, quest, args)
+function cmd:Parse(quest, args)
   -- addon:info("Parsing objective command")
   -- addon:logtable(args)
-  local rule = args:GetValue(2)
+  local rule = qs:GetArgsValue(args, 2)
   if rule == nil then
     error("Rule name is required")
   end
@@ -40,24 +40,24 @@ cmd.Parse = function(cmd, quest, args)
     --tempdata = {} -- Additional data that will not be written to save
   }
 
-  local goal = tonumber(args:GetValue("goal", "g", 3))
+  local goal = tonumber(qs:GetArgsValue(args, "goal", "g", 3))
   if goal and goal > 0 then
     objective.goal = goal
 
-    local displayText = args:GetValue("displaytext", "d", 4)
+    local displayText = qs:GetArgsValue(args, "displaytext", "d", 4)
     if displayText then
       objective.displayText = displayText
     end
   else
     -- If param #3 was not a number, then it will be interpreted as the displayText
-    local displayText = args:GetValue("displaytext", "d", 3)
+    local displayText = qs:GetArgsValue(args, "displaytext", "d", 3)
     if displayText then
       objective.displayText = displayText
     end
   end
 
   for _, names in ipairs(conditions) do
-    local val = args:GetSet(unpack(names))
+    local val = qs:GetArgsSet(args, unpack(names))
     if val then
       -- Group all aliased values and assign them to the primary condition name
       objective.conditions[names[1]] = val
