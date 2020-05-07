@@ -1,14 +1,38 @@
 local _, addon = ...
 addon:traceFile("EventsCore.lua")
 
-addon.Events = {}
-local keyCounter = 0
+local unpack = addon.G.unpack
 
-local function getHandlerKey()
-  -- A global static counter is sufficient for generating unique handler indices
-  keyCounter = keyCounter + 1
-  -- String index will prevent reindexing when an item is removed from a table
-  return tostring(keyCounter)
+addon.Events = {}
+local processDelayMs = 0.033 -- approximately 1 frame @ 30 FPS
+
+local function processQueue(broker)
+  broker.pubFlag = false
+  for event, payloadArray in pairs(broker.queue) do
+    broker.queue[event] = nil -- immediately remove from queue so it doesn't get reprocessed
+    local subscriberFuncs = broker.handlersMap[event]
+    if addon:tlen(subscriberFuncs) == 0 then
+      -- There are no handlers registered for this event
+      addon:log(broker.logLevelNoHandlers, "Attempted to handle", event, "event, but there are no subscribers")
+    else
+      for _, payload in pairs(payloadArray) do
+        for _, handler in pairs(subscriberFuncs) do
+          local logLevel = broker.logLevel
+          if handler.logLevel then
+            -- If the handler has a log level, then override the broker's default log level
+            logLevel = handler.logLevel
+          end
+          addon:log(logLevel, "Handling event:", event)
+          if broker.OnPublish then
+            -- todo: OnPublish is not wrapped in a catch
+            addon:catch(handler.fn, broker:OnPublish(unpack(payload)))
+          else
+            addon:catch(handler.fn, unpack(payload))
+          end
+        end
+      end
+    end
+  end
 end
 
 local function broker_Publish(self, event, ...)
@@ -18,19 +42,19 @@ local function broker_Publish(self, event, ...)
     addon:log(self.logLevelNoHandlers, "Attempted to handle", event, "event, but there are no subscribers")
     return
   else
-    for _, handler in pairs(handlers) do
-      local logLevel = self.logLevel
-      if handler.logLevel then
-        -- If the handler has a log level, then override the broker's default log level
-        logLevel = handler.logLevel
-      end
-      addon:log(logLevel, "Handling event:", event)
-      if self.OnPublish then
-        -- todo: OnPublish is not wrapped in a catch
-        addon:catch(handler.fn, self:OnPublish(...))
-      else
-        addon:catch(handler.fn, ...)
-      end
+    -- Insert the payload for this event into the queue
+    local existing = self.queue[event]
+    if existing == nil then
+      existing = {}
+      self.queue[event] = existing
+    end
+    table.insert(existing, { ... })
+
+    if not self.pubFlag then
+      -- If this is the first event published to this broker (this frame)
+      -- then set a timer to process the queue on the next frame (approximately)
+      addon.Ace:ScheduleTimer(processQueue, processDelayMs, self)
+      self.pubFlag = true
     end
   end
 end
@@ -58,7 +82,7 @@ local function broker_Subscribe(self, event, handlerFunc, options)
     self.handlersMap[event] = handlers
   end
 
-  local key = getHandlerKey()
+  local key = addon:CreateID("subscription-%i")
   handlers[key] = handler
   addon:log(self.logLevel, "Subscribed to event:", event)
   return key -- Key can be used to unsubscribe later
@@ -97,9 +121,13 @@ end
 
 function addon.Events:CreateBroker()
   local broker = {
+    pubFlag = false,
+    queue = {},
     handlersMap = {},
-    logLevel = addon.LogLevel.trace, -- Default log level for tracking that an event was received
-    logLevelNoHandlers = addon.LogLevel.none, -- Log level for event received w/ no subscribers
+    -- Default log level for tracking that an event was received
+    logLevel = addon.LogLevel.trace,
+    -- Log level for event received w/ no subscribers
+    logLevelNoHandlers = addon.LogLevel.none,
 
     Publish = broker_Publish,
     Subscribe = broker_Subscribe,
