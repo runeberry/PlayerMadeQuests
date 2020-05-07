@@ -1,7 +1,6 @@
 local _, addon = ...
 addon:traceFile("rules/talkto.lua")
-local UnitExists = UnitExists
-local UnitIsFriend = UnitIsFriend
+local UnitExists = addon.G.UnitExists
 
 local rule = addon.QuestEngine:NewRule("talkto")
 rule.displayText = "Talk to %1 %p/%g" -- todo: change how displayText is calculated

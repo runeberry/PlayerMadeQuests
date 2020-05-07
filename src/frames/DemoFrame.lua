@@ -1,6 +1,8 @@
 local _, addon = ...
-local AceGUI = addon.AceGUI
 addon:traceFile("DemoFrame.lua")
+
+local AceGUI = addon.AceGUI
+local UISpecialFrames = addon.G.UISpecialFrames
 
 local textStore, savedSettings
 

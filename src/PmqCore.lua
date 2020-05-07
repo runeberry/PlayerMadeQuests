@@ -1,8 +1,9 @@
 local _, addon = ...
 
-addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
-addon.AceGUI = LibStub("AceGUI-3.0")
-addon.LibCompress = LibStub("LibCompress")
+local strsplit = addon.G.strsplit
+local time = addon.G.time
+local unpack = addon.G.unpack
+local CombatLogGetCurrentEventInfo = addon.G.CombatLogGetCurrentEventInfo
 
 local savedSettings
 
@@ -268,7 +269,7 @@ end
 -- This object will be provided as the only parameter to functions
 --   registered in PmqCombatLogEvents.lua
 function addon:GetClog()
-  local info = {CombatLogGetCurrentEventInfo()}
+  local info = { CombatLogGetCurrentEventInfo() }
   local obj = {
     raw = info,
     timestamp = info[1],

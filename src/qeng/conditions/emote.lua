@@ -1,6 +1,6 @@
 local _, addon = ...
-local UnitExists = UnitExists
-local GetUnitName = GetUnitName
+local UnitExists = addon.G.UnitExists
+local GetUnitName = addon.G.GetUnitName
 addon:traceFile("conditions/emote.lua")
 
 local condition = addon.QuestEngine:NewCondition("emote")

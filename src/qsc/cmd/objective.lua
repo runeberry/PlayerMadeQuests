@@ -1,5 +1,7 @@
 local _, addon = ...
 addon:traceFile("cmd/objective.lua")
+
+local unpack = addon.G.unpack
 local qs = addon.QuestScript
 
 local conditions = {
@@ -23,10 +25,6 @@ function cmd:Parse(quest, args)
   end
 
   rule = rule:lower()
-
-  if not addon.QuestEngine:IsValidRule(rule) then
-    error("Unrecognized rule: "..rule)
-  end
 
   local objective = {
     --id = addon:CreateID("objective:"..rule.."-%i"),

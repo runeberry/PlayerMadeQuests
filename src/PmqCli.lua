@@ -1,6 +1,10 @@
 local _, addon = ...
-local savedSettings
 addon:traceFile("PmqCli.lua")
+
+local SlashCmdList = addon.G.SlashCmdList
+local strsplit = addon.G.strsplit
+
+local savedSettings
 
 SLASH_PMQ1 = "/pmq"
 

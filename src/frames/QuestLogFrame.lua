@@ -1,6 +1,10 @@
 local _, addon = ...
-local AceGUI = addon.AceGUI
 addon:traceFile("QuestLogFrame.lua")
+
+local AceGUI = addon.AceGUI
+local strjoin = addon.G.strjoin
+local strsplit = addon.G.strsplit
+local UIParent = addon.G.UIParent
 
 local frames = {}
 local subscriptions = {}

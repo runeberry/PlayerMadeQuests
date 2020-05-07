@@ -1,6 +1,6 @@
 local _, addon = ...
-local GetUnitName = GetUnitName
-local UnitGUID = UnitGUID
+local GetUnitName =addon.G.GetUnitName
+local UnitGUID = addon.G.UnitGUID
 addon:traceFile("conditions/target.lua")
 
 local condition = addon.QuestEngine:NewCondition("target")

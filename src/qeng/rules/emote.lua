@@ -1,5 +1,5 @@
 local _, addon = ...
-local GetUnitName = GetUnitName
+local GetUnitName = addon.G.GetUnitName
 addon:traceFile("rules/emote.lua")
 
 local rule = addon.QuestEngine:NewRule("emote")
