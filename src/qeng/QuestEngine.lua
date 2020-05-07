@@ -5,7 +5,21 @@ addon.QuestEngine = {}
 
 local rules = {}
 local conditions = {}
+local quests = {}
 local cleanNamePattern = "^[%l%d]+$"
+local loaded = false
+
+addon.QuestStatus = {
+  Active = "Active",
+  Failed = "Failed",
+  Completed = "Completed",
+}
+local status = addon.QuestStatus
+
+addon:OnSaveDataLoaded(function()
+  addon.QuestEngine:Load()
+  loaded = true
+end)
 
 local function objective_HasCondition(obj, name)
   return obj.conditions and obj.conditions[name] and true
@@ -17,21 +31,33 @@ local function objective_SetMetadata(obj, name, value, persistent)
     obj.metadata[name] = value
   else
     -- These values will not be saved. Use for non-serializable data.
-    obj.tempdata[name] = value
+    obj._tempdata[name] = value
   end
 end
 
 local function objective_GetMetadata(obj, name)
-  if obj.metadata[name] ~= nil then
+  if obj._tempdata[name] ~= nil then
+    return obj._tempdata[name]
+  elseif obj.metadata[name] ~= nil then
     return obj.metadata[name]
-  elseif obj.tempdata[name] ~= nil then
-    return obj.tempdata[name]
   end
   return nil
 end
 
-local function condition_CheckCondition(cond, obj, args)
-  addon:warn("No CheckCondition method is defined for condition:", cond.name)
+local function quest_StartTracking(quest)
+  -- All objectives created for a rule are stored together
+  -- so that they can be quickly evaluated together
+  for _, obj in pairs(quest.objectives) do
+    obj._rule.objectives[obj.id] = obj
+  end
+  addon.AppEvents:Publish("QuestTrackingStarted", quest)
+end
+
+local function quest_StopTracking(quest)
+  for _, obj in pairs(quest.objectives) do
+    obj._rule.objectives[obj.id] = nil
+  end
+  addon.AppEvents:Publish("QuestTrackingStopped", quest)
 end
 
 -- todo: move this somewhere else
@@ -132,11 +158,13 @@ local function wrapRuleHandler(rule)
         end
 
         if changed then
+          local quest = obj._quest
+
           -- Sanity checks: progress must be >= 0, and progress must be an integer
           obj.progress = math.max(math.floor(obj.progress), 0)
 
           addon.AppEvents:Publish("ObjectiveUpdated", obj)
-          addon.AppEvents:Publish("QuestUpdated", obj.quest)
+          addon.AppEvents:Publish("QuestUpdated", quest)
 
           if obj.progress >= obj.goal then
             -- Mark objective for removal from further checks
@@ -144,14 +172,15 @@ local function wrapRuleHandler(rule)
             addon.AppEvents:Publish("ObjectiveCompleted", obj)
 
             local questCompleted = true
-            for _, qobj in pairs(obj.quest.objectives) do
+            for _, qobj in pairs(quest.objectives) do
               if qobj.progress < qobj.goal then
                 questCompleted = false
                 break
               end
             end
             if questCompleted then
-              addon.AppEvents:Publish("QuestCompleted", obj.quest)
+              obj.quest.status = status.Completed
+              addon.AppEvents:Publish("QuestCompleted", quest)
             end
           end
         end
@@ -209,57 +238,113 @@ function addon.QuestEngine:NewCondition(name)
   end
 
   local condition = {
-    name = name,
-    CheckCondition = condition_CheckCondition
+    name = name
   }
 
   conditions[name] = condition
   return condition
 end
 
-function addon.QuestEngine:IsValidRule(name)
-  return rules[name] ~= nil
-end
+function addon.QuestEngine:NewQuest(parameters)
+  parameters.name = parameters.name or error("Failed to create quest: quest name is required")
 
-function addon.QuestEngine:ActivateQuest(quest)
+  local quest = addon:CopyTable(parameters)
+  quest.id = quest.id or addon:CreateID("quest-%i")
+  quest.status = quest.status or status.Active
+  quest.objectives = quest.objectives or {}
+
   for _, obj in pairs(quest.objectives) do
-    obj.rule = rules[obj.name] -- Rule is validated on script compilation
-    obj.quest = quest -- Add reference back to this obj's quest
-    if obj.id == nil then
-      obj.id = addon:CreateID("objective["..obj.name.."]-%i")
-    elseif obj.rule.objectives[obj.id] then
-      -- Unusual situation, should never end up here
-      addon:warn(obj.id.." is already being tracked")
-      return
-    end
-    if obj.progress == nil then
-      obj.progress = 0
-    end
-    if obj.metadata == nil then
-      obj.metadata = {}
-    end
-    if obj.tempdata == nil then
-      obj.tempdata = {}
-    end
+    obj.name = obj.name or error("Failed to create quest: objective name is required")
+    obj._rule = rules[obj.name] or error("Failed to create quest: '"..obj.name.."' is not a valid rule")
+    obj._quest = quest -- Add reference back to this obj's quest
+    obj._tempdata = {}
+
+    obj.id = obj.id or addon:CreateID("objective-"..obj.name.."-%i")
+    obj.progress = obj.progress or 0
+    obj.goal = obj.goal or 1
+    obj.conditions = obj.conditions or {}
+    obj.metadata = obj.metadata or {}
 
     -- Add predefined methods here
     obj.HasCondition = objective_HasCondition
     obj.GetMetadata = objective_GetMetadata
     obj.SetMetadata = objective_SetMetadata
 
-    -- All objectives created for a rule are stored together
-    -- so that they can be quickly evaluated together
-    obj.rule.objectives[obj.id] = obj
+    for name, _ in pairs(obj.conditions) do
+      local condition = conditions[name]
+      if condition == nil then
+        error("Failed to create quest: '"..name.."' is not a valid condition")
+      end
+      if condition.CheckCondition == nil then
+        error("Failed to create quest: condition '"..name.."' does not have a CheckCondition method")
+      end
+    end
   end
 
-  quest.id = addon:CreateID("quest-%i")
+  -- Add predefined methods here
+  quest.StartTracking = quest_StartTracking
+  quest.StopTracking = quest_StopTracking
+
+  quests[quest.id] = quest
+  if loaded then
+    addon.AppEvents:Publish("QuestCreated", quest)
+  end
   return quest
 end
 
-function addon.QuestEngine:DeactivateQuest(quest)
-  for _, obj in pairs(quest.objectives) do
-    obj.rule.objectives[obj.id] = nil
+function addon.QuestEngine:GetQuestByID(id)
+  return quests[id]
+end
+
+function addon.QuestEngine:Save()
+  local serialized = addon.Ace:Serialize(quests)
+  local compressed = addon.LibCompress:CompressHuffman(serialized)
+  addon.SaveData:Save("QuestLog", compressed)
+end
+
+function addon.QuestEngine:Load()
+  local compressed = addon.SaveData:LoadString("QuestLog")
+  -- For some reason the data becomes an empty table when I first access it?
+  if compressed == "" then
+    -- Nothing to load
+    return
   end
 
-  return quest
+  local serialized, msg = addon.LibCompress:Decompress(compressed)
+  if serialized == nil then
+    error("Error loading quest log: "..msg)
+  end
+
+  local ok, saved = addon.Ace:Deserialize(serialized)
+  if not(ok) then
+    -- 2nd param is an error message if it failed
+    error("Error loading quest log: "..saved)
+  end
+
+  for _, q in pairs(saved) do
+    addon.QuestEngine:NewQuest(q)
+  end
+
+  loaded = true
+  addon.AppEvents:Publish("QuestLogLoaded", quests)
+end
+
+function addon.QuestEngine:ResetQuestLog()
+  for _, quest in pairs(quests) do
+    quest:StopTracking()
+  end
+  quests = {}
+  self:Save()
+  addon.AppEvents:Publish("QuestLogLoaded", quests)
+end
+
+function addon.QuestEngine:PrintQuestLog()
+  -- addon:logtable(qlog)
+  addon:info("=== You have", addon:tlen(quests), "quests in your log ===")
+  for _, q in pairs(quests) do
+    addon:info(q.name, "(", q.status, ") [", q.id, "]")
+    for _, o in pairs(q.objectives) do
+      addon:info("    ", o.name, o.progress, "/",  o.goal)
+    end
+  end
 end

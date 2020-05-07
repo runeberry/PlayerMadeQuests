@@ -9,6 +9,7 @@ local UIParent = addon.G.UIParent
 local frames = {}
 local subscriptions = {}
 local savedSettings
+local qlog = {}
 
 local function SavePosition(widget)
   local p1, _, p2, x, y = widget:GetPoint()
@@ -53,7 +54,7 @@ end
 
 local function SetQuestText(label, quest)
   local text = quest.name
-  if quest.status == addon.QuestLogStatus.Completed then
+  if quest.status == addon.QuestStatus.Completed then
     text = text.." (Complete)"
   end
   label:SetText(text)
@@ -68,7 +69,7 @@ local function AddQuest(questList, quest)
   qLabel:SetFullWidth(true)
   questList:AddChild(qLabel)
   SetQuestText(qLabel, quest)
-  frames["q:"..quest.id] = qLabel
+  frames[quest.id] = qLabel
 
   local objList = AceGUI:Create("SimpleGroup")
   questList:AddChild(objList)
@@ -78,7 +79,7 @@ local function AddQuest(questList, quest)
     oLabel:SetFullWidth(true)
     objList:AddChild(oLabel)
     SetObjectiveText(oLabel, obj)
-    frames["o:"..obj.id] = oLabel
+    frames[obj.id] = oLabel
   end
 end
 
@@ -116,8 +117,6 @@ local function BuildQuestLogFrame()
   scroller:AddChild(questList)
   frames["questList"] = questList
 
-  local qlog = addon.QuestLog:Get()
-
   SetQuestLogHeadingText(questHeading, qlog)
   SetQuestLogText(questList, qlog)
 
@@ -135,12 +134,12 @@ local function BuildQuestLogFrame()
   subscriptions["QuestAccepted"] = subKey
 
   subKey = addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
-    SetQuestText(frames["q:"..quest.id], quest)
+    SetQuestText(frames[quest.id], quest)
   end)
   subscriptions["QuestStatusChanged"] = subKey
 
   subKey = addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
-    SetObjectiveText(frames["o:"..obj.id], obj)
+    SetObjectiveText(frames[obj.id], obj)
   end)
   subscriptions["ObjectiveUpdated"] = subKey
 
@@ -158,6 +157,10 @@ function addon:ShowQuestLog(show)
   end
 end
 
-addon:onload(function()
+addon:OnSaveDataLoaded(function()
   savedSettings = addon.SaveData:LoadTable("Settings")
+end)
+
+addon.AppEvents:Subscribe("QuestLogLoaded", function(quests)
+  qlog = quests
 end)

@@ -14,14 +14,18 @@ SlashCmdList.PMQ = function(msg, editbox)
     local cmd = args[1]
 
     if cmd == "reset" then
-      addon.QuestLog:Reset()
+      addon.QuestEngine:ResetQuestLog()
+      addon:info("Quest log reset")
     elseif cmd == "add" then
       local demo = addon.QuestDemos:FindByID(args[2])
       if not demo then
         addon:error("Error: no demo quest exists with id:", args[2])
         return
       end
-      addon.QuestLog:AcceptFromDemo(demo)
+      local parameters = addon.QuestScript:Compile(demo.script)
+      local quest = addon.QuestEngine:NewQuest(parameters)
+      quest:StartTracking()
+      addon:info("Accepted quest -", quest.name)
     elseif cmd == "log" then
       addon.MinLogLevel = tonumber(args[2])
       savedSettings.MinLogLevel = addon.MinLogLevel
@@ -35,7 +39,7 @@ SlashCmdList.PMQ = function(msg, editbox)
     elseif cmd == "demoframe" then
       addon:ShowDemoFrame()
     elseif cmd == "list" then
-      addon.QuestLog:Print()
+      addon.QuestEngine:PrintQuestLog()
     else
       addon:info("PMQ Version 0.0.1")
     end
