@@ -72,6 +72,11 @@ function addon.QuestScript:GetArgsSet(args, ...)
   return set
 end
 
+local Q_start_ptn, Q_end_ptn = [=[^(['"])]=], [=[(['"])$]=]
+local SQ_start_ptn, DQ_start_ptn, SQ_end_ptn, DQ_end_ptn = [[^(')]], [[^(")]], [[(')$]], [[(")$]]
+local escSQ_end_ptn, escDQ_end_ptn = [[(\)(')]], [[(\)(")]]
+local esc_ptn = [=[(\*)['"]$]=]
+
 local function parseArgs(line)
   --Normalize spacing around named arguments
   line = line:gsub([=[([^\])%s*=%s*(%S)]=], "%1= %2")
@@ -82,21 +87,28 @@ local function parseArgs(line)
     ordered = {},
     named = {}
   }
-  local spat, epat, buf, quoted, pname = [=[^(['"])]=], [=[(['"])$]=]
+
+  local buf, quoted, pname
   for str in line:gmatch("%S+") do
-    local squoted = str:match(spat)
-    local equoted = str:match(epat)
-    local escaped = str:match([=[(\*)['"]$]=])
-    if squoted and not quoted and not equoted then
-      buf, quoted = str, squoted
-    elseif buf and equoted == quoted and #escaped % 2 == 0 then
+    local SQ_start = str:match(SQ_start_ptn)
+    local SQ_end = str:match(SQ_end_ptn)
+    local DQ_start = str:match(DQ_start_ptn)
+    local DQ_end = str:match(DQ_end_ptn)
+    local escSQ_end = str:match(escSQ_end_ptn)
+    local escDQ_end = str:match(escDQ_end_ptn)
+    local escaped = str:match(esc_ptn)
+    if not quoted and SQ_start and (not SQ_end or escSQ_end) then
+      buf, quoted = str, SQ_start
+    elseif not quoted and DQ_start and (not DQ_end or escDQ_end) then
+      buf, quoted = str, DQ_start
+    elseif buf and (SQ_end == quoted or DQ_end == quoted) and #escaped % 2 == 0 then
       str, buf, quoted = buf .. ' ' .. str, nil, nil
     elseif buf then
       buf = buf .. ' ' .. str
     end
     if not buf then
       -- Remove quotes and escaped characters ["'=]
-      str = str:gsub(spat,""):gsub(epat,""):gsub([=[(\)(["'=])]=], "%2")
+      str = str:gsub(Q_start_ptn,""):gsub(Q_end_ptn,""):gsub([=[(\)(["'=])]=], "%2")
       if pname then
         -- If the last arg was a param name, then this is its value
         local existing = args.named[pname]
