@@ -18,6 +18,7 @@ addon.G = {
   UnitExists = UnitExists,
   UnitGUID = UnitGUID,
   UnitIsFriend = UnitIsFriend,
-  UISpecialFrames = UISpecialFrames,
+  UIErrorsFrame = UIErrorsFrame,
   UIParent = UIParent,
+  UISpecialFrames = UISpecialFrames,
 }
