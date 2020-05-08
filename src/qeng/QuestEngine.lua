@@ -69,50 +69,55 @@ local function quest_StopTracking(quest)
 end
 
 local function evaluateObjective(rule, obj, ...)
-  local ok, result
+  local ok, beforeResult, checkResult, afterResult
   if rule.BeforeCheckConditions then
-    ok, result = addon:catch(rule.BeforeCheckConditions, rule, obj, ...)
+    ok, beforeResult = addon:catch(rule.BeforeCheckConditions, rule, obj, ...)
     if not(ok) then
-      addon:error("Error during BeforeCheckConditions for '", obj.id, "':", result)
+      addon:error("Error during BeforeCheckConditions for '", obj.id, "':", beforeResult)
       return
-    elseif result == false then
+    elseif beforeResult == false then
       return
     end
   end
 
+  -- CheckCondition is expected to return a boolean value only:
+  -- true if the condition was met, false otherwise
   for name, val in pairs(obj.conditions) do
     local condition = conditions[name]
-    ok, result = addon:catch(condition.CheckCondition, condition, obj, val)
+    ok, checkResult = addon:catch(condition.CheckCondition, condition, obj, val)
     if not(ok) then
-      addon:error("Error evaluating condition '", name,"' for '", obj.id, "':", result)
+      addon:error("Error evaluating condition '", name,"' for '", obj.id, "':", checkResult)
       return
-    elseif result == false then
-      -- If any result was false, stop evaluating conditions
-      -- But still let the rule have the final say on the result
+    elseif checkResult ~= true  then
+      -- If any result was not true, stop evaluating conditions
+      --addon:trace("Condition '"..name.."' evaluated: "..checkResult.."")
       break
     end
   end
 
+  -- AfterCheckConditions may take the result from CheckCondition and make a final ruling by
+  -- returning either a boolean or a number to represent objective progress
   if rule.AfterCheckConditions then
-    ok, result = addon:catch(rule.AfterCheckConditions, rule, obj, result, ...)
+    ok, afterResult = addon:catch(rule.AfterCheckConditions, rule, obj, checkResult, ...)
     if not(ok) then
-      addon:error("Error during AfterCheckConditions for '", obj.id, "':", result)
+      addon:error("Error during AfterCheckConditions for '", obj.id, "':", afterResult)
       return
+    elseif afterResult ~= nil then
+      -- If the After function returns a value, then that value will override the result of CheckCondition
+      checkResult = afterResult
     end
   end
 
   -- Coerce non-numeric results to a goal progress number
-  if type(result) ~= "number" then
-    if result == false then
-      -- False will result in no objective progress
-      result = 0
-    else
-      -- True, nil, or non-numeric values will advance the objective by 1
-      result = 1
-    end
+  if checkResult == true then
+    -- A boolean result of true will advance the objective by 1
+    checkResult = 1
+  elseif type(checkResult) ~= "number" then
+    -- False, nil, or non-numeric values will result in no objective progress
+    checkResult = 0
   end
 
-  return result
+  return checkResult
 end
 
 local function wrapRuleHandler(rule)

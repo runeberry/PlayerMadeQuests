@@ -24,7 +24,7 @@ function rule:AfterCheckConditions(obj)
 end
 
 addon:onload(function()
-  addon.CombatLogEvents:Subscribe("PARTY_KILL", function(cl)
-    addon.RuleEvents:Publish(rule.name, cl)
+  addon.CombatLogEvents:Subscribe("PARTY_KILL", function()
+    addon.RuleEvents:Publish(rule.name, addon:GetClog())
   end)
 end)
