@@ -131,7 +131,7 @@ local function parseArgs(line)
 end
 
 local function runCommand(quest, args)
-  local commandName = args:GetValue(1)
+  local commandName = addon.QuestScript:GetArgsValue(args, 1)
   if commandName == nil then
     error("No command name was specified")
   end

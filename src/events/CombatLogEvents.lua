@@ -22,3 +22,7 @@ function addon.CombatLogEvents:OnPublish()
   -- All events registered with this broker will get one arg, and that is a parsed combat log event
   return addon:GetClog()
 end
+
+addon:onload(function()
+  addon.CombatLogEvents:Start()
+end)

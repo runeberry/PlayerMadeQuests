@@ -183,6 +183,8 @@ local function wrapRuleHandler(rule)
               addon.AppEvents:Publish("QuestCompleted", quest)
             end
           end
+
+          addon.QuestEngine:Save()
         end
       end
     end
@@ -289,6 +291,7 @@ function addon.QuestEngine:NewQuest(parameters)
   if loaded then
     addon.AppEvents:Publish("QuestCreated", quest)
   end
+  self:Save()
   return quest
 end
 
@@ -297,7 +300,8 @@ function addon.QuestEngine:GetQuestByID(id)
 end
 
 function addon.QuestEngine:Save()
-  local serialized = addon.Ace:Serialize(quests)
+  local cleaned = addon:CleanTable(addon:CopyTable(quests))
+  local serialized = addon.Ace:Serialize(cleaned)
   local compressed = addon.LibCompress:CompressHuffman(serialized)
   addon.SaveData:Save("QuestLog", compressed)
 end

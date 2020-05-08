@@ -22,19 +22,6 @@ function addon.Ace:OnInitialize()
     addon._loaded = true
     addon:flushLogs()
 
-    addon.GameEvents:Start()
-    addon.CombatLogEvents:Start()
-
-    addon.GameEvents:Subscribe("PLAYER_ENTERING_WORLD", function()
-      if savedSettings.IsDemoFrameShown then
-        addon:ShowDemoFrame()
-      end
-
-      if savedSettings.IsQuestLogShown then
-        addon:ShowQuestLog(true)
-      end
-    end)
-
     addon:info("PMQ Loaded")
   end)
   if not ok then
@@ -116,6 +103,10 @@ function addon:pvargs(...)
 end
 
 function addon:logtable(t, key, indent, circ)
+  if t == nil then
+    addon:info("Table is nil")
+    return
+  end
   indent = indent or ""
   circ = circ or {}
   circ[t] = true
@@ -362,6 +353,7 @@ function addon:CleanTable(t, circ)
       t[k] = nil
     end
   end
+  return t
 end
 
 -- Performs a deep copy of the table and all subtables

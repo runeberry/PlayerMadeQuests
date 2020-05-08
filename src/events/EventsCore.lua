@@ -108,11 +108,11 @@ local function broker_Unsubscribe(self, event, key)
     self:OnUnsubscribe(event, handler)
   end
 
-  table.remove(handlers, key)
+  handlers[key] = nil
 
   if addon:tlen(handlers) == 0 then
     -- If this was the last subscriber for this event, remove the event from the handlersMap
-    table.remove(self.handlersMap, event)
+    self.handlersMap[event] = nil
   end
 
   addon:log(self.logLevel, "Unsubscribed from event:", event)

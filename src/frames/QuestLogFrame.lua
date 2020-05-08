@@ -10,24 +10,48 @@ local frames = {}
 local subscriptions = {}
 local savedSettings
 local qlog = {}
+local wp = {
+  p1 = "RIGHT",
+  p2 = "RIGHT",
+  x = -100,
+  y = 0,
+  w = 250,
+  h = 300
+}
+
+-- For some reason GetPoint() returns the wrong position unless you move the window
+-- Still trying to figure this one out
+local function isInaccuratePoint(p1, p2, x, y)
+  return p1 == "CENTER" and p2 == "CENTER" and x == 0 and y == 0
+end
 
 local function SavePosition(widget)
   local p1, _, p2, x, y = widget:GetPoint()
+  if isInaccuratePoint(p1, p2, x, y) then
+    p1 = wp.p1
+    p2 = wp.p2
+    x = wp.x
+    y = wp.y
+  end
   local w, h = widget.frame:GetSize()
   savedSettings.QuestLogPosition = strjoin(",", p1, p2, x, y, w, h)
+  addon:debug("Saving position:", p1, p2, x, y, w, h)
 end
 
 local function LoadPosition(widget)
   if savedSettings.QuestLogPosition then
     local p1, p2, x, y, w, h = strsplit(",", savedSettings.QuestLogPosition)
-    widget:SetPoint(p1, UIParent, p2, x, y)
-    widget:SetWidth(w)
-    widget:SetHeight(h)
-  else
-    widget:SetPoint("RIGHT", UIParent, "RIGHT", -100, 0)
-    widget:SetWidth(250)
-    widget:SetHeight(300)
+    wp.p1 = p1
+    wp.p2 = p2
+    wp.x = x
+    wp.y = y
+    wp.w = w
+    wp.h = h
   end
+
+  widget:SetPoint(wp.p1, UIParent, wp.p2, wp.x, wp.y)
+  widget:SetWidth(wp.w)
+  widget:SetHeight(wp.h)
 end
 
 local function OnOpen(widget)
@@ -127,11 +151,11 @@ local function BuildQuestLogFrame()
   end)
   subscriptions["QuestLogLoaded"] = subKey
 
-  subKey = addon.AppEvents:Subscribe("QuestAccepted", function(quest)
+  subKey = addon.AppEvents:Subscribe("QuestCreated", function(quest)
     SetQuestLogHeadingText(frames["heading"], qlog)
     AddQuest(frames["questList"], quest)
   end)
-  subscriptions["QuestAccepted"] = subKey
+  subscriptions["QuestCreated"] = subKey
 
   subKey = addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
     SetQuestText(frames[quest.id], quest)
@@ -159,6 +183,9 @@ end
 
 addon:OnSaveDataLoaded(function()
   savedSettings = addon.SaveData:LoadTable("Settings")
+  if savedSettings.IsQuestLogShown then
+    addon:ShowQuestLog(true)
+  end
 end)
 
 addon.AppEvents:Subscribe("QuestLogLoaded", function(quests)

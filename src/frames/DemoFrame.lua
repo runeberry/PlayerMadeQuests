@@ -92,4 +92,7 @@ end
 
 addon:onload(function()
   savedSettings = addon.SaveData:LoadTable("Settings")
+  if savedSettings.IsDemoFrameShown then
+    addon:ShowDemoFrame()
+  end
 end)

@@ -37,3 +37,7 @@ function addon.GameEvents:OnUnsubscribe(event)
     addon.Ace.UnregisterEvent(event)
   end
 end
+
+addon:onload(function()
+  addon.GameEvents:Start()
+end)

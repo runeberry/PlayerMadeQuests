@@ -17,7 +17,7 @@ SlashCmdList.PMQ = function(msg, editbox)
       addon.QuestEngine:ResetQuestLog()
       addon:info("Quest log reset")
     elseif cmd == "add" then
-      local demo = addon.QuestDemos:FindByID(args[2])
+      local demo = addon.QuestDemos:GetDemoByID(args[2])
       if not demo then
         addon:error("Error: no demo quest exists with id:", args[2])
         return
