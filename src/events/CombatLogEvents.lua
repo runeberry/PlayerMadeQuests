@@ -1,7 +1,8 @@
 local _, addon = ...
 addon:traceFile("CombatLogEvents.lua")
 
-addon.CombatLogEvents = addon.Events:CreateBroker()
+addon.CombatLogEvents = addon.Events:CreateBroker("CombatLogEvent")
+addon.CombatLogEvents.logLevelHandle = addon.LogLevel.trace
 
 function addon.CombatLogEvents:Start()
   if self.started then

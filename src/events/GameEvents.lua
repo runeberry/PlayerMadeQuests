@@ -1,7 +1,8 @@
 local _, addon = ...
 addon:traceFile("GameEvents.lua")
 
-addon.GameEvents = addon.Events:CreateBroker()
+addon.GameEvents = addon.Events:CreateBroker("GameEvent")
+addon.GameEvents.logLevelHandle = addon.LogLevel.trace
 addon.GameEvents.logLevelNoHandlers = addon.LogLevel.warn
 
 -- This function can be used to pipe Event API events to this broker's Publish function
