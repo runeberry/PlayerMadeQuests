@@ -35,7 +35,7 @@ addon.DemoQuestDB = {
       obj talkto t='Brog Hamfist'
       obj talkto t='Innkeeper Farley'
       obj talkto t='William Pestle'
-      obj talkto 3 t="Stormwind Guard"
+      obj talkto 2 t="Stormwind Guard"
     ]]
   },
   {
