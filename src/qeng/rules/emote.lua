@@ -3,14 +3,18 @@ local GetUnitName = addon.G.GetUnitName
 addon:traceFile("rules/emote.lua")
 
 local rule = addon.QuestEngine:NewRule("emote")
-rule.displayText = "Use emote %1 %2 %p/%g"
 
-function rule:GetShortText()
-
-end
-
-function rule:GetFullText()
-
+function rule:GetDisplayText(obj)
+  local str = ""
+  if obj:HasCondition("emote") then
+    str = addon:GetConditionValueText(obj.conditions["emote"])
+  else
+    str = "Use an emote"
+  end
+  if obj:HasCondition("target") then
+    str = str.." with "..addon:GetConditionValueText(obj.conditions["target"])
+  end
+  return str
 end
 
 function rule:BeforeCheckConditions(obj, msg)

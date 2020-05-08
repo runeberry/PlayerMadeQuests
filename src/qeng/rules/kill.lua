@@ -3,12 +3,14 @@ addon:traceFile("rules/kill.lua")
 
 local rule = addon.QuestEngine:NewRule("kill")
 
-function rule:GetShortText(obj)
+function rule:GetDisplayText(obj)
+  local str = ""
   if obj:HasCondition("target") then
-    return "%t %p/%g"
-  elseif obj.goal == 1 then
-    return "Kill enemies %p/%g"
+    str = addon:GetConditionValueText(obj.conditions["target"])
+  else
+    str = "Kill enemies"
   end
+  return str
 end
 
 function rule:BeforeCheckConditions(obj, cl)

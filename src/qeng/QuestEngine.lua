@@ -44,6 +44,14 @@ local function objective_GetMetadata(obj, name)
   return nil
 end
 
+local function objective_GetDisplayText(obj)
+  if obj._rule.GetDisplayText then
+    return obj._rule:GetDisplayText(obj)
+  else
+    return obj.name
+  end
+end
+
 local function quest_StartTracking(quest)
   -- All objectives created for a rule are stored together
   -- so that they can be quickly evaluated together
@@ -58,30 +66,6 @@ local function quest_StopTracking(quest)
     obj._rule.objectives[obj.id] = nil
   end
   addon.AppEvents:Publish("QuestTrackingStopped", quest)
-end
-
--- todo: move this somewhere else
-local function getConditionParameterText(cond, val)
-  if type(val) == "string" then
-    return val
-  elseif type(val) == "table" then
-    if #val == 1 then
-      for v in val do
-        return v
-      end
-    elseif #val > 1 then
-      local ret = ""
-      local i = 1
-      for v in val do
-        if i == #val then
-          return ret.." or "..v
-        else
-          ret = ret..", "..v
-        end
-        i = i + 1
-      end
-    end
-  end
 end
 
 local function evaluateObjective(rule, obj, ...)
@@ -134,30 +118,24 @@ end
 local function wrapRuleHandler(rule)
   -- Given an arbitrary list of game event args, handle them as follows
   return function(...)
+    -- addon:debug("Evaluating rule:", rule.name, "(", addon:tlen(rule.objectives), "objectives )")
+    -- addon:logtable(rule.objectives)
     -- Completed objectives will be tracked and removed from the list
     local completed = {}
+    local anychanged = false
 
     -- For each objective that is backed by this rule
-    for i, obj in ipairs(rule.objectives) do
+    for id, obj in pairs(rule.objectives) do
       if obj.progress >= obj.goal then
         -- The objective is already completed, nothing to do
-        table.insert(completed, i)
+        completed[id] = obj
       else
         local result = evaluateObjective(rule, obj, ...)
+        -- addon:debug("    Result:", result)
 
-        local changed = false
-        if result == true then
-          -- If the handler returns true, then objective progress is advanced by 1
-          obj.progress = obj.progress + 1
-          changed = true
-        elseif type(result) == "number" then
-          -- If it returns a number, then objective progress is advanced by that amount
-          -- Note that this can be negative to "undo" objective progress
+        if result > 0 then
+          anychanged = true
           obj.progress = obj.progress + result
-          changed = true
-        end
-
-        if changed then
           local quest = obj._quest
 
           -- Sanity checks: progress must be >= 0, and progress must be an integer
@@ -168,7 +146,7 @@ local function wrapRuleHandler(rule)
 
           if obj.progress >= obj.goal then
             -- Mark objective for removal from further checks
-            table.insert(completed, i)
+            completed[id] = obj
             addon.AppEvents:Publish("ObjectiveCompleted", obj)
 
             local questCompleted = true
@@ -179,19 +157,22 @@ local function wrapRuleHandler(rule)
               end
             end
             if questCompleted then
-              obj.quest.status = status.Completed
+              quest.status = status.Completed
               addon.AppEvents:Publish("QuestCompleted", quest)
+              quest:StopTracking()
             end
           end
-
-          addon.QuestEngine:Save()
         end
       end
     end
 
-    for _, i in pairs(completed) do
+    for id, _ in pairs(completed) do
       -- Stop trying to update that objective on subsequent game events
-      table.remove(rule.objectives, i)
+      rule.objectives[id] = nil
+    end
+
+    if anychanged then
+      addon.QuestEngine:Save()
     end
   end
 end
@@ -271,6 +252,7 @@ function addon.QuestEngine:NewQuest(parameters)
     obj.HasCondition = objective_HasCondition
     obj.GetMetadata = objective_GetMetadata
     obj.SetMetadata = objective_SetMetadata
+    obj.GetDisplayText = objective_GetDisplayText
 
     for name, _ in pairs(obj.conditions) do
       local condition = conditions[name]
@@ -291,7 +273,6 @@ function addon.QuestEngine:NewQuest(parameters)
   if loaded then
     addon.AppEvents:Publish("QuestCreated", quest)
   end
-  self:Save()
   return quest
 end
 
@@ -326,7 +307,10 @@ function addon.QuestEngine:Load()
   end
 
   for _, q in pairs(saved) do
-    addon.QuestEngine:NewQuest(q)
+    local qc = addon.QuestEngine:NewQuest(q)
+    if qc.status == status.Active then
+      qc:StartTracking()
+    end
   end
 
   loaded = true

@@ -81,7 +81,7 @@ function addon:trace(str, ...) self:log(ll.trace, str, ...) end
 
 -- Place at the top of a file to help debugging in trace mode
 function addon:traceFile(filename)
-  addon:trace("[PMQ] File loaded:", filename)
+  addon:trace("File loaded:", filename)
 end
 
 -- This is the earliest that this log statement can be called
@@ -403,4 +403,27 @@ function addon:MergeTable(t1, t2, circ)
     end
   end
   return merged
+end
+
+function addon:GetConditionValueText(val)
+  local len = addon:tlen(val)
+  if len == 0 then
+    return ""
+  end
+  if len == 1 then
+    for v in pairs(val) do
+      return v
+    end
+  elseif len > 1 then
+    local ret = ""
+    local i = 1
+    for v in pairs(val) do
+      if i == len then
+        return ret.." or "..v
+      else
+        ret = ret..", "..v
+      end
+      i = i + 1
+    end
+  end
 end

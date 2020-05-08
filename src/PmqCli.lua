@@ -25,6 +25,7 @@ SlashCmdList.PMQ = function(msg, editbox)
       local parameters = addon.QuestScript:Compile(demo.script)
       local quest = addon.QuestEngine:NewQuest(parameters)
       quest:StartTracking()
+      addon.QuestEngine:Save()
       addon:info("Accepted quest -", quest.name)
     elseif cmd == "log" then
       addon.MinLogLevel = tonumber(args[2])

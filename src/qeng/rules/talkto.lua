@@ -3,7 +3,16 @@ addon:traceFile("rules/talkto.lua")
 local UnitExists = addon.G.UnitExists
 
 local rule = addon.QuestEngine:NewRule("talkto")
-rule.displayText = "Talk to %1 %p/%g" -- todo: change how displayText is calculated
+
+function rule:GetDisplayText(obj)
+  local str = ""
+  if obj:HasCondition("target") then
+    str = "Talk to "..addon:GetConditionValueText(obj.conditions["target"])
+  else
+    str = "Talk to anyone"
+  end
+  return str
+end
 
 -- Publish the TalkTo event anytime the player targets a friendly unit
 -- that activates one of the registered events below

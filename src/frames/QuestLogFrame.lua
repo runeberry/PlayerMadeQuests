@@ -85,7 +85,8 @@ local function SetQuestText(label, quest)
 end
 
 local function SetObjectiveText(label, obj)
-  label:SetText("    "..obj.name)
+  local displayText = obj:GetDisplayText()
+  label:SetText("    "..displayText.." "..obj.progress.."/"..obj.goal)
 end
 
 local function AddQuest(questList, quest)
@@ -157,10 +158,10 @@ local function BuildQuestLogFrame()
   end)
   subscriptions["QuestCreated"] = subKey
 
-  subKey = addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
+  subKey = addon.AppEvents:Subscribe("QuestCompleted", function(quest)
     SetQuestText(frames[quest.id], quest)
   end)
-  subscriptions["QuestStatusChanged"] = subKey
+  subscriptions["QuestCompleted"] = subKey
 
   subKey = addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
     SetObjectiveText(frames[obj.id], obj)
