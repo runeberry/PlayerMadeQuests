@@ -1,7 +1,13 @@
 local _, addon = ...
 
+local aceMixins = {
+  "AceEvent-3.0",
+  "AceSerializer-3.0",
+  "AceTimer-3.0"
+}
+
 -- Libraries
-addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", "AceEvent-3.0", "AceSerializer-3.0", "AceTimer-3.0")
+addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", unpack(aceMixins))
 addon.AceGUI = LibStub("AceGUI-3.0")
 addon.LibCompress = LibStub("LibCompress")
 addon.LibScrollingTable = LibStub("ScrollingTable")
@@ -14,6 +20,7 @@ addon.G = {
   unpack = unpack,
 
   CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo,
+  CreateFrame = CreateFrame,
   GetUnitName = GetUnitName,
   SlashCmdList = SlashCmdList,
   UnitExists = UnitExists,
