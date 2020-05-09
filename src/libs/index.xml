@@ -8,5 +8,5 @@
   <Include file="libs\AceTimer-3.0\AceTimer-3.0.xml"/>
   <Include file="libs\AceGUI-3.0\AceGUI-3.0.xml"/>
 
-  <Script file="db\DemoQuestDB.lua"/>
+  <Script file="libs\ScrollingTable\Core.lua"/>
 </Ui>
