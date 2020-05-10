@@ -7,6 +7,10 @@ local CombatLogGetCurrentEventInfo = addon.G.CombatLogGetCurrentEventInfo
 
 local savedSettings
 
+addon.ADDON_VERSION = "0.0.1"
+addon.ADDON_BRANCH = "alpha"
+
+
 function addon.Ace:OnInitialize()
   local ok, msg = addon:catch(function()
     addon.SaveData:Init()
@@ -35,6 +39,14 @@ end
 
 function addon.Ace:OnDisable()
 
+end
+
+function addon:GetVersion()
+  if self.ADDON_BRANCH and self.ADDON_BRANCH ~= "" then
+    return self.ADDON_VERSION.."-"..self.ADDON_BRANCH
+  end
+
+  return self.ADDON_VERSION
 end
 
 -- Must provide a log level when using addon:log()
