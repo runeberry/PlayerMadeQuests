@@ -1,5 +1,0 @@
-<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-  <Script file="frames/DemoFrame.lua"/>
-  <Script file="frames/QuestLogFrame.lua"/>
-  <Script file="frames/UIErrorsFrame.lua"/>
-</Ui>

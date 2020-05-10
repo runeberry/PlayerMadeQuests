@@ -11,6 +11,6 @@
   <Include file="qsc/index.xml"/>
   <Include file="catalog/index.xml"/>
   <Include file="db/index.xml"/>
-  <Include file="frames/index.xml"/>
+  <Include file="gui/index.xml"/>
   <Include file="qdata/index.xml"/>
 </Ui>

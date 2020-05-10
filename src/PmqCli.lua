@@ -39,6 +39,8 @@ SlashCmdList.PMQ = function(msg, editbox)
       addon:ShowQuestLog(not(savedSettings.IsQuestLogShown))
     elseif cmd == "demoframe" then
       addon:ShowDemoFrame()
+    elseif cmd == "main" then
+      addon.MainMenu:Show()
     elseif cmd == "list" then
       addon.QuestEngine:PrintQuestLog()
     else

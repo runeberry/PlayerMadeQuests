@@ -1,0 +1,16 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="gui/CustomWidgets.lua"/>
+
+  <Script file="gui/MainMenuFrame.lua"/>
+  <Script file="gui/QuestLogFrame.lua"/>
+  <Script file="gui/UIErrorsFrame.lua"/>
+
+  <Script file="gui/menu/drafts.lua"/>
+  <Script file="gui/menu/demo.lua"/>
+  <Script file="gui/menu/settings.lua"/>
+  <Script file="gui/menu/about.lua"/>
+  <Script file="gui/menu/faq.lua"/>
+
+  <Script file="gui/widgets/DraftEditor.lua"/>
+  <Script file="gui/widgets/DraftTable.lua"/>
+</Ui>
