@@ -20,12 +20,9 @@ local function getOrCreateMenu(menu, value)
 end
 
 local function OnGroupSelected(container, event, group)
-  local errPrefix = "Failed to build MainMenu screen:"
-
   local selectedScreen = menuScreens[group]
   if selectedScreen == nil then
-    addon:error(errPrefix, "no screen registered for group", group)
-    return
+    error("No screen registered for group "..group)
   end
   if type(selectedScreen.Create) ~= "function" then
     -- No screen for this menu item
@@ -56,7 +53,7 @@ local function OnGroupSelected(container, event, group)
   container:AddChild(contentGroup)
 
   if not selectedScreen.frame then
-    selectedScreen.frame = selectedScreen:Create(selectedScreen, contentGroup.frame)
+    selectedScreen.frame = selectedScreen:Create(contentGroup.frame)
   end
 
   if selectedScreen.frame then
