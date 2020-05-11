@@ -10,7 +10,6 @@ local savedSettings
 addon.ADDON_VERSION = "0.0.1"
 addon.ADDON_BRANCH = "alpha"
 
-
 function addon.Ace:OnInitialize()
   local ok, msg = addon:catch(function()
     addon.SaveData:Init()
@@ -64,6 +63,31 @@ local ll = addon.LogLevel
 addon.MinLogLevel = ll.info
 addon._logBuffer = {}
 
+local colors = {
+  red = "|cffff0000",
+  green = "|cff1eff00",
+  blue = "|cff0070dd",
+  grey = "|cff9d9d9d",
+  white = "|cffffffff",
+  black = "|cff000000",
+  purple = "|cffa335ee",
+  orange = "|cffff8000",
+  yellow = "|cffffff00"
+}
+function addon:colorize(color, str)
+  local c = colors[color] or color or colors.white -- Use mapped color if available
+  return c..str.."|r"
+end
+
+local logcolors = {
+  [ll.fatal] = "red",
+  [ll.error] = "red",
+  [ll.warn] = "yellow",
+  [ll.info] = "white",
+  [ll.debug] = "orange",
+  [ll.trace] = "grey",
+  [ll.none] = "grey"
+}
 -- Prints a message to console with respect to MinLogLevel
 function addon:log(loglevel, str, ...)
   if addon._loaded == nil then
@@ -73,7 +97,7 @@ function addon:log(loglevel, str, ...)
   if loglevel > addon.MinLogLevel then
     return
   end
-  print("[PMQ]", str, ...)
+  print(colors[logcolors[loglevel]].."[PMQ]", str, ...)
 end
 
 function addon:flushLogs()
@@ -92,12 +116,16 @@ function addon:debug(str, ...) self:log(ll.debug, str, ...) end
 function addon:trace(str, ...) self:log(ll.trace, str, ...) end
 
 -- Place at the top of a file to help debugging in trace mode
+local tracedFiles = {}
 function addon:traceFile(filename)
-  addon:trace("File loaded:", filename)
+  tracedFiles[filename] = true
 end
 
--- This is the earliest that this log statement can be called
-addon:traceFile("PmqCore.lua")
+function addon:assertFile(filename)
+  if tracedFiles[filename] == nil then
+    addon:fatal("Expected file not loaded:", filename)
+  end
+end
 
 -- Prints variadic args in one line to the console
 -- this is not performant! only use for troubleshooting
