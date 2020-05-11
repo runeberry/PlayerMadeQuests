@@ -47,5 +47,14 @@ addon.DemoQuestDB = {
       obj TalkTo t=Atepa
       obj TalkTo 3 t=Bluffwatcher
     ]]
+  },
+  {
+    id = "ss",
+    script = [[
+      quest "Southshore Showdown"
+      obj talkto t="Barkeep Kelly"
+      obj talkto t="Innkeeper Anderson"
+      obj talkto t="Wesley"
+    ]]
   }
 }
