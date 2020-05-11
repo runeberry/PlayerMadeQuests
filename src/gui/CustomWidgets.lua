@@ -28,7 +28,7 @@ function addon.CustomWidgets:CreateWidget(name, ...)
   if type(widgetTemplate.Create) ~= "function" then
     error(errPrefix.."Widget does not have a Create function")
   end
-  local widget = widgetTemplate.Create(...)
+  local widget = widgetTemplate:Create(...)
   if widget == nil then
     error(errPrefix.."Widget constructor returned nil")
   end
