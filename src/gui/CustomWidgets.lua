@@ -14,22 +14,23 @@ function addon.CustomWidgets:NewWidget(name)
     return {}
   end
 
-  local widget = {}
-  widgets[name] = {}
-  return widget
+  local widgetTemplate = {}
+  widgets[name] = widgetTemplate
+  return widgetTemplate
 end
 
 function addon.CustomWidgets:CreateWidget(name, ...)
-  local constructor = widgets[name]
-  if constructor == nil then
-    error("No custom widget exists with name: "..name)
+  local errPrefix = "Failed to create widget '"..name.."': "
+  local widgetTemplate = widgets[name]
+  if widgetTemplate == nil then
+    error(errPrefix.."No custom widget is registered with this name")
   end
-  local ok, widget = addon:catch(constructor, ...)
-  if not ok then
-    return nil
-  elseif widget == nil then
-    addon:error("Failed to build custom widget: constructor returned nil for widget '"..name.."'")
-    return nil
+  if type(widgetTemplate.Create) ~= "function" then
+    error(errPrefix.."Widget does not have a Create function")
+  end
+  local widget = widgetTemplate.Create(...)
+  if widget == nil then
+    error(errPrefix.."Widget constructor returned nil")
   end
   return widget
 end

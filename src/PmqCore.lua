@@ -11,7 +11,7 @@ addon.ADDON_VERSION = "0.0.1"
 addon.ADDON_BRANCH = "alpha"
 
 function addon.Ace:OnInitialize()
-  local ok, msg = addon:catch(function()
+  addon:catch(function()
     addon.SaveData:Init()
 
     addon:load()
@@ -27,9 +27,6 @@ function addon.Ace:OnInitialize()
 
     addon:info("PMQ Loaded")
   end)
-  if not ok then
-    print("[PMQ] Fatal error on startup:", msg)
-  end
 end
 
 function addon.Ace:OnEnable()
@@ -222,7 +219,7 @@ end
 function addon:load()
   if _onloadBuffer == nil then return end
   for _, fn in pairs(_onloadBuffer) do
-    addon:catch(fn)
+    fn()
   end
   _onloadBuffer = nil
 end

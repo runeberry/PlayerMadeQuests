@@ -56,12 +56,7 @@ local function OnGroupSelected(container, event, group)
   container:AddChild(contentGroup)
 
   if not selectedScreen.frame then
-    local ok, frame = addon:catch(selectedScreen.Create, selectedScreen, contentGroup.frame)
-    if not ok then
-      addon:error(errPrefix, frame)
-      return
-    end
-    selectedScreen.frame = frame
+    selectedScreen.frame = selectedScreen:Create(selectedScreen, contentGroup.frame)
   end
 
   if selectedScreen.frame then
@@ -92,7 +87,9 @@ local function OnShow()
   treeGroupWidget = AceGUI:Create("TreeGroup")
   treeGroupWidget:EnableButtonTooltips(false)
   treeGroupWidget:SetTree(menuTree)
-  treeGroupWidget:SetCallback("OnGroupSelected", OnGroupSelected)
+  treeGroupWidget:SetCallback("OnGroupSelected", function(...)
+    addon:catch(OnGroupSelected, ...)
+  end)
   mainMenuWidget:AddChild(treeGroupWidget)
 end
 
