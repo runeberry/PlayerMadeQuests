@@ -22,7 +22,7 @@ SlashCmdList.PMQ = function(msg, editbox)
         addon:error("Error: no demo quest exists with id:", args[2])
         return
       end
-      local parameters = addon.QuestScript:Compile(demo.script)
+      local parameters = addon.QuestEngine:Compile(demo.script)
       local quest = addon.QuestEngine:NewQuest(parameters)
       quest:StartTracking()
       addon.QuestEngine:Save()
