@@ -8,9 +8,7 @@
 
   <Include file="events/index.xml"/>
   <Include file="qeng/index.xml"/>
-  <Include file="qsc/index.xml"/>
-  <Include file="catalog/index.xml"/>
+  <Include file="data/index.xml"/>
   <Include file="db/index.xml"/>
   <Include file="gui/index.xml"/>
-  <Include file="qdata/index.xml"/>
 </Ui>
