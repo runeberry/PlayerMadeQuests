@@ -13,7 +13,6 @@ function addon.Ace:OnInitialize()
     addon:load()
     addon.SaveData:Init()
     logger:info("PMQ Loaded")
-    --addon.MainMenu:Show()
   end)
 end
 

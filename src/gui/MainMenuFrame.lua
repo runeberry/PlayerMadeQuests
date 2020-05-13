@@ -135,4 +135,5 @@ end
 addon:OnSaveDataLoaded(function()
   savedSettings = addon.SaveData:LoadTable("Settings")
   addon.MainMenu:NewMenuScreen([[help]], "Help")
+  --addon.MainMenu:Show()
 end)
