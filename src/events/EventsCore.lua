@@ -9,7 +9,6 @@ local processDelayMs = 0.033 -- approximately 1 frame @ 30 FPS
 local function checkHasSubscribers(broker, event)
   if addon:tlen(broker.handlersMap[event]) == 0 then
     -- There are no handlers registered for this event
-    addon:log(broker.logLevelNoHandlers, "Attempted to handle", event, "event, but there are no subscribers")
     return false
   end
   return true
@@ -17,12 +16,12 @@ end
 
 local function handleEvent(broker, event, ...)
   for _, handler in pairs(broker.handlersMap[event]) do
-    local logLevel = broker.logLevelHandle
+    local logLevel = addon.LogLevel.trace
     if handler.logLevel then
       -- If the handler has a log level, then override the broker's default log level
       logLevel = handler.logLevel
     end
-    addon:log(logLevel, "Handling "..broker.name..":", event)
+    broker.logger:log(logLevel, "Handling "..broker.name..":", event)
     addon:catch(handler.fn, ...)
   end
 end
@@ -40,11 +39,10 @@ local function processQueue(broker)
 end
 
 local function broker_Publish(self, event, ...)
-  addon:log(self.logLevelPublish, "Publishing "..self.name..":", event)
+  self.logger:trace("Publishing "..self.name..":", event)
   local handlers = self.handlersMap[event]
   if addon:tlen(handlers) == 0 then
     -- There are no handlers registered for this event
-    addon:log(self.logLevelNoHandlers, "Attempted to handle", event, "event, but there are no subscribers")
     return
   elseif self._async then
     -- Async event handling - set a timer and execute events on the next frame
@@ -95,7 +93,7 @@ local function broker_Subscribe(self, event, handlerFunc, options)
 
   local key = addon:CreateID("subscription-%i")
   handlers[key] = handler
-  addon:log(self.logLevelSubscribe, "Subscribed to "..self.name..":", event)
+  self.logger:trace("Subscribed to "..self.name..":", event)
   return key -- Key can be used to unsubscribe later
 end
 
@@ -103,7 +101,6 @@ local function broker_Unsubscribe(self, event, key)
   local handlers = self.handlersMap[event]
   if handlers == nil then
     -- No handlers to unsubscribe
-    addon:log(self.loglevelNoHandlers, "No handlers to unsubscribe from event:", event)
     return false
   end
 
@@ -111,7 +108,6 @@ local function broker_Unsubscribe(self, event, key)
 
   if handler == nil then
     -- No handler subscribed with that key
-    addon:log(self.loglevelNoHandlers, "No", event, "handlers to unsubscribe with key:", key)
     return false
   end
 
@@ -126,7 +122,7 @@ local function broker_Unsubscribe(self, event, key)
     self.handlersMap[event] = nil
   end
 
-  addon:log(self.logLevelUnsubscribe, "Unsubscribed from event:", event)
+  self.logger:trace("Unsubscribed from event:", event)
   return true
 end
 
@@ -136,25 +132,25 @@ local function broker_EnableAsync(self, bool)
   self._async = bool
 end
 
+local function broker_SetLogLevel(self, loglevel)
+  self.logger:SetLogLevel(loglevel)
+end
+
 function addon.Events:CreateBroker(name)
   local broker = {
     name = name or "event",
     _pubFlag = false,
     _async = false,
+    logger = addon:NewLogger(),
     queue = {},
     handlersMap = {},
-
-    logLevelPublish = addon.LogLevel.none,
-    logLevelSubscribe = addon.LogLevel.none,
-    logLevelUnsubscribe = addon.LogLevel.none,
-    logLevelHandle = addon.LogLevel.none,
-    logLevelNoHandlers = addon.LogLevel.none,
 
     Publish = broker_Publish,
     Subscribe = broker_Subscribe,
     Unsubscribe = broker_Unsubscribe,
 
-    EnableAsync = broker_EnableAsync
+    EnableAsync = broker_EnableAsync,
+    SetLogLevel = broker_SetLogLevel,
   }
 
   return broker

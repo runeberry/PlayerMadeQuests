@@ -4,7 +4,7 @@ addon:traceFile("PmqCli.lua")
 local SlashCmdList = addon.G.SlashCmdList
 local strsplit = addon.G.strsplit
 
-local savedSettings
+local logger = addon:NewLogger()
 
 SLASH_PMQ1 = "/pmq"
 
@@ -15,28 +15,26 @@ SlashCmdList.PMQ = function(msg, editbox)
 
     if cmd == "reset" then
       addon.QuestEngine:ResetQuestLog()
-      addon:info("Quest log reset")
+      logger:info("Quest log reset")
     elseif cmd == "add" then
       local demo = addon.QuestDemos:GetDemoByID(args[2])
       if not demo then
-        addon:error("Error: no demo quest exists with id:", args[2])
+        logger:error("Error: no demo quest exists with id:", args[2])
         return
       end
       local parameters = addon.QuestEngine:Compile(demo.script)
       local quest = addon.QuestEngine:NewQuest(parameters)
       quest:StartTracking()
       addon.QuestEngine:Save()
-      addon:info("Accepted quest -", quest.name)
+      logger:info("Accepted quest -", quest.name)
     elseif cmd == "log" then
-      addon.MinLogLevel = tonumber(args[2])
-      savedSettings.MinLogLevel = addon.MinLogLevel
-      addon:fatal("Log level set to", args[2])
+      addon.PlayerSettings.MinLogLevel = addon:SetGlobalLogLevel(args[2])
     elseif cmd == "show" then
       addon:ShowQuestLog(true)
     elseif cmd == "hide" then
       addon:ShowQuestLog(false)
     elseif cmd == "toggle" then
-      addon:ShowQuestLog(not(savedSettings.IsQuestLogShown))
+      addon:ShowQuestLog(not(addon.PlayerSettings.IsQuestLogShown))
     elseif cmd == "demoframe" then
       addon:ShowDemoFrame()
     elseif cmd == "list" then
@@ -46,7 +44,3 @@ SlashCmdList.PMQ = function(msg, editbox)
     end
   end)
 end
-
-addon:onload(function()
-  savedSettings = addon.SaveData:LoadTable("Settings")
-end)

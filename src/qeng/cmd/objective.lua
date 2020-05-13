@@ -17,8 +17,6 @@ local conditions = {
 local cmd = QuestEngine:NewCommand("objective", "obj", "o")
 
 function cmd:Parse(quest, args)
-  -- addon:info("Parsing objective command")
-  -- addon:logtable(args)
   local rule = QuestEngine:GetArgsValue(args, 2)
   if rule == nil then
     error("Rule name is required")

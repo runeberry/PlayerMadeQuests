@@ -5,13 +5,7 @@ local UnitExists = addon.G.UnitExists
 local rule = addon.QuestEngine:NewRule("talkto")
 
 function rule:GetDisplayText(obj)
-  local str = ""
-  if obj:HasCondition("target") then
-    str = "Talk to "..addon:GetConditionValueText(obj.conditions["target"])
-  else
-    str = "Talk to anyone"
-  end
-  return str
+  return "Talk to "..obj:GetConditionDisplayText("target", "anyone")
 end
 
 -- Publish the TalkTo event anytime the player targets a friendly unit

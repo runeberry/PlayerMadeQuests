@@ -1,6 +1,8 @@
 local _, addon = ...
 addon:traceFile("QuestEngine.lua")
 
+local logger = addon:NewLogger(addon.LogLevel.info)
+
 addon.QuestEngine = {}
 
 local commands = {}
@@ -19,7 +21,6 @@ local status = addon.QuestStatus
 
 addon:OnSaveDataLoaded(function()
   addon.QuestEngine:Load()
-  loaded = true
 end)
 
 ------------------------
@@ -57,6 +58,35 @@ local function objective_GetDisplayText(obj)
   end
 end
 
+local function objective_GetConditionDisplayText(obj, condName, defaultIfZero)
+  local condVal = obj.conditions and obj.conditions[condName]
+
+  if condVal == nil then
+    return defaultIfZero or ""
+  end
+
+  local len = addon:tlen(condVal)
+  if len == 0 then
+    return defaultIfZero or ""
+  end
+  if len == 1 then
+    for v in pairs(condVal) do
+      return v
+    end
+  elseif len > 1 then
+    local ret = ""
+    local i = 1
+    for v in pairs(condVal) do
+      if i == len then
+        return ret.." or "..v
+      else
+        ret = ret..", "..v
+      end
+      i = i + 1
+    end
+  end
+end
+
 local function quest_StartTracking(quest)
   -- All objectives created for a rule are stored together
   -- so that they can be quickly evaluated together
@@ -82,7 +112,7 @@ local function evaluateObjective(rule, obj, ...)
   if rule.BeforeCheckConditions then
     ok, beforeResult = addon:catch(rule.BeforeCheckConditions, rule, obj, ...)
     if not(ok) then
-      addon:error("Error during BeforeCheckConditions for '", obj.id, "':", beforeResult)
+      logger:error("Error during BeforeCheckConditions for '", obj.id, "':", beforeResult)
       return
     elseif beforeResult == false then
       return
@@ -95,11 +125,11 @@ local function evaluateObjective(rule, obj, ...)
     local condition = conditions[name]
     ok, checkResult = addon:catch(condition.CheckCondition, condition, obj, val)
     if not(ok) then
-      addon:error("Error evaluating condition '", name,"' for '", obj.id, "':", checkResult)
+      logger:error("Error evaluating condition '", name,"' for '", obj.id, "':", checkResult)
       return
     elseif checkResult ~= true  then
       -- If any result was not true, stop evaluating conditions
-      --addon:trace("Condition '"..name.."' evaluated: "..checkResult.."")
+      logger:trace("Condition '"..name.."' evaluated:", checkResult)
       break
     end
   end
@@ -109,7 +139,7 @@ local function evaluateObjective(rule, obj, ...)
   if rule.AfterCheckConditions then
     ok, afterResult = addon:catch(rule.AfterCheckConditions, rule, obj, checkResult, ...)
     if not(ok) then
-      addon:error("Error during AfterCheckConditions for '", obj.id, "':", afterResult)
+      logger:error("Error during AfterCheckConditions for '", obj.id, "':", afterResult)
       return
     elseif afterResult ~= nil then
       -- If the After function returns a value, then that value will override the result of CheckCondition
@@ -132,8 +162,8 @@ end
 local function wrapRuleHandler(rule)
   -- Given an arbitrary list of game event args, handle them as follows
   return function(...)
-    -- addon:debug("Evaluating rule:", rule.name, "(", addon:tlen(rule.objectives), "objectives )")
-    -- addon:logtable(rule.objectives)
+    logger:debug("Evaluating rule:", rule.name, "(", addon:tlen(rule.objectives), "objectives )")
+    -- logger:table(rule.objectives)
     -- Completed objectives will be tracked and removed from the list
     local completed = {}
     local anychanged = false
@@ -145,7 +175,7 @@ local function wrapRuleHandler(rule)
         completed[id] = obj
       else
         local result = evaluateObjective(rule, obj, ...)
-        -- addon:debug("    Result:", result)
+        logger:debug("    Result:", result)
 
         if result > 0 then
           anychanged = true
@@ -197,17 +227,17 @@ end
 
 function addon.QuestEngine:NewCommand(name, ...)
   if name == nil or name == "" then
-    addon:error("Failed to build QuestEngine command: at least one name is required")
+    logger:error("Failed to build QuestEngine command: at least one name is required")
     return {}
   end
 
   if type(name) ~= "string" or not(name:match(cleanNamePattern)) then
-    addon:error("Failed to build QuestEngine command: name '"..name.."'must contain only lowercase alphanumeric characters")
+    logger:error("Failed to build QuestEngine command: name '"..name.."'must contain only lowercase alphanumeric characters")
     return {}
   end
 
   if commands[name] ~= nil then
-    addon:error("Failed to build QuestEngine command: '"..name.."' is already defined")
+    logger:error("Failed to build QuestEngine command: '"..name.."' is already defined")
     return {}
   end
 
@@ -220,7 +250,7 @@ function addon.QuestEngine:NewCommand(name, ...)
   local aliases = { ... }
   for _, alias in pairs(aliases) do
     if commands[alias] ~= nil then
-      addon:error("Failed to build QuestEngine alias: '"..alias.."' is already defined")
+      logger:error("Failed to build QuestEngine alias: '"..alias.."' is already defined")
     else
       commands[alias] = command
     end
@@ -231,17 +261,17 @@ end
 
 function addon.QuestEngine:NewRule(name)
   if name == nil or name == "" then
-    addon:error("Failed to build quest rule: name is required")
+    logger:error("Failed to build quest rule: name is required")
     return {}
   end
 
   if type(name) ~= "string" or not(name:match(cleanNamePattern)) then
-    addon:error("Failed to build quest rule: name '"..name.."'must contain only lowercase alphanumeric characters")
+    logger:error("Failed to build quest rule: name '"..name.."'must contain only lowercase alphanumeric characters")
     return {}
   end
 
   if rules[name] ~= nil then
-    addon:error("Failed to build quest rule: '"..name.."' is already defined")
+    logger:error("Failed to build quest rule: '"..name.."' is already defined")
     return {}
   end
 
@@ -252,23 +282,23 @@ function addon.QuestEngine:NewRule(name)
 
   addon.RuleEvents:Subscribe(name, wrapRuleHandler(rule))
   rules[name] = rule
-  -- addon:trace("Registered quest rule: '" .. rule.name .. "'")
+  logger:trace("Registered quest rule: '" .. rule.name .. "'")
   return rule
 end
 
 function addon.QuestEngine:NewCondition(name)
   if name == nil or name == "" then
-    addon:error("Failed to build condition: name is required")
+    logger:error("Failed to build condition: name is required")
     return {}
   end
 
   if type(name) ~= "string" or not(name:match(cleanNamePattern)) then
-    addon:error("Failed to build condition: name '"..name.."'must contain only lowercase alphanumeric characters")
+    logger:error("Failed to build condition: name '"..name.."'must contain only lowercase alphanumeric characters")
     return {}
   end
 
   if conditions[name] ~= nil then
-    addon:error("Failed to build condition: '"..name.."' is already defined")
+    logger:error("Failed to build condition: '"..name.."' is already defined")
     return {}
   end
 
@@ -305,6 +335,7 @@ function addon.QuestEngine:NewQuest(parameters)
     obj.GetMetadata = objective_GetMetadata
     obj.SetMetadata = objective_SetMetadata
     obj.GetDisplayText = objective_GetDisplayText
+    obj.GetConditionDisplayText = objective_GetConditionDisplayText
 
     for name, _ in pairs(obj.conditions) do
       local condition = conditions[name]
@@ -322,7 +353,7 @@ function addon.QuestEngine:NewQuest(parameters)
   quest.StopTracking = quest_StopTracking
 
   quests[quest.id] = quest
-  if loaded then
+  if addon.IsAddonLoaded then
     addon.AppEvents:Publish("QuestCreated", quest)
   end
   return quest
@@ -369,7 +400,6 @@ function addon.QuestEngine:Load()
     end
   end
 
-  loaded = true
   addon.AppEvents:Publish("QuestLogLoaded", quests)
 end
 
@@ -383,14 +413,18 @@ function addon.QuestEngine:ResetQuestLog()
 end
 
 function addon.QuestEngine:PrintQuestLog()
-  -- addon:logtable(qlog)
-  addon:info("=== You have", addon:tlen(quests), "quests in your log ===")
+  -- logger:table(qlog)
+  logger:info("=== You have", addon:tlen(quests), "quests in your log ===")
   for _, q in pairs(quests) do
-    addon:info(q.name, "(", q.status, ") [", q.id, "]")
+    logger:info(q.name, "(", q.status, ") [", q.id, "]")
     for _, o in pairs(q.objectives) do
-      addon:info("    ", o.name, o.progress, "/",  o.goal)
+      logger:info("    ", o.name, o.progress, "/",  o.goal)
     end
   end
+end
+
+function addon.QuestEngine:GetConditionValueText(val)
+
 end
 
 -----------------------------
@@ -582,7 +616,7 @@ function addon.QuestEngine:Compile(script)
       end
     end
   end
-  addon:debug("Quest compiled")
-  -- addon:logtable(quest)
+  logger:debug("Quest compiled")
+  -- logger:table(quest)
   return quest
 end

@@ -1,6 +1,7 @@
 local _, addon = ...
 addon:traceFile("SaveData.lua")
 
+local logger = addon:NewLogger()
 local loaded = false
 local files = {
   PMQCache = false,
@@ -8,6 +9,8 @@ local files = {
 }
 
 addon.SaveData = {}
+addon.PlayerSettings = nil
+addon.GlobalSettings = nil
 
 function addon.SaveData:Init()
   if loaded then return end
@@ -21,6 +24,11 @@ function addon.SaveData:Init()
     files[varname] = saved
   end
   loaded = true
+
+  -- These are such frequently used tables, just make them easily accessible
+  addon.PlayerSettings = self:LoadTable("Settings")
+  addon.GlobalSettings = self:LoadTable("Settings", true)
+
   addon.AppEvents:Publish("SaveDataLoaded")
 end
 
@@ -36,7 +44,7 @@ function addon.SaveData:Load(field, global)
   else
     value = files.PMQCache[field]
   end
-  -- addon:debug("SaveData loaded. ("..field..")")
+  -- logger:debug("SaveData loaded. ("..field..")")
   return value
 end
 
@@ -73,5 +81,5 @@ function addon.SaveData:Save(field, value, global)
   else
     files.PMQCache[field] = value
   end
-  addon:debug("SaveData saved. ("..field..")")
+  logger:debug("SaveData saved. ("..field..")")
 end

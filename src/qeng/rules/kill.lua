@@ -1,16 +1,12 @@
 local _, addon = ...
 addon:traceFile("rules/kill.lua")
 
-local rule = addon.QuestEngine:NewRule("kill")
+local QuestEngine = addon.QuestEngine
+
+local rule = QuestEngine:NewRule("kill")
 
 function rule:GetDisplayText(obj)
-  local str = ""
-  if obj:HasCondition("target") then
-    str = addon:GetConditionValueText(obj.conditions["target"])
-  else
-    str = "Kill enemies"
-  end
-  return str
+  return obj:GetConditionDisplayText("target", "Kill enemies")
 end
 
 function rule:BeforeCheckConditions(obj, cl)
@@ -24,7 +20,7 @@ function rule:AfterCheckConditions(obj)
 end
 
 addon:onload(function()
-  addon.CombatLogEvents:Subscribe("PARTY_KILL", function()
-    addon.RuleEvents:Publish(rule.name, addon:GetClog())
+  addon.CombatLogEvents:Subscribe("PARTY_KILL", function(cl)
+    addon.RuleEvents:Publish(rule.name, cl)
   end)
 end)

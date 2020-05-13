@@ -3,6 +3,9 @@
 
   <Script file="Deps.lua"/>
   <Script file="PmqCore.lua"/>
+
+  <Include file="util/index.xml"/>
+
   <Script file="PmqCli.lua"/>
   <Script file="SaveData.lua"/>
 

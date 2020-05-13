@@ -35,7 +35,7 @@ local function SavePosition(widget)
   end
   local w, h = widget.frame:GetSize()
   savedSettings.QuestLogPosition = strjoin(",", p1, p2, x, y, w, h)
-  -- addon:debug("Saving position:", p1, p2, x, y, w, h)
+  -- logger:debug("Saving position:", p1, p2, x, y, w, h)
 end
 
 local function LoadPosition(widget)
@@ -73,7 +73,7 @@ end
 
 local function SetQuestLogHeadingText(heading, qlog)
   local numQuests = addon:tlen(qlog)
-  heading:SetText("You have "..numQuests.." "..addon:pluralize(numQuests, "quest").." in your log.")
+  heading:SetText("You have "..numQuests.." "..addon:Pluralize(numQuests, "quest").." in your log.")
 end
 
 local function SetQuestText(label, quest)
