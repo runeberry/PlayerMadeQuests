@@ -54,6 +54,14 @@ local function dt_UnsubscribeFromEvents(self, ...)
   end
 end
 
+local function dt_GetSelectedRow(self)
+  local index = self._scrollingTable:GetSelection()
+  if not index then
+    return nil
+  end
+  return self._scrollingTable:GetRow(index)
+end
+
 function widget:Create(parent, colinfo, datasource, ...)
   local frame = CreateFrame("Frame", nil, parent)
   frame:SetAllPoints(true)
@@ -75,6 +83,7 @@ function widget:Create(parent, colinfo, datasource, ...)
   frame.SubscribeToEvents = dt_SubscribeToEvents
   frame.EnableUpdates = dt_EnableUpdates
   frame.UnsubscribeFromEvents = dt_UnsubscribeFromEvents
+  frame.GetSelectedRow = dt_GetSelectedRow
 
   return frame
 end

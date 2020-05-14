@@ -1,35 +1,21 @@
 local _, addon = ...
+local QuestDemos = addon.QuestDemos
 local CreateFrame = addon.G.CreateFrame
 
 local menu = addon.MainMenu:NewMenuScreen([[demo]], "Demo Quests")
 
 local colinfo = {
   {
-    name = "Objective",
-    width = 100,
+    name = "QuestID",
+    width = 200,
     align = "LEFT"
-  },
-  {
-    name = "Progress",
-    width = 50,
-    align = "CENTER"
-  },
-  {
-    name = "Goal",
-    width = 50,
-    align = "CENTER"
   }
 }
 
-local testdata = {
-  { "table start"}
-}
+local dqRows = {}
 
-local function getDemoQuests(obj)
-  if obj ~= nil then
-    table.insert(testdata, { obj.name, obj.progress, obj.goal })
-  end
-  return testdata
+local function getDemoQuests()
+  return dqRows
 end
 
 function menu:Create(parent)
@@ -37,19 +23,55 @@ function menu:Create(parent)
   frame:SetAllPoints(true)
   frame:Hide()
 
-  local dataTable = addon.CustomWidgets:CreateWidget("DataTable", frame, colinfo, getDemoQuests)
-  dataTable:SubscribeToEvents("ObjectiveUpdated")
+  for _, dq in pairs(QuestDemos:GetDemos()) do
+    table.insert(dqRows, { dq.id })
+  end
 
-  frame.dataTable = dataTable
+  local buttonPane = CreateFrame("Frame", nil, frame)
+  buttonPane:SetPoint("TOPLEFT", frame, "TOPLEFT")
+  buttonPane:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT")
+  buttonPane:SetWidth(120)
+
+  local tablePane = CreateFrame("Frame", nil, frame)
+  tablePane:SetPoint("TOPLEFT", buttonPane, "TOPRIGHT")
+  tablePane:SetPoint("BOTTOMLEFT", buttonPane, "BOTTOMRIGHT")
+  tablePane:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
+  tablePane:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
+
+  local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getDemoQuests)
+  dataTable:RefreshData()
+  -- frame.dataTable = dataTable
+
+  local acceptButton = CreateFrame("Button", nil, buttonPane, "UIPanelButtonTemplate")
+  acceptButton:SetPoint("TOPLEFT", buttonPane, "TOPLEFT")
+  acceptButton:SetPoint("TOPRIGHT", buttonPane, "TOPRIGHT")
+  acceptButton:SetSize(100, 20)
+  acceptButton:SetText("Accept")
+  acceptButton:SetScript("OnClick", function()
+    local row = dataTable:GetSelectedRow()
+    if not row or not row[1] then
+      return
+    end
+    local demoId = row[1]
+    local demo = addon.QuestDemos:GetDemoByID(demoId)
+    if not demo then
+      -- logger:error("Error: no demo quest exists with id:", args[2])
+      return
+    end
+    local parameters = addon.QuestEngine:Compile(demo.script)
+    local quest = addon.QuestEngine:NewQuest(parameters)
+    quest:StartTracking()
+    addon.QuestEngine:Save()
+  end)
 
   return frame
 end
 
-function menu:OnShow(frame)
-  frame.dataTable:EnableUpdates(true)
-  frame.dataTable:RefreshData()
-end
+-- function menu:OnShow(frame)
+--   -- frame.dataTable:EnableUpdates(true)
+--   -- frame.dataTable:RefreshData()
+-- end
 
-function menu:OnHide(frame)
-  frame.dataTable:EnableUpdates(false)
-end
+-- function menu:OnHide(frame)
+--   -- frame.dataTable:EnableUpdates(false)
+-- end
