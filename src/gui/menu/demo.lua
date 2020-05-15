@@ -57,8 +57,12 @@ function menu:Create(parent)
     dataTable:ClearSelection()
   end
 
+  local viewCode = function()
+    addon.MainMenu:OpenSubmenu("demo-view")
+  end
+
   buttonPane:AddButton("Accept Quest", acceptQuest)
-  buttonPane:AddButton("View Code")
+  buttonPane:AddButton("View Code", viewCode)
   buttonPane:AddButton("Copy to Drafts")
 
   return frame

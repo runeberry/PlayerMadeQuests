@@ -4,8 +4,9 @@ local addonVersion = addon:GetVersion()
 
 addon.MainMenu = {}
 local menuTree = {}
-local menuScreens = {}
-local savedSettings, mainMenuWidget, treeGroupWidget
+local menuScreens = {} -- These screens are accessed directly by a menu item
+local submenuScreens = {}
+local mainMenuWidget, treeGroupWidget, selectedScreen, groupSelectContainer
 
 local function getOrCreateMenu(menu, value)
   for _, m in pairs(menu) do
@@ -14,13 +15,19 @@ local function getOrCreateMenu(menu, value)
     end
   end
 
-  local newItem = { value = value, text = value }
+  local newItem = { value = value, name = value }
   table.insert(menu, newItem)
   return newItem
 end
 
-local function OnGroupSelected(container, event, group)
-  local selectedScreen = menuScreens[group]
+local function OnGroupSelected(container, event, group, useSubmenus)
+  groupSelectContainer = container
+  if useSubmenus then
+    selectedScreen = submenuScreens[group]
+  else
+    selectedScreen = menuScreens[group]
+  end
+
   if selectedScreen == nil then
     error("No screen registered for group "..group)
   end
@@ -71,6 +78,10 @@ end
 local function OnClose(widget)
   mainMenuWidget = nil
   treeGroupWidget = nil
+  if selectedScreen and selectedScreen.frame then
+    selectedScreen.frame:Hide()
+  end
+  selectedScreen = nil
   AceGUI:Release(widget)
 end
 
@@ -126,13 +137,26 @@ function addon.MainMenu:NewMenuScreen(path, text)
   local obj = {
     heading = menu.text
   }
-  path = path:gsub([[\]], "\001") -- to match Ace's crazy format
-  menuScreens[path] = obj
+  menuScreens[path:gsub([[\]], "\001")] = obj -- to match Ace's crazy format
+  addon.Logger:Trace("Registered menu", menu.text, "at path:", path)
   return obj
 end
 
+function addon.MainMenu:NewSubmenuScreen(id, name)
+  local obj = {
+    heading = name
+  }
+  submenuScreens[id] = obj
+  addon.Logger:Trace("Registered submenu", name, "with id:", id)
+  return obj
+end
+
+-- This is my hacky way of doing submenus... but it seems to work!
+function addon.MainMenu:OpenSubmenu(id)
+  OnGroupSelected(groupSelectContainer, nil, id, true)
+end
+
 addon:OnSaveDataLoaded(function()
-  savedSettings = addon.SaveData:LoadTable("Settings")
   addon.MainMenu:NewMenuScreen([[help]], "Help")
-  -- addon.MainMenu:Show()
+  addon.MainMenu:Show()
 end)

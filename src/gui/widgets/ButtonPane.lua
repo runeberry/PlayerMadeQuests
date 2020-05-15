@@ -61,7 +61,7 @@ local function bp_AddButton(self, text, onClick, options)
 
   local button = CreateFrame("Button", nil, self, options.template)
   button:SetText(text)
-  button:SetScript("OnClick", onClick)
+  button:SetScript("OnClick", function() addon:catch(onClick) end)
   button:SetSize(options.width, options.height)
   button._anchor = options.anchor
 
