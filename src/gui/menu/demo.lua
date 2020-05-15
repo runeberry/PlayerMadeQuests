@@ -27,10 +27,7 @@ function menu:Create(parent)
     table.insert(dqRows, { dq.id })
   end
 
-  local buttonPane = CreateFrame("Frame", nil, frame)
-  buttonPane:SetPoint("TOPLEFT", frame, "TOPLEFT")
-  buttonPane:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT")
-  buttonPane:SetWidth(120)
+  local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "LEFT", 120)
 
   local tablePane = CreateFrame("Frame", nil, frame)
   tablePane:SetPoint("TOPLEFT", buttonPane, "TOPRIGHT")
@@ -42,12 +39,7 @@ function menu:Create(parent)
   dataTable:RefreshData()
   -- frame.dataTable = dataTable
 
-  local acceptButton = CreateFrame("Button", nil, buttonPane, "UIPanelButtonTemplate")
-  acceptButton:SetPoint("TOPLEFT", buttonPane, "TOPLEFT")
-  acceptButton:SetPoint("TOPRIGHT", buttonPane, "TOPRIGHT")
-  acceptButton:SetSize(100, 20)
-  acceptButton:SetText("Accept")
-  acceptButton:SetScript("OnClick", function()
+  local acceptQuest = function()
     local row = dataTable:GetSelectedRow()
     if not row or not row[1] then
       return
@@ -62,7 +54,12 @@ function menu:Create(parent)
     local quest = addon.QuestEngine:NewQuest(parameters)
     quest:StartTracking()
     addon.QuestEngine:Save()
-  end)
+    dataTable:ClearSelection()
+  end
+
+  buttonPane:AddButton("Accept Quest", acceptQuest)
+  buttonPane:AddButton("View Code")
+  buttonPane:AddButton("Copy to Drafts")
 
   return frame
 end

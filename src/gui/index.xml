@@ -11,6 +11,7 @@
   <Script file="gui/menu/about.lua"/>
   <Script file="gui/menu/faq.lua"/>
 
+  <Script file="gui/widgets/ButtonPane.lua"/>
   <Script file="gui/widgets/DataTable.lua"/>
   <Script file="gui/widgets/DraftEditor.lua"/>
   <Script file="gui/widgets/DraftTable.lua"/>

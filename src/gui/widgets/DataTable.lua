@@ -62,6 +62,10 @@ local function dt_GetSelectedRow(self)
   return self._scrollingTable:GetRow(index)
 end
 
+local function dt_ClearSelection(self)
+  return self._scrollingTable:ClearSelection()
+end
+
 function widget:Create(parent, colinfo, datasource, ...)
   local frame = CreateFrame("Frame", nil, parent)
   frame:SetAllPoints(true)
@@ -84,6 +88,7 @@ function widget:Create(parent, colinfo, datasource, ...)
   frame.EnableUpdates = dt_EnableUpdates
   frame.UnsubscribeFromEvents = dt_UnsubscribeFromEvents
   frame.GetSelectedRow = dt_GetSelectedRow
+  frame.ClearSelection = dt_ClearSelection
 
   return frame
 end
