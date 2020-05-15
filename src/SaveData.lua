@@ -1,7 +1,6 @@
 local _, addon = ...
 addon:traceFile("SaveData.lua")
 
-local logger = addon:NewLogger()
 local loaded = false
 local files = {
   PMQCache = false,
@@ -44,7 +43,7 @@ function addon.SaveData:Load(field, global)
   else
     value = files.PMQCache[field]
   end
-  -- logger:debug("SaveData loaded. ("..field..")")
+  -- addon.Logger:Debug("SaveData loaded. ("..field..")")
   return value
 end
 
@@ -81,5 +80,5 @@ function addon.SaveData:Save(field, value, global)
   else
     files.PMQCache[field] = value
   end
-  logger:debug("SaveData saved. ("..field..")")
+  addon.Logger:Debug("SaveData saved. ("..field..")")
 end

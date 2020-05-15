@@ -1,6 +1,7 @@
 local _, addon = ...
 local unpack = addon.G.unpack
 
+addon.Logger = nil -- Defined at the end of this file
 addon.LogLevel = {
   fatal = 1,
   error = 2,
@@ -12,15 +13,6 @@ addon.LogLevel = {
 }
 local ll = addon.LogLevel
 
--- Enable this to bypass all logging rules and print everything to console
-local forceLogging = false
-local minloglevel = nil
-local loggers = {}
-
--- Buffer logs from all loggers until the app is loaded, then flush them
-local useLogBuffer = true
-local globalLogBuffer = {}
-
 local logcolors = {
   [ll.fatal] = "red",
   [ll.error] = "red",
@@ -31,19 +23,25 @@ local logcolors = {
   [ll.none] = "grey"
 }
 
-addon:OnSaveDataLoaded(function()
-  minloglevel = addon.PlayerSettings.MinLogLevel or addon.LogLevel.info
+-- Enable this to bypass all logging rules and print everything to console
+-- Only enable this if something is seriously broken with logging
+local forceLogging = false
 
-  for _, logger in pairs(loggers) do
-    -- Set minloglevel now that it's loaded from save file
-    logger._minloglevel = logger._minloglevel or minloglevel
-  end
+-- This will be updated from player settings when save data is loaded
+local globalLogLevel = ll.info
+
+-- Buffer logs from all loggers until the app is loaded, then flush them
+local useLogBuffer = true
+local globalLogBuffer = {}
+
+addon:OnSaveDataLoaded(function()
+  globalLogLevel = addon.PlayerSettings.MinLogLevel or globalLogLevel
 
   -- Flush all buffered logs
-  -- print("Flushing log buffer")
+  -- print("Flushing log buffer:", #globalLogBuffer)
   useLogBuffer = false
   for _, l in pairs(globalLogBuffer) do
-    l.logger:log(l.loglevel, l.str, unpack(l.args))
+    l.logger:Log(l.loglevel, l.str, unpack(l.args))
   end
   globalLogBuffer = nil
   -- print("End flushing log buffer")
@@ -53,15 +51,15 @@ local function logger_SetLogLevel(self, loglevel)
   self._minloglevel = loglevel
 end
 
-local function logger_log(self, loglevel, str, ...)
+local function logger_Log(self, loglevel, str, ...)
   if useLogBuffer then
     table.insert(globalLogBuffer, { logger = self, loglevel = loglevel, str = str, args = { ... } })
     return
   end
-  if loglevel > self._minloglevel then
-    return
+  -- Log must be "higher priority" than both the instance and global log levels
+  if loglevel <= globalLogLevel and loglevel <= self._minloglevel then
+    print(addon:GetEscapeColor(logcolors[loglevel])..self._prefix, str, ...)
   end
-  print(addon:GetEscapeColor(logcolors[loglevel]).."[PMQ]", str, ...)
 end
 
 local function logger_forcelog(self, loglevel, str, ...)
@@ -69,73 +67,87 @@ local function logger_forcelog(self, loglevel, str, ...)
 end
 
 -- Shorthand methods for logging
-local function logger_fatal(self, str, ...) self:log(ll.fatal, str, ...) end
-local function logger_error(self, str, ...) self:log(ll.error, str, ...) end
-local function logger_warn(self, str, ...) self:log(ll.warn, str, ...) end
-local function logger_info(self, str, ...) self:log(ll.info, str, ...) end
-local function logger_debug(self, str, ...) self:log(ll.debug, str, ...) end
-local function logger_trace(self, str, ...) self:log(ll.trace, str, ...) end
+local function logger_Fatal(self, str, ...) self:Log(ll.fatal, str, ...) end
+local function logger_Error(self, str, ...) self:Log(ll.error, str, ...) end
+local function logger_Warn(self, str, ...) self:Log(ll.warn, str, ...) end
+local function logger_Info(self, str, ...) self:Log(ll.info, str, ...) end
+local function logger_Debug(self, str, ...) self:Log(ll.debug, str, ...) end
+local function logger_Trace(self, str, ...) self:Log(ll.trace, str, ...) end
 
-local function logger_varargs(self, ...)
+local function logger_Varargs(self, ...)
   local vals = {}
   for n=1, select('#', ...) do
     local val = select(n, ...)
     vals[#vals+1] = tostring(val)
   end
-  self:debug("Variadic args: [" .. table.concat(vals, ", ") .. "]")
+  self:Debug("Variadic args: [" .. table.concat(vals, ", ") .. "]")
 end
 
-local function logger_table(self, t, key, indent, circ)
+local function logger_Table(self, t, key, indent, circ)
   if t == nil then
-    self:debug("Table is nil")
+    self:Debug("Table is nil")
     return
   end
   indent = indent or ""
   circ = circ or {}
   circ[t] = true
   if key then
-    self:debug(indent, key, "=", t, "(", addon:tlen(t), "elements )")
+    self:Debug(indent, key, "=", t, "(", addon:tlen(t), "elements )")
   else
-    self:debug(t, "(", addon:tlen(t), "elements )")
+    self:Debug(t, "(", addon:tlen(t), "elements )")
   end
   indent = indent.."  "
   for k, v in pairs(t) do
     if type(v) == "table" then
       if circ[v] then
-        self:debug(indent, k, "=", v, "(Dupe)")
+        self:Debug(indent, k, "=", v, "(Dupe)")
       else
-        self:table(v, k, indent, circ)
+        self:Table(v, k, indent, circ)
       end
     else
-      self:debug(indent, k, "=", v)
+      self:Debug(indent, k, "=", v)
     end
   end
 end
 
-function addon:NewLogger(min)
-  local logger = {
-    _logbuffer = {},
-    _minloglevel = min or minloglevel,
+local function logger_NewLogger(self, name, min)
+  if self then
+    -- Inherit the logger name from the parent logger
+    if name then
+      name = self._name..":"..name
+    else
+      name = self._name
+    end
+    -- Inherit the log level unless another one was specified
+    if not min then
+      min = self._minloglevel
+    end
+  end
 
+  local logger = {
+    _name = name,
+    _prefix = "["..name.."]",
+    _minloglevel = min,
+
+    NewLogger = logger_NewLogger,
     SetLogLevel = logger_SetLogLevel,
 
-    log = logger_log,
-    fatal = logger_fatal,
-    error = logger_error,
-    warn = logger_warn,
-    info = logger_info,
-    debug = logger_debug,
-    trace = logger_trace,
+    Log = logger_Log,
+    Fatal = logger_Fatal,
+    Error = logger_Error,
+    Warn = logger_Warn,
+    Info = logger_Info,
+    Debug = logger_Debug,
+    Trace = logger_Trace,
 
-    varargs = logger_varargs,
-    table = logger_table
+    Varargs = logger_Varargs,
+    Table = logger_Table
   }
 
   if forceLogging then
     logger.log = logger_forcelog
   end
 
-  table.insert(loggers, logger)
   return logger
 end
 
@@ -151,11 +163,10 @@ function addon:SetGlobalLogLevel(loglevel)
     return
   end
 
-  minloglevel = logvalue
-  for _, logger in pairs(loggers) do
-    -- set log level for any loggers that don't have one set explicitly
-    logger._minloglevel = logger._minloglevel or minloglevel
-  end
+  globalLogLevel = logvalue
   print("[PMQ] Global log level set to:", logname)
-  return minloglevel
+  return globalLogLevel
 end
+
+-- Cannot create the global logger until this method is available
+addon.Logger = logger_NewLogger(nil, "PMQ", ll.trace)

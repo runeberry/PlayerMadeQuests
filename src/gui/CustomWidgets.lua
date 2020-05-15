@@ -3,15 +3,14 @@ addon:traceFile("CustomWidgets.lua")
 
 addon.CustomWidgets = {}
 local widgets = {}
-local logger = addon:NewLogger()
 
 function addon.CustomWidgets:NewWidget(name)
   if name == nil or name == "" then
-    logger:error("Unable to create CustomWidget: name is required")
+    addon.Logger:Error("Unable to create CustomWidget: name is required")
     return {}
   end
   if widgets[name] then
-    logger:warn("Unable to create CustomWidget: widget already exists with name '"..name.."'")
+    addon.Logger:Warn("Unable to create CustomWidget: widget already exists with name '"..name.."'")
     return {}
   end
 

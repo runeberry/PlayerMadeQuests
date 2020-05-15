@@ -4,15 +4,13 @@ addon.ADDON_VERSION = "0.0.1"
 addon.ADDON_BRANCH = "alpha"
 addon.IsAddonLoaded = false
 
-local logger
-
 function addon.Ace:OnInitialize()
-  logger = addon:NewLogger()
   addon:catch(function()
+    addon.Logger:NewLogger("test")
     addon.IsAddonLoaded = true
     addon:load()
     addon.SaveData:Init()
-    logger:info("PMQ Loaded")
+    addon.Logger:Info("PMQ Loaded")
   end)
 end
 
@@ -37,9 +35,11 @@ end
 function addon:catch(fn, ...)
   local ok, result = pcall(fn, ...)
   if not(ok) then
-    logger:error("Lua script error")
+    -- Uncomment this as an escape hatch to print errors if logging breaks
+    -- print("Lua script error") if result then print(result) end
+    addon.Logger:Error("Lua script error")
     if result then
-      logger:error(result)
+      addon.Logger:Error(result)
     end
   end
   return ok, result
@@ -73,6 +73,6 @@ end
 
 function addon:assertFile(filename)
   if tracedFiles[filename] == nil then
-    logger:fatal("Expected file not loaded:", filename)
+    addon.Logger:Fatal("Expected file not loaded:", filename)
   end
 end

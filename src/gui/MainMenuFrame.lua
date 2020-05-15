@@ -3,7 +3,6 @@ local AceGUI, strsplit = addon.AceGUI, addon.G.strsplit
 local addonVersion = addon:GetVersion()
 
 addon.MainMenu = {}
-local logger = addon:NewLogger()
 local menuTree = {}
 local menuScreens = {}
 local savedSettings, mainMenuWidget, treeGroupWidget
@@ -118,7 +117,7 @@ function addon.MainMenu:NewMenuScreen(path, text)
   elseif t1 then
     menu = getOrCreateMenu(menuTree, t1)
   else
-    logger:warn("Unable to build menu at path:", path)
+    addon.Logger:Warn("Unable to build menu at path:", path)
     return {}
   end
 
@@ -135,5 +134,5 @@ end
 addon:OnSaveDataLoaded(function()
   savedSettings = addon.SaveData:LoadTable("Settings")
   addon.MainMenu:NewMenuScreen([[help]], "Help")
-  --addon.MainMenu:Show()
+  -- addon.MainMenu:Show()
 end)

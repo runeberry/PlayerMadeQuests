@@ -47,7 +47,7 @@ function menu:Create(parent)
     local demoId = row[1]
     local demo = addon.QuestDemos:GetDemoByID(demoId)
     if not demo then
-      -- logger:error("Error: no demo quest exists with id:", args[2])
+      -- addon.Logger:Error("Error: no demo quest exists with id:", args[2])
       return
     end
     local parameters = addon.QuestEngine:Compile(demo.script)
