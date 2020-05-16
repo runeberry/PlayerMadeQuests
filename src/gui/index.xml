@@ -14,9 +14,9 @@
 
   <!-- Submenus -->
   <Script file="gui/menu/demo-view.lua"/>
-  <Script file="gui/menu/demo-view.lua"/>
 
   <!-- Custom Widgets -->
   <Script file="gui/widgets/ButtonPane.lua"/>
   <Script file="gui/widgets/DataTable.lua"/>
+  <Script file="gui/widgets/ScrollingEditBox.lua"/>
 </Ui>
