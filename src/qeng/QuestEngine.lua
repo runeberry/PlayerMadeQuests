@@ -465,21 +465,21 @@ end
     }
   }
 --]]
-function addon.QuestEngine:Compile(script)
-  local quest = {}
+function addon.QuestEngine:Compile(script, params)
+  local parameters = params or {}
   if script ~= nil and script ~= "" then
     for line in script:gmatch("[^\r\n]+") do
       if not line:match("^%s*$") then
         local ok, args = addon:catch(parseArgs, line)
         if ok then
-          addon:catch(runCommand, quest, args)
+          addon:catch(runCommand, parameters, args)
         end
       end
     end
   end
   logger:Debug("Quest compiled")
   -- logger:Table(quest)
-  return quest
+  return parameters
 end
 
 function addon.QuestEngine:Build(parameters)

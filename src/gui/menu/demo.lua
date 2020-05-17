@@ -6,9 +6,14 @@ local menu = addon.MainMenu:NewMenuScreen([[demo]], "Demo Quests", true)
 
 local colinfo = {
   {
-    name = "QuestID",
-    width = 200,
+    name = "Quest",
+    pwidth = 0.5,
     align = "LEFT"
+  },
+  {
+    name = "Demo ID",
+    pwidth = 0.5,
+    align = "RIGHT"
   }
 }
 
@@ -24,7 +29,7 @@ function menu:Create(parent)
   frame:Hide()
 
   for _, dq in pairs(QuestDemos:GetDemos()) do
-    table.insert(dqRows, { dq.id })
+    table.insert(dqRows, { dq.name, dq.id })
   end
 
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "LEFT", 120)
@@ -41,17 +46,18 @@ function menu:Create(parent)
 
   local acceptQuest = function()
     local row = dataTable:GetSelectedRow()
-    if not row or not row[1] then
+    if not row or not row[2] then
       return
     end
-    addon.QuestLog:AcceptDemo(row[1])
+    addon.Logger:Table(row)
+    addon.QuestLog:AcceptDemo(row[2])
     dataTable:ClearSelection()
   end
 
   local viewCode = function()
     local selectedRow = dataTable:GetSelectedRow()
     if not selectedRow then return end
-    local demoId = selectedRow[1]
+    local demoId = selectedRow[2]
     addon.MainMenu:Show("demo-view", demoId)
   end
 

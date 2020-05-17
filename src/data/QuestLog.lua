@@ -84,13 +84,13 @@ function addon.QuestLog:AcceptDemo(demoId)
     logger:Error("Failed to accept quest: no demo exists with id:", demoId)
     return
   end
-  local parameters = QuestEngine:Compile(demo.script)
+  local parameters = QuestEngine:Compile(demo.script, { name = demo.name })
   local quest = QuestEngine:Build(parameters)
   acceptQuest(quest)
 end
 
 function addon.QuestLog:AcceptDraft(draft)
-  local parameters = QuestEngine:Compile(draft.script)
+  local parameters = QuestEngine:Compile(draft.script, draft.parameters)
   local quest = QuestEngine:Build(parameters)
   acceptQuest(quest)
 end
