@@ -23,7 +23,7 @@ SlashCmdList.PMQ = function(msg, editbox)
       addon:ShowQuestLog(false)
     elseif cmd == "toggle" then
       addon:ShowQuestLog(not(addon.PlayerSettings.IsQuestLogShown))
-    elseif cmd == "list" then
+    elseif cmd == "print" then
       addon.QuestLog:Print()
     else
       addon.MainMenu:Show()
