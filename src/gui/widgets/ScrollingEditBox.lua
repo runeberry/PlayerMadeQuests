@@ -41,8 +41,8 @@ function widget:Create(parent)
 
   scrollFrame:SetPoint("TOPLEFT", editBoxBorderFrame, "TOPLEFT", 8, -8)
   scrollFrame:SetPoint("BOTTOMLEFT", editBoxBorderFrame, "BOTTOMLEFT", -8, 8)
-  scrollFrame:SetPoint("TOPRIGHT", editBoxBorderFrame, "TOPRIGHT", -1*scrollBarWidth - 8, -8)
-  scrollFrame:SetPoint("BOTTOMRIGHT", editBoxBorderFrame, "BOTTOMRIGHT", -1*scrollBarWidth - 8, 8)
+  scrollFrame:SetPoint("TOPRIGHT", editBoxBorderFrame, "TOPRIGHT", -1*scrollBarWidth, -8)
+  scrollFrame:SetPoint("BOTTOMRIGHT", editBoxBorderFrame, "BOTTOMRIGHT", -1*scrollBarWidth, 8)
 
   editBoxBorderFrame:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1*scrollBarWidth, 0)
   editBoxBorderFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1*scrollBarWidth, 0)

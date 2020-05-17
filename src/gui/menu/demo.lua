@@ -2,7 +2,7 @@ local _, addon = ...
 local QuestDemos = addon.QuestDemos
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen([[demo]], "Demo Quests")
+local menu = addon.MainMenu:NewMenuScreen([[demo]], "Demo Quests", true)
 
 local colinfo = {
   {
@@ -58,7 +58,7 @@ function menu:Create(parent)
   end
 
   local viewCode = function()
-    addon.MainMenu:OpenSubmenu("demo-view")
+    addon.MainMenu:Show("demo-view")
   end
 
   buttonPane:AddButton("Accept Quest", acceptQuest)

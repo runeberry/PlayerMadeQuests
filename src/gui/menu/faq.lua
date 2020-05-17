@@ -1,7 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen([[help\faq]], "FAQs")
+local menu = addon.MainMenu:NewMenuScreen([[help\faq]], "FAQs", true)
 local _frame
 
 local faq = {

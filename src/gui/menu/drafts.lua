@@ -1,7 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen([[drafts]], "My Questography")
+local menu = addon.MainMenu:NewMenuScreen([[drafts]], "My Questography", true)
 
 function menu:Create(parent)
   local frame = CreateFrame("Frame", nil, parent)

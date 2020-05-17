@@ -1,7 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen([[help\about]], "About PMQ")
+local menu = addon.MainMenu:NewMenuScreen([[help\about]], "About PMQ", true)
 
 function menu:Create(parent)
   local frame = CreateFrame("Frame", nil, parent)
