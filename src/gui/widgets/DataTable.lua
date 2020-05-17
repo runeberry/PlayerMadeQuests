@@ -70,6 +70,25 @@ function widget:Create(parent, colinfo, datasource, ...)
   local frame = CreateFrame("Frame", nil, parent)
   frame:SetAllPoints(true)
 
+  -- Set column widths if not explicitly set in pixels
+  local frameWidth = frame:GetWidth() - 15 -- approx. account for edge inset
+  local remainingWidth, remainingCols = frameWidth, {}
+  for _, ci in pairs(colinfo) do
+    if ci.pwidth then
+      -- pwidth: percent width of the parent frame
+      ci.width = ci.pwidth * frameWidth
+      remainingWidth = remainingWidth - ci.width
+    elseif ci.width then
+      remainingWidth = remainingWidth - ci.width
+    else
+      table.insert(remainingCols, ci)
+    end
+  end
+  for _, ci in pairs(remainingCols) do
+    -- any cols without a width set will equally share the remaining space
+    ci.width = remainingWidth / #remainingCols
+  end
+
   local st = LibScrollingTable:CreateST(colinfo, nil, nil, nil, frame)
   st.frame:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -12)
   st.frame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
