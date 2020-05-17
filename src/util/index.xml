@@ -3,4 +3,5 @@
   <Script file="util/Tables.lua"/>
   <Script file="util/Identifiers.lua"/>
   <Script file="util/Logger.lua"/>
+  <Script file="util/Sounds.lua"/>
 </Ui>

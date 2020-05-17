@@ -1,5 +1,5 @@
 local _, addon = ...
-local Ace, LibCompress, PlaySoundFile = addon.Ace, addon.LibCompress, addon.G.PlaySoundFile
+local Ace, LibCompress = addon.Ace, addon.LibCompress
 local QuestEngine, QuestStatus = addon.QuestEngine, addon.QuestStatus
 local QuestDemos = addon.QuestDemos
 local logger = addon.Logger:NewLogger("QuestLog")
@@ -18,6 +18,7 @@ local function acceptQuest(quest)
   addon.QuestLog:Save()
   addon.AppEvents:Publish("QuestAccepted", quest)
   logger:Info("Accepted quest:", quest.name)
+  addon:PlaySound("QuestAccepted")
 end
 
 function addon.QuestLog:Save()
@@ -63,6 +64,8 @@ function addon.QuestLog:Clear()
   quests = {}
   self:Save()
   addon.AppEvents:Publish("QuestLogLoaded", quests)
+  logger:Info("Quest Log reset")
+  addon:PlaySound("QuestAbandoned")
 end
 
 function addon.QuestLog:Print()

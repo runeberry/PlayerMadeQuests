@@ -13,7 +13,6 @@ SlashCmdList.PMQ = function(msg, editbox)
 
     if cmd == "reset" then
       addon.QuestLog:Clear()
-      addon.Logger:Info("Quest log reset")
     elseif cmd == "add" then
       addon.QuestLog:AcceptDemo(args[2])
     elseif cmd == "log" then
