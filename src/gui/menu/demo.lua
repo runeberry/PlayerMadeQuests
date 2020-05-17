@@ -44,16 +44,7 @@ function menu:Create(parent)
     if not row or not row[1] then
       return
     end
-    local demoId = row[1]
-    local demo = addon.QuestDemos:GetDemoByID(demoId)
-    if not demo then
-      -- addon.Logger:Error("Error: no demo quest exists with id:", args[2])
-      return
-    end
-    local parameters = addon.QuestEngine:Compile(demo.script)
-    local quest = addon.QuestEngine:NewQuest(parameters)
-    quest:StartTracking()
-    addon.QuestEngine:Save()
+    addon.QuestLog:AcceptDemo(row[1])
     dataTable:ClearSelection()
   end
 

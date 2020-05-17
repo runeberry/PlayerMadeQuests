@@ -22,6 +22,7 @@ addon.G = {
   CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo,
   CreateFrame = CreateFrame,
   GetUnitName = GetUnitName,
+  PlaySoundFile = PlaySoundFile,
   SlashCmdList = SlashCmdList,
   UnitExists = UnitExists,
   UnitGUID = UnitGUID,

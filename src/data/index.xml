@@ -2,4 +2,5 @@
   <Script file="data/QuestCatalog.lua"/>
   <Script file="data/QuestDemos.lua"/>
   <Script file="data/QuestDrafts.lua"/>
+  <Script file="data/QuestLog.lua"/>
 </Ui>

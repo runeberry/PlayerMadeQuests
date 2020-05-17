@@ -8,9 +8,7 @@ addon.QuestEngine = {}
 local commands = {}
 local rules = {}
 local conditions = {}
-local quests = {}
 local cleanNamePattern = "^[%l%d]+$"
-local loaded = false
 
 addon.QuestStatus = {
   Active = "Active",
@@ -18,10 +16,6 @@ addon.QuestStatus = {
   Completed = "Completed",
 }
 local status = addon.QuestStatus
-
-addon:OnSaveDataLoaded(function()
-  addon.QuestEngine:Load()
-end)
 
 ------------------------
 -- Predefined Methods --
@@ -85,22 +79,6 @@ local function objective_GetConditionDisplayText(obj, condName, defaultIfZero)
       i = i + 1
     end
   end
-end
-
-local function quest_StartTracking(quest)
-  -- All objectives created for a rule are stored together
-  -- so that they can be quickly evaluated together
-  for _, obj in pairs(quest.objectives) do
-    obj._rule.objectives[obj.id] = obj
-  end
-  addon.AppEvents:Publish("QuestTrackingStarted", quest)
-end
-
-local function quest_StopTracking(quest)
-  for _, obj in pairs(quest.objectives) do
-    obj._rule.objectives[obj.id] = nil
-  end
-  addon.AppEvents:Publish("QuestTrackingStopped", quest)
 end
 
 ---------------------------------------------------
@@ -203,7 +181,7 @@ local function wrapRuleHandler(rule)
             if questCompleted then
               quest.status = status.Completed
               addon.AppEvents:Publish("QuestCompleted", quest)
-              quest:StopTracking()
+              addon.QuestEngine:StopTracking(quest)
             end
           end
         end
@@ -216,7 +194,7 @@ local function wrapRuleHandler(rule)
     end
 
     if anychanged then
-      addon.QuestEngine:Save()
+      addon.QuestLog:Save()
     end
   end
 end
@@ -308,123 +286,6 @@ function addon.QuestEngine:NewCondition(name)
 
   conditions[name] = condition
   return condition
-end
-
-function addon.QuestEngine:NewQuest(parameters)
-  parameters.name = parameters.name or error("Failed to create quest: quest name is required")
-
-  local quest = addon:CopyTable(parameters)
-  quest.id = quest.id or addon:CreateID("quest-%i")
-  quest.status = quest.status or status.Active
-  quest.objectives = quest.objectives or {}
-
-  for _, obj in pairs(quest.objectives) do
-    obj.name = obj.name or error("Failed to create quest: objective name is required")
-    obj._rule = rules[obj.name] or error("Failed to create quest: '"..obj.name.."' is not a valid rule")
-    obj._quest = quest -- Add reference back to this obj's quest
-    obj._tempdata = {}
-
-    obj.id = obj.id or addon:CreateID("objective-"..obj.name.."-%i")
-    obj.progress = obj.progress or 0
-    obj.goal = obj.goal or 1
-    obj.conditions = obj.conditions or {}
-    obj.metadata = obj.metadata or {}
-
-    -- Add predefined methods here
-    obj.HasCondition = objective_HasCondition
-    obj.GetMetadata = objective_GetMetadata
-    obj.SetMetadata = objective_SetMetadata
-    obj.GetDisplayText = objective_GetDisplayText
-    obj.GetConditionDisplayText = objective_GetConditionDisplayText
-
-    for name, _ in pairs(obj.conditions) do
-      local condition = conditions[name]
-      if condition == nil then
-        error("Failed to create quest: '"..name.."' is not a valid condition")
-      end
-      if condition.CheckCondition == nil then
-        error("Failed to create quest: condition '"..name.."' does not have a CheckCondition method")
-      end
-    end
-  end
-
-  -- Add predefined methods here
-  quest.StartTracking = quest_StartTracking
-  quest.StopTracking = quest_StopTracking
-
-  quests[quest.id] = quest
-  if addon.IsAddonLoaded then
-    addon.AppEvents:Publish("QuestCreated", quest)
-  end
-  return quest
-end
-
----------------
--- Quest Log --
----------------
-
-function addon.QuestEngine:GetQuestByID(id)
-  return quests[id]
-end
-
-function addon.QuestEngine:Save()
-  local cleaned = addon:CleanTable(addon:CopyTable(quests))
-  local serialized = addon.Ace:Serialize(cleaned)
-  local compressed = addon.LibCompress:CompressHuffman(serialized)
-  addon.SaveData:Save("QuestLog", compressed)
-end
-
-function addon.QuestEngine:Load()
-  local compressed = addon.SaveData:LoadString("QuestLog")
-  -- For some reason the data becomes an empty table when I first access it?
-  if compressed == "" then
-    -- Nothing to load
-    return
-  end
-
-  local serialized, msg = addon.LibCompress:Decompress(compressed)
-  if serialized == nil then
-    error("Error loading quest log: "..msg)
-  end
-
-  local ok, saved = addon.Ace:Deserialize(serialized)
-  if not(ok) then
-    -- 2nd param is an error message if it failed
-    error("Error loading quest log: "..saved)
-  end
-
-  for _, q in pairs(saved) do
-    local qc = addon.QuestEngine:NewQuest(q)
-    if qc.status == status.Active then
-      qc:StartTracking()
-    end
-  end
-
-  addon.AppEvents:Publish("QuestLogLoaded", quests)
-end
-
-function addon.QuestEngine:ResetQuestLog()
-  for _, quest in pairs(quests) do
-    quest:StopTracking()
-  end
-  quests = {}
-  self:Save()
-  addon.AppEvents:Publish("QuestLogLoaded", quests)
-end
-
-function addon.QuestEngine:PrintQuestLog()
-  -- logger:table(qlog)
-  logger:Info("=== You have", addon:tlen(quests), "quests in your log ===")
-  for _, q in pairs(quests) do
-    logger:Info(q.name, "(", q.status, ") [", q.id, "]")
-    for _, o in pairs(q.objectives) do
-      logger:Info("    ", o.name, o.progress, "/",  o.goal)
-    end
-  end
-end
-
-function addon.QuestEngine:GetConditionValueText(val)
-
 end
 
 -----------------------------
@@ -619,4 +480,64 @@ function addon.QuestEngine:Compile(script)
   logger:Debug("Quest compiled")
   -- logger:Table(quest)
   return quest
+end
+
+function addon.QuestEngine:Build(parameters)
+  parameters.name = parameters.name or error("Failed to create quest: quest name is required")
+
+  local quest = addon:CopyTable(parameters)
+  quest.id = quest.id or addon:CreateID("quest-%i")
+  quest.status = quest.status or status.Active
+  quest.objectives = quest.objectives or {}
+
+  for _, obj in pairs(quest.objectives) do
+    obj.name = obj.name or error("Failed to create quest: objective name is required")
+    obj._rule = rules[obj.name] or error("Failed to create quest: '"..obj.name.."' is not a valid rule")
+    obj._quest = quest -- Add reference back to this obj's quest
+    obj._tempdata = {}
+
+    obj.id = obj.id or addon:CreateID("objective-"..obj.name.."-%i")
+    obj.progress = obj.progress or 0
+    obj.goal = obj.goal or 1
+    obj.conditions = obj.conditions or {}
+    obj.metadata = obj.metadata or {}
+
+    -- Add predefined methods here
+    obj.HasCondition = objective_HasCondition
+    obj.GetMetadata = objective_GetMetadata
+    obj.SetMetadata = objective_SetMetadata
+    obj.GetDisplayText = objective_GetDisplayText
+    obj.GetConditionDisplayText = objective_GetConditionDisplayText
+
+    for name, _ in pairs(obj.conditions) do
+      local condition = conditions[name]
+      if condition == nil then
+        error("Failed to create quest: '"..name.."' is not a valid condition")
+      end
+      if condition.CheckCondition == nil then
+        error("Failed to create quest: condition '"..name.."' does not have a CheckCondition method")
+      end
+    end
+  end
+
+  if addon.IsAddonLoaded then
+    addon.AppEvents:Publish("QuestCreated", quest)
+  end
+  return quest
+end
+
+function addon.QuestEngine:StartTracking(quest)
+  -- All objectives created for a rule are stored together
+  -- so that they can be quickly evaluated together
+  for _, obj in pairs(quest.objectives) do
+    obj._rule.objectives[obj.id] = obj
+  end
+  addon.AppEvents:Publish("QuestTrackingStarted", quest)
+end
+
+function addon.QuestEngine:StopTracking(quest)
+  for _, obj in pairs(quest.objectives) do
+    obj._rule.objectives[obj.id] = nil
+  end
+  addon.AppEvents:Publish("QuestTrackingStopped", quest)
 end

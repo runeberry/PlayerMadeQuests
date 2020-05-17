@@ -1,6 +1,6 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
-local QuestDemos = addon.QuestDemos
+local QuestDemos, QuestLog = addon.QuestDemos, addon.QuestLog
 
 local menu = addon.MainMenu:NewMenuScreen([[demo-view]], "Demo Quest View")
 
@@ -23,15 +23,8 @@ local function button_Back()
 end
 
 local function button_Accept()
-  local demo = addon.QuestDemos:GetDemoByID(currentDemoId)
-  if not demo then
-    addon.Logger:Error("No demo available with id:", currentDemoId)
-    return
-  end
-  local parameters = addon.QuestEngine:Compile(demo.script)
-  local quest = addon.QuestEngine:NewQuest(parameters)
-  quest:StartTracking()
-  addon.QuestEngine:Save()
+  if not currentDemoId then return end
+  QuestLog:AcceptDemo(currentDemoId)
 end
 
 local function button_CopyToDrafts()

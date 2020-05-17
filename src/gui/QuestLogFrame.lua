@@ -152,11 +152,11 @@ local function BuildQuestLogFrame()
   end)
   subscriptions["QuestLogLoaded"] = subKey
 
-  subKey = addon.AppEvents:Subscribe("QuestCreated", function(quest)
+  subKey = addon.AppEvents:Subscribe("QuestAccepted", function(quest)
     SetQuestLogHeadingText(frames["heading"], qlog)
     AddQuest(frames["questList"], quest)
   end)
-  subscriptions["QuestCreated"] = subKey
+  subscriptions["QuestAccepted"] = subKey
 
   subKey = addon.AppEvents:Subscribe("QuestCompleted", function(quest)
     SetQuestText(frames[quest.id], quest)
