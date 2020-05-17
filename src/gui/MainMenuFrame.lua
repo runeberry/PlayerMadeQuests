@@ -79,14 +79,6 @@ local function OnGroupSelected(container, event, group, useSubmenus)
   openMenuScreen(container, screen)
 end
 
-function addon.MainMenu:ShowMenuScreen(id)
-
-end
-
-function addon.MainMenu:NavigateToMenuScreen(path)
-
-end
-
 local function OnClose(widget)
   mainMenuWidget = nil
   treeGroupWidget = nil

@@ -58,7 +58,10 @@ function menu:Create(parent)
   end
 
   local viewCode = function()
-    addon.MainMenu:Show("demo-view")
+    local selectedRow = dataTable:GetSelectedRow()
+    if not selectedRow then return end
+    local demoId = selectedRow[1]
+    addon.MainMenu:Show("demo-view", demoId)
   end
 
   buttonPane:AddButton("Accept Quest", acceptQuest)
