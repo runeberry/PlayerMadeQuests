@@ -33,7 +33,7 @@ end)
 function addon.QuestDrafts:NewDraft(name)
   local draft = {
     id = addon:CreateID("draft-%i"),
-    name = name,
+    name = name or "",
     version = 1,
     status = status.Draft,
     listing = {},
@@ -45,6 +45,10 @@ function addon.QuestDrafts:NewDraft(name)
 
   addon.AppEvents:Publish("DraftCreated", draft)
   return draft
+end
+
+function addon.QuestDrafts:GetDrafts()
+  return drafts
 end
 
 function addon.QuestDrafts:GetDraftByID(id)
