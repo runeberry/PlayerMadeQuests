@@ -3,6 +3,7 @@
 
   <Script file="gui/MainMenuFrame.lua"/>
   <Script file="gui/QuestLogFrame.lua"/>
+  <Script file="gui/StaticPopups.lua"/>
   <Script file="gui/UIErrorsFrame.lua"/>
 
   <!-- This determines the order in which menu items are listed. -->

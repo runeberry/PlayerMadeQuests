@@ -91,6 +91,7 @@ end
 
 local function OnShow()
   mainMenuWidget = AceGUI:Create("Frame")
+  mainMenuWidget.frame:SetFrameStrata("HIGH")
   mainMenuWidget:SetTitle("PlayerMadeQuests")
   mainMenuWidget:SetStatusText("PMQ v"..addonVersion.." (thank you for testing! <3)")
   mainMenuWidget:SetCallback("OnClose", OnClose)
