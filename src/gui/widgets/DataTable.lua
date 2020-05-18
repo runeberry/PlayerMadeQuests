@@ -4,6 +4,9 @@ local CreateFrame, LibScrollingTable = addon.G.CreateFrame, addon.LibScrollingTa
 
 local widget = addon.CustomWidgets:NewWidget("DataTable")
 
+local rowHeight = 15
+local highlightColor = { r = 0.8, g = 0.7, b = 0, a = 0.5 }
+
 local function wrapEventRefresh(dt)
   return function(...)
     if dt._enableUpdates then
@@ -71,7 +74,7 @@ function widget:Create(parent, colinfo, datasource, ...)
   frame:SetAllPoints(true)
 
   -- Set column widths if not explicitly set in pixels
-  local frameWidth = frame:GetWidth() - 15 -- approx. account for edge inset
+  local frameWidth = frame:GetWidth() - 35 -- approx. account for edge inset and scrollbar
   local remainingWidth, remainingCols = frameWidth, {}
   for _, ci in pairs(colinfo) do
     if ci.pwidth then
@@ -89,7 +92,11 @@ function widget:Create(parent, colinfo, datasource, ...)
     ci.width = remainingWidth / #remainingCols
   end
 
-  local st = LibScrollingTable:CreateST(colinfo, nil, nil, nil, frame)
+  -- Show however many rows it takes to fill out the parent frame
+  local frameHeight = frame:GetHeight()
+  local numRows = math.floor(frameHeight / rowHeight) - 1 -- Leave off a row to account for header
+
+  local st = LibScrollingTable:CreateST(colinfo, numRows, rowHeight, highlightColor, frame)
   st.frame:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -12)
   st.frame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
   st:EnableSelection(true)
