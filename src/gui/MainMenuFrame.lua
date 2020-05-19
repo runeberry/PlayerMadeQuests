@@ -67,8 +67,7 @@ local function openMenuScreen(container, screen, ...)
 end
 
 -- This is the entry point for accessing a primary menu screen
-local function OnGroupSelected(container, event, group, useSubmenus)
-  groupSelectContainer = container
+local function OnGroupSelected(container, event, group)
   local path = group:gsub("\001", [[\]])
   local screen = menuScreensByPath[path]
   if not screen then
@@ -108,6 +107,9 @@ local function OnShow()
   -- Make closable with ESC
   _G[mmfGlobalName] = mainMenuWidget.frame
   table.insert(UISpecialFrames, mmfGlobalName)
+
+  -- This is the first parameter passed to OnGroupSelect
+  groupSelectContainer = treeGroupWidget.content.obj
 end
 
 function addon.MainMenu:Show(menuId, ...)
@@ -184,5 +186,5 @@ end
 
 addon:OnSaveDataLoaded(function()
   addon.MainMenu:NewMenuScreen([[help]], "Help", true)
-  addon.MainMenu:Show()
+  addon.MainMenu:Show([[demo-view]], "dtalk-ally")
 end)
