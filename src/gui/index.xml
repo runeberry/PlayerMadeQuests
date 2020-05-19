@@ -20,6 +20,6 @@
   <!-- Custom Widgets -->
   <Script file="gui/widgets/ButtonPane.lua"/>
   <Script file="gui/widgets/DataTable.lua"/>
-  <Script file="gui/widgets/ScrollingEditBox.lua"/>
   <Script file="gui/widgets/TextInput.lua"/>
+  <Script file="gui/widgets/TextInputScrolling.lua"/>
 </Ui>

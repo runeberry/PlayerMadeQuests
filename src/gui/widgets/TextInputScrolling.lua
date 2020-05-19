@@ -1,7 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 
-local widget = addon.CustomWidgets:NewWidget("ScrollingEditBox")
+local widget = addon.CustomWidgets:NewWidget("TextInputScrolling")
 
 local backdrop = {
 	bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
