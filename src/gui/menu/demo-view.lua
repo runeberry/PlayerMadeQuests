@@ -36,19 +36,24 @@ function menu:Create(parent)
   frame:SetAllPoints(true)
   frame:Hide()
 
+  local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Quest Name")
+  nameField:SetEnabled(false)
+  nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
+  nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
+  nameField:OnSubmit(function(text) addon.Logger:Info(text) end)
+
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "BOTTOM")
   -- bug: This should default to LEFT anchor, but it's defaulting to TOP for some reason? Investigate...
   buttonPane:AddButton("Back", button_Back, { anchor = "LEFT" })
   buttonPane:AddButton("Accept", button_Accept, { anchor = "RIGHT" })
   buttonPane:AddButton("Copy to Drafts", button_CopyToDrafts, { anchor = "RIGHT" })
 
-  local editBoxFrame = CreateFrame("Frame", nil, frame)
-  editBoxFrame:SetPoint("TOPLEFT", frame, "TOPLEFT")
-  editBoxFrame:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
-
-  local scrollingEditBox = addon.CustomWidgets:CreateWidget("ScrollingEditBox", editBoxFrame)
+  local scrollingEditBox = addon.CustomWidgets:CreateWidget("ScrollingEditBox", frame)
+  scrollingEditBox:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
+  scrollingEditBox:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
   scrollingEditBox.editBox:Disable()
 
+  frame.nameField = nameField
   frame.scrollingEditBox = scrollingEditBox
 
   return frame
@@ -61,9 +66,12 @@ function menu:OnShow(frame, demoId)
     addon.Logger:Error("No demo available with id:", demoId)
   end
   -- frame.scrollingEditBox.editBox:SetText(loremipsum)
+  frame.nameField:SetText(demo.name)
   frame.scrollingEditBox.editBox:SetText(demo.script)
 end
 
 function menu:OnHide(frame)
   currentDemoId = nil
+  frame.nameField:SetText(nil)
+  frame.scrollingEditBox.editBox:SetText("")
 end

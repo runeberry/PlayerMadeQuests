@@ -100,6 +100,7 @@ function widget:Create(parent, colinfo, datasource, ...)
   st.frame:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -12)
   st.frame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
   st:EnableSelection(true)
+  addon:ApplyBackgroundStyle(st.frame)
 
   frame._dataSource = datasource
   frame._enableUpdates = true
