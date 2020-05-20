@@ -40,7 +40,7 @@ function menu:Create(parent)
   nameField:SetEnabled(false)
   nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
   nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
-  nameField:OnSubmit(function(text) addon.Logger:Info(text) end)
+  nameField:OnEnterPressed(function(text) addon.Logger:Info(text) end)
 
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "BOTTOM")
   -- bug: This should default to LEFT anchor, but it's defaulting to TOP for some reason? Investigate...
@@ -48,13 +48,13 @@ function menu:Create(parent)
   buttonPane:AddButton("Accept", button_Accept, { anchor = "RIGHT" })
   buttonPane:AddButton("Copy to Drafts", button_CopyToDrafts, { anchor = "RIGHT" })
 
-  local scrollingEditBox = addon.CustomWidgets:CreateWidget("ScrollingEditBox", frame)
-  scrollingEditBox:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
-  scrollingEditBox:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
-  scrollingEditBox.editBox:Disable()
+  local scriptEditor = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "QuestScript")
+  -- scriptEditor:SetEnabled(false)
+  scriptEditor:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
+  scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
 
   frame.nameField = nameField
-  frame.scrollingEditBox = scrollingEditBox
+  frame.scriptEditor = scriptEditor
 
   return frame
 end
@@ -65,13 +65,13 @@ function menu:OnShow(frame, demoId)
   if not demo then
     addon.Logger:Error("No demo available with id:", demoId)
   end
-  -- frame.scrollingEditBox.editBox:SetText(loremipsum)
+  -- frame.scriptEditorSetText(loremipsum)
   frame.nameField:SetText(demo.name)
-  frame.scrollingEditBox.editBox:SetText(demo.script)
+  frame.scriptEditor:SetText(demo.script)
 end
 
 function menu:OnHide(frame)
   currentDemoId = nil
-  frame.nameField:SetText(nil)
-  frame.scrollingEditBox.editBox:SetText("")
+  frame.nameField:SetText()
+  frame.scriptEditor:SetText()
 end

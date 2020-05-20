@@ -5,10 +5,6 @@ local widget = addon.CustomWidgets:NewWidget("TextInput")
 
 local labelSpacer = "  "
 local textInset = 8
-local scrollBarBackdrop = {
-  bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
-  insets = { left = -1, right = 0, top = 4, bottom = 4 }
-}
 
 local function getFontHeight(fontInstance)
   local _, height = fontInstance:GetFont()
@@ -48,59 +44,34 @@ local function widget_GetText(self)
   return self.editBox:GetText()
 end
 
-local function widget_OnSubmit(self, fn)
+local function widget_OnEnterPressed(self, fn)
   self.onSubmit = fn
 end
 
-function widget:Create(parent, labelText, editBoxText, options)
+function widget:Create(parent, labelText, editBoxText, multiline)
   labelText = labelText or ""
   editBoxText = editBoxText or ""
 
   local frame = CreateFrame("Frame", nil, parent)
-
-  if options then
-    frame.multiline = options.multiline
-    frame.scrolling = options.scrolling
-  end
 
   local label = frame:CreateFontString(nil, "BACKGROUND")
   label:SetFontObject("GameFontHighlightSmall")
   label:SetJustifyH("LEFT")
   label:SetText(labelSpacer..labelText)
 
-  local scrollFrame, scrollBarFrame
-  if frame.scrolling then
-    scrollFrame, scrollBarFrame = addon:CreateScrollFrame(frame)
-  end
-
-  local editBox = CreateFrame("EditBox", nil, scrollFrame or frame)
+  local editBox = CreateFrame("EditBox", nil, frame)
   editBox:SetAutoFocus(false)
   editBox:SetFontObject("ChatFontNormal")
   editBox:SetText(editBoxText or "")
   editBox:SetScript("OnEscapePressed", editBox_OnEscapePressed)
+  editBox:SetTextInsets(textInset, textInset, textInset, textInset)
   addon:ApplyBackgroundStyle(editBox)
 
-  if frame.multiline then
+  if multiline then
     editBox:SetMultiLine(true)
   else
     -- OnSubmit will only react to single-line text boxes
     editBox:SetScript("OnEnterPressed", editBox_OnEnterPressed)
-  end
-
-  if frame.scrolling then
-    local scrollBarWidth = scrollBarFrame:GetWidth()
-    editBox:SetTextInsets(textInset, textInset + scrollBarWidth, textInset, textInset)
-
-    scrollBarFrame:SetPoint("TOPRIGHT", editBox, "TOPRIGHT")
-    scrollBarFrame:SetPoint("BOTTOMRIGHT", editBox, "BOTTOMRIGHT")
-    scrollFrame:SetPoint("TOPLEFT", label, "BOTTOMLEFT")
-    scrollFrame:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT")
-    scrollFrame:SetPoint("TOPRIGHT", label, "BOTTOMRIGHT", -1*scrollBarWidth, 0)
-    scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1*scrollBarWidth, 0)
-
-    scrollFrame:SetScrollChild(editBox)
-  else
-    editBox:SetTextInsets(textInset, textInset, textInset, textInset)
   end
 
   label:SetPoint("TOPLEFT", frame, "TOPLEFT")
@@ -108,13 +79,11 @@ function widget:Create(parent, labelText, editBoxText, options)
   editBox:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT")
   editBox:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
-  -- These are simply default heights and can be modified after the widget is created
-  if frame.multiline then
-    frame:SetHeight(getFontHeight(label) + getFontHeight(editBox)*3 + textInset*2)
-  else
-    frame:SetHeight(getFontHeight(label) + getFontHeight(editBox) + textInset*2)
+  local textHeight = getFontHeight(editBox)
+  if multiline then
+    textHeight = textHeight * 3
   end
-
+  frame:SetHeight(getFontHeight(label) + textHeight + textInset*2)
 
   editBox._widget = frame
   frame.label = label
@@ -127,7 +96,7 @@ function widget:Create(parent, labelText, editBoxText, options)
   frame.SetLabel = widget_SetLabel
   frame.SetText = widget_SetText
   frame.GetText = widget_GetText
-  frame.OnSubmit = widget_OnSubmit
+  frame.OnEnterPressed = widget_OnEnterPressed
 
   return frame
 end
