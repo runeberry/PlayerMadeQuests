@@ -466,7 +466,12 @@ end
   }
 --]]
 function addon.QuestEngine:Compile(script, params)
-  local parameters = params or {}
+  local parameters
+  if params then
+    parameters = addon:CopyTable(params)
+  else
+    parameters = {}
+  end
   if script ~= nil and script ~= "" then
     for line in script:gmatch("[^\r\n]+") do
       if not line:match("^%s*$") then

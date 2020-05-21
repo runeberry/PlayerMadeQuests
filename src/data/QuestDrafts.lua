@@ -30,6 +30,7 @@ addon:OnSaveDataLoaded(function()
   addon.AppEvents:Publish("DraftsLoaded", drafts)
 end)
 
+-- Does not save the draft to SavedVariables until you call SaveDraft
 function addon.QuestDrafts:NewDraft(name)
   local draft = {
     id = addon:CreateID("draft-%i"),
@@ -37,13 +38,33 @@ function addon.QuestDrafts:NewDraft(name)
     version = 1,
     status = status.Draft,
     listing = {},
-    quest = {},
+    parameters = { name = name or "" },
     script = ""
   }
 
-  drafts[draft.id] = draft
+  return draft
+end
 
-  addon.AppEvents:Publish("DraftCreated", draft)
+function addon.QuestDrafts:SaveDraft(draft)
+  if not draft.id then
+    addon.Logger:Error("Failed to save draft: id is required")
+  end
+
+  local existing = drafts[draft.id]
+  if existing then
+    if existing ~= draft then
+      -- Apply the provided draft as a patch to the existing one
+      draft = addon:MergeTable(existing, draft)
+      drafts[draft.id] = draft
+    end
+    -- Otherwise, the draft in the table is already updated, nothing to do
+  else
+    -- New draft, stick it in the table
+    drafts[draft.id] = draft
+  end
+
+  addon.SaveData:Save("Drafts", drafts)
+  addon.AppEvents:Publish("DraftSaved", draft)
   return draft
 end
 

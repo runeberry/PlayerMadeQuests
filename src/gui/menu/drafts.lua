@@ -26,7 +26,9 @@ local function getDrafts()
   draftRows = {}
   local drafts = QuestDrafts:GetDrafts()
   for _, draft in pairs(drafts) do
-    local row = { draft.name, draft.version, draft.status, draft.id }
+    -- Use quest name by default, but fall back on draft name if unavailable for some reaosn
+    local draftName = draft.parameters.name or ("["..draft.name.."]")
+    local row = { draftName, draft.version, draft.status, draft.id }
     table.insert(draftRows, row)
   end
   return draftRows
@@ -46,20 +48,18 @@ function menu:Create(parent)
   tablePane:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getDrafts)
-  dataTable:SubscribeToEvents("DraftCreated", "DraftDeleted")
+  dataTable:SubscribeToEvents("DraftSaved", "DraftDeleted")
   frame.dataTable = dataTable
 
   local newDraft = function()
-    QuestDrafts:NewDraft("Draft")
-    -- addon.MainMenu:Show("draft-view")
+    addon.MainMenu:Show("draft-view")
   end
 
   local editDraft = function()
     local selectedRow = dataTable:GetSelectedRow()
     if not selectedRow then return end
     local draftId = selectedRow[4]
-    addon.Logger:Info(draftId)
-    -- addon.MainMenu:Show("draft-view", draftId)
+    addon.MainMenu:Show("draft-view", draftId)
   end
 
   local confirmDraftDelete = addon.StaticPopups:NewPopup("ConfirmDraftDelete")

@@ -49,7 +49,7 @@ function menu:Create(parent)
   buttonPane:AddButton("Copy to Drafts", button_CopyToDrafts, { anchor = "RIGHT" })
 
   local scriptEditor = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "QuestScript")
-  -- scriptEditor:SetEnabled(false)
+  scriptEditor:SetEnabled(false)
   scriptEditor:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
 

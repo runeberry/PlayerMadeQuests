@@ -186,5 +186,5 @@ end
 
 addon:OnSaveDataLoaded(function()
   addon.MainMenu:NewMenuScreen([[help]], "Help", true)
-  addon.MainMenu:Show([[demo-view]], "dtalk-ally")
+  addon.MainMenu:Show([[drafts]])
 end)

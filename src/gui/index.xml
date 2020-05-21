@@ -16,6 +16,7 @@
 
   <!-- Submenus -->
   <Script file="gui/menu/demo-view.lua"/>
+  <Script file="gui/menu/draft-view.lua"/>
 
   <!-- Custom Widgets -->
   <Script file="gui/widgets/ButtonPane.lua"/>

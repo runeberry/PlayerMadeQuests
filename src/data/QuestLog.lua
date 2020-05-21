@@ -1,7 +1,7 @@
 local _, addon = ...
 local Ace, LibCompress = addon.Ace, addon.LibCompress
 local QuestEngine, QuestStatus = addon.QuestEngine, addon.QuestStatus
-local QuestDemos = addon.QuestDemos
+local QuestDemos, QuestDrafts = addon.QuestDemos, addon.QuestDrafts
 local logger = addon.Logger:NewLogger("QuestLog")
 
 addon.QuestLog = {}
@@ -89,7 +89,12 @@ function addon.QuestLog:AcceptDemo(demoId)
   acceptQuest(quest)
 end
 
-function addon.QuestLog:AcceptDraft(draft)
+function addon.QuestLog:AcceptDraft(draftId)
+  local draft = QuestDrafts:GetDraftByID(draftId)
+  if not draft then
+    logger:Error("Failed to accept quest: no draft exists with id:", draftId)
+    return
+  end
   local parameters = QuestEngine:Compile(draft.script, draft.parameters)
   local quest = QuestEngine:Build(parameters)
   acceptQuest(quest)
