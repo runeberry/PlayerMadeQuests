@@ -28,7 +28,7 @@ function menu:Create(parent)
   frame:SetAllPoints(true)
   frame:Hide()
 
-  for _, dq in pairs(QuestDemos:GetDemos()) do
+  for _, dq in pairs(QuestDemos:FindAll()) do
     table.insert(dqRows, { dq.name, dq.id })
   end
 

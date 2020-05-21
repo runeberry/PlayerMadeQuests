@@ -7,7 +7,7 @@
   <Include file="util/index.xml"/>
 
   <Script file="PmqCli.lua"/>
-  <Script file="SaveData.lua"/>
+  <Script file="data/SaveData.lua"/>
 
   <Include file="events/index.xml"/>
   <Include file="qeng/index.xml"/>

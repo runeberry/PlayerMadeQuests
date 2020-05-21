@@ -61,7 +61,7 @@ end
 
 function menu:OnShow(frame, demoId)
   currentDemoId = demoId
-  local demo = QuestDemos:GetDemoByID(demoId)
+  local demo = QuestDemos:FindByID(demoId)
   if not demo then
     addon.Logger:Error("No demo available with id:", demoId)
   end

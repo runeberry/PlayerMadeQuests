@@ -6,7 +6,8 @@ addon.IsAddonLoaded = false
 
 function addon.Ace:OnInitialize()
   addon:catch(function()
-    addon.Logger:NewLogger("test")
+
+    -- addon.Logger:NewLogger("test")
     addon.IsAddonLoaded = true
     addon:load()
     addon.SaveData:Init()
@@ -31,18 +32,15 @@ function addon:GetVersion()
 end
 
 -- Runs the provided function, catching any Lua errors and logging them to console
--- Currently only returns a single result
+-- Returns up to 4 values... not sure how to effectively make this dynamic
 function addon:catch(fn, ...)
-  local ok, result = pcall(fn, ...)
+  local ok, result, r2, r3, r4 = pcall(fn, ...)
   if not(ok) then
     -- Uncomment this as an escape hatch to print errors if logging breaks
     -- print("Lua script error") if result then print(result) end
-    addon.Logger:Error("Lua script error")
-    if result then
-      addon.Logger:Error(result)
-    end
+    addon.Logger:Error("Lua script error:", result)
   end
-  return ok, result
+  return ok, result, r2, r3, r4
 end
 
 -- Defer code execution until the addon is fully loaded
@@ -54,7 +52,10 @@ end
 function addon:load()
   if _onloadBuffer == nil then return end
   for _, fn in pairs(_onloadBuffer) do
-    fn()
+    local ok, err = pcall(fn)
+    if not ok then
+      print("[PMQ:onload] Startup error:", err)
+    end
   end
   _onloadBuffer = nil
 end

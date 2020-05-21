@@ -79,7 +79,7 @@ function addon.QuestLog:Print()
 end
 
 function addon.QuestLog:AcceptDemo(demoId)
-  local demo = QuestDemos:GetDemoByID(demoId)
+  local demo = QuestDemos:FindByID(demoId)
   if not demo then
     logger:Error("Failed to accept quest: no demo exists with id:", demoId)
     return
