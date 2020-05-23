@@ -12,6 +12,12 @@ addon.LogLevel = {
   none = 7
 }
 local ll = addon.LogLevel
+addon.LogMode = {
+  Pretty = "pretty",
+  Simple = "simple",
+  SimpleUnbuffered = "simple-unbuffered",
+}
+local lm = addon.LogMode
 
 local logcolors = {
   [ll.fatal] = "red",
@@ -25,10 +31,10 @@ local logcolors = {
 
 -- Enable this to bypass all logging rules and print everything to console
 -- Only enable this if something is seriously broken with logging
-local forceLogging = false
+local globalLogMode = addon.LOG_MODE or lm.Pretty
 
 -- This will be updated from player settings when save data is loaded
-local globalLogLevel = ll.info
+local globalLogLevel = addon.LOG_LEVEL or ll.info
 
 -- Buffer logs from all loggers until the app is loaded, then flush them
 local useLogBuffer = true
@@ -51,20 +57,33 @@ local function logger_SetLogLevel(self, loglevel)
   self._minloglevel = loglevel
 end
 
-local function logger_Log(self, loglevel, str, ...)
-  if useLogBuffer then
-    table.insert(globalLogBuffer, { logger = self, loglevel = loglevel, str = str, args = { ... } })
-    return
+local logMethods = {
+  [lm.Pretty] = function(self, loglevel, str, ...)
+    if useLogBuffer then
+      table.insert(globalLogBuffer, { logger = self, loglevel = loglevel, str = str, args = { ... } })
+      return
+    end
+    -- Log must be "higher priority" than both the instance and global log levels
+    if loglevel <= globalLogLevel and loglevel <= self._minloglevel then
+      print(addon:GetEscapeColor(logcolors[loglevel])..self._prefix, str, ...)
+    end
+  end,
+  [lm.Simple] = function(self, loglevel, str, ...)
+    if useLogBuffer then
+      table.insert(globalLogBuffer, { logger = self, loglevel = loglevel, str = str, args = { ... } })
+      return
+    end
+    -- Log must be "higher priority" than both the instance and global log levels
+    if loglevel <= globalLogLevel and loglevel <= self._minloglevel then
+      print(self._prefix, str, ...)
+    end
+  end,
+  [lm.SimpleUnbuffered] = function(self, loglevel, str, ...)
+    if loglevel <= globalLogLevel and loglevel <= self._minloglevel then
+      print(self._prefix, str, ...)
+    end
   end
-  -- Log must be "higher priority" than both the instance and global log levels
-  if loglevel <= globalLogLevel and loglevel <= self._minloglevel then
-    print(addon:GetEscapeColor(logcolors[loglevel])..self._prefix, str, ...)
-  end
-end
-
-local function logger_forcelog(self, loglevel, str, ...)
-  print("[PMQ]", str, ...)
-end
+}
 
 -- Shorthand methods for logging
 local function logger_Fatal(self, str, ...) self:Log(ll.fatal, str, ...) end
@@ -132,7 +151,7 @@ local function logger_NewLogger(self, name, min)
     NewLogger = logger_NewLogger,
     SetLogLevel = logger_SetLogLevel,
 
-    Log = logger_Log,
+    Log = logMethods[globalLogMode],
     Fatal = logger_Fatal,
     Error = logger_Error,
     Warn = logger_Warn,
@@ -143,10 +162,6 @@ local function logger_NewLogger(self, name, min)
     Varargs = logger_Varargs,
     Table = logger_Table
   }
-
-  if forceLogging then
-    logger.log = logger_forcelog
-  end
 
   return logger
 end
