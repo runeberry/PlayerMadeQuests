@@ -1,4 +1,5 @@
 local _, addon = ...
+local Ace, LibCompress = addon.Ace, addon.LibCompress
 
 -- Gets the length of a table (top-level only), for troubleshooting
 function addon:tlen(t)
@@ -12,6 +13,7 @@ end
 -- Removes all fields that begin with _
 -- May not play well with array tables... idk!
 function addon:CleanTable(t, circ)
+  if t == nil then error("Cannot clean a nil table") end
   circ = circ or {}
   circ[t] = true -- Ensure the provided table won't get cleaned twice
   local ktype, vtype
@@ -19,16 +21,17 @@ function addon:CleanTable(t, circ)
     ktype = type(k)
     vtype = type(v)
     if ktype == "string" and k:match("^_") then
-      -- Remove the value
+      -- Remove any values whose key starts with '_'
       t[k] = nil
     elseif vtype == "table" then
+      -- Any inner tables will also be cleaned
       if not circ[v] then
         self:CleanTable(v, circ)
       end
     elseif vtype == "string" or vtype == "number" or vtype == "boolean" then
-      -- Leave the value alone
+      -- Any values of type string, number, or boolean are left as-is
     else
-      -- Remove the value
+      -- Remove any values of any other type (like functions)
       t[k] = nil
     end
   end
@@ -38,6 +41,7 @@ end
 -- Performs a deep copy of the table and all subtables
 -- References to functions will not be changed
 function addon:CopyTable(t, circ)
+  if t == nil then error("Cannot copy a nil table") end
   circ = circ or {}
   local copy = {}
   circ[t] = copy -- Ensure the provided table won't get copied twice
@@ -60,6 +64,7 @@ end
 -- If any fields collide, t2 will overwrite t1
 -- Returns a new table - does not modify t1 or t2
 function addon:MergeTable(t1, t2, circ)
+  if t1 == nil or t2 == nil then error("Cannot merge a nil table") end
   local merged = self:CopyTable(t1)
   circ = circ or {}
   circ[t1] = merged -- Ensure that both provided tables will only be merged once
@@ -82,4 +87,63 @@ function addon:MergeTable(t1, t2, circ)
     end
   end
   return merged
+end
+
+function addon:DistinctSet(t)
+  if t == nil then error("Cannot create a set from a nil table") end
+  local set, i = {}, 0
+  for _, item in pairs(t) do
+    set[item] = true
+    i = i + 1
+  end
+  return set, i
+end
+
+function addon:SetToArray(set)
+  if set == nil then error("Cannot convert a nil set to an array") end
+  local array, i = {}, 0
+  for item in pairs(set) do
+    table.insert(array, item)
+    i = i + 1
+  end
+  return array, i
+end
+
+function addon:InvertTable(t)
+  if t == nil then error("Cannot invert a nil table") end
+  local inverted, i = {}, 0
+  for k, v in pairs(t) do
+    inverted[v] = k
+    i = i + 1
+  end
+  return inverted, i
+end
+
+function addon:CompressTable(t)
+  if t == nil then error("Cannot compress a nil table") end
+  local cleaned = addon:CleanTable(addon:CopyTable(t))
+  local serialized = Ace:Serialize(cleaned)
+  local compressed = LibCompress:CompressHuffman(serialized)
+  return compressed
+end
+
+function addon:DecompressTable(str)
+  if str == nil or str == "" then
+    return {}
+  end
+
+  local serialized, msg = LibCompress:Decompress(str)
+  if serialized == nil then
+    addon.Logger:Error("Failed to decompress table:", msg)
+    return {}
+  end
+
+  local ok, t = Ace:Deserialize(serialized)
+  if not ok then
+    -- 2nd param is an error message if it failed
+    addon.Logger:Error("Failed to deserialize table:", t)
+    return {}
+  end
+
+  return t
 end
