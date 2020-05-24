@@ -60,7 +60,7 @@ function builder:Build(opts)
   local requires = getIncludedFilesFromXML("index.xml")
 
   local addon = {
-    LOG_LEVEL = 2, -- Only log errors by default
+    LOG_LEVEL = 0, -- Log no errors by default
     LOG_MODE = "simple"
   }
 

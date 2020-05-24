@@ -3,6 +3,7 @@ local unpack = addon.G.unpack
 
 addon.Logger = nil -- Defined at the end of this file
 addon.LogLevel = {
+  silent = 0,
   fatal = 1,
   error = 2,
   warn = 3,
@@ -20,6 +21,7 @@ addon.LogMode = {
 local lm = addon.LogMode
 
 local logcolors = {
+  [ll.silent] = "white",
   [ll.fatal] = "red",
   [ll.error] = "red",
   [ll.warn] = "yellow",
@@ -179,7 +181,7 @@ function addon:SetGlobalLogLevel(loglevel)
   end
 
   globalLogLevel = logvalue
-  print("[PMQ] Global log level set to:", logname)
+  addon.Logger:Log(logvalue, "Global log level set to:", logname)
   return globalLogLevel
 end
 
