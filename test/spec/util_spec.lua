@@ -1,14 +1,40 @@
 local mock = require("mock")
-local addon = require("addon-builder"):Build()
+local builder = require("addon-builder")
+local addon = builder:Build()
 
 local logSpy = spy.on(addon.Logger, "Log")
 
 describe("Identifiers", function()
-
+  it("can create different sequential ids", function()
+    local id1, id2 = addon:CreateID(), addon:CreateID()
+    assert.not_equals(id1, id2)
+  end)
+  it("can create IDs with format strings", function()
+    local format = "test-id-%i"
+    local id = addon:CreateID(format)
+    assert.not_equals(id, format)
+  end)
 end)
 
 describe("Logger", function()
-
+  before_each(function()
+    addon.Logger.Log:clear()
+  end)
+  it("can log", function()
+    addon.Logger:Info(6, "test log", "more stuff")
+    assert.spy(logSpy).was_called()
+  end)
+  it("can flush log buffer on startup", function()
+    local tempAddon = builder:Build()
+    local tempLogSpy = spy.on(tempAddon.Logger, "Log")
+    local printSpy = spy.on(_G, "print")
+    tempAddon.Logger:Debug("buffered log")
+    assert.spy(tempLogSpy).was_called()
+    assert.spy(printSpy).was_not_called()
+    tempAddon:Init()
+    tempAddon:Advance()
+    assert.spy(printSpy).was_called()
+  end)
 end)
 
 describe("Sounds", function()
@@ -31,7 +57,22 @@ describe("Sounds", function()
 end)
 
 describe("Strings", function()
-
+  local str
+  before_each(function()
+    str = "test string"
+  end)
+  it("can colorize with named color", function()
+    local colorized = addon:Colorize("red", str)
+    assert.not_equals(str, colorized)
+  end)
+  it("can colorize with custom color", function()
+    local colorized = addon:Colorize("|cffaf9023", str)
+    assert.not_equals(str, colorized)
+  end)
+  it("can colorize default", function()
+    local colorized = addon:Colorize(nil, str)
+    assert.not_equals(str, colorized)
+  end)
 end)
 
 describe("Tables", function()
