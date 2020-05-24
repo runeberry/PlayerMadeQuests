@@ -9,7 +9,22 @@ function deps:Init(addon)
       addon:AddTimerFunction(func, ...)
     end
   }
-  addon.AceGUI = {}
+  addon.AceGUI = {
+    Create = mock:NewMock( mock:Returns({
+      frame = {
+        SetFrameStrata = mock:NewMock()
+      },
+      content = {},
+      SetTitle = mock:NewMock(),
+      SetStatusText = mock:NewMock(),
+      SetCallback = mock:NewMock(),
+      SetLayout = mock:NewMock(),
+      EnableButtonTooltips = mock:NewMock(),
+      SetTree = mock:NewMock(),
+      AddChild = mock:NewMock(),
+      SelectByValue = mock:NewMock()
+    }) )
+  }
   addon.LibCompress = {}
   addon.LibScrollingTable = {}
 
