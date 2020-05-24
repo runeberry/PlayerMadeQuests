@@ -1,15 +1,10 @@
-local deps = {}
+local mock = require("mock")
 
-local function setReturns(...)
-  local ret = { ... }
-  return function()
-    return table.unpack(ret)
-  end
-end
+local deps = {}
 
 function deps:Init(addon)
   addon.Ace = {
-    RegisterEvent = setReturns(),
+    RegisterEvent = mock:NewMock(),
     ScheduleTimer = function(self, func, delay, ...)
       addon:AddTimerFunction(func, ...)
     end
@@ -36,17 +31,17 @@ function deps:Init(addon)
     time = function() return os.clock() * 1000 end,
     unpack = table.unpack,
 
-    CombatLogGetCurrentEventInfo = setReturns(),
-    CreateFrame = setReturns({}),
-    GetUnitName = setReturns("name"),
-    PlaySoundFile = setReturns(),
+    CombatLogGetCurrentEventInfo = mock:NewMock(),
+    CreateFrame = mock:NewMock( mock:Returns({}) ),
+    GetUnitName = mock:NewMock( mock:Returns("name") ),
+    PlaySoundFile = mock:NewMock(),
     SlashCmdList = {},
     StaticPopupDialogs = {},
-    StaticPopup_Show = setReturns(),
-    StaticPopup_Hide = setReturns(),
-    UnitExists = setReturns(false),
-    UnitGUID = setReturns("guid"),
-    UnitIsFriend = setReturns(false),
+    StaticPopup_Show = mock:NewMock(),
+    StaticPopup_Hide = mock:NewMock(),
+    UnitExists = mock:NewMock( mock:Returns(false) ),
+    UnitGUID = mock:NewMock( mock:Returns("guid") ),
+    UnitIsFriend = mock:NewMock( mock:Returns(false) ),
     UIErrorsFrame = {},
     UIParent = {},
     UISpecialFrames = {},
