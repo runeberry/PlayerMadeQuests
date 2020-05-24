@@ -4,9 +4,18 @@ local deps = {}
 
 function deps:Init(addon)
   addon.Ace = {
+    _stable = {},
     RegisterEvent = mock:NewMock(),
     ScheduleTimer = function(self, func, delay, ...)
       addon:AddTimerFunction(func, ...)
+    end,
+    Serialize = function(self, t)
+      local serialized = addon:CreateID("serialize-mock-%i")
+      self._stable[serialized] = addon:CopyTable(t)
+      return serialized
+    end,
+    Deserialize = function(self, serialized)
+      return true, self._stable[serialized] or error("Serialized value not mocked: "..serialized)
     end
   }
   addon.AceGUI = {
@@ -25,7 +34,17 @@ function deps:Init(addon)
       SelectByValue = mock:NewMock()
     }) )
   }
-  addon.LibCompress = {}
+  addon.LibCompress = {
+    _ctable = {},
+    CompressHuffman = function(self, str)
+      local compressed = addon:CreateID("compress-mock-%i")
+      self._ctable[compressed] = str
+      return compressed
+    end,
+    Decompress = function(self, compressed)
+      return self._ctable[compressed] or error("Compressed value not mocked: "..compressed)
+    end
+  }
   addon.LibScrollingTable = {}
 
   addon.G = {
@@ -43,7 +62,7 @@ function deps:Init(addon)
       table.insert( result, string.sub( str, from  ) )
       return table.unpack(result)
     end,
-    time = function() return os.clock() * 1000 end,
+    time = function() return math.floor(os.clock() * 1000) end,
     unpack = table.unpack,
 
     CombatLogGetCurrentEventInfo = mock:NewMock(),
