@@ -1,4 +1,4 @@
-local addon = require("addon-builder"):Build()
+local addon = require("spec/addon-builder"):Build()
 
 describe("PmqCore", function()
   local logSpy = spy.on(addon.Logger, "Log")

@@ -1,5 +1,5 @@
-local mock = require("mock")
-local builder = require("addon-builder")
+local mock = require("spec/mock")
+local builder = require("spec/addon-builder")
 local addon = builder:Build()
 
 local logSpy = spy.on(addon.Logger, "Log")

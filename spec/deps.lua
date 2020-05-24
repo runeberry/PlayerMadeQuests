@@ -1,4 +1,4 @@
-local mock = require("mock")
+local mock = require("spec/mock")
 
 local deps = {}
 

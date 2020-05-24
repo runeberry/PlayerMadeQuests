@@ -1,7 +1,7 @@
-local deps = require("deps")
+local deps = require("spec/deps")
 
 local builder = {}
-local SRC_DIR = "../src/"
+local SRC_DIR = "src/"
 
 local function getIncludedFilesFromXML(xmlFilename, list, circ)
   xmlFilename = SRC_DIR..xmlFilename
