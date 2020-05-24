@@ -8,5 +8,5 @@
 ## SavedVariables: PMQGlobalCache
 ## SavedVariablesPerCharacter: PMQCache
 
-pre-index.xml
+dependencies.xml
 index.xml

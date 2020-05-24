@@ -2,5 +2,14 @@
     "Lua.workspace.ignoreDir": [
         "src/libs",
         "src/Deps.lua"
+    ],
+    "Lua.diagnostics.globals": [
+        "describe",
+        "it",
+        "setup",
+        "teardown",
+        "before_each",
+        "after_each",
+        "spy"
     ]
 }
