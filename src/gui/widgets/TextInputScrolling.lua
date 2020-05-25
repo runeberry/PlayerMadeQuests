@@ -96,7 +96,11 @@ function widget:Create(parent, labelText, editBoxText)
   -- Wrap an invisible button over the editBox frame to expand its clickable area
   local clickHandler = CreateFrame("Button", nil, editBoxBorderFrame)
   clickHandler:SetAllPoints(true)
-  clickHandler:SetScript("OnClick", function() editBox:SetFocus() end)
+  clickHandler:SetScript("OnClick", function()
+    editBox:SetFocus()
+    editBox:HighlightText(0, 0)
+    editBox:SetCursorPosition(#(editBox:GetText()))
+  end)
 
   scrollFrame:SetScrollChild(editBox)
 
