@@ -197,7 +197,7 @@ function addon:SetGlobalLogLevel(loglevel)
   if not value then return end
 
   globalLogLevel = value
-  addon.Logger:Log(value, "Global log level set to:", name)
+  addon.Logger:Log(ll.silent, "Global log level set to:", name)
   return globalLogLevel
 end
 
