@@ -33,10 +33,10 @@ local logcolors = {
 
 -- Enable this to bypass all logging rules and print everything to console
 -- Only enable this if something is seriously broken with logging
-local globalLogMode = addon.LOG_MODE or lm.Pretty
+local globalLogMode = lm.Pretty
 
 -- This will be updated from player settings when save data is loaded
-local globalLogLevel = addon.LOG_LEVEL or ll.info
+local globalLogLevel = ll.info
 
 -- Buffer logs from all loggers until the app is loaded, then flush them
 local useLogBuffer = true
@@ -54,10 +54,6 @@ addon:OnSaveDataLoaded(function()
   globalLogBuffer = nil
   -- print("End flushing log buffer")
 end)
-
-local function logger_SetLogLevel(self, loglevel)
-  self._minloglevel = loglevel
-end
 
 local logMethods = {
   [lm.Pretty] = function(self, loglevel, str, ...)
@@ -86,6 +82,33 @@ local logMethods = {
     end
   end
 }
+
+local function getLogLevel(level)
+  local value, name
+  if type(level) == "string" then
+    value = addon.LogLevel[level]
+    name = level
+  elseif type(level) == "number" then
+    value = level
+    for k, v in pairs(addon.LogLevel) do
+      if v == value then
+        name = k
+        break
+      end
+    end
+  end
+  return value, name
+end
+
+local function logger_SetLogLevel(self, loglevel)
+  local value = getLogLevel(loglevel)
+  if not value then return end
+  self._minloglevel = value
+end
+
+local function logger_SetLogMode(self, logmode)
+  self.Log = logMethods[logmode]
+end
 
 -- Shorthand methods for logging
 local function logger_Fatal(self, str, ...) self:Log(ll.fatal, str, ...) end
@@ -152,6 +175,7 @@ local function logger_NewLogger(self, name, min)
 
     NewLogger = logger_NewLogger,
     SetLogLevel = logger_SetLogLevel,
+    SetLogMode = logger_SetLogMode,
 
     Log = logMethods[globalLogMode],
     Fatal = logger_Fatal,
@@ -169,19 +193,11 @@ local function logger_NewLogger(self, name, min)
 end
 
 function addon:SetGlobalLogLevel(loglevel)
-  local logname, logvalue
+  local value, name = getLogLevel(loglevel)
+  if not value then return end
 
-  if type(loglevel) == "string" then
-    logname = loglevel
-    logvalue = addon.LogLevel[logname]
-  end
-
-  if not logvalue then
-    return
-  end
-
-  globalLogLevel = logvalue
-  addon.Logger:Log(logvalue, "Global log level set to:", logname)
+  globalLogLevel = value
+  addon.Logger:Log(value, "Global log level set to:", name)
   return globalLogLevel
 end
 

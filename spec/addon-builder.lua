@@ -59,16 +59,7 @@ local testMethods = {
 function builder:Build(opts)
   local requires = getIncludedFilesFromXML("index.xml")
 
-  local addon = {
-    LOG_LEVEL = 0, -- Log no errors by default
-    LOG_MODE = "simple"
-  }
-
-  if opts then
-    addon.LOG_LEVEL = opts.LOG_LEVEL or addon.LOG_LEVEL
-    addon.LOG_MODE = opts.LOG_MODE or addon.LOG_MODE
-  end
-
+  local addon = {}
   for name, fn in pairs(testMethods) do
     addon[name] = fn
   end
@@ -78,6 +69,18 @@ function builder:Build(opts)
   for _, req in pairs(requires) do
     -- print(req)
     assert(loadfile(req))(nil, addon)
+  end
+
+  -- Configure logging for unit tests
+  addon:SetGlobalLogLevel(addon.LogLevel.silent) -- Log nothing by default
+  addon.Logger:SetLogMode(addon.LogMode.Simple) -- Removes WoW color codes from logs
+  if opts then
+    if opts.LOG_LEVEL then
+      addon.Logger:SetLogLevel(opts.LOG_LEVEL)
+    end
+    if opts.LOG_MODE then
+      addon.Logger:SetLogMode(opts.LOG_MODE)
+    end
   end
 
   return addon
