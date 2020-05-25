@@ -33,7 +33,7 @@ local logcolors = {
 
 -- Enable this to bypass all logging rules and print everything to console
 -- Only enable this if something is seriously broken with logging
-local globalLogMode = lm.Pretty
+local globalLogMode = addon.GLOBAL_LOG_MODE or lm.Pretty
 
 -- This will be updated from player settings when save data is loaded
 local globalLogLevel = ll.info

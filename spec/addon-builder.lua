@@ -59,7 +59,9 @@ local testMethods = {
 function builder:Build(opts)
   local requires = getIncludedFilesFromXML("index.xml")
 
-  local addon = {}
+  local addon = {
+    GLOBAL_LOG_MODE = "simple-unbuffered"
+  }
   for name, fn in pairs(testMethods) do
     addon[name] = fn
   end
@@ -71,9 +73,9 @@ function builder:Build(opts)
     assert(loadfile(req))(nil, addon)
   end
 
-  -- Configure logging for unit tests
-  addon:SetGlobalLogLevel(addon.LogLevel.silent) -- Log nothing by default
-  addon.Logger:SetLogMode(addon.LogMode.Simple) -- Removes WoW color codes from logs
+  -- Logger is silent unless manually enabled by a test
+  addon.Logger:SetLogLevel(addon.LogLevel.silent)
+  -- Removes color codes and prints logs immediately instead of buffering them
   if opts then
     if opts.LOG_LEVEL then
       addon.Logger:SetLogLevel(opts.LOG_LEVEL)
