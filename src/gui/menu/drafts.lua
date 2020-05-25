@@ -24,7 +24,7 @@ local draftRows = {}
 
 local function getDrafts()
   draftRows = {}
-  local drafts = QuestDrafts:GetDrafts()
+  local drafts = QuestDrafts:FindAll()
   for _, draft in pairs(drafts) do
     -- Use quest name by default, but fall back on draft name if unavailable for some reaosn
     local draftName = draft.parameters.name or ("["..draft.name.."]")
@@ -72,7 +72,7 @@ function menu:Create(parent)
     local selectedRow = dataTable:GetSelectedRow()
     if not selectedRow then return end
     local draftId = selectedRow[4]
-    QuestDrafts:DeleteDraft(draftId)
+    QuestDrafts:Delete(draftId)
     addon.Logger:Info("Draft deleted:", selectedRow[1])
   end)
   confirmDraftDelete:SetNoButton("Cancel")

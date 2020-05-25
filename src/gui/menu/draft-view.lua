@@ -12,16 +12,17 @@ local function button_Back()
 end
 
 local function button_Validate()
+  if not currentDraft then return end
   local parameters = QuestEngine:Compile(currentDraft.script, currentDraft.parameters)
   QuestEngine:Build(parameters)
   addon.Logger:Info("Your quest looks good! No errors detected.")
 end
 
 local function button_Save()
+  if not currentDraft then return end
   currentDraft.parameters.name = frame.nameField:GetText()
   currentDraft.script = frame.scriptEditor:GetText()
-
-  currentDraft = addon:CopyTable(QuestDrafts:SaveDraft(currentDraft))
+  QuestDrafts:Save(currentDraft)
   addon.Logger:Info("Draft Saved -", currentDraft.parameters.name)
 end
 
@@ -52,18 +53,16 @@ function menu:Create(parent)
 end
 
 function menu:OnShow(frame, draftId)
-  local draft
   if draftId then
-    draft = QuestDrafts:GetDraftByID(draftId)
-    if not draft then
+    currentDraft = QuestDrafts:FindByID(draftId)
+    if not currentDraft then
       addon.Logger:Error("No draft available with id:", draftId)
       return
     end
   else
-    draft = QuestDrafts:NewDraft("New Quest")
+    currentDraft = QuestDrafts:NewDraft("New Quest")
   end
 
-  currentDraft = addon:CopyTable(draft)
   frame.nameField:SetText(currentDraft.parameters.name)
   frame.scriptEditor:SetText(currentDraft.script)
 end

@@ -90,7 +90,7 @@ function addon.QuestLog:AcceptDemo(demoId)
 end
 
 function addon.QuestLog:AcceptDraft(draftId)
-  local draft = QuestDrafts:GetDraftByID(draftId)
+  local draft = QuestDrafts:FindByID(draftId)
   if not draft then
     logger:Error("Failed to accept quest: no draft exists with id:", draftId)
     return

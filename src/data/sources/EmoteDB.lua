@@ -16,7 +16,7 @@ addon:onload(function()
   -- end
 end)
 
-addon.Data:NewDataSource("Emotes", {
+addon.EmoteDB = {
   {
     ["command"] = "/agree",
     ["targeted"] = "You agree with %t.",
@@ -1355,4 +1355,17 @@ addon.Data:NewDataSource("Emotes", {
     ["untargeted"] = "You nod.",
     ["token"] = "NOD",
   },
-})
+}
+
+addon.Emotes = addon.Data:NewRepository("Emote", "command")
+addon.Emotes:AddIndex("targeted")
+addon.Emotes:AddIndex("untargeted")
+addon.Emotes:SetTableSource(addon.EmoteDB)
+
+function addon.Emotes:FindByCommand(cmd)
+  if not(cmd:match("^/")) then
+    cmd = "/"..cmd
+  end
+
+  return self:FindByID(cmd)
+end

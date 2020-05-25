@@ -1,19 +1,14 @@
 local _, addon = ...
 addon:traceFile("QuestDemos.lua")
 
-addon.QuestDemos = addon.Data:NewRepository("DemoQuests")
-addon.QuestDemos:SetDataSource("DemoQuests")
+addon.QuestDemos = addon.Data:NewRepository("DemoQuest")
+addon.QuestDemos:SetTableSource(addon.DemoQuestDB)
 addon.QuestDemos:EnableDirectRead(true)
-addon.QuestDemos:AddIndex("id", true)
-
-function addon.QuestDemos:FindByID(id)
-  return self:FindByIndex("id", id)
-end
 
 function addon.QuestDemos:CopyToDrafts(id)
-  local demo = self:FindById(id)
+  local demo = self:FindByID(id)
   local draft = addon.QuestDrafts:NewDraft(id)
   draft.script = demo.script
-  addon.QuestDrafts:UpdateDraft(draft)
+  addon.QuestDrafts:Save(draft)
   return draft
 end

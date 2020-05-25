@@ -1,7 +1,7 @@
 local _, addon = ...
 addon:traceFile("DemoQuestDB.lua")
 
-addon.Data:NewDataSource("DemoQuests", {
+addon.DemoQuestDB = {
   {
     id = "dkill-ally",
     name = "Babby's First Quest",
@@ -51,4 +51,4 @@ obj TalkTo 3 t=Bluffwatcher]]
 obj talkto t="Innkeeper Anderson"
 obj talkto t="Wesley"]]
   }
-})
+}
