@@ -1,8 +1,7 @@
 local _, addon = ...
 addon:traceFile("SaveData.lua")
 
-local loaded = false
-local files = {
+local SavedVariables = {
   PMQCache = false,
   PMQGlobalCache = false
 }
@@ -10,19 +9,19 @@ local files = {
 addon.SaveData = {}
 addon.PlayerSettings = nil
 addon.GlobalSettings = nil
+addon.SaveDataLoaded = false
 
 function addon.SaveData:Init()
-  if loaded then return end
-  -- Load all "files" from global variables
-  for varname in pairs(files) do
+  if addon.SaveDataLoaded then return end
+  for varname in pairs(SavedVariables) do
     local saved = _G[varname]
     if not saved then
       saved = {}
       _G[varname] = saved
     end
-    files[varname] = saved
+    SavedVariables[varname] = saved
   end
-  loaded = true
+  addon.SaveDataLoaded = true
 
   -- These are such frequently used tables, just make them easily accessible
   addon.PlayerSettings = self:LoadTable("Settings")
@@ -34,14 +33,14 @@ end
 -- Returns the value of the specified field from SavedVariables
 -- If the value is a table, then a copy of the saved table is returned
 function addon.SaveData:Load(field, global)
-  if not loaded then
+  if not addon.SaveDataLoaded then
     error("Cannot Load: SaveData not ready")
   end
   local value
   if global then
-    value = files.PMQGlobalCache[field]
+    value = SavedVariables.PMQGlobalCache[field]
   else
-    value = files.PMQCache[field]
+    value = SavedVariables.PMQCache[field]
   end
   -- addon.Logger:Debug("SaveData loaded. ("..field..")")
   return value
@@ -72,13 +71,13 @@ end
 -- Saves the value to the specified field in SavedVariables
 -- If the value is a table, it is copied and cleaned before saving
 function addon.SaveData:Save(field, value, global)
-  if not loaded then
+  if not addon.SaveDataLoaded then
     error("Cannot Save: SaveData not ready")
   end
   if global then
-    files.PMQGlobalCache[field] = value
+    SavedVariables.PMQGlobalCache[field] = value
   else
-    files.PMQCache[field] = value
+    SavedVariables.PMQCache[field] = value
   end
   addon.Logger:Debug("SaveData saved. ("..field..")")
 end

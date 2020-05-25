@@ -62,9 +62,20 @@ function addon:load()
 end
 
 function addon:OnSaveDataLoaded(fn)
-  addon:onload(function()
+  if addon.SaveDataLoaded then
+    -- If save data is already loaded, run the function now
+    fn()
+  elseif not _onloadBuffer then
+    -- If the onload buffer has already been flushed, but save data is
+    -- not loaded, then subscribe directly to the SaveDataLoaded event
     addon.AppEvents:Subscribe("SaveDataLoaded", fn)
-  end)
+  else
+    -- Otherwise, subscribe to SaveDataLoaded only after the addon has
+    -- fully loaded
+    addon:onload(function()
+      addon.AppEvents:Subscribe("SaveDataLoaded", fn)
+    end)
+  end
 end
 
 -- Place at the top of a file to help debugging in trace mode
