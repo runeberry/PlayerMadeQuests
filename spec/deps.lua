@@ -48,6 +48,22 @@ function deps:Init(addon)
   addon.LibScrollingTable = {}
 
   addon.G = {
+    print = mock:NewMock("print", mock:Handler(function(...)
+      local args, spaced = table.pack(...), {}
+      for i = 1, args.n do
+        local arg = args[i]
+        if arg == nil then
+          table.insert(spaced, "nil")
+        elseif type(arg) == "string" then
+          table.insert(spaced, arg)
+        else
+          table.insert(spaced, tostring(arg))
+        end
+        table.insert(spaced, " ")
+      end
+      table.insert(spaced, "\n")
+      io.write(table.unpack(spaced))
+    end) ),
     strjoin = function(delim, ...) return table.concat({ ... }, delim) end,
     -- Adapted from: https://gist.github.com/jaredallard/ddb152179831dd23b230
     strsplit = function(delim, str)

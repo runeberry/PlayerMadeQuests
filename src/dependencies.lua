@@ -14,6 +14,7 @@ addon.LibScrollingTable = LibStub("ScrollingTable")
 
 -- WoW Global Functions
 addon.G = {
+  print = print,
   strjoin = strjoin,
   strsplit = strsplit,
   time = time,

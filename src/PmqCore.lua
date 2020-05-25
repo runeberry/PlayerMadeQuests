@@ -1,4 +1,5 @@
 local _, addon = ...
+local print = addon.G.print
 
 addon.ADDON_VERSION = "0.0.1"
 addon.ADDON_BRANCH = "alpha"

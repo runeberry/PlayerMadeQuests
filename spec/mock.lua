@@ -59,6 +59,9 @@ local mockMethods = {
     self.called = 0
     self.calledArgs = {}
   end,
+  ["SetHandler"] = function(self, fn)
+    self.handler = fn
+  end,
   ["SetReturns"] = function(self, ...)
     self.defaultReturns = { ... }
   end,
@@ -91,6 +94,12 @@ function mock:ReturnsWhen(condition, ...)
   }
 end
 
+function mock:Handler(fn)
+  return {
+    handler = fn
+  }
+end
+
 local function createMockWrapper(m)
   return function(...)
     m.called = m.called + 1
@@ -100,7 +109,9 @@ local function createMockWrapper(m)
         return table.unpack(ret.value)
       end
     end
-    if m.defaultReturns then
+    if m.handler then
+      return m.handler(...)
+    elseif m.defaultReturns then
       return table.unpack(m.defaultReturns)
     end
   end
@@ -111,6 +122,7 @@ function mock:NewMock(...)
     name = "",
     called = 0,
     calledArgs = {},
+    handler = nil,
     defaultReturns = nil,
     conditionalReturns = {}
   }
@@ -128,6 +140,8 @@ function mock:NewMock(...)
       else
         m:SetReturnsWhen(arg.returns.condition, table.unpack(arg.returns.value))
       end
+    elseif arg.handler then
+      m:SetHandler(arg.handler)
     end
   end
 

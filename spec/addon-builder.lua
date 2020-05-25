@@ -60,7 +60,9 @@ function builder:Build(opts)
   local requires = getIncludedFilesFromXML("index.xml")
 
   local addon = {
-    GLOBAL_LOG_MODE = "simple-unbuffered"
+    GLOBAL_LOG_MODE = "simple-unbuffered",
+    GLOBAL_LOG_LEVEL = 5,
+    TRANSACTION_LOGS = false
   }
   for name, fn in pairs(testMethods) do
     addon[name] = fn

@@ -1,5 +1,5 @@
 local _, addon = ...
-local unpack = addon.G.unpack
+local unpack, print = addon.G.unpack, addon.G.print
 
 addon.Logger = nil -- Defined at the end of this file
 addon.LogLevel = {
@@ -36,7 +36,7 @@ local logcolors = {
 local globalLogMode = addon.GLOBAL_LOG_MODE or lm.Pretty
 
 -- This will be updated from player settings when save data is loaded
-local globalLogLevel = ll.info
+local globalLogLevel = addon.GLOBAL_LOG_LEVEL or ll.info
 
 -- Buffer logs from all loggers until the app is loaded, then flush them
 local useLogBuffer = true
@@ -171,7 +171,7 @@ local function logger_NewLogger(self, name, min)
   local logger = {
     _name = name,
     _prefix = "["..name.."]",
-    _minloglevel = min,
+    _minloglevel = getLogLevel(min),
 
     NewLogger = logger_NewLogger,
     SetLogLevel = logger_SetLogLevel,
