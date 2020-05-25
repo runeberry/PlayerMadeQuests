@@ -1,21 +1,6 @@
 local _, addon = ...
 addon:traceFile("EmoteDB.lua")
 
-addon:onload(function()
-  -- function addon.EmoteDB:FindByCommand(cmd)
-  --   -- todo: index to make this much faster
-  --   if not(cmd:match("^/")) then
-  --     cmd = "/"..cmd
-  --   end
-
-  --   for _, emoteData in pairs(addon.EmoteDB) do
-  --     if emoteData.command == cmd then
-  --       return emoteData
-  --     end
-  --   end
-  -- end
-end)
-
 addon.EmoteDB = {
   {
     ["command"] = "/agree",
@@ -1356,16 +1341,3 @@ addon.EmoteDB = {
     ["token"] = "NOD",
   },
 }
-
-addon.Emotes = addon.Data:NewRepository("Emote", "command")
-addon.Emotes:AddIndex("targeted")
-addon.Emotes:AddIndex("untargeted")
-addon.Emotes:SetTableSource(addon.EmoteDB)
-
-function addon.Emotes:FindByCommand(cmd)
-  if not(cmd:match("^/")) then
-    cmd = "/"..cmd
-  end
-
-  return self:FindByID(cmd)
-end

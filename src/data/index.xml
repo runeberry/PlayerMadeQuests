@@ -4,6 +4,7 @@
   <Script file="data/sources/DemoQuestDB.lua"/>
   <Script file="data/sources/EmoteDB.lua"/>
 
+  <Script file="data/repos/Emotes.lua"/>
   <Script file="data/repos/QuestCatalog.lua"/>
   <Script file="data/repos/QuestDemos.lua"/>
   <Script file="data/repos/QuestDrafts.lua"/>

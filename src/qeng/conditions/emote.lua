@@ -13,7 +13,7 @@ function condition:CheckCondition(obj, emoteNames)
     eem = {}
 
     for emoteName in pairs(emoteNames) do
-      local emote = addon.EmoteDB:FindByCommand(emoteName)
+      local emote = addon.Emotes:FindByCommand(emoteName)
       if emote then
         if expectTargetedEmote then
           table.insert(eem, emote.targeted)
