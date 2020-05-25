@@ -28,7 +28,8 @@ local function editBox_OnEscapePressed(editBox)
 end
 
 local function widget_SetEnabled(self, flag)
-  self.editBox:SetEnabled(flag or true)
+  if flag == nil then flag = true end
+  self.editBox:SetEnabled(flag)
 end
 
 local function widget_SetLabel(self, text)
