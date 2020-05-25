@@ -1,5 +1,5 @@
 return {
   _all = {
-
+    output = "plainTerminal"
   }
 }
