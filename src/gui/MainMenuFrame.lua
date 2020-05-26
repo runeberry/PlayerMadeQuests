@@ -186,5 +186,7 @@ end
 
 addon:OnSaveDataLoaded(function()
   addon.MainMenu:NewMenuScreen([[help]], "Help", true)
-  addon.MainMenu:Show([[drafts]])
+  if addon.SHOW_MENU_ON_START then
+    addon.MainMenu:Show(addon.SHOW_MENU_ON_START)
+  end
 end)
