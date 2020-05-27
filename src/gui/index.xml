@@ -19,6 +19,7 @@
   <Script file="gui/menu/draft-view.lua"/>
 
   <!-- Custom Widgets -->
+  <Script file="gui/widgets/ArticleText.lua"/>
   <Script file="gui/widgets/ButtonPane.lua"/>
   <Script file="gui/widgets/DataTable.lua"/>
   <Script file="gui/widgets/TextInput.lua"/>
