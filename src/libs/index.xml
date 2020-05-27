@@ -5,6 +5,7 @@
 
   <Include file="libs\LibCompress\LibCompress.xml"/>
   <Include file="libs\AceAddon-3.0\AceAddon-3.0.xml"/>
+  <Include file="libs\AceComm-3.0\AceComm-3.0.xml"/>
   <Include file="libs\AceEvent-3.0\AceEvent-3.0.xml"/>
   <Include file="libs\AceSerializer-3.0\AceSerializer-3.0.xml"/>
   <Include file="libs\AceTimer-3.0\AceTimer-3.0.xml"/>
