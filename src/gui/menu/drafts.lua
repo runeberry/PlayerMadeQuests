@@ -25,6 +25,7 @@ local draftRows = {}
 local function getDrafts()
   draftRows = {}
   local drafts = QuestDrafts:FindAll()
+  table.sort(drafts, function(a, b) return a.id < b.id end)
   for _, draft in pairs(drafts) do
     -- Use quest name by default, but fall back on draft name if unavailable for some reaosn
     local draftName = draft.parameters.name or ("["..draft.name.."]")
@@ -88,7 +89,12 @@ function menu:Create(parent)
     if not row or not row[4] then
       return
     end
-    addon.QuestLog:AcceptDraft(row[4])
+    local ok, quest = addon.QuestDrafts:CompileDraft(row[4])
+    if not ok then
+      addon.Logger:Error("Failed to accept quest draft:", quest)
+      return
+    end
+    addon.AppEvents:Publish("QuestInvite", quest)
     dataTable:ClearSelection()
   end
 

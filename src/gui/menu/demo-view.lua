@@ -13,7 +13,12 @@ end
 
 local function button_Accept()
   if not currentDemoId then return end
-  QuestLog:AcceptDemo(currentDemoId)
+  local ok, quest = addon.QuestDemos:CompileDemo(currentDemoId)
+  if not ok then
+    addon.Logger:Error("Failed to accept demo quest:", quest)
+    return
+  end
+  addon.AppEvents:Publish("QuestInvite", quest)
 end
 
 local function button_CopyToDrafts()

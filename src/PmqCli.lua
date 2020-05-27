@@ -14,7 +14,12 @@ SlashCmdList.PMQ = function(msg, editbox)
     if cmd == "reset" then
       addon.QuestLog:Clear()
     elseif cmd == "add" then
-      addon.QuestLog:AcceptDemo(args[2])
+      local ok, quest = addon.QuestDemos:CompileDemo(args[2])
+      if not ok then
+        addon.Logger:Error("Failed to add demo quest:", quest)
+        return
+      end
+      addon.QuestLog:AcceptQuest(quest)
     elseif cmd == "log" then
       addon.PlayerSettings.MinLogLevel = addon:SetGlobalLogLevel(args[2])
     elseif cmd == "show" then

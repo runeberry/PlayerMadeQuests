@@ -13,8 +13,12 @@ end
 
 local function button_Validate()
   if not currentDraft then return end
-  local parameters = QuestEngine:Compile(currentDraft.script, currentDraft.parameters)
-  QuestEngine:Build(parameters)
+  local ok, quest = addon.QuestDrafts:CompileDraft(currentDraft.id)
+  if not ok then
+    addon.Logger:Warn("Your quest contains an error:")
+    addon.Logger:Warn(quest)
+    return
+  end
   addon.Logger:Info("Your quest looks good! No errors detected.")
 end
 

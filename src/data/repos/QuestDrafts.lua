@@ -39,3 +39,23 @@ function addon.QuestDrafts:NewDraft(name)
 
   return draft
 end
+
+function addon.QuestDrafts:CompileDraft(id)
+  if not id then
+    return false, "Draft id is required"
+  end
+  local draft = self:FindByID(id)
+  if not draft then
+    return false, "No draft exists with id: "..id
+  end
+  local ok, parameters = pcall(addon.QuestEngine.Compile, addon.QuestEngine, draft.script, draft.parameters)
+  if not ok then
+    return ok, parameters
+  end
+  local quest
+  ok, quest = pcall(addon.QuestEngine.Build, addon.QuestEngine, parameters)
+  if not ok then
+    return ok, quest
+  end
+  return true, quest
+end

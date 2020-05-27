@@ -3,6 +3,7 @@
   <Script file="gui/Styles.lua"/>
 
   <Script file="gui/MainMenuFrame.lua"/>
+  <Script file="gui/QuestInviteFrame.lua"/>
   <Script file="gui/QuestLogFrame.lua"/>
   <Script file="gui/StaticPopups.lua"/>
   <Script file="gui/UIErrorsFrame.lua"/>

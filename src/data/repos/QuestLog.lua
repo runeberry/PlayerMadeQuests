@@ -1,7 +1,6 @@
 local _, addon = ...
 local Ace, LibCompress = addon.Ace, addon.LibCompress
 local QuestEngine, QuestStatus = addon.QuestEngine, addon.QuestStatus
-local QuestDemos, QuestDrafts = addon.QuestDemos, addon.QuestDrafts
 local logger = addon.Logger:NewLogger("QuestLog")
 
 addon.QuestLog = {}
@@ -11,15 +10,6 @@ local quests = {}
 addon:OnSaveDataLoaded(function()
   addon.QuestLog:Load()
 end)
-
-local function acceptQuest(quest)
-  table.insert(quests, quest)
-  QuestEngine:StartTracking(quest)
-  addon.QuestLog:Save()
-  addon.AppEvents:Publish("QuestAccepted", quest)
-  logger:Info("Accepted quest:", quest.name)
-  addon:PlaySound("QuestAccepted")
-end
 
 function addon.QuestLog:Save()
   local cleaned = addon:CleanTable(addon:CopyTable(quests))
@@ -78,29 +68,12 @@ function addon.QuestLog:Print()
   end
 end
 
-function addon.QuestLog:AcceptDemo(demoId)
-  local demo = QuestDemos:FindByID(demoId)
-  if not demo then
-    logger:Error("Failed to accept quest: no demo exists with id:", demoId)
-    return
-  end
-  local parameters = QuestEngine:Compile(demo.script, { name = demo.name })
-  local quest = QuestEngine:Build(parameters)
-  acceptQuest(quest)
-end
-
-function addon.QuestLog:AcceptDraft(draftId)
-  local draft = QuestDrafts:FindByID(draftId)
-  if not draft then
-    logger:Error("Failed to accept quest: no draft exists with id:", draftId)
-    return
-  end
-  local parameters = QuestEngine:Compile(draft.script, draft.parameters)
-  local quest = QuestEngine:Build(parameters)
-  acceptQuest(quest)
-end
-
-function addon.QuestLog:AcceptListing(listing)
-  local quest = QuestEngine:Build(listing.parameters)
-  acceptQuest(quest)
+-- This expects a fully compiled and built quest
+function addon.QuestLog:AcceptQuest(quest)
+  table.insert(quests, quest)
+  QuestEngine:StartTracking(quest)
+  addon.QuestLog:Save()
+  addon.AppEvents:Publish("QuestAccepted", quest)
+  logger:Info("Accepted quest:", quest.name)
+  addon:PlaySound("QuestAccepted")
 end

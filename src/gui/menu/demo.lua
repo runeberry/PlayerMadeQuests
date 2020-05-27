@@ -31,6 +31,7 @@ function menu:Create(parent)
   for _, dq in pairs(QuestDemos:FindAll()) do
     table.insert(dqRows, { dq.name, dq.id })
   end
+  table.sort(dqRows, function(a, b) return a[2] < b[2] end)
 
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "LEFT", 120)
 
@@ -49,8 +50,12 @@ function menu:Create(parent)
     if not row or not row[2] then
       return
     end
-    addon.Logger:Table(row)
-    addon.QuestLog:AcceptDemo(row[2])
+    local ok, quest = addon.QuestDemos:CompileDemo(row[2])
+    if not ok then
+      addon.Logger:Error("Failed to accept demo quest:", quest)
+      return
+    end
+    addon.AppEvents:Publish("QuestInvite", quest)
     dataTable:ClearSelection()
   end
 

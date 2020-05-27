@@ -108,7 +108,7 @@ local function widget_AddText(self, text, textStyleName)
 end
 
 local function widget_GetFontString(self, i)
-  return self.fontString[i]
+  return self.fontStrings[i]
 end
 
 local function widget_OnShow(self)
