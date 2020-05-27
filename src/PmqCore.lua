@@ -6,7 +6,7 @@ addon.ADDON_BRANCH = "alpha"
 addon.IsAddonLoaded = false
 
 -- For quick testing
-addon.SHOW_MENU_ON_START = [[drafts]]
+addon.SHOW_MENU_ON_START = nil
 
 function addon.Ace:OnInitialize()
   addon:catch(function()

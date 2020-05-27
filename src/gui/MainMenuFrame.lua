@@ -23,7 +23,15 @@ local function getOrCreateMenuTreeItem(menu, value)
 end
 
 local function openMenuScreen(container, screen, ...)
-  local prevScreen = selectedScreen
+  if selectedScreen then
+    if selectedScreen.frame then
+      selectedScreen.frame:Hide()
+    end
+    if selectedScreen.OnHide then
+      selectedScreen:OnHide(selectedScreen.frame)
+    end
+  end
+
   selectedScreen = screen
   if type(screen.Create) ~= "function" then
     -- No screen for this menu item
@@ -44,15 +52,6 @@ local function openMenuScreen(container, screen, ...)
 
   if not screen.frame then
     screen.frame = screen:Create(contentGroup.frame)
-  end
-
-  if prevScreen then
-    if prevScreen.frame then
-      prevScreen.frame:Hide()
-    end
-    if prevScreen.OnHide then
-      prevScreen:OnHide(prevScreen.frame)
-    end
   end
 
   if screen.frame then
