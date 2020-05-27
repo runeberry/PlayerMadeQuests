@@ -59,10 +59,12 @@ local function acceptButton_OnClick()
   end
   addon.QuestLog:AcceptQuest(currentQuest)
   addon:ShowQuestInviteFrame(false)
+  addon:PlaySound("BookClose")
 end
 
 local function declineButton_OnClick()
   addon:ShowQuestInviteFrame(false)
+  addon:PlaySound("BookClose")
 end
 
 local function buildQuestInviteFrame()
@@ -174,5 +176,6 @@ addon:onload(function()
   -- This expects a fully compiled and built quest
   addon.AppEvents:Subscribe("QuestInvite", function(quest)
     addon:ShowQuestInviteFrame(true, quest)
+    addon:PlaySound("BookWrite")
   end)
 end)
