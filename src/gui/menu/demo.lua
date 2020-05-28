@@ -66,9 +66,18 @@ function menu:Create(parent)
     addon.MainMenu:Show("demo-view", demoId)
   end
 
+  local copyToDrafts = function()
+    local row = dataTable:GetSelectedRow()
+    if not row or not row[2] then
+      return
+    end
+    addon.QuestDemos:CopyToDrafts(row[2])
+    addon.Logger:Info("Demo quest copied to drafts.")
+  end
+
   buttonPane:AddButton("Accept Quest", acceptQuest)
   buttonPane:AddButton("View Code", viewCode)
-  buttonPane:AddButton("Copy to Drafts")
+  buttonPane:AddButton("Copy to Drafts", copyToDrafts)
 
   return frame
 end

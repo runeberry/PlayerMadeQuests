@@ -8,6 +8,7 @@ addon.QuestDemos:EnableDirectRead(true)
 function addon.QuestDemos:CopyToDrafts(id)
   local demo = self:FindByID(id)
   local draft = addon.QuestDrafts:NewDraft(id)
+  draft.name = demo.name
   draft.script = demo.script
   addon.QuestDrafts:Save(draft)
   return draft

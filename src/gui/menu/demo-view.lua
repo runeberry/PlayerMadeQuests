@@ -22,7 +22,9 @@ local function button_Accept()
 end
 
 local function button_CopyToDrafts()
-  addon.Logger:Warn("Copy to Drafts - Feature not implemented!")
+  if not currentDemoId then return end
+  addon.QuestDemos:CopyToDrafts(currentDemoId)
+  addon.Logger:Info("Demo quest copied to drafts.")
 end
 
 function menu:Create(parent)
