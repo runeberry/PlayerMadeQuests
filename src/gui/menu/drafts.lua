@@ -99,7 +99,17 @@ function menu:Create(parent)
   end
 
   local shareQuest = function()
-    addon.Logger:Warn("Share Quest feature not yet implemented!")
+    local row = dataTable:GetSelectedRow()
+    if not row or not row[4] then
+      return
+    end
+    local ok, quest = addon.QuestDrafts:CompileDraft(row[4])
+    if not ok then
+      addon.Logger:Error("Failed to share quest draft:", quest)
+      return
+    end
+    addon.MessageEvents:Publish("QuestInvite", nil, quest)
+    addon.Logger:Info("Sharing quest -", row[1])
   end
 
   buttonPane:AddButton("New", newDraft)

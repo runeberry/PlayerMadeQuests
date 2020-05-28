@@ -172,10 +172,16 @@ function addon:ShowQuestInviteFrame(flag, quest)
   end
 end
 
+local function handleQuestInvite(quest)
+  addon:ShowQuestInviteFrame(true, quest)
+  addon:PlaySound("BookWrite")
+end
+
 addon:onload(function()
   -- This expects a fully compiled and built quest
-  addon.AppEvents:Subscribe("QuestInvite", function(quest)
-    addon:ShowQuestInviteFrame(true, quest)
-    addon:PlaySound("BookWrite")
+  addon.AppEvents:Subscribe("QuestInvite", handleQuestInvite)
+  addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
+    addon.Logger:Info("Quest invite received from:", sender)
+    handleQuestInvite(quest)
   end)
 end)
