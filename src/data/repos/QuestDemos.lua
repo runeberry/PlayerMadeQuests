@@ -8,7 +8,7 @@ addon.QuestDemos:EnableDirectRead(true)
 function addon.QuestDemos:CopyToDrafts(id)
   local demo = self:FindByID(id)
   local draft = addon.QuestDrafts:NewDraft(id)
-  draft.name = demo.name
+  draft.parameters = addon:CopyTable(demo.parameters)
   draft.script = demo.script
   addon.QuestDrafts:Save(draft)
   return draft
@@ -22,7 +22,7 @@ function addon.QuestDemos:CompileDemo(id)
   if not demo then
     return false, "No demo exists with id: "..id
   end
-  local ok, parameters = pcall(addon.QuestEngine.Compile, addon.QuestEngine, demo.script, { name = demo.name })
+  local ok, parameters = pcall(addon.QuestEngine.Compile, addon.QuestEngine, demo.script, demo.parameters)
   if not ok then
     return ok, parameters
   end

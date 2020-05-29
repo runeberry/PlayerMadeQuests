@@ -40,6 +40,11 @@ function menu:Create(parent)
   nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
   nameField:OnEnterPressed(function(text) addon.Logger:Info(text) end)
 
+  local descField = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "Quest Description")
+  descField:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
+  descField:SetPoint("TOPRIGHT", nameField, "BOTTOMRIGHT")
+  descField:SetHeight(100)
+
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "BOTTOM")
   -- bug: This should default to LEFT anchor, but it's defaulting to TOP for some reason? Investigate...
   buttonPane:AddButton("Back", button_Back, { anchor = "LEFT" })
@@ -47,10 +52,11 @@ function menu:Create(parent)
   buttonPane:AddButton("Validate", button_Validate, { anchor = "RIGHT" })
 
   local scriptEditor = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "QuestScript")
-  scriptEditor:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
+  scriptEditor:SetPoint("TOPLEFT", descField, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
 
   frame.nameField = nameField
+  frame.descField = descField
   frame.scriptEditor = scriptEditor
 
   return frame
@@ -68,11 +74,13 @@ function menu:OnShow(frame, draftId)
   end
 
   frame.nameField:SetText(currentDraft.parameters.name)
+  frame.descField:SetText(currentDraft.parameters.description)
   frame.scriptEditor:SetText(currentDraft.script)
 end
 
 function menu:OnHide(frame)
   currentDraft = nil
   frame.nameField:SetText()
+  frame.descField:SetText()
   frame.scriptEditor:SetText()
 end

@@ -29,9 +29,9 @@ function menu:Create(parent)
   frame:Hide()
 
   for _, dq in pairs(QuestDemos:FindAll()) do
-    table.insert(dqRows, { dq.name, dq.id })
+    table.insert(dqRows, { dq.parameters.name, dq.id, dq.order })
   end
-  table.sort(dqRows, function(a, b) return a[2] < b[2] end)
+  table.sort(dqRows, function(a, b) return a[3] < b[3] end)
 
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "LEFT", 120)
 

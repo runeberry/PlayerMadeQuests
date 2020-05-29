@@ -5,6 +5,7 @@ local widget = addon.CustomWidgets:NewWidget("TextInputScrolling")
 
 local labelSpacer = "  "
 local textInset = 8
+local scrollDelay = 0.033 -- approximately 1 frame @ 30 FPS
 local backdrop = {
 	bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
 	edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]], edgeSize = 16,
@@ -53,10 +54,25 @@ end
 
 local function widget_SetText(self, text)
   self.editBox:SetText(text or "")
+  addon.Ace:ScheduleTimer(function()
+    -- Force the scrollFrame to start at the top whenever the text is changed
+    -- Seems the WoW client can't correctly set scroll until the next frame
+    self.scrollFrame:SetVerticalScroll(0)
+  end, scrollDelay)
 end
 
 local function widget_GetText(self)
   return self.editBox:GetText()
+end
+
+local function widget_ScrollTo(self, anchor, offset)
+  anchor, offset = anchor or "TOP", offset or 0
+  if anchor == "TOP" then
+    self.scrollFrame:SetVerticalScroll(offset)
+  elseif anchor == "BOTTOM" then
+    offset = self.scrollFrame:GetHeight() - offset
+    self.scrollFrame:SetVerticalScroll(offset)
+  end
 end
 
 function widget:Create(parent, labelText, editBoxText)
@@ -64,7 +80,9 @@ function widget:Create(parent, labelText, editBoxText)
   editBoxText = editBoxText or ""
 
   local frame = CreateFrame("Frame", nil, parent)
-  frame:SetAllPoints(true)
+  frame:SetPoint("TOPLEFT", parent, "TOPLEFT")
+  frame:SetPoint("TOPRIGHT", parent, "TOPRIGHT")
+  frame:SetHeight(1) -- Frame must have >0 height when text is set or text won't show
 
   local label = frame:CreateFontString(nil, "BACKGROUND")
   label:SetFontObject("GameFontHighlightSmall")
@@ -115,6 +133,7 @@ function widget:Create(parent, labelText, editBoxText)
   frame.SetLabel = widget_SetLabel
   frame.SetText = widget_SetText
   frame.GetText = widget_GetText
+  frame.ScrollTo = widget_ScrollTo
 
   return frame
 end
