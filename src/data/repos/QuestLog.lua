@@ -76,4 +76,5 @@ function addon.QuestLog:AcceptQuest(quest)
   addon.AppEvents:Publish("QuestAccepted", quest)
   logger:Info("Accepted quest:", quest.name)
   addon:PlaySound("QuestAccepted")
+  addon:ShowQuestLog(true)
 end
