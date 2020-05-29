@@ -1,5 +1,7 @@
 package-as: PlayerMadeQuests-Classic
 
+enable-nolib-creation: no
+
 move-folders:
   - PlayerMadeQuests/src PlayerMadeQuests
 
