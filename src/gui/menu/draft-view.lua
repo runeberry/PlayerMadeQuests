@@ -25,6 +25,7 @@ end
 local function button_Save()
   if not currentDraft then return end
   currentDraft.parameters.name = frame.nameField:GetText()
+  currentDraft.parameters.description = frame.descField:GetText()
   currentDraft.script = frame.scriptEditor:GetText()
   QuestDrafts:Save(currentDraft)
   addon.Logger:Info("Draft Saved -", currentDraft.parameters.name)
