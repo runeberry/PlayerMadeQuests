@@ -1,5 +1,5 @@
 del "PlayerMadeQuests.zip"
 rd /S /Q "PlayerMadeQuests"
 cp -r "./src" "PlayerMadeQuests"
-tar -acf "PlayerMadeQuests.zip" "PlayerMadeQuests"
+7z a "PlayerMadeQuests.zip" "PlayerMadeQuests"
 rd /S /Q "PlayerMadeQuests"
