@@ -15,7 +15,7 @@ function addon.Ace:OnInitialize()
     addon.IsAddonLoaded = true
     addon:load()
     addon.SaveData:Init()
-    addon.Logger:Info("PMQ Loaded")
+    addon.Logger:Info("PlayerMadeQuests loaded. Type "..addon:Colorize("orange", "/pmq").." to open the main menu.")
   end)
 end
 
