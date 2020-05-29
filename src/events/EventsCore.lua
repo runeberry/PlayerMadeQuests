@@ -4,7 +4,7 @@ addon:traceFile("EventsCore.lua")
 local unpack = addon.G.unpack
 
 addon.Events = {}
-local processDelayMs = 0.033 -- approximately 1 frame @ 30 FPS
+local processDelay = 0.033 -- approximately 1 frame @ 30 FPS
 
 local function checkHasSubscribers(broker, event)
   if addon:tlen(broker.handlersMap[event]) == 0 then
@@ -57,7 +57,7 @@ local function broker_Publish(self, event, ...)
     if not self._pubFlag then
       -- If this is the first event published to this broker (this frame)
       -- then set a timer to process the queue on the next frame (approximately)
-      addon.Ace:ScheduleTimer(processQueue, processDelayMs, self)
+      addon.Ace:ScheduleTimer(processQueue, processDelay, self)
       self._pubFlag = true
     end
   else
