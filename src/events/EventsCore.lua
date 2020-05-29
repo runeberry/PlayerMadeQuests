@@ -28,13 +28,17 @@ end
 
 local function processQueue(broker)
   broker._pubFlag = false
+  local queueRem = {}
   for event, payloadArray in pairs(broker.queue) do
-    broker.queue[event] = nil -- immediately remove from queue so it doesn't get reprocessed
+    table.insert(queueRem, event)
     if checkHasSubscribers(broker, event) then
       for _, payload in pairs(payloadArray) do
         handleEvent(broker, event, unpack(payload))
       end
     end
+  end
+  for _, event in ipairs(queueRem) do
+    broker.queue[event] = nil -- Cleanup queue after events are processed
   end
 end
 
