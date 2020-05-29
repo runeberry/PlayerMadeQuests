@@ -87,7 +87,7 @@ obj talkto 2 t="Orgrimmar Grunt"]]
     },
     script =
 [[obj emote em=dance
-obj emote em=clap t=Sorak
+obj emote em=clap t=Sarok
 obj emote em=smile t=Kozish
 obj emote 2 em=salute t="Orgrimmar Grunt"]]
   },
