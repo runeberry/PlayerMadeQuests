@@ -4,6 +4,7 @@ local Ace, unpack = addon.Ace, addon.G.unpack
 local encoder = addon.LibCompress:GetAddonEncodeTable()
 
 local PMQ_MESSAGE_PREFIX = "PMQ"
+local USE_INTERNAL = false -- for testing only
 local defaultDetails = {
   distribution = "PARTY", -- see: https://wow.gamepedia.com/API_C_ChatInfo.SendAddonMessage
   target = nil, -- player name, required only for "WHISPER"
@@ -30,7 +31,7 @@ addon.MessageEvents:EnableAsync()
 local function onCommReceived(prefix, message, distribution, sender)
   local decoded = encoder:Decode(message)
   local payload = addon:DecompressTable(decoded)
-  internalPublish(payload.e, distribution, sender, unpack(payload.p))
+  internalPublish(addon.MessageEvents, payload.e, distribution, sender, unpack(payload.p))
 end
 
 -- This broker overrides the standard publish function with an implementation of its own
@@ -42,6 +43,10 @@ local function broker_publishMessage(self, event, details, ...)
   local payload = { e = event, p = { ... } }
   local compressed = addon:CompressTable(payload)
   local encoded = encoder:Encode(compressed)
+  if USE_INTERNAL then
+    onCommReceived(PMQ_MESSAGE_PREFIX, encoded, details.distribution, "yourself")
+    return
+  end
   Ace:SendCommMessage(PMQ_MESSAGE_PREFIX, encoded, details.distribution, details.target, details.priority)
 end
 

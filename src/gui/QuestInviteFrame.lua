@@ -182,6 +182,7 @@ addon:onload(function()
   addon.AppEvents:Subscribe("QuestInvite", handleQuestInvite)
   addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
     addon.Logger:Info("Quest invite received from:", sender)
+    quest = addon.QuestEngine:Build(quest) -- Quest is received in "compiled" but not "built" form from message
     handleQuestInvite(quest)
   end)
 end)
