@@ -1,0 +1,11 @@
+package-as: PlayerMadeQuests-Classic
+
+move-folders:
+  - PlayerMadeQuests/src PlayerMadeQuests
+
+ignore:
+  - LICENSE
+  - README.md
+  - docs
+  - scripts
+  - spec
