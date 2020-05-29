@@ -31,7 +31,7 @@ SlashCmdList.PMQ = function(msg, editbox)
     elseif cmd == "print" then
       addon.QuestLog:Print()
     else
-      addon.MainMenu:Show()
+      addon.MainMenu:Show("drafts")
     end
   end)
 end
