@@ -36,7 +36,7 @@ function addon.GameEvents:OnUnsubscribe(event)
   local handlers = self.handlersMap[event]
   if addon:tlen(handlers) == 1 then
     -- If this is the last subscriber for this event, unregister it from Ace
-    addon.Ace.UnregisterEvent(event)
+    addon.Ace:UnregisterEvent(event)
   end
 end
 
