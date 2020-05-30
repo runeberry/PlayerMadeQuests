@@ -53,7 +53,7 @@ objective kill 5 t='Elder Mottled Boar']]
     },
     script =
 [[obj talkto t='Brog Hamfist'
-obj talkto t='William Pestle'
+obj talkto t='Innkeeper Farley'
 obj talkto 2 t="Stormwind Guard"]]
   },
   {
@@ -73,10 +73,12 @@ obj talkto 2 t="Orgrimmar Grunt"]]
     order = 5,
     parameters = {
       name = "Objective: Use emote (Alliance)",
-      description = descriptions["emote"].."TODO: finish this description",
+      description = descriptions["emote"].."These eager participants are waiting for you in Goldshire, south of Stormwind",
     },
     script =
-[[obj emote em=roar]]
+[[obj emote em=roar
+obj emote em=cry t=Tomas
+obj emote 2 em=fart t="Stormwind Guard"]]
   },
   {
     id = "tutorial-emote-horde",
