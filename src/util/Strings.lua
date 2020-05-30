@@ -1,24 +1,25 @@
 local _, addon = ...
 
 local colors = {
-  red = "|cffff0000",
-  green = "|cff1eff00",
-  blue = "|cff0070dd",
-  grey = "|cff9d9d9d",
-  white = "|cffffffff",
-  black = "|cff000000",
-  purple = "|cffa335ee",
-  orange = "|cffff8000",
-  yellow = "|cffffff00"
+  red = "ffff0000",
+  green = "ff1eff00",
+  blue = "ff0070dd",
+  grey = "ff9d9d9d",
+  white = "ffffffff",
+  black = "ff000000",
+  purple = "ffa335ee",
+  orange = "ffff8000",
+  yellow = "ffffff00"
 }
 
-function addon:GetEscapeColor(shortName)
-  return colors[shortName]
+-- Use the mapped color if available, otherwise assume the string is an 8-char hex string
+-- If no color is specified, default to white
+function addon:GetEscapeColor(color)
+  return "|c"..(colors[color] or color or colors.white)
 end
 
 function addon:Colorize(color, str)
-  local c = colors[color] or color or colors.white -- Use mapped color if available
-  return c..str.."|r"
+  return addon:GetEscapeColor(color)..str.."|r"
 end
 
 function addon:Pluralize(num, singular, plural)
