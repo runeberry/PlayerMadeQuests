@@ -26,10 +26,9 @@ function condition:CheckCondition(obj, emoteNames)
   end
 
   local pem = obj:GetMetadata("PlayerEmoteMessage")
-  if expectTargetedEmote then
+  if expectTargetedEmote and UnitExists("target") then
     -- Replace the emote message from chat with a %t placeholder
     -- so we can compare to the generic emote message.
-    local targetExists = UnitExists("target")
     local targetName = GetUnitName("target")
     pem = pem:gsub(targetName, "%%t")
   end
