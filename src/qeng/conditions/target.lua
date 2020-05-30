@@ -7,16 +7,8 @@ local condition = addon.QuestEngine:NewCondition("target")
 condition.allowMultiple = true
 
 function condition:CheckCondition(obj, unitNames)
-  -- todo: Build objective metadata
-  local targetUnitName
-  if obj.metadata.targetUnitName then
-    -- The rule wants to override the default method for obtaining the targeted unit name
-    targetUnitName = obj.metadata.targetUnitName
-    obj.metadata.targetUnitName = nil -- No other conditions should need this, erase it for safety
-  else
-    -- Otherwise, get the name of the currently targeted unit
-    targetUnitName = GetUnitName("target")
-  end
+  -- The rule may want to override the default method for obtaining the targeted unit name
+  local targetUnitName = obj:GetMetadata("TargetUnitName") or GetUnitName("target")
 
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name
@@ -26,40 +18,33 @@ function condition:CheckCondition(obj, unitNames)
   if obj.goal == 1 then
     -- Only one unit to target, so the objective is satisfied
     return true
-  else
-    -- If the objective is to target multiples of the same NPC (i.e. 3 guards),
-    -- make sure they're different by guid
-
-    local targetUnitGuid
-    if obj.metadata.targetUnitGuid then
-      -- The rule wants to override the default method for obtaining the targeted unit guid
-      targetUnitGuid = obj.metadata.targetUnitGuid
-      obj.metadata.targetUnitGuid = nil -- No other conditions should need this, erase it for safety
-    else
-      -- Otherwise, get the name of the currently targeted unit
-      targetUnitGuid = UnitGUID("target")
-    end
-
-    if obj.metadata.targetGuidHistory == nil then
-      obj.metadata.targetGuidHistory = {}
-    end
-
-    local guidHistory = obj.metadata.targetGuidHistory[obj.id]
-    if guidHistory == nil then
-      -- First one, log this result and return true
-      obj.metadata.targetGuidHistory[obj.id] = { targetUnitGuid }
-      return true
-    end
-
-    for _, g in pairs(guidHistory) do
-      if g == targetUnitGuid then
-        -- Already targeted this NPC for this objective, don't count it
-        return false
-      end
-    end
-
-    -- Otherwise, log this guid and progress the objective
-    table.insert(guidHistory, targetUnitGuid)
-    return true
   end
+  -- If the objective is to target multiples of the same NPC (i.e. 3 guards),
+  -- make sure they're different by guid
+
+  -- The rule may want to override the default method for obtaining the targeted unit guid
+  local targetUnitGuid = obj:GetMetadata("TargetUnitGuid") or UnitGUID("target")
+
+  local targetGuidHistory = obj:GetMetadata("TargetGuidHistory")
+  if not targetGuidHistory then
+    targetGuidHistory = {}
+    obj:SetMetadata("TargetGuidHistory", targetGuidHistory, true)
+  end
+
+  -- Get the targeting history for this specific objective
+  local objTargetGuidHistory = targetGuidHistory[obj.id]
+  if not objTargetGuidHistory then
+    -- First one, log this result and return true
+    objTargetGuidHistory = {}
+    targetGuidHistory[obj.id] = objTargetGuidHistory
+  end
+
+  if objTargetGuidHistory[targetUnitGuid] then
+    -- Already targeted this NPC for this objective, don't count it
+    return false
+  end
+
+  -- Otherwise, log this guid and progress the objective
+  objTargetGuidHistory[targetUnitGuid] = true
+  return true
 end
