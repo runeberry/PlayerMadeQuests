@@ -15,9 +15,10 @@ function condition:CheckCondition(obj, emoteNames)
     for emoteName in pairs(emoteNames) do
       local emote = addon.Emotes:FindByCommand(emoteName)
       if emote then
-        if expectTargetedEmote then
-          table.insert(eem, emote.targeted)
-        else
+        -- The targeted version of an emote is always allowed
+        table.insert(eem, emote.targeted)
+        if not expectTargetedEmote then
+          -- but the untargeted version is only allowed if no target condition is specified
           table.insert(eem, emote.untargeted)
         end
       end
@@ -26,7 +27,7 @@ function condition:CheckCondition(obj, emoteNames)
   end
 
   local pem = obj:GetMetadata("PlayerEmoteMessage")
-  if expectTargetedEmote and UnitExists("target") then
+  if UnitExists("target") then
     -- Replace the emote message from chat with a %t placeholder
     -- so we can compare to the generic emote message.
     local targetName = GetUnitName("target")
