@@ -3,33 +3,6 @@ local CreateFrame = addon.G.CreateFrame
 
 local widget = addon.CustomWidgets:NewWidget("ArticleText")
 
--- Unpacks either format { r = r, g = g, b = b, a = a } or { r, g, b, a }
-local function unpackRGBA(t)
-  if t.r or t.g or t.b or t.a then
-    return t.r or 0.0, t.g or 0.0, t.b or 0.0, t.a or 1.0
-  else
-    return t[1] or 0.0, t[2] or 0.0, t[3] or 0.0, t[4] or 1.0
-  end
-end
-
--- Unpacks either format { x = x, y = y } or { x, y }
-local function unpackXY(t)
-  if t.x or t.y then
-    return t.x or 0, t.y or 0
-  else
-    return t[1] or 0, t[2] or 0
-  end
-end
-
--- Unpacks either format { l = l, r = r, t = t, b = b } or { l, r, t, b }
-local function unpackLRTB(t)
-  if t.l or t.r or t.t or t.b then
-    return t.l or 0, t.r or 0, t.t or 0, t.b or 0
-  else
-    return t[1] or 0, t[2] or 0, t[3] or 0, t[4] or 0
-  end
-end
-
 local globalDefaultTextStyle = {}
 local globalDefaultPageStyle = {
   margins = { 6, 6, 6, 6 },
@@ -46,9 +19,9 @@ local textStyleHandlers = {
   justifyH = function(fs, v) fs:SetJustifyH(v) end,
   justifyV = function(fs, v) fs:SetJustifyV(v) end,
   spacing = function(fs, v) fs:SetSpacing(v) end,
-  shadowColor = function(fs, v) fs:SetShadowColor(unpackRGBA(v)) end,
-  shadowOffset = function(fs, v) fs:SetShadowOffset(unpackXY(v)) end,
-  textColor = function(fs, v) fs:SetTextColor(unpackRGBA(v)) end,
+  shadowColor = function(fs, v) fs:SetShadowColor(addon:UnpackRGBA(v)) end,
+  shadowOffset = function(fs, v) fs:SetShadowOffset(addon:UnpackXY(v)) end,
+  textColor = function(fs, v) fs:SetTextColor(addon:UnpackRGBA(v)) end,
 }
 
 local function buildFontStrings(frame)
@@ -75,7 +48,7 @@ local function buildFontStrings(frame)
 end
 
 local function applyTextToPage(frame)
-  local l, r, t, b = unpackLRTB(frame.pageStyle.margins or globalDefaultPageStyle.margins)
+  local l, r, t, b = addon:UnpackLRTB(frame.pageStyle.margins or globalDefaultPageStyle.margins)
   local parent = frame:GetParent()
   frame:ClearAllPoints()
   frame:SetPoint("TOPLEFT", parent, "TOPLEFT", l, -1*t)

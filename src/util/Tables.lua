@@ -147,3 +147,39 @@ function addon:DecompressTable(str)
 
   return t
 end
+
+-- Unpacks either format { r = r, g = g, b = b, a = a } or { r, g, b, a }
+function addon:UnpackRGBA(t)
+  if not t then
+    return 0.0, 0.0, 0.0, 1.0
+  end
+  if t.r or t.g or t.b or t.a then
+    return t.r or 0.0, t.g or 0.0, t.b or 0.0, t.a or 1.0
+  else
+    return t[1] or 0.0, t[2] or 0.0, t[3] or 0.0, t[4] or 1.0
+  end
+end
+
+-- Unpacks either format { x = x, y = y } or { x, y }
+function addon:UnpackLRTB(t)
+  if not t then
+    return 0, 0, 0, 0
+  end
+  if t.l or t.r or t.t or t.b then
+    return t.l or 0, t.r or 0, t.t or 0, t.b or 0
+  else
+    return t[1] or 0, t[2] or 0, t[3] or 0, t[4] or 0
+  end
+end
+
+-- Unpacks either format { l = l, r = r, t = t, b = b } or { l, r, t, b }
+function addon:UnpackXY(t)
+  if not t then
+    return 0.0, 0.0
+  end
+  if t.x or t.y then
+    return t.x or 0.0, t.y or 0.0
+  else
+    return t[1] or 0.0, t[2] or 0.0
+  end
+end
