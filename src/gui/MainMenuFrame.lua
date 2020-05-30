@@ -1,6 +1,5 @@
 local _, addon = ...
 local AceGUI, strsplit, UISpecialFrames = addon.AceGUI, addon.G.strsplit, addon.G.UISpecialFrames
-local addonVersion = addon:GetVersion()
 
 addon.MainMenu = {}
 local mmfGlobalName = "PMQ_MainMenuFrame"
@@ -91,7 +90,7 @@ local function OnShow()
   mainMenuWidget = AceGUI:Create("Frame")
   mainMenuWidget.frame:SetFrameStrata("HIGH")
   mainMenuWidget:SetTitle("PlayerMadeQuests")
-  mainMenuWidget:SetStatusText("PMQ v"..addonVersion.." (thank you for testing! <3)")
+  mainMenuWidget:SetStatusText("PMQ "..addon.ADDON_VERSION.." (thank you for testing! <3)")
   mainMenuWidget:SetCallback("OnClose", OnClose)
   mainMenuWidget:SetLayout("Fill") -- Fill the entire frame with the TabGroup widget
 

@@ -1,8 +1,7 @@
 local _, addon = ...
 local print = addon.G.print
 
-addon.ADDON_VERSION = "0.0.1"
-addon.ADDON_BRANCH = "alpha"
+addon.ADDON_VERSION = "v0.0.2-alpha"
 addon.IsAddonLoaded = false
 
 -- For quick testing
@@ -25,14 +24,6 @@ end
 
 function addon.Ace:OnDisable()
 
-end
-
-function addon:GetVersion()
-  if self.ADDON_BRANCH and self.ADDON_BRANCH ~= "" then
-    return self.ADDON_VERSION.."-"..self.ADDON_BRANCH
-  end
-
-  return self.ADDON_VERSION
 end
 
 -- Runs the provided function, catching any Lua errors and logging them to console
