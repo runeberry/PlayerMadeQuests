@@ -6,6 +6,7 @@ function deps:Init(addon)
   addon.Ace = {
     _stable = {},
     RegisterEvent = mock:NewMock(),
+    RegisterComm = mock:NewMock(),
     ScheduleTimer = function(self, func, delay, ...)
       addon:AddTimerFunction(func, ...)
     end,
@@ -43,7 +44,8 @@ function deps:Init(addon)
     end,
     Decompress = function(self, compressed)
       return self._ctable[compressed] or error("Compressed value not mocked: "..compressed)
-    end
+    end,
+    GetAddonEncodeTable = mock:NewMock()
   }
   addon.LibScrollingTable = {}
 
