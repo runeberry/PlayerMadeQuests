@@ -10,7 +10,7 @@ SLASH_PMQ1 = "/pmq"
 SlashCmdList.PMQ = function(msg, editbox)
   addon:catch(function()
     local args = { strsplit(" ", msg) }
-    local cmd = args[1]
+    local cmd = (args[1] or ""):lower()
 
     if cmd == "reset" then
       addon.QuestLog:Clear()
