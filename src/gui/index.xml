@@ -6,6 +6,7 @@
   <Script file="gui/widgets/ArticleText.lua"/>
   <Script file="gui/widgets/ButtonPane.lua"/>
   <Script file="gui/widgets/DataTable.lua"/>
+  <Script file="gui/widgets/Heading.lua"/>
   <Script file="gui/widgets/TextInput.lua"/>
   <Script file="gui/widgets/TextInputScrolling.lua"/>
   <Script file="gui/widgets/TreeMenuFrame.lua"/>
