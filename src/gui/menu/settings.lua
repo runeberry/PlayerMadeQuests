@@ -1,7 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen([[settings]], "Settings", true)
+local menu = addon.MainMenu:NewMenuScreen("settings")
 
 function menu:Create(parent)
   local frame = CreateFrame("Frame", nil, parent)

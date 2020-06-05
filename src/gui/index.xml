@@ -2,27 +2,27 @@
   <Script file="gui/CustomWidgets.lua"/>
   <Script file="gui/Styles.lua"/>
 
-  <Script file="gui/MainMenuFrame.lua"/>
-  <Script file="gui/QuestInviteFrame.lua"/>
-  <Script file="gui/QuestLogFrame.lua"/>
-  <Script file="gui/StaticPopups.lua"/>
-  <Script file="gui/UIErrorsFrame.lua"/>
-
-  <!-- This determines the order in which menu items are listed. -->
-  <Script file="gui/menu/drafts.lua"/>
-  <Script file="gui/menu/demo.lua"/>
-  <Script file="gui/menu/settings.lua"/>
-  <Script file="gui/menu/about.lua"/>
-  <Script file="gui/menu/faq.lua"/>
-
-  <!-- Submenus -->
-  <Script file="gui/menu/demo-view.lua"/>
-  <Script file="gui/menu/draft-view.lua"/>
-
   <!-- Custom Widgets -->
   <Script file="gui/widgets/ArticleText.lua"/>
   <Script file="gui/widgets/ButtonPane.lua"/>
   <Script file="gui/widgets/DataTable.lua"/>
   <Script file="gui/widgets/TextInput.lua"/>
   <Script file="gui/widgets/TextInputScrolling.lua"/>
+  <Script file="gui/widgets/TreeMenuFrame.lua"/>
+
+  <!-- Top-level frames -->
+  <Script file="gui/MainMenu.lua"/>
+  <Script file="gui/QuestInviteFrame.lua"/>
+  <Script file="gui/QuestLogFrame.lua"/>
+  <Script file="gui/StaticPopups.lua"/>
+  <Script file="gui/UIErrorsFrame.lua"/>
+
+  <!-- MainMenu screens -->
+  <Script file="gui/menu/draft-view.lua"/>
+  <Script file="gui/menu/drafts.lua"/>
+  <Script file="gui/menu/demo.lua"/>
+  <Script file="gui/menu/demo-view.lua"/>
+  <Script file="gui/menu/settings.lua"/>
+  <Script file="gui/menu/about.lua"/>
+  <Script file="gui/menu/faq.lua"/>
 </Ui>

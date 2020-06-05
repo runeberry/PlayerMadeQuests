@@ -1,14 +1,14 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
-local QuestDemos, QuestLog = addon.QuestDemos, addon.QuestLog
+local QuestDemos = addon.QuestDemos
 
-local menu = addon.MainMenu:NewMenuScreen([[demo-view]], "Demo Quest View")
+local menu = addon.MainMenu:NewMenuScreen("demo-view")
 
 -- Temporarily store an id here to use it with the onclick functions
 local currentDemoId = nil
 
 local function button_Back()
-  addon.MainMenu:Show("demo")
+  addon.MainMenu:NavToMenuScreen("demo")
 end
 
 local function button_Accept()
@@ -62,18 +62,20 @@ function menu:Create(parent)
   return frame
 end
 
-function menu:OnShow(frame, demoId)
+function menu:OnShowMenu(frame, demoId)
   currentDemoId = demoId
   local demo = QuestDemos:FindByID(demoId)
   if not demo then
     addon.Logger:Error("No demo available with id:", demoId)
+    error("No demo available with id:", demoId)
+    return
   end
   frame.nameField:SetText(demo.parameters.name)
   frame.descField:SetText(demo.parameters.description)
   frame.scriptEditor:SetText(demo.script)
 end
 
-function menu:OnHide(frame)
+function menu:OnLeaveMenu(frame)
   currentDemoId = nil
   frame.nameField:SetText()
   frame.descField:SetText()

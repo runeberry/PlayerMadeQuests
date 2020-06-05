@@ -1,14 +1,14 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
-local QuestDrafts, QuestEngine = addon.QuestDrafts, addon.QuestEngine
+local QuestDrafts = addon.QuestDrafts
 
-local menu = addon.MainMenu:NewMenuScreen([[draft-view]], "Edit Quest Draft")
+local menu = addon.MainMenu:NewMenuScreen("draft-view")
 
-local frame
+local currentFrame
 local currentDraft = nil
 
 local function button_Back()
-  addon.MainMenu:Show("drafts")
+  addon.MainMenu:NavToMenuScreen("drafts")
 end
 
 local function button_Validate()
@@ -24,22 +24,21 @@ end
 
 local function button_Save()
   if not currentDraft then return end
-  currentDraft.parameters.name = frame.nameField:GetText()
-  currentDraft.parameters.description = frame.descField:GetText()
-  currentDraft.script = frame.scriptEditor:GetText()
+  currentDraft.parameters.name = currentFrame.nameField:GetText()
+  currentDraft.parameters.description = currentFrame.descField:GetText()
+  currentDraft.script = currentFrame.scriptEditor:GetText()
   QuestDrafts:Save(currentDraft)
   addon.Logger:Info("Draft Saved -", currentDraft.parameters.name)
 end
 
 function menu:Create(parent)
-  frame = CreateFrame("Frame", nil, parent)
+  local frame = CreateFrame("Frame", nil, parent)
   frame:SetAllPoints(true)
   frame:Hide()
 
   local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Quest Name")
   nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
   nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
-  nameField:OnEnterPressed(function(text) addon.Logger:Info(text) end)
 
   local descField = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "Quest Description")
   descField:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
@@ -63,7 +62,8 @@ function menu:Create(parent)
   return frame
 end
 
-function menu:OnShow(frame, draftId)
+function menu:OnShowMenu(frame, draftId)
+  currentFrame = frame
   if draftId then
     currentDraft = QuestDrafts:FindByID(draftId)
     if not currentDraft then
@@ -79,7 +79,8 @@ function menu:OnShow(frame, draftId)
   frame.scriptEditor:SetText(currentDraft.script)
 end
 
-function menu:OnHide(frame)
+function menu:OnLeaveMenu(frame)
+  currentFrame = nil
   currentDraft = nil
   frame.nameField:SetText()
   frame.descField:SetText()

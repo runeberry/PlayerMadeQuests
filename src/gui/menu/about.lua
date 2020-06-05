@@ -1,6 +1,8 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 
+local menu = addon.MainMenu:NewMenuScreen("about")
+
 local textStyles = {
   ["Header"] = {
     inheritsFrom = "GameFontNormalSmall",
@@ -43,8 +45,6 @@ local textLines = {
     text = "Resets your PMQ quest log. Abandons all quests without confirmation!",
   },
 }
-
-local menu = addon.MainMenu:NewMenuScreen([[help\about]], "About PMQ", true)
 
 function menu:Create(parent)
   local frame = CreateFrame("Frame", nil, parent)

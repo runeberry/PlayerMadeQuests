@@ -2,7 +2,7 @@ local _, addon = ...
 local QuestDrafts = addon.QuestDrafts
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen([[drafts]], "My Questography", true)
+local menu = addon.MainMenu:NewMenuScreen("drafts")
 
 local colinfo = {
   {
@@ -52,15 +52,16 @@ function menu:Create(parent)
   dataTable:SubscribeToEvents("DraftSaved", "DraftDeleted")
   frame.dataTable = dataTable
 
+
   local newDraft = function()
-    addon.MainMenu:Show("draft-view")
+    addon.MainMenu:ShowMenuScreen("draft-view")
   end
 
   local editDraft = function()
     local selectedRow = dataTable:GetSelectedRow()
     if not selectedRow then return end
     local draftId = selectedRow[4]
-    addon.MainMenu:Show("draft-view", draftId)
+    addon.MainMenu:ShowMenuScreen("draft-view", draftId)
   end
 
   local confirmDraftDelete = addon.StaticPopups:NewPopup("ConfirmDraftDelete")
@@ -121,11 +122,11 @@ function menu:Create(parent)
   return frame
 end
 
-function menu:OnShow(frame)
+function menu:OnShowMenu(frame)
   frame.dataTable:RefreshData()
   frame.dataTable:EnableUpdates(true)
 end
 
-function menu:OnHide(frame)
+function menu:OnLeaveMenu(frame)
   frame.dataTable:EnableUpdates(false)
 end

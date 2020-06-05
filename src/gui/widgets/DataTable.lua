@@ -95,6 +95,7 @@ function widget:Create(parent, colinfo, datasource, ...)
   -- Show however many rows it takes to fill out the parent frame
   local frameHeight = frame:GetHeight()
   local numRows = math.floor(frameHeight / rowHeight) - 1 -- Leave off a row to account for header
+  numRows = math.max(numRows, 1) -- Must try to display at least one row
 
   local st = LibScrollingTable:CreateST(colinfo, numRows, rowHeight, highlightColor, frame)
   st.frame:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -12)

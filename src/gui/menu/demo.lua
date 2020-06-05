@@ -2,7 +2,7 @@ local _, addon = ...
 local QuestDemos = addon.QuestDemos
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen([[demo]], "Demo Quests", true)
+local menu = addon.MainMenu:NewMenuScreen("demo")
 
 local colinfo = {
   {
@@ -63,7 +63,7 @@ function menu:Create(parent)
     local selectedRow = dataTable:GetSelectedRow()
     if not selectedRow then return end
     local demoId = selectedRow[2]
-    addon.MainMenu:Show("demo-view", demoId)
+    addon.MainMenu:ShowMenuScreen("demo-view", demoId)
   end
 
   local copyToDrafts = function()
@@ -81,12 +81,3 @@ function menu:Create(parent)
 
   return frame
 end
-
--- function menu:OnShow(frame)
---   -- frame.dataTable:EnableUpdates(true)
---   -- frame.dataTable:RefreshData()
--- end
-
--- function menu:OnHide(frame)
---   -- frame.dataTable:EnableUpdates(false)
--- end
