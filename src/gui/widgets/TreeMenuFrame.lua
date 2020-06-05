@@ -5,43 +5,42 @@ local AceGUI = addon.AceGUI
 local widget = addon.CustomWidgets:NewWidget("TreeMenuFrame")
 
 local function getOrCreateScreen(frame, menuId)
-  local screen = frame._screens[menuId]
-  if not screen then
-    local parentFrame = CreateFrame("Frame", nil, frame._contentFrame)
-    parentFrame:SetAllPoints(true)
-    parentFrame:Show()
+  -- If the screen has already been built, return it
+  local existing = frame._screens[menuId]
+  if existing then return existing end
 
-    local menu = frame._menus[menuId]
-    if not menu then
-      return -- No screen registered for this ID
-    end
-    if type(menu.Create) ~= "function" then
-      error("Failed to load menu screen: screen "..menuId.." does not have a Create function")
-    end
-
-    screen = menu:Create(parentFrame)
-    if not screen then
-      error("Failed to load menu screen: Create did not return a screen for menu "..menuId)
-    end
-    -- Hook up the OnShowMenu and OnLeaveMenu functions from the template
-    screen.OnShowMenu = function(self, ...)
-      if menu.OnShowMenu then
-        menu:OnShowMenu(self, ...)
-      end
-    end
-    screen.OnLeaveMenu = function(self, ...)
-      if menu.OnLeaveMenu then
-        menu:OnLeaveMenu(self, ...)
-      end
-    end
-    frame._screens[menuId] = screen
+  -- Otherwise, Create it for the first time
+  local menu = frame._menus[menuId]
+  if not menu then
+    return -- No screen registered for this ID
   end
-  return screen
+  if type(menu.Create) ~= "function" then
+    error("Failed to load menu screen: screen "..menuId.." does not have a Create function")
+  end
+
+  local container = CreateFrame("Frame", nil, frame._contentFrame)
+  container:SetAllPoints(true)
+  container:Show()
+  menu:Create(container)
+
+  -- Hook up the OnShowMenu and OnLeaveMenu functions from the template
+  container.OnShowMenu = function(self, ...)
+    if menu.OnShowMenu then
+      menu:OnShowMenu(self, ...)
+    end
+  end
+  container.OnLeaveMenu = function(self, ...)
+    if menu.OnLeaveMenu then
+      menu:OnLeaveMenu(self, ...)
+    end
+  end
+  frame._screens[menuId] = container
+  return container
 end
 
 local methods = {
-  ["NewMenuScreen"] = function(self, menuId)
-    local st = {}
+  ["NewMenuScreen"] = function(self, menuId, headingText)
+    local st = { headingText = headingText }
     if self._menus[menuId] then
       addon.Logger:Error("Failed to register NewMenuScreen: screen already exists with id", menuId)
       return st

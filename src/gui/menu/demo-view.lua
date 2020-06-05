@@ -1,5 +1,4 @@
 local _, addon = ...
-local CreateFrame = addon.G.CreateFrame
 local QuestDemos = addon.QuestDemos
 
 local menu = addon.MainMenu:NewMenuScreen("demo-view")
@@ -27,11 +26,7 @@ local function button_CopyToDrafts()
   addon.Logger:Info("Demo quest copied to drafts.")
 end
 
-function menu:Create(parent)
-  local frame = CreateFrame("Frame", nil, parent)
-  frame:SetAllPoints(true)
-  frame:Hide()
-
+function menu:Create(frame)
   local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Quest Name")
   nameField:SetEnabled(false)
   nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")

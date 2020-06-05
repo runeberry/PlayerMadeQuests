@@ -23,11 +23,7 @@ local function getDemoQuests()
   return dqRows
 end
 
-function menu:Create(parent)
-  local frame = CreateFrame("Frame", nil, parent)
-  frame:SetAllPoints(true)
-  frame:Hide()
-
+function menu:Create(frame)
   for _, dq in pairs(QuestDemos:FindAll()) do
     table.insert(dqRows, { dq.parameters.name, dq.id, dq.order })
   end
@@ -78,6 +74,4 @@ function menu:Create(parent)
   buttonPane:AddButton("Accept Quest", acceptQuest)
   buttonPane:AddButton("View Code", viewCode)
   buttonPane:AddButton("Copy to Drafts", copyToDrafts)
-
-  return frame
 end

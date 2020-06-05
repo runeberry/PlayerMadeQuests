@@ -1,5 +1,4 @@
 local _, addon = ...
-local CreateFrame = addon.G.CreateFrame
 local QuestDrafts = addon.QuestDrafts
 
 local menu = addon.MainMenu:NewMenuScreen("draft-view")
@@ -31,11 +30,7 @@ local function button_Save()
   addon.Logger:Info("Draft Saved -", currentDraft.parameters.name)
 end
 
-function menu:Create(parent)
-  local frame = CreateFrame("Frame", nil, parent)
-  frame:SetAllPoints(true)
-  frame:Hide()
-
+function menu:Create(frame)
   local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Quest Name")
   nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
   nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
@@ -58,8 +53,6 @@ function menu:Create(parent)
   frame.nameField = nameField
   frame.descField = descField
   frame.scriptEditor = scriptEditor
-
-  return frame
 end
 
 function menu:OnShowMenu(frame, draftId)

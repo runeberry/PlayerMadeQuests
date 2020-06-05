@@ -1,5 +1,4 @@
 local _, addon = ...
-local CreateFrame = addon.G.CreateFrame
 
 local menu = addon.MainMenu:NewMenuScreen("faq")
 
@@ -38,10 +37,7 @@ local textLines = {
   },
 }
 
-function menu:Create(parent)
-  local frame = CreateFrame("Frame", nil, parent)
-  frame:SetAllPoints(true)
-
+function menu:Create(frame)
   local article = addon.CustomWidgets:CreateWidget("ArticleText", frame)
 
   for name, style in pairs(textStyles) do
@@ -54,6 +50,4 @@ function menu:Create(parent)
 
   frame.article = article
   article:Assemble()
-
-  return frame
 end

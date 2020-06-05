@@ -35,11 +35,7 @@ local function getDrafts()
   return draftRows
 end
 
-function menu:Create(parent)
-  local frame = CreateFrame("Frame", nil, parent)
-  frame:SetAllPoints(true)
-  frame:Hide()
-
+function menu:Create(frame)
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "LEFT", 120)
 
   local tablePane = CreateFrame("Frame", nil, frame)
@@ -51,7 +47,6 @@ function menu:Create(parent)
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getDrafts)
   dataTable:SubscribeToEvents("DraftSaved", "DraftDeleted")
   frame.dataTable = dataTable
-
 
   local newDraft = function()
     addon.MainMenu:ShowMenuScreen("draft-view")
@@ -118,8 +113,6 @@ function menu:Create(parent)
   buttonPane:AddButton("Delete", deleteDraft)
   buttonPane:AddButton("Accept Quest", acceptQuest)
   buttonPane:AddButton("Share Quest", shareQuest)
-
-  return frame
 end
 
 function menu:OnShowMenu(frame)
