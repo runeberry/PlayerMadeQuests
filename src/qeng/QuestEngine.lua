@@ -6,8 +6,8 @@ local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
 addon.QuestEngine = {}
 
 local commands = {}
-local rules = {}
-local conditions = {}
+local objectives = {}
+local scripts = {}
 local cleanNamePattern = "^[%l%d]+$"
 
 addon.QuestStatus = {
@@ -45,8 +45,8 @@ local function objective_GetMetadata(obj, name)
 end
 
 local function objective_GetDisplayText(obj)
-  if obj._rule.GetDisplayText then
-    return obj._rule:GetDisplayText(obj)
+  if obj._parent.scripts.GetDisplayText then
+    return obj._parent.scripts.GetDisplayText(obj)
   else
     return obj.name
   end
@@ -85,10 +85,10 @@ end
 -- Private functions: Quest objective evaluation --
 ---------------------------------------------------
 
-local function evaluateObjective(rule, obj, ...)
+local function evaluateObjective(objective, obj, ...)
   local ok, beforeResult, checkResult, afterResult
-  if rule.BeforeCheckConditions then
-    ok, beforeResult = addon:catch(rule.BeforeCheckConditions, rule, obj, ...)
+  if objective.scripts and objective.scripts.BeforeCheckConditions then
+    ok, beforeResult = pcall(objective.scripts.BeforeCheckConditions, obj, ...)
     if not(ok) then
       logger:Error("Error during BeforeCheckConditions for '", obj.id, "':", beforeResult)
       return
@@ -100,8 +100,9 @@ local function evaluateObjective(rule, obj, ...)
   -- CheckCondition is expected to return a boolean value only:
   -- true if the condition was met, false otherwise
   for name, val in pairs(obj.conditions) do
-    local condition = conditions[name]
-    ok, checkResult = addon:catch(condition.CheckCondition, condition, obj, val)
+    local condition = objective._params[name]
+    -- CheckCondition receives 2 args: The obj being evaluated, and the value(s) for this condition
+    ok, checkResult = pcall(condition.scripts.CheckCondition, obj, val)
     if not(ok) then
       logger:Error("Error evaluating condition '", name,"' for '", obj.id, "':", checkResult)
       return
@@ -114,8 +115,8 @@ local function evaluateObjective(rule, obj, ...)
 
   -- AfterCheckConditions may take the result from CheckCondition and make a final ruling by
   -- returning either a boolean or a number to represent objective progress
-  if rule.AfterCheckConditions then
-    ok, afterResult = addon:catch(rule.AfterCheckConditions, rule, obj, checkResult, ...)
+  if objective.scripts and objective.scripts.AfterCheckConditions then
+    ok, afterResult = addon:catch(objective.scripts.AfterCheckConditions, obj, checkResult, ...)
     if not(ok) then
       logger:Error("Error during AfterCheckConditions for '", obj.id, "':", afterResult)
       return
@@ -137,22 +138,25 @@ local function evaluateObjective(rule, obj, ...)
   return checkResult
 end
 
-local function wrapRuleHandler(rule)
+local function wrapObjectiveHandler(objective)
   -- Given an arbitrary list of game event args, handle them as follows
   return function(...)
-    logger:Debug("Evaluating rule:", rule.name, "(", addon:tlen(rule.objectives), "objectives )")
-    -- logger:Table(rule.objectives)
+    local numActive = addon:tlen(objective._active)
+    if numActive < 1 then return end
+
+    logger:Debug("Evaluating objective:", objective.name, "("..addon:tlen(objective._active).." active)")
+    -- logger:Table(objective._active)
     -- Completed objectives will be tracked and removed from the list
     local completed = {}
     local anychanged = false
 
-    -- For each objective that is backed by this rule
-    for id, obj in pairs(rule.objectives) do
+    -- For each active instance of this objective
+    for id, obj in pairs(objective._active) do
       if obj.progress >= obj.goal then
         -- The objective is already completed, nothing to do
         completed[id] = obj
       else
-        local result = evaluateObjective(rule, obj, ...)
+        local result = evaluateObjective(objective, obj, ...)
         logger:Debug("    Result:", result)
 
         if result > 0 then
@@ -190,7 +194,7 @@ local function wrapRuleHandler(rule)
 
     for id, _ in pairs(completed) do
       -- Stop trying to update that objective on subsequent game events
-      rule.objectives[id] = nil
+      objective._active[id] = nil
     end
 
     if anychanged then
@@ -199,98 +203,27 @@ local function wrapRuleHandler(rule)
   end
 end
 
-------------------
--- Constructors --
-------------------
-
-function addon.QuestEngine:NewCommand(name, ...)
-  if name == nil or name == "" then
-    logger:Error("Failed to build QuestEngine command: at least one name is required")
-    return {}
-  end
-
-  if type(name) ~= "string" or not(name:match(cleanNamePattern)) then
-    logger:Error("Failed to build QuestEngine command: name '"..name.."'must contain only lowercase alphanumeric characters")
-    return {}
-  end
-
-  if commands[name] ~= nil then
-    logger:Error("Failed to build QuestEngine command: '"..name.."' is already defined")
-    return {}
-  end
-
-  local command = {
-    name = name, -- All aliases for this command will reference the same "name"
-  }
-  commands[name] = command
-
-  -- A condition can be registered with multiple aliases, index them here
-  local aliases = { ... }
-  for _, alias in pairs(aliases) do
-    if commands[alias] ~= nil then
-      logger:Error("Failed to build QuestEngine alias: '"..alias.."' is already defined")
-    else
-      commands[alias] = command
-    end
-  end
-
-  return command
-end
-
-function addon.QuestEngine:NewRule(name)
-  if name == nil or name == "" then
-    logger:Error("Failed to build quest rule: name is required")
-    return {}
-  end
-
-  if type(name) ~= "string" or not(name:match(cleanNamePattern)) then
-    logger:Error("Failed to build quest rule: name '"..name.."'must contain only lowercase alphanumeric characters")
-    return {}
-  end
-
-  if rules[name] ~= nil then
-    logger:Error("Failed to build quest rule: '"..name.."' is already defined")
-    return {}
-  end
-
-  local rule = {
-    name = name,
-    objectives = {}
-  }
-
-  addon.RuleEvents:Subscribe(name, wrapRuleHandler(rule))
-  rules[name] = rule
-  logger:Trace("Registered quest rule: '" .. rule.name .. "'")
-  return rule
-end
-
-function addon.QuestEngine:NewCondition(name)
-  if name == nil or name == "" then
-    logger:Error("Failed to build condition: name is required")
-    return {}
-  end
-
-  if type(name) ~= "string" or not(name:match(cleanNamePattern)) then
-    logger:Error("Failed to build condition: name '"..name.."'must contain only lowercase alphanumeric characters")
-    return {}
-  end
-
-  if conditions[name] ~= nil then
-    logger:Error("Failed to build condition: '"..name.."' is already defined")
-    return {}
-  end
-
-  local condition = {
-    name = name
-  }
-
-  conditions[name] = condition
-  return condition
-end
-
 -----------------------------
 -- QuestScript Compilation --
 -----------------------------
+
+--[[
+  Registers an arbitrary script by the specified unique name.
+  Reference this script name in QuestScript.lua and it will be attached
+  to the associated item and executed at the appropriate point in the quest lifecycle.
+--]]
+function addon.QuestEngine:AddScript(name, fn)
+  if not name or name == "" then
+    addon.Logger:Error("AddScript: name is required")
+    return
+  end
+  if scripts[name] then
+    addon.Logger:Error("AddScript: script is already registered with name:", name)
+    return
+  end
+
+  scripts[name] = fn
+end
 
 --[[
   Returns the string value of the requested arg
@@ -430,20 +363,98 @@ end
 
 local function runCommand(quest, args)
   local commandName = addon.QuestEngine:GetArgsValue(args, 1)
-  if commandName == nil then
+  if not commandName then
     error("No command name was specified")
   end
 
   local command = commands[commandName]
-  if command == nil then
+  if not command then
     error("No command exists with name: "..commandName)
   end
 
-  if command.Parse == nil then
-    error("No Parse method is defined for command: "..commandName)
+  if not command.scripts or not command.scripts.Run then
+    error("No Run script is defined for command: "..commandName)
   end
 
-  command:Parse(quest, args)
+  command.scripts.Run(quest, args)
+end
+
+function addon.QuestEngine:InitQuestScript(qsconfig)
+  local function validateAndRegister(set, name, item)
+    if not name or name == "" then
+      error("Name/alias cannot be nil or empty")
+    end
+    if type(name) ~= "string" or not name:match(cleanNamePattern) then
+      error("Name/alias must only contain lowercase alphanumeric characters")
+    end
+    if set[name] and set[name] ~= item then
+      error("An item is already registered with name/alias: "..name)
+    end
+    set[name] = item
+  end
+
+  local function setup(set, item)
+    local name = item.name
+    -- An item's primary alias is its name
+    validateAndRegister(set, name, item)
+
+    local alias = item.alias
+    if alias then
+      if type(alias) == "string" then
+        -- Single alias
+        validateAndRegister(set, alias, item)
+      elseif type(alias) == "table" then
+        -- Multiple aliases
+        for _, al in ipairs(alias) do
+          validateAndRegister(set, al, item)
+        end
+      else
+        error("Unrecognized alias type ("..type(alias)..") for:"..name)
+      end
+    end
+
+    local itemScripts = item.scripts
+    if itemScripts then
+      -- Replace any script name tokens with the actual script function registered here
+      local newScripts = {}
+      for callName, script in pairs(itemScripts) do
+        if type(script) == "function" then
+          newScripts[callName] = script
+        elseif type(script) == "string" then
+          local fn = scripts[script]
+          if not fn then
+            error("No script registered with name: "..script)
+          end
+          newScripts[callName] = fn
+        else
+          error("Unrecognized script type ("..type(script)..") for:"..name)
+        end
+      end
+      item.scripts = newScripts
+    end
+
+    local params = item.params
+    if params then
+      local indexed = {}
+      for _, param in ipairs(params) do
+        -- Recursively set up parameters exactly like their parent items
+        setup(indexed, param)
+      end
+      item._params = indexed
+    end
+  end
+
+  for _, command in ipairs(qsconfig.commands) do
+    setup(commands, command)
+  end
+  for _, objective in ipairs(qsconfig.objectives) do
+    setup(objectives, objective)
+  end
+  -- Ensure everything can be setup, then wire up objectives into the engine
+  for _, objective in ipairs(qsconfig.objectives) do
+    objective._active = {} -- Every active instance of this objective will be tracked
+    addon.RuleEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))
+  end
 end
 
 --[[
@@ -495,7 +506,7 @@ function addon.QuestEngine:Build(parameters)
 
   for _, obj in pairs(quest.objectives) do
     obj.name = obj.name or error("Failed to create quest: objective name is required")
-    obj._rule = rules[obj.name] or error("Failed to create quest: '"..obj.name.."' is not a valid rule")
+    obj._parent = objectives[obj.name] or error("Failed to create quest: '"..obj.name.."' is not a valid objective")
     obj._quest = quest -- Add reference back to this obj's quest
     obj._tempdata = {}
 
@@ -513,12 +524,12 @@ function addon.QuestEngine:Build(parameters)
     obj.GetConditionDisplayText = objective_GetConditionDisplayText
 
     for name, _ in pairs(obj.conditions) do
-      local condition = conditions[name]
-      if condition == nil then
-        error("Failed to create quest: '"..name.."' is not a valid condition")
+      local condition = obj._parent._params[name]
+      if not condition then
+        error("Failed to create quest: '"..name.."' is not a valid condition for objective '"..obj._parent.name.."'")
       end
-      if condition.CheckCondition == nil then
-        error("Failed to create quest: condition '"..name.."' does not have a CheckCondition method")
+      if not condition.scripts or not condition.scripts.CheckCondition then
+        error("Failed to create quest: condition '"..name.."' does not have a CheckCondition script")
       end
     end
   end
@@ -530,17 +541,22 @@ function addon.QuestEngine:Build(parameters)
 end
 
 function addon.QuestEngine:StartTracking(quest)
-  -- All objectives created for a rule are stored together
+  -- All active instances of a created objective are stored together
   -- so that they can be quickly evaluated together
   for _, obj in pairs(quest.objectives) do
-    obj._rule.objectives[obj.id] = obj
+    obj._parent._active[obj.id] = obj
   end
   addon.AppEvents:Publish("QuestTrackingStarted", quest)
 end
 
 function addon.QuestEngine:StopTracking(quest)
   for _, obj in pairs(quest.objectives) do
-    obj._rule.objectives[obj.id] = nil
+    obj._parent._active[obj.id] = nil
   end
   addon.AppEvents:Publish("QuestTrackingStopped", quest)
 end
+
+addon:onload(function()
+  addon.QuestEngine:InitQuestScript(addon.QuestScript)
+  logger:Debug("QuestScript initialized OK!")
+end)

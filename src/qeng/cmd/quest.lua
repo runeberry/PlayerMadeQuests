@@ -1,12 +1,9 @@
 local _, addon = ...
 addon:traceFile("cmd/quest.lua")
-local QuestEngine = addon.QuestEngine
+local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
 
-local cmd = QuestEngine:NewCommand("quest", "q")
-
-function cmd:Parse(quest, args)
+QuestEngine:AddScript(tokens.CMD_QUEST_SCRIPT, function(quest, args)
   local name = QuestEngine:GetArgsValue(args, "name", "n", 2)
-
   if name then
     quest.name = name
   end
@@ -15,4 +12,4 @@ function cmd:Parse(quest, args)
   if description then
     quest.description = description
   end
-end
+end)

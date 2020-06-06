@@ -1,30 +1,11 @@
 local _, addon = ...
-local GetUnitName =addon.G.GetUnitName
-local UnitGUID = addon.G.UnitGUID
 addon:traceFile("conditions/target.lua")
+local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
+local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
 
-local condition = addon.QuestEngine:NewCondition("target")
-condition.allowMultiple = true
-
-function condition:CheckCondition(obj, unitNames)
-  -- The rule may want to override the default method for obtaining the targeted unit name
-  local targetUnitName = obj:GetMetadata("TargetUnitName") or GetUnitName("target")
-
-  if unitNames[targetUnitName] == nil then
-    -- The targeted unit's name does not match the objective's unit name
-    return false
-  end
-
-  if obj.goal == 1 then
-    -- Only one unit to target, so the objective is satisfied
-    return true
-  end
+local function isUniqueTargetGuid(obj, targetUnitGuid)
   -- If the objective is to target multiples of the same NPC (i.e. 3 guards),
   -- make sure they're different by guid
-
-  -- The rule may want to override the default method for obtaining the targeted unit guid
-  local targetUnitGuid = obj:GetMetadata("TargetUnitGuid") or UnitGUID("target")
-
   local targetGuidHistory = obj:GetMetadata("TargetGuidHistory")
   if not targetGuidHistory then
     targetGuidHistory = {}
@@ -48,3 +29,29 @@ function condition:CheckCondition(obj, unitNames)
   objTargetGuidHistory[targetUnitGuid] = true
   return true
 end
+
+QuestEngine:AddScript(tokens.COND_TARGET_UNIT_SCRIPT, function(obj, unitNames)
+  local targetUnitName = GetUnitName("target")
+  if unitNames[targetUnitName] == nil then
+    -- The targeted unit's name does not match the objective's unit name
+    return false
+  end
+  if obj.goal == 1 then
+    -- Only one unit to target, so the objective is satisfied
+    return true
+  end
+  return isUniqueTargetGuid(obj, UnitGUID("target"))
+end)
+
+QuestEngine:AddScript(tokens.COND_TARGET_KILL_SCRIPT, function(obj, unitNames)
+  local targetUnitName = obj:GetMetadata("TargetUnitName")
+  if unitNames[targetUnitName] == nil then
+    -- The targeted unit's name does not match the objective's unit name
+    return false
+  end
+  if obj.goal == 1 then
+    -- Only one unit to target, so the objective is satisfied
+    return true
+  end
+  return isUniqueTargetGuid(obj, obj:GetMetadata("TargetUnitGuid"))
+end)

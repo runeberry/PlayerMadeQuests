@@ -1,8 +1,7 @@
 local _, addon = ...
 addon:traceFile("cmd/objective.lua")
-
+local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
 local unpack = addon.G.unpack
-local QuestEngine = addon.QuestEngine
 
 local conditions = {
   { "aura", "a" },
@@ -14,9 +13,7 @@ local conditions = {
   { "zone", "z" }
 }
 
-local cmd = QuestEngine:NewCommand("objective", "obj", "o")
-
-function cmd:Parse(quest, args)
+QuestEngine:AddScript(tokens.CMD_OBJ_SCRIPT, function(quest, args)
   local rule = QuestEngine:GetArgsValue(args, 2)
   if rule == nil then
     error("Rule name is required")
@@ -65,4 +62,4 @@ function cmd:Parse(quest, args)
   end
 
   table.insert(quest.objectives, objective)
-end
+end)

@@ -1,26 +1,23 @@
 local _, addon = ...
 addon:traceFile("rules/kill.lua")
+local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
 
-local QuestEngine = addon.QuestEngine
-
-local rule = QuestEngine:NewRule("kill")
-
-function rule:GetDisplayText(obj)
-  return obj:GetConditionDisplayText("target", "Kill enemies")
-end
-
-function rule:BeforeCheckConditions(obj, cl)
+QuestEngine:AddScript(tokens.OBJ_KILL_SCRIPT, function(obj, cl)
   obj:SetMetadata("TargetUnitName", cl.destName)
   obj:SetMetadata("TargetUnitGuid", cl.destGuid)
-end
+end)
 
-function rule:AfterCheckConditions(obj)
+QuestEngine:AddScript(tokens.OBJ_KILL_POST_SCRIPT, function(obj)
   obj:SetMetadata("TargetUnitName", nil)
   obj:SetMetadata("TargetUnitGuid", nil)
-end
+end)
+
+QuestEngine:AddScript(tokens.OBJ_KILL_TEXT, function(obj)
+  return obj:GetConditionDisplayText("target", "Kill enemies")
+end)
 
 addon:onload(function()
   addon.CombatLogEvents:Subscribe("PARTY_KILL", function(cl)
-    addon.RuleEvents:Publish(rule.name, cl)
+    addon.RuleEvents:Publish(tokens.OBJ_KILL, cl)
   end)
 end)

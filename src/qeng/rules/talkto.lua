@@ -1,18 +1,17 @@
 local _, addon = ...
 addon:traceFile("rules/talkto.lua")
+local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
 local UnitExists = addon.G.UnitExists
 
-local rule = addon.QuestEngine:NewRule("talkto")
-
-function rule:GetDisplayText(obj)
+QuestEngine:AddScript(tokens.OBJ_TALKTO_TEXT, function(obj)
   return "Talk to "..obj:GetConditionDisplayText("target", "anyone")
-end
+end)
 
 -- Publish the TalkTo event anytime the player targets a friendly unit
 -- that activates one of the registered events below
 local function publishEvent()
   if UnitExists("target") then
-    addon.RuleEvents:Publish(rule.name)
+    addon.RuleEvents:Publish(tokens.OBJ_TALKTO)
   end
 end
 

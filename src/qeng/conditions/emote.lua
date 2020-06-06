@@ -1,11 +1,9 @@
 local _, addon = ...
-local UnitExists = addon.G.UnitExists
-local GetUnitName = addon.G.GetUnitName
 addon:traceFile("conditions/emote.lua")
+local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
+local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
 
-local condition = addon.QuestEngine:NewCondition("emote")
-
-function condition:CheckCondition(obj, emoteNames)
+QuestEngine:AddScript(tokens.COND_EMOTE_SCRIPT, function(obj, emoteNames)
   local eem = obj:GetMetadata("ExpectedEmoteMessages")
   local expectTargetedEmote = obj:HasCondition("target")
 
@@ -41,4 +39,4 @@ function condition:CheckCondition(obj, emoteNames)
       return true
     end
   end
-end
+end)

@@ -21,3 +21,9 @@ addon.MainMenu:SetMenuTree({ -- value == menuId
 local mmfGlobalName = "PMQ_MainMenuFrame"
 _G[mmfGlobalName] = addon.MainMenu
 table.insert(UISpecialFrames, mmfGlobalName)
+
+addon:OnSaveDataLoaded(function()
+  if addon.SHOW_MENU_ON_START then
+    addon.MainMenu:NavToMenuScreen(addon.SHOW_MENU_ON_START)
+  end
+end)
