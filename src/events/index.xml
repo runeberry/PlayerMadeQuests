@@ -5,5 +5,5 @@
   <Script file="events/CombatLogEvents.lua"/>
   <Script file="events/GameEvents.lua"/>
   <Script file="events/MessageEvents.lua"/>
-  <Script file="events/RuleEvents.lua"/>
+  <Script file="events/QuestEvents.lua"/>
 </Ui>

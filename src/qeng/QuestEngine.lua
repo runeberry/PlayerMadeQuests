@@ -453,7 +453,7 @@ function addon.QuestEngine:InitQuestScript(qsconfig)
   -- Ensure everything can be setup, then wire up objectives into the engine
   for _, objective in ipairs(qsconfig.objectives) do
     objective._active = {} -- Every active instance of this objective will be tracked
-    addon.RuleEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))
+    addon.QuestEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))
   end
 end
 

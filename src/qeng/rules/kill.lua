@@ -18,6 +18,6 @@ end)
 
 addon:onload(function()
   addon.CombatLogEvents:Subscribe("PARTY_KILL", function(cl)
-    addon.RuleEvents:Publish(tokens.OBJ_KILL, cl)
+    addon.QuestEvents:Publish(tokens.OBJ_KILL, cl)
   end)
 end)

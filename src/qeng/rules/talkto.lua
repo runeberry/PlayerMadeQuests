@@ -11,7 +11,7 @@ end)
 -- that activates one of the registered events below
 local function publishEvent()
   if UnitExists("target") then
-    addon.RuleEvents:Publish(tokens.OBJ_TALKTO)
+    addon.QuestEvents:Publish(tokens.OBJ_TALKTO)
   end
 end
 
