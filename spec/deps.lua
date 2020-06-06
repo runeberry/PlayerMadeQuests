@@ -2,6 +2,34 @@ local mock = require("spec/mock")
 
 local deps = {}
 
+local function newFrameMock()
+  return {
+    SetFrameStrata = mock:NewMock(),
+    Show = mock:NewMock(),
+    Hide = mock:NewMock(),
+  }
+end
+
+local function newAceFrameMock()
+  local aceFrameMock = {
+    frame = newFrameMock(),
+    SetTitle = mock:NewMock(),
+    SetStatusText = mock:NewMock(),
+    SetCallback = mock:NewMock(),
+    SetLayout = mock:NewMock(),
+    EnableButtonTooltips = mock:NewMock(),
+    SetTree = mock:NewMock(),
+    AddChild = mock:NewMock(),
+    SelectByValue = mock:NewMock(),
+    SetFullWidth = mock:NewMock(),
+    SetFullHeight = mock:NewMock()
+  }
+
+  aceFrameMock.content = { obj = aceFrameMock }
+
+  return aceFrameMock
+end
+
 function deps:Init(addon)
   addon.Ace = {
     _stable = {},
@@ -20,20 +48,7 @@ function deps:Init(addon)
     end
   }
   addon.AceGUI = {
-    Create = mock:NewMock( mock:Returns({
-      frame = {
-        SetFrameStrata = mock:NewMock()
-      },
-      content = {},
-      SetTitle = mock:NewMock(),
-      SetStatusText = mock:NewMock(),
-      SetCallback = mock:NewMock(),
-      SetLayout = mock:NewMock(),
-      EnableButtonTooltips = mock:NewMock(),
-      SetTree = mock:NewMock(),
-      AddChild = mock:NewMock(),
-      SelectByValue = mock:NewMock()
-    }) )
+    Create = mock:NewMock( mock:Returns(newAceFrameMock()) )
   }
   addon.LibCompress = {
     _ctable = {},
