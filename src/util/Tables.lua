@@ -119,6 +119,15 @@ function addon:InvertTable(t)
   return inverted, i
 end
 
+-- Adapted from: https://stackoverflow.com/a/15278426/7071436
+function addon:ConcatArray(t1, t2)
+  if t1 == nil or t2 == nil then error("Cannot concat nil tables") end
+  for i = 1, #t2 do
+    t1[#t1+1] = t2[i]
+  end
+  return t1
+end
+
 function addon:CompressTable(t)
   if t == nil then error("Cannot compress a nil table") end
   local cleaned = addon:CleanTable(addon:CopyTable(t))
