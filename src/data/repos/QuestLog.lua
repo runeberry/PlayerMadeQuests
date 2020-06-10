@@ -8,7 +8,9 @@ addon.QuestLog = {}
 local quests = {}
 
 addon:OnSaveDataLoaded(function()
-  addon.QuestLog:Load()
+  addon.AppEvents:Subscribe("EngineLoaded", function()
+    addon.QuestLog:Load()
+  end)
 end)
 
 function addon.QuestLog:Save()

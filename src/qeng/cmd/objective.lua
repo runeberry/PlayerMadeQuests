@@ -1,6 +1,6 @@
 local _, addon = ...
 addon:traceFile("cmd/objective.lua")
-local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
+local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 local unpack = addon.G.unpack
 
 local conditions = {
@@ -13,8 +13,8 @@ local conditions = {
   { "zone", "z" }
 }
 
-QuestEngine:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
-  local rule = QuestEngine:GetArgsValue(args, 2)
+compiler:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
+  local rule = compiler:GetArgsValue(args, 2)
   if rule == nil then
     error("Rule name is required")
   end
@@ -33,24 +33,24 @@ QuestEngine:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
     --tempdata = {} -- Additional data that will not be written to save
   }
 
-  local goal = tonumber(QuestEngine:GetArgsValue(args, "goal", "g", 3))
+  local goal = tonumber(compiler:GetArgsValue(args, "goal", "g", 3))
   if goal and goal > 0 then
     objective.goal = goal
 
-    local displayText = QuestEngine:GetArgsValue(args, "displaytext", "d", 4)
+    local displayText = compiler:GetArgsValue(args, "displaytext", "d", 4)
     if displayText then
       objective.displayText = displayText
     end
   else
     -- If param #3 was not a number, then it will be interpreted as the displayText
-    local displayText = QuestEngine:GetArgsValue(args, "displaytext", "d", 3)
+    local displayText = compiler:GetArgsValue(args, "displaytext", "d", 3)
     if displayText then
       objective.displayText = displayText
     end
   end
 
   for _, names in ipairs(conditions) do
-    local val = QuestEngine:GetArgsSet(args, unpack(names))
+    local val = compiler:GetArgsSet(args, unpack(names))
     if val then
       -- Group all aliased values and assign them to the primary condition name
       objective.conditions[names[1]] = val

@@ -1,6 +1,6 @@
 local _, addon = ...
 addon:traceFile("conditions/target.lua")
-local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
+local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
 
 local function isUniqueTargetGuid(obj, targetUnitGuid)
@@ -30,7 +30,7 @@ local function isUniqueTargetGuid(obj, targetUnitGuid)
   return true
 end
 
-QuestEngine:AddScript(tokens.COND_TARGET, tokens.METHOD_CHECK_COND, function(obj, unitNames)
+compiler:AddScript(tokens.COND_TARGET, tokens.METHOD_CHECK_COND, function(obj, unitNames)
   local targetUnitName = obj:GetMetadata("TargetUnitName") or GetUnitName("target")
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name

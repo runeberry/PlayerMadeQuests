@@ -22,7 +22,7 @@ function addon.QuestDemos:CompileDemo(id)
   if not demo then
     return false, "No demo exists with id: "..id
   end
-  local ok, parameters = pcall(addon.QuestEngine.Compile, addon.QuestEngine, demo.script, demo.parameters)
+  local ok, parameters = pcall(addon.QuestScriptCompiler.Compile, addon.QuestEngine, demo.script, demo.parameters)
   if not ok then
     return ok, parameters
   end
