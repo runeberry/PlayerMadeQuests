@@ -3,7 +3,7 @@ addon:traceFile("rules/talkto.lua")
 local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
 local UnitExists = addon.G.UnitExists
 
-QuestEngine:AddScript(tokens.OBJ_TALKTO_TEXT, function(obj)
+QuestEngine:AddScript(tokens.OBJ_TALKTO, tokens.METHOD_DISPLAY_TEXT, function(obj)
   return "Talk to "..obj:GetConditionDisplayText("target", "anyone")
 end)
 

@@ -30,8 +30,8 @@ local function isUniqueTargetGuid(obj, targetUnitGuid)
   return true
 end
 
-QuestEngine:AddScript(tokens.COND_TARGET_UNIT_SCRIPT, function(obj, unitNames)
-  local targetUnitName = GetUnitName("target")
+QuestEngine:AddScript(tokens.COND_TARGET, tokens.METHOD_CHECK_COND, function(obj, unitNames)
+  local targetUnitName = obj:GetMetadata("TargetUnitName") or GetUnitName("target")
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name
     return false
@@ -40,18 +40,5 @@ QuestEngine:AddScript(tokens.COND_TARGET_UNIT_SCRIPT, function(obj, unitNames)
     -- Only one unit to target, so the objective is satisfied
     return true
   end
-  return isUniqueTargetGuid(obj, UnitGUID("target"))
-end)
-
-QuestEngine:AddScript(tokens.COND_TARGET_KILL_SCRIPT, function(obj, unitNames)
-  local targetUnitName = obj:GetMetadata("TargetUnitName")
-  if unitNames[targetUnitName] == nil then
-    -- The targeted unit's name does not match the objective's unit name
-    return false
-  end
-  if obj.goal == 1 then
-    -- Only one unit to target, so the objective is satisfied
-    return true
-  end
-  return isUniqueTargetGuid(obj, obj:GetMetadata("TargetUnitGuid"))
+  return isUniqueTargetGuid(obj, obj:GetMetadata("TargetUnitGuid") or UnitGUID("target"))
 end)

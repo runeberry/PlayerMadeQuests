@@ -2,7 +2,7 @@ local _, addon = ...
 addon:traceFile("cmd/quest.lua")
 local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
 
-QuestEngine:AddScript(tokens.CMD_QUEST_SCRIPT, function(quest, args)
+QuestEngine:AddScript(tokens.CMD_QUEST, tokens.METHOD_PARSE, function(quest, args)
   local name = QuestEngine:GetArgsValue(args, "name", "n", 2)
   if name then
     quest.name = name

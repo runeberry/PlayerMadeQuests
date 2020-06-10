@@ -4,51 +4,31 @@ local tokens = {
   COMMENT = "#",
 
   OBJ_EMOTE = "emote",
-  OBJ_EMOTE_SCRIPT = "objective-emote",
-  OBJ_EMOTE_TEXT = "objective-emote-display-text",
   OBJ_KILL = "kill",
-  OBJ_KILL_SCRIPT = "objective-kill",
-  OBJ_KILL_POST_SCRIPT = "objective-kill-after",
-  OBJ_KILL_TEXT = "objective-kill-display-text",
   OBJ_TALKTO = "talkto",
-  OBJ_TALKTO_ALIAS = "talk",
-  OBJ_TALKTO_SCRIPT = "objective-talkto",
-  OBJ_TALKTO_TEXT = "objective-talkto-display-text",
 
   COND_EMOTE = "emote",
-  COND_EMOTE_ALIAS = "em",
-  COND_EMOTE_SCRIPT = "condition-emote-message",
   COND_TARGET = "target",
-  COND_TARGET_ALIAS = { "tar", "t" },
-  COND_TARGET_KILL_SCRIPT = "condition-unique-kill-target",
-  COND_TARGET_UNIT_SCRIPT = "condition-unique-unit-target",
 
   CMD_DEFINE = "define",
-  CMD_DEFINE_ALIAS = "def",
-  CMD_DEFINE_SCRIPT = "command-define",
   CMD_DESC = "description",
-  CMD_DESC_SCRIPT = "command-description",
   CMD_FACTION = "faction",
-  CMD_FACTION_SCRIPT = "command-faction",
   CMD_LEVEL = "level",
-  CMD_LEVEL_SCRIPT = "command-level",
   CMD_LOC = "location",
-  CMD_LOC_ALIAS = "loc",
-  CMD_LOC_SCRIPT = "command-location",
   CMD_OBJ = "objective",
-  CMD_OBJ_ALIAS = { "obj", "o" },
-  CMD_OBJ_SCRIPT = "command-objective",
   CMD_QUEST = "quest",
-  CMD_QUEST_SCRIPT = "command-quest",
+
+  METHOD_PARSE = "Parse",
+  METHOD_PRE_COND = "BeforeCheckConditions",
+  METHOD_CHECK_COND = "CheckCondition",
+  METHOD_POST_COND = "AfterCheckConditions",
+  METHOD_DISPLAY_TEXT = "GetDisplayText",
 
   PARAM_DIFFICULTY = "difficulty",
-  PARAM_DIFFICULTY_ALIAS = "diff",
   PARAM_GOAL = "goal",
-  PARAM_GOAL_ALIAS = "g",
   PARAM_MAX = "max",
   PARAM_MIN = "min",
   PARAM_NAME = "name",
-  PARAM_NAME_ALIAS = "n",
   PARAM_SIDE = "side",
   PARAM_TEXT = "text",
   PARAM_VARNAME = "varname",
@@ -65,68 +45,66 @@ local objectives = {
   {
     name = tokens.OBJ_EMOTE,
     scripts = {
-      ["BeforeCheckConditions"] = tokens.OBJ_EMOTE_SCRIPT,
-      ["GetDisplayText"] = tokens.OBJ_EMOTE_TEXT,
+      tokens.METHOD_PRE_COND,
+      tokens.METHOD_DISPLAY_TEXT,
     },
     params = {
       {
         name = tokens.COND_EMOTE,
-        alias = tokens.COND_EMOTE_ALIAS,
+        alias = "em",
         position = 1,
         required = true,
         multiple = true,
         scripts = {
-          ["CheckCondition"] = tokens.COND_EMOTE_SCRIPT
+          tokens.METHOD_CHECK_COND,
         }
       },
       {
         name = tokens.COND_TARGET,
-        alias = tokens.COND_TARGET_ALIAS,
+        alias = { "tar", "t" },
         position = 2,
         multiple = true,
         scripts = {
-          ["CheckCondition"] = tokens.COND_TARGET_UNIT_SCRIPT
+          tokens.METHOD_CHECK_COND,
         }
       },
     }
   },
   {
     name = tokens.OBJ_KILL,
-    handler = tokens.OBJ_KILL_SCRIPT,
-    text = tokens.OBJ_KILL_TEXT,
     scripts = {
-      ["BeforeCheckConditions"] = tokens.OBJ_KILL_SCRIPT,
-      ["AfterCheckConditions"] = tokens.OBJ_KILL_POST_SCRIPT,
-      ["GetDisplayText"] = tokens.OBJ_KILL_TEXT,
+      tokens.METHOD_PRE_COND,
+      tokens.METHOD_POST_COND,
+      tokens.METHOD_DISPLAY_TEXT,
     },
     params = {
       {
         name = tokens.COND_TARGET,
-        alias = tokens.COND_TARGET_ALIAS,
+        alias = { "tar", "t" },
         position = 1,
         required = true,
         multiple = true,
         scripts = {
-          ["CheckCondition"] = tokens.COND_TARGET_KILL_SCRIPT
+          tokens.METHOD_CHECK_COND,
         }
       },
     }
   },
   {
     name = tokens.OBJ_TALKTO,
-    alias = tokens.OBJ_TALKTO_ALIAS,
+    alias = "talk",
     scripts = {
-      ["GetDisplayText"] = tokens.OBJ_TALKTO_TEXT,
+      tokens.METHOD_DISPLAY_TEXT,
     },
     params = {
       {
         name = tokens.COND_TARGET,
-        alias = tokens.COND_TARGET_ALIAS,
+        alias = { "tar", "t" },
         position = 1,
         required = true,
         multiple = true,
         scripts = {
-          ["CheckCondition"] = tokens.COND_TARGET_UNIT_SCRIPT
+          tokens.METHOD_CHECK_COND,
         },
       }
     }
@@ -136,9 +114,8 @@ local objectives = {
 local commands = {
   -- {
   --   name = tokens.CMD_DEFINE,
-  --   alias = tokens.CMD_DEFINE_ALIAS,
+  --   alias = "def",
   --   multiple = true,
-  --   handler = tokens.CMD_DEFINE_SCRIPT,
   --   params = {
   --     {
   --       name = tokens.PARAM_VARNAME,
@@ -150,20 +127,19 @@ local commands = {
   {
     name = tokens.CMD_QUEST,
     scripts = {
-      ["Run"] = tokens.CMD_QUEST_SCRIPT
+      tokens.METHOD_PARSE,
     },
     params = {
       {
         name = tokens.PARAM_NAME,
-        alias = tokens.PARAM_NAME_ALIAS,
+        alias = "n",
         position = 1,
       }
     }
   },
   -- {
   --   name = tokens.CMD_DESC,
-  --   alias = tokens.ALIAS_DESC,
-  --   handler = tokens.CMD_DESC_SCRIPT,
+  --   alias = "desc",
   --   params = {
   --     {
   --       name = tokens.PARAM_TEXT,
@@ -173,8 +149,7 @@ local commands = {
   -- },
   -- {
   --   name = tokens.CMD_LOC,
-  --   alias = tokens.CMD_LOC_ALIAS,
-  --   handler = tokens.CMD_LOC_SCRIPT,
+  --   alias = "loc",
   --   params = {
   --     {
   --       name = tokens.PARAM_ZONE,
@@ -201,11 +176,10 @@ local commands = {
   -- },
   -- {
   --   name = tokens.CMD_LEVEL,
-  --   handler = tokens.CMD_LEVEL_SCRIPT,
   --   params = {
   --     {
   --       name = tokens.PARAM_DIFFICULTY,
-  --       alias = tokens.PARAM_DIFFICULTY_ALIAS,
+  --       alias = "diff",
   --       position = 1,
   --       type = "number",
   --     },
@@ -225,7 +199,6 @@ local commands = {
   -- },
   -- {
   --   name = tokens.CMD_FACTION,
-  --   handler = tokens.CMD_FACTION_SCRIPT,
   --   params = {
   --     {
   --       name = tokens.PARAM_SIDE,
@@ -240,10 +213,9 @@ local commands = {
   -- },
   {
     name = tokens.CMD_OBJ,
-    alias = tokens.CMD_OBJ_ALIAS,
-    multiple = true,
+    alias = { "obj", "o" },
     scripts = {
-      ["Run"] = tokens.CMD_OBJ_SCRIPT
+      tokens.METHOD_PARSE,
     },
     params = {
       {
@@ -253,14 +225,13 @@ local commands = {
       },
       {
         name = tokens.PARAM_GOAL,
-        alias = tokens.PARAM_GOAL_ALIAS,
+        alias = "g",
         position = 2,
         type = "number",
         default = 1,
       },
       {
         name = tokens.PARAM_TEXT,
-        position = 3,
       }
     }
   }

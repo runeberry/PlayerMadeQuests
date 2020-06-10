@@ -13,7 +13,7 @@ local conditions = {
   { "zone", "z" }
 }
 
-QuestEngine:AddScript(tokens.CMD_OBJ_SCRIPT, function(quest, args)
+QuestEngine:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
   local rule = QuestEngine:GetArgsValue(args, 2)
   if rule == nil then
     error("Rule name is required")

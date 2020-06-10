@@ -100,7 +100,7 @@ local function evaluateObjective(objective, obj, ...)
   -- CheckCondition is expected to return a boolean value only:
   -- true if the condition was met, false otherwise
   for name, val in pairs(obj.conditions) do
-    local condition = objective._params[name]
+    local condition = objective._paramsByName[name]
     -- CheckCondition receives 2 args: The obj being evaluated, and the value(s) for this condition
     ok, checkResult = pcall(condition.scripts.CheckCondition, obj, val)
     if not(ok) then
@@ -212,17 +212,30 @@ end
   Reference this script name in QuestScript.lua and it will be attached
   to the associated item and executed at the appropriate point in the quest lifecycle.
 --]]
-function addon.QuestEngine:AddScript(name, fn)
-  if not name or name == "" then
-    addon.Logger:Error("AddScript: name is required")
+function addon.QuestEngine:AddScript(itemName, methodName, fn)
+  if not itemName or itemName == "" then
+    addon.Logger:Error("AddScript: itemName is required")
+    addon.Logger:Debug("methodName:", methodName)
     return
   end
-  if scripts[name] then
-    addon.Logger:Error("AddScript: script is already registered with name:", name)
+  if not methodName or methodName == "" then
+    addon.Logger:Error("AddScript: methodName is required")
+    addon.Logger:Debug("itemName:", itemName)
     return
   end
 
-  scripts[name] = fn
+  local existing = scripts[itemName]
+  if not existing then
+    existing = {}
+    scripts[itemName] = existing
+  end
+
+  if existing[methodName] then
+    addon.Logger:Error("AddScript: script is already registered for", itemName, "with name", methodName)
+    return
+  end
+
+  existing[methodName] = fn
 end
 
 --[[
@@ -372,11 +385,11 @@ local function runCommand(quest, args)
     error("No command exists with name: "..commandName)
   end
 
-  if not command.scripts or not command.scripts.Run then
-    error("No Run script is defined for command: "..commandName)
+  if not command.scripts or not command.scripts.Parse then
+    error("No Parse script is defined for command: "..commandName)
   end
 
-  command.scripts.Run(quest, args)
+  command.scripts.Parse(quest, args)
 end
 
 function addon.QuestEngine:InitQuestScript(qsconfig)
@@ -415,20 +428,21 @@ function addon.QuestEngine:InitQuestScript(qsconfig)
 
     local itemScripts = item.scripts
     if itemScripts then
-      -- Replace any script name tokens with the actual script function registered here
+      -- Replace the array of script names with a table like: { name = function }
       local newScripts = {}
-      for callName, script in pairs(itemScripts) do
-        if type(script) == "function" then
-          newScripts[callName] = script
-        elseif type(script) == "string" then
-          local fn = scripts[script]
-          if not fn then
-            error("No script registered with name: "..script)
-          end
-          newScripts[callName] = fn
-        else
-          error("Unrecognized script type ("..type(script)..") for:"..name)
+      for _, methodName in pairs(itemScripts) do
+        local method = scripts[name]
+        if not method then
+          error("No scripts registered for: "..name)
         end
+        method = method[methodName]
+        if not method then
+          error("No script registered for "..name.." with name: "..methodName)
+        end
+        if type(method) ~= "function" then
+          error("Non-function registered as script for "..name..": "..methodName)
+        end
+        newScripts[methodName] = method
       end
       item.scripts = newScripts
     end
@@ -440,7 +454,7 @@ function addon.QuestEngine:InitQuestScript(qsconfig)
         -- Recursively set up parameters exactly like their parent items
         setup(indexed, param)
       end
-      item._params = indexed
+      item._paramsByName = indexed
     end
   end
 
@@ -524,7 +538,7 @@ function addon.QuestEngine:Build(parameters)
     obj.GetConditionDisplayText = objective_GetConditionDisplayText
 
     for name, _ in pairs(obj.conditions) do
-      local condition = obj._parent._params[name]
+      local condition = obj._parent._paramsByName[name]
       if not condition then
         error("Failed to create quest: '"..name.."' is not a valid condition for objective '"..obj._parent.name.."'")
       end
@@ -560,3 +574,12 @@ addon:onload(function()
   addon.QuestEngine:InitQuestScript(addon.QuestScript)
   logger:Debug("QuestScript initialized OK!")
 end)
+
+-- addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
+--   -- Ensure everything can be setup, then wire up objectives into the engine
+--   objectives = qsObjectives
+--   for _, objective in ipairs(qsObjectives) do
+--     objective._active = {} -- Every active instance of this objective will be tracked
+--     addon.QuestEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))
+--   end
+-- end)

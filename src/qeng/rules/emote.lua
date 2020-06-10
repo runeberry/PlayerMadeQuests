@@ -3,11 +3,11 @@ addon:traceFile("rules/emote.lua")
 local QuestEngine, tokens = addon.QuestEngine, addon.QuestScript.tokens
 local GetUnitName = addon.G.GetUnitName
 
-QuestEngine:AddScript(tokens.OBJ_EMOTE_SCRIPT, function(obj, msg)
+QuestEngine:AddScript(tokens.OBJ_EMOTE, tokens.METHOD_PRE_COND, function(obj, msg)
   obj:SetMetadata("PlayerEmoteMessage", msg)
 end)
 
-QuestEngine:AddScript(tokens.OBJ_EMOTE_TEXT, function(obj)
+QuestEngine:AddScript(tokens.OBJ_EMOTE, tokens.METHOD_DISPLAY_TEXT, function(obj)
   local str = obj:GetConditionDisplayText("emote", "Use an emote")
   if obj:HasCondition("target") then
     str = str.." with "..obj:GetConditionDisplayText("target")
