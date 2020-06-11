@@ -33,7 +33,7 @@ compiler:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
     --tempdata = {} -- Additional data that will not be written to save
   }
 
-  local goal = tonumber(compiler:GetArgsValue(args, "goal", "g", 3))
+  local goal = compiler:GetArgsValue(args, "goal", "g", 3)
   if goal and goal > 0 then
     objective.goal = goal
 

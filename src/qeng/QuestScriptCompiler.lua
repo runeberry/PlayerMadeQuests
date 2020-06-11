@@ -47,16 +47,17 @@ end
   If no value was set, returns nil
 --]]
 function addon.QuestScriptCompiler:GetArgsValue(args, ...)
+  local val
   for _, key in pairs({...}) do
     if type(key) == "number" then
-      return args.ordered[key]
-    else
-      local value = args.named[key]
-      if type(value) == "table" then
-        value = value[addon:tlen(value)]
+      val = args.ordered[key]
+      if val then
+        return val.value
       end
-      if value ~= nil then
-        return value
+    else
+      val = args.named[key]
+      if val then
+        return val[#val].value -- In case multiple values were specified, pull the last one only
       end
     end
   end
@@ -69,16 +70,21 @@ end
   If no value was set, returns nil
 --]]
 function addon.QuestScriptCompiler:GetArgsTable(args, ...)
+  local val
   for _, key in pairs({...}) do
     if type(key) == "number" then
-      return { args.ordered[key] }
-    else
-      local value = args.named[key]
-      if type(value) == "string" then
-        value = { value }
+      val = args.ordered[key]
+      if val then
+        return val.value
       end
-      if value ~= nil then
-        return value
+    else
+      val = args.named[key]
+      if val then
+        local arr = {}
+        for i, v in ipairs(val) do
+          arr[i] = v.value
+        end
+        return arr
       end
     end
   end
@@ -94,7 +100,7 @@ function addon.QuestScriptCompiler:GetArgsSet(args, ...)
   local set = {}
   for _, key in pairs({...}) do
     local value = self:GetArgsTable(args, key)
-    if value ~= nil then
+    if value then
       for _, v in ipairs(value) do
         set[v] = true
       end
@@ -110,6 +116,34 @@ local Q_start_ptn, Q_end_ptn = [=[^(['"])]=], [=[(['"])$]=]
 local SQ_start_ptn, DQ_start_ptn, SQ_end_ptn, DQ_end_ptn = [[^(')]], [[^(")]], [[(')$]], [[(")$]]
 local escSQ_end_ptn, escDQ_end_ptn = [[(\)(')]], [[(\)(")]]
 local esc_ptn = [=[(\*)['"]$]=]
+
+-- Parser tries to convert values to each of the following types, in the order listed
+-- If the coercer retruns nil, parser will try to convert to the next type in the chain
+local coercers = {
+  function(str) -- quoted string
+    -- Remove the quotes from either side of the raw string
+    local dequoted = str:gsub(Q_start_ptn, ""):gsub(Q_end_ptn, "")
+    -- If this made any difference in the raw string, then the value was quoted and must be a string
+    if dequoted ~= str then
+      -- Since it was quoted, remove escape characters from these inner characters: ["'=]
+      return dequoted:gsub([=[(\)(["'=])]=], "%2")
+    end
+  end,
+  function(str) -- number
+    return tonumber(str)
+  end,
+  function(str) -- boolean
+    str = str:lower()
+    if str == "true" then
+      return true
+    elseif str == "false" then
+      return false
+    end
+  end,
+  function(str) -- unquoted string
+    return str
+  end
+}
 
 local function parseArgs(line)
   --Normalize spacing around named arguments
@@ -141,32 +175,45 @@ local function parseArgs(line)
       buf = buf .. ' ' .. str
     end
     if not buf then
-      -- Remove quotes and escaped characters ["'=]
-      str = str:gsub(Q_start_ptn,""):gsub(Q_end_ptn,""):gsub([=[(\)(["'=])]=], "%2")
+      --[[
+        Create an object to store all relevant information about the parameter
+        pvalue model: {
+          raw = "string",   -- The literal value input, quotes and all
+          value = any,      -- The type-coerced value, as determined by the coercers
+          type = "string",  -- The type of the value
+          key = "string"    -- The original pname or position that this value came from
+        }
+      --]]
+      local pvalue = { raw = str }
+
+      -- Attempt each type coercion until a successful result is found
+      for _, coercer in ipairs(coercers) do
+        pvalue.value = coercer(str)
+        if pvalue.value then
+          pvalue.type = type(pvalue.value)
+          break
+        end
+      end
+
       if pname then
         -- If the last arg was a param name, then this is its value
-        local existing = args.named[pname]
-        if existing then
-          if type(existing) == "table" then
-            -- 3rd or later value, add to table
-            table.insert(existing, str)
-          else
-            -- 2nd value, convert string to table
-            args.named[pname] = { existing, str }
-          end
-        else
-          -- 1st value, set as string
-          args.named[pname] = str
+        pvalue.key = pname
+        local namedValues = args.named[pname]
+        if not namedValues then
+          namedValues = {}
+          args.named[pname] = namedValues
         end
+        table.insert(namedValues, pvalue)
         pname = nil
       else
-        local pn = str:match("^(%w-)=$")
+        local pn = pvalue.raw:match("^(%w-)=$")
         if pn then
           -- This is the param name, next str will be the value
           pname = pn
         else
           -- This an ordered (unnamed) value
-          table.insert(args.ordered, str)
+          table.insert(args.ordered, pvalue)
+          pvalue.key = #args.ordered
         end
       end
     end
@@ -176,22 +223,25 @@ local function parseArgs(line)
   return args
 end
 
-local function runCommand(quest, args)
-  local commandName = addon.QuestScriptCompiler:GetArgsValue(args, 1)
+local function getCommand(args)
+  local commandName = args.ordered[1].value
   if not commandName then
-    error("No command name was specified")
+    error("No command name specified")
   end
-
   local command = commands[commandName]
   if not command then
     error("No command exists with name: "..commandName)
   end
-
   if not command.scripts or not command.scripts.Parse then
     error("No Parse script is defined for command: "..commandName)
   end
+  return command
+end
 
-  command.scripts.Parse(quest, args)
+local function processLine(line, parameters)
+  local args = parseArgs(line)
+  local command = getCommand(args)
+  command.scripts.Parse(parameters, args)
 end
 
 local function initQuestScript(qsconfig)
@@ -251,12 +301,20 @@ local function initQuestScript(qsconfig)
 
     local params = item.params
     if params then
-      local indexed = {}
+      local nameIndexed, positionIndexed = {}, {}
+
       for _, param in ipairs(params) do
         -- Recursively set up parameters exactly like their parent items
-        setup(indexed, param)
+        setup(nameIndexed, param)
+        if param.position then
+          if positionIndexed[param.position] then
+            error("Multiple parameters specified for position "..param.position.." on "..name)
+          end
+          positionIndexed[param.position] = param
+        end
       end
-      item._paramsByName = indexed
+      item._paramsByPosition = positionIndexed
+      item._paramsByName = nameIndexed
     end
   end
 
@@ -295,10 +353,14 @@ function addon.QuestScriptCompiler:Compile(script, params)
     parameters = {}
   end
   if script ~= nil and script ~= "" then
+    local lnum, ok, err = 0
     for line in script:gmatch("[^\r\n]+") do
+      lnum = lnum + 1
       if not line:match("^%s*$") then
-        local args = parseArgs(line)
-        runCommand(parameters, args)
+        ok, err = pcall(processLine, line, parameters)
+        if not ok then
+          error("Error on line "..lnum..": "..err)
+        end
       end
     end
   end
