@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
+local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.debug)
 
 addon.QuestScriptCompiler = {}
 
@@ -9,35 +9,40 @@ local objectives = {}
 local scripts = {}
 local cleanNamePattern = "^[%l%d]+$"
 
---[[
-  Registers an arbitrary script by the specified unique name.
-  Reference this script name in QuestScript.lua and it will be attached
-  to the associated item and executed at the appropriate point in the quest lifecycle.
---]]
-function addon.QuestScriptCompiler:AddScript(itemName, methodName, fn)
-  if not itemName or itemName == "" then
-    logger:Error("AddScript: itemName is required")
-    logger:Debug("methodName:", methodName)
-    return
+local function getPositionalArgValue(args, position)
+  local val = args.ordered[position]
+  if val then
+    return val.value
   end
-  if not methodName or methodName == "" then
-    logger:Error("AddScript: methodName is required")
-    logger:Debug("itemName:", itemName)
-    return
-  end
+end
 
-  local existing = scripts[itemName]
-  if not existing then
-    existing = {}
-    scripts[itemName] = existing
+local function getNamedArgValues(args, name)
+  local val = args.named[name]
+  if val then
+    local arr = {}
+    for i, v in ipairs(val) do
+      arr[i] = v.value
+    end
+    return arr
   end
+end
 
-  if existing[methodName] then
-    addon.Logger:Error("AddScript: script is already registered for", itemName, "with name", methodName)
-    return
+local function getAliases(param)
+  -- A param's name is always its primary alias
+  local aliases = { param.name }
+  if type(param.alias) == "string" then
+    -- Single alias
+    table.insert(aliases, param.alias)
+  elseif type(param.alias) == "table" then
+    -- Multiple aliases
+    for _, a in ipairs(param.alias) do
+      table.insert(aliases, a)
+    end
   end
-
-  existing[methodName] = fn
+  if param.position then
+    table.insert(aliases, param.position)
+  end
+  return aliases
 end
 
 --[[
@@ -46,70 +51,52 @@ end
   If multiple values were set, returns the last value specified
   If no value was set, returns nil
 --]]
-function addon.QuestScriptCompiler:GetArgsValue(args, ...)
+local function args_GetValue(args, token)
+  local aliases = getAliases(args._parent._paramsByName[token])
   local val
-  for _, key in pairs({...}) do
-    if type(key) == "number" then
-      val = args.ordered[key]
-      if val then
-        return val.value
-      end
+  for _, alias in pairs(aliases) do
+    if type(alias) == "number" then
+      val = getPositionalArgValue(args, alias)
+      if val then return val end
     else
-      val = args.named[key]
-      if val then
-        return val[#val].value -- In case multiple values were specified, pull the last one only
-      end
+      val = getNamedArgValues(args, alias)
+      -- In case multiple values were specified, return the last one only
+      if val then return val[#val] end
     end
   end
 end
 
 --[[
   Returns all string values specified for this arg in the order that they were set
-  If multiple keys are specified, the first one found will be returned
+  If multiple keys are specified, the values for all will be returned
   If a single value was set, it's returned as a table with one element
   If no value was set, returns nil
 --]]
-function addon.QuestScriptCompiler:GetArgsTable(args, ...)
-  local val
-  for _, key in pairs({...}) do
-    if type(key) == "number" then
-      val = args.ordered[key]
+local function args_GetValues(args, token)
+  local aliases = getAliases(args._parent._paramsByName[token])
+  local ret, val
+  for _, alias in pairs(aliases) do
+    if type(alias) == "number" then
+      val = getPositionalArgValue(args, alias)
       if val then
-        return val.value
+        -- Positional arg values takes the lowest priority, after any named aliases
+        -- If there is already one or more named values, do not add positionals
+        if not ret then
+          -- If you've gotten to this point, just return the single positional value
+          return { val }
+        end
       end
     else
-      val = args.named[key]
+      val = getNamedArgValues(args, alias)
       if val then
-        local arr = {}
-        for i, v in ipairs(val) do
-          arr[i] = v.value
+        ret = ret or {}
+        for _, v in ipairs(val) do
+          table.insert(ret, v)
         end
-        return arr
       end
     end
   end
-end
-
---[[
-  Returns all distinct string values specified for this arg as a value-indexed set
-  If multiple keys are specified, then the distinct values for ALL args will be returned
-  If a single value was set, it's returned as a table with one element
-  If no value was set, returns nil
---]]
-function addon.QuestScriptCompiler:GetArgsSet(args, ...)
-  local set = {}
-  for _, key in pairs({...}) do
-    local value = self:GetArgsTable(args, key)
-    if value then
-      for _, v in ipairs(value) do
-        set[v] = true
-      end
-    end
-  end
-  if addon:tlen(set) == 0 then
-    return nil
-  end
-  return set
+  return ret
 end
 
 local Q_start_ptn, Q_end_ptn = [=[^(['"])]=], [=[(['"])$]=]
@@ -146,7 +133,7 @@ local coercers = {
 }
 
 local function parseArgs(line)
-  --Normalize spacing around named arguments
+  -- Normalize spacing around named arguments
   line = line:gsub([=[([^\])%s*=%s*(%S)]=], "%1= %2")
 
   -- Split parts on space, but keep quoted groups together
@@ -212,8 +199,15 @@ local function parseArgs(line)
           pname = pn
         else
           -- This an ordered (unnamed) value
-          table.insert(args.ordered, pvalue)
-          pvalue.key = #args.ordered
+          if not args._parentName then
+            -- The first unordered arg is always the command name, so
+            -- it does not go into the ordered list
+            args._parentName = pvalue
+            pvalue.key = 0
+          else
+            table.insert(args.ordered, pvalue)
+            pvalue.key = #args.ordered
+          end
         end
       end
     end
@@ -224,7 +218,7 @@ local function parseArgs(line)
 end
 
 local function getCommand(args)
-  local commandName = args.ordered[1].value
+  local commandName = args._parentName.value
   if not commandName then
     error("No command name specified")
   end
@@ -241,44 +235,50 @@ end
 local function processLine(line, parameters)
   local args = parseArgs(line)
   local command = getCommand(args)
+
+  args._parent = command
+  args.GetValue = args_GetValue
+  args.GetValues = args_GetValues
+
   command.scripts.Parse(parameters, args)
 end
 
 local function initQuestScript(qsconfig)
-  local function validateAndRegister(set, name, item)
+  local function validateAndRegister(set, name, param)
     if not name or name == "" then
       error("Name/alias cannot be nil or empty")
     end
     if type(name) ~= "string" or not name:match(cleanNamePattern) then
       error("Name/alias must only contain lowercase alphanumeric characters")
     end
-    if set[name] and set[name] ~= item then
+    if set[name] and set[name] ~= param then
       error("An item is already registered with name/alias: "..name)
     end
-    set[name] = item
+    set[name] = param
   end
 
-  local function setup(set, item)
-    local name = item.name
-    -- An item's primary alias is its name
-    validateAndRegister(set, name, item)
+  local function setup(set, param)
+    local name = param.name
+    -- An param's primary alias is its name
+    validateAndRegister(set, name, param)
 
-    local alias = item.alias
+    local alias = param.alias
     if alias then
       if type(alias) == "string" then
         -- Single alias
-        validateAndRegister(set, alias, item)
+        validateAndRegister(set, alias, param)
       elseif type(alias) == "table" then
         -- Multiple aliases
         for _, al in ipairs(alias) do
-          validateAndRegister(set, al, item)
+          validateAndRegister(set, al, param)
         end
       else
         error("Unrecognized alias type ("..type(alias)..") for:"..name)
       end
     end
+    param._aliases = getAliases(param)
 
-    local itemScripts = item.scripts
+    local itemScripts = param.scripts
     if itemScripts then
       -- Replace the array of script names with a table like: { name = function }
       local newScripts = {}
@@ -296,25 +296,25 @@ local function initQuestScript(qsconfig)
         end
         newScripts[methodName] = method
       end
-      item.scripts = newScripts
+      param.scripts = newScripts
     end
 
-    local params = item.params
+    local params = param.params
     if params then
       local nameIndexed, positionIndexed = {}, {}
 
-      for _, param in ipairs(params) do
+      for _, p in ipairs(params) do
         -- Recursively set up parameters exactly like their parent items
-        setup(nameIndexed, param)
-        if param.position then
-          if positionIndexed[param.position] then
-            error("Multiple parameters specified for position "..param.position.." on "..name)
+        setup(nameIndexed, p)
+        if p.position then
+          if positionIndexed[p.position] then
+            error("Multiple parameters specified for position "..p.position.." on "..name)
           end
-          positionIndexed[param.position] = param
+          positionIndexed[p.position] = p
         end
       end
-      item._paramsByPosition = positionIndexed
-      item._paramsByName = nameIndexed
+      param._paramsByPosition = positionIndexed
+      param._paramsByName = nameIndexed
     end
   end
 
@@ -324,6 +324,53 @@ local function initQuestScript(qsconfig)
   for _, objective in ipairs(qsconfig.objectives) do
     setup(objectives, objective)
   end
+end
+
+--------------------
+-- Public Methods --
+--------------------
+
+--[[
+  Registers an arbitrary script by the specified unique name.
+  Reference this script name in QuestScript.lua and it will be attached
+  to the associated item and executed at the appropriate point in the quest lifecycle.
+--]]
+function addon.QuestScriptCompiler:AddScript(itemName, methodName, fn)
+  if not itemName or itemName == "" then
+    logger:Error("AddScript: itemName is required")
+    logger:Debug("methodName:", methodName)
+    return
+  end
+  if not methodName or methodName == "" then
+    logger:Error("AddScript: methodName is required")
+    logger:Debug("itemName:", itemName)
+    return
+  end
+
+  local existing = scripts[itemName]
+  if not existing then
+    existing = {}
+    scripts[itemName] = existing
+  end
+
+  if existing[methodName] then
+    addon.Logger:Error("AddScript: script is already registered for", itemName, "with name", methodName)
+    return
+  end
+
+  existing[methodName] = fn
+end
+
+function addon.QuestScriptCompiler:GetCommandInfo(cmdToken, paramToken)
+  local command = commands[cmdToken]
+  if not paramToken then return command end
+  return command._paramsByName[paramToken]
+end
+
+function addon.QuestScriptCompiler:GetObjectiveInfo(objToken, paramToken)
+  local obj = objectives[objToken]
+  if not paramToken then return obj end
+  return obj._paramsByName[paramToken]
 end
 
 --[[

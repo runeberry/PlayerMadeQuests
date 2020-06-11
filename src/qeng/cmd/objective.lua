@@ -3,29 +3,23 @@ addon:traceFile("cmd/objective.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 local unpack = addon.G.unpack
 
-local conditions = {
-  { "aura", "a" },
-  { "emote", "em" },
-  { "equip", "e" },
-  { "item", "i" },
-  { "target", "tar", "t" },
-  { "spell", "sp" },
-  { "zone", "z" }
-}
-
 compiler:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
-  local rule = compiler:GetArgsValue(args, 2)
-  if rule == nil then
-    error("Rule name is required")
+  local objName = args:GetValue(tokens.PARAM_NAME)
+  if not objName then
+    error("Objective name is required")
   end
 
-  rule = rule:lower()
+  objName = objName:lower()
+  local objInfo = compiler:GetObjectiveInfo(objName)
+  if not objInfo then
+    error("Unknown objective: "..objName)
+  end
 
   local objective = {
     --id = addon:CreateID("objective:"..rule.."-%i"),
     --rule = rules[p1], -- The objective contains a reference to its backing rule
-    name = rule, -- objective name == rule name
-    displayText = rule.." %p/%g",
+    name = objName, -- objective name == rule name
+    displayText = objName.." %p/%g",
     --progress = 0, -- All objectives start at 0 progress
     goal = 1, -- Objective goal will be 1 unless otherwise defined
     conditions = {}, -- The conditions under which this objective must be completed
@@ -33,27 +27,46 @@ compiler:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
     --tempdata = {} -- Additional data that will not be written to save
   }
 
-  local goal = compiler:GetArgsValue(args, "goal", "g", 3)
-  if goal and goal > 0 then
+  -- Only treat param #2 as the goal if it's a number.
+  -- Otherwise treat it as param #1 for the upcoming objective.
+  local goal = args:GetValue(tokens.PARAM_GOAL)
+  if goal and type(goal) == "number" and goal > 0 then
     objective.goal = goal
-
-    local displayText = compiler:GetArgsValue(args, "displaytext", "d", 4)
-    if displayText then
-      objective.displayText = displayText
-    end
   else
-    -- If param #3 was not a number, then it will be interpreted as the displayText
-    local displayText = compiler:GetArgsValue(args, "displaytext", "d", 3)
-    if displayText then
-      objective.displayText = displayText
-    end
+    goal = nil
   end
 
-  for _, names in ipairs(conditions) do
-    local val = compiler:GetArgsSet(args, unpack(names))
+  local displayText = args:GetValue(tokens.PARAM_TEXT)
+  if displayText then
+    objective.displayText = displayText
+  end
+
+  -- Before processing objective parameters, a little hackiness has to happen
+  -- If the objective name or goal were specified as ordered parameters,
+  -- they need to be removed here. By doing this, the following ordered parameters
+  -- for objective parameters can be handled consistently. For example, in:
+  --     objective emote 2 dance "Stormwind Guard"
+  --     |_0       |1    |2|3    |4         <-- literal order
+  --               |_0     |1    |2         <-- corrected order for objective parameters
+  -- but also...
+  --     objective g=2 name=emote dance "Stormwind Guard"
+  --     |_0       |g  |n         |1    |2  <-- literal order
+  --                   |_0        |1    |2  <-- corrected order for objective parameters
+
+  if goal and args.ordered[2] and args.ordered[2].value == goal then
+    table.remove(args.ordered, 2)
+  end
+  if args.ordered[1] and args.ordered[1].value == objName then
+    table.remove(args.ordered, 1)
+  end
+
+  args._parentName = objName
+  args._parent = objInfo
+
+  for _, param in ipairs(objInfo.params) do
+    local val = args:GetValues(param.name)
     if val then
-      -- Group all aliased values and assign them to the primary condition name
-      objective.conditions[names[1]] = val
+      objective.conditions[param.name] = addon:DistinctSet(val)
     end
   end
 

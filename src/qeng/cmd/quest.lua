@@ -3,12 +3,12 @@ addon:traceFile("cmd/quest.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 
 compiler:AddScript(tokens.CMD_QUEST, tokens.METHOD_PARSE, function(quest, args)
-  local name = compiler:GetArgsValue(args, "name", "n", 2)
+  local name = args:GetValue(tokens.PARAM_NAME)
   if name then
     quest.name = name
   end
 
-  local description = compiler:GetArgsValue(args, "description", "desc", "d", 3)
+  local description = args:GetValue(tokens.PARAM_DESCRIPTION)
   if description then
     quest.description = description
   end
