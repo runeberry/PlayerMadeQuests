@@ -24,6 +24,7 @@ local tokens = {
   METHOD_POST_COND = "AfterCheckConditions",
   METHOD_DISPLAY_TEXT = "GetDisplayText",
 
+  PARAM_DESCRIPTION = "description",
   PARAM_DIFFICULTY = "difficulty",
   PARAM_GOAL = "goal",
   PARAM_MAX = "max",
@@ -134,6 +135,11 @@ local commands = {
         name = tokens.PARAM_NAME,
         alias = "n",
         position = 1,
+      },
+      {
+        name = tokens.PARAM_DESCRIPTION,
+        alias = "desc",
+        position = 2,
       }
     }
   },
@@ -228,7 +234,6 @@ local commands = {
         alias = "g",
         position = 2,
         type = "number",
-        default = 1,
       },
       {
         name = tokens.PARAM_TEXT,
