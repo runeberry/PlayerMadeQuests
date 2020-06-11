@@ -6,9 +6,9 @@
   <Script file="qeng/cmd/objective.lua"/>
   <Script file="qeng/cmd/quest.lua"/>
 
-  <Script file="qeng/rules/emote.lua"/>
-  <Script file="qeng/rules/kill.lua"/>
-  <Script file="qeng/rules/talkto.lua"/>
+  <Script file="qeng/objectives/emote.lua"/>
+  <Script file="qeng/objectives/kill.lua"/>
+  <Script file="qeng/objectives/talkto.lua"/>
 
   <Script file="qeng/conditions/emote.lua"/>
   <Script file="qeng/conditions/target.lua"/>
