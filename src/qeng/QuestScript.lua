@@ -1,8 +1,6 @@
 local _, addon = ...
 
 local tokens = {
-  COMMENT = "#",
-
   OBJ_EMOTE = "emote",
   OBJ_KILL = "kill",
   OBJ_TALKTO = "talkto",

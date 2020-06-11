@@ -392,6 +392,7 @@ end
     }
   }
 --]]
+local newline_ptn, empty_ptn, comment_ptn = "[^\r\n]+", "^%s*$", "^#"
 function addon.QuestScriptCompiler:Compile(script, params)
   local parameters
   if params then
@@ -401,9 +402,11 @@ function addon.QuestScriptCompiler:Compile(script, params)
   end
   if script ~= nil and script ~= "" then
     local lnum, ok, err = 0
-    for line in script:gmatch("[^\r\n]+") do
+    for line in script:gmatch(newline_ptn) do
       lnum = lnum + 1
-      if not line:match("^%s*$") then
+      if line:match(comment_ptn) or line:match(empty_ptn) then
+        -- Ignore comments and empty lines
+      else
         ok, err = pcall(processLine, line, parameters)
         if not ok then
           error("Error on line "..lnum..": "..err)
