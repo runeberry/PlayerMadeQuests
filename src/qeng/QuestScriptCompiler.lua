@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.debug)
+local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
 
 addon.QuestScriptCompiler = {}
 
