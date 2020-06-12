@@ -31,6 +31,7 @@ local function newAceFrameMock()
 end
 
 function deps:Init(addon)
+  addon.SILENT_PRINT = false
   addon.Ace = {
     _stable = {},
     RegisterEvent = mock:NewMock(),
@@ -66,6 +67,7 @@ function deps:Init(addon)
 
   addon.G = {
     print = mock:NewMock("print", mock:Handler(function(...)
+      if addon.SILENT_PRINT then return end
       local args, spaced = table.pack(...), {}
       for i = 1, args.n do
         local arg = args[i]

@@ -26,6 +26,7 @@ describe("Logger", function()
   end)
   it("can flush log buffer on startup", function()
     local tempAddon = builder:Build({ LOG_LEVEL = 4, LOG_MODE = "simple" })
+    tempAddon.SILENT_PRINT = true
     local tempLogSpy = spy.on(tempAddon.Logger, "Log")
     local printSpy = mock:GetMock(tempAddon.G.print)
     tempAddon.Logger:Debug("buffered log")
