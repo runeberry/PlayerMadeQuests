@@ -20,6 +20,7 @@ return {
   -- (exclude overrules include, do not include
   -- the .lua extension)
   ['include'] = {
+    "src/*"
   },
 
   -- Patterns for files to exclude when reporting
@@ -27,6 +28,7 @@ return {
   -- (exclude overrules include, do not include
   -- the .lua extension)
   ['exclude'] = {
+    'src/libs/*',
     'luacov$',
     'luacov.reporter$',
     'luacov.defaults$',
