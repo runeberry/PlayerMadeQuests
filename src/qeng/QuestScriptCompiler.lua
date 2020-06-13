@@ -176,7 +176,7 @@ local function parseArgs(line)
       -- Attempt each type coercion until a successful result is found
       for _, coercer in ipairs(coercers) do
         pvalue.value = coercer(str)
-        if pvalue.value then
+        if pvalue.value ~= nil then
           pvalue.type = type(pvalue.value)
           break
         end
