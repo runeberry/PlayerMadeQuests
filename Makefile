@@ -1,7 +1,9 @@
 CoverageDir=luacov
+CoverageReport=$(CoverageDir)/luacov.report.out
+CoverageHtmlDir=$(CoverageDir)/coverage
 
 coverage-setup:
-	rm -f $(CoverageDir)/*
+	rm -rf $(CoverageDir)/*.out
 	mkdir -p $(CoverageDir)
 
 test:
@@ -13,9 +15,12 @@ test-coverage: coverage-setup
 	luacov-console --summary
 
 test-report: coverage-setup
+	rm -rf $(CoverageHtmlDir)
 	busted --coverage
 	luacov -r lcov
-	genhtml $(CoverageDir)/luacov.report.out -o $(CoverageDir)/coverage
+	sed -i "s/,[0-9a-f]\+\?$$//g" $(CoverageReport)
+	genhtml $(CoverageReport) -o $(CoverageHtmlDir)
+	@echo "View your coverage report here: $(CoverageHtmlDir)/index.html"
 
 clean:
 	rm -rf $(CoverageDir)
