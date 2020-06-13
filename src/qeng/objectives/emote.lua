@@ -1,5 +1,5 @@
 local _, addon = ...
-addon:traceFile("rules/emote.lua")
+addon:traceFile("objectives/emote.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 local GetUnitName = addon.G.GetUnitName
 

@@ -1,5 +1,5 @@
 local _, addon = ...
-addon:traceFile("rules/talkto.lua")
+addon:traceFile("objectives/talkto.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 local UnitExists = addon.G.UnitExists
 

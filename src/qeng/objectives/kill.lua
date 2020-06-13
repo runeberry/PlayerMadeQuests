@@ -1,5 +1,5 @@
 local _, addon = ...
-addon:traceFile("rules/kill.lua")
+addon:traceFile("objectives/kill.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 
 compiler:AddScript(tokens.OBJ_KILL, tokens.METHOD_PRE_COND, function(obj, cl)
