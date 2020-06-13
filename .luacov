@@ -1,10 +1,6 @@
 return {
-  statsfile = 'luacov.stats.out',
-  deletestats = false,
-
-  reporter = 'lcov',
-  reportfile = 'lcov.info',
-  runreport = true,
+  statsfile = 'luacov/luacov.stats.out',
+  reportfile = 'luacov/luacov.report.out',
 
   include = {
     "src/*"

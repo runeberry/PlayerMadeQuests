@@ -1,17 +1,21 @@
-setup:
-	luarocks install --only-deps pmq-dev-1.rockspec
+CoverageDir=luacov
+
+coverage-setup:
+	rm -f $(CoverageDir)/*
+	mkdir -p $(CoverageDir)
 
 test:
 	busted
 
-test-coverage:
+test-coverage: coverage-setup
 	busted --coverage
-	# genhtml lcov.info -o coverage # todo: not working quite right
 	luacov-console ./src
 	luacov-console --summary
 
+test-report: coverage-setup
+	busted --coverage
+	luacov -r lcov
+	genhtml $(CoverageDir)/luacov.report.out -o $(CoverageDir)/coverage
+
 clean:
-	rm luacov.stats.out
-	rm lcov.info
-	rm lcov.info.index
-	rm -rf coverage
+	rm -rf $(CoverageDir)
