@@ -1,47 +1,15 @@
 return {
-  -- default filename to load for config options if not provided
-  -- only has effect in 'luacov.defaults.lua'
-  ['configfile'] = '.luacov',
+  statsfile = 'luacov.stats.out',
+  deletestats = false,
 
-  -- filename to store stats collected
-  ['statsfile'] = 'luacov.stats.out',
+  reporter = 'lcov',
+  reportfile = 'lcov.info',
+  runreport = true,
 
-  -- filename to store report
-  ['reportfile'] = 'luacov.report.out',
-
-  -- Run reporter on completion? (won't work for ticks)
-  -- runreport = true,
-
-  -- Delete stats file after reporting?
-  -- deletestats = true,
-
-  -- Patterns for files to include when reporting
-  -- all will be included if nothing is listed
-  -- (exclude overrules include, do not include
-  -- the .lua extension)
-  ['include'] = {
+  include = {
     "src/*"
   },
-
-  -- Patterns for files to exclude when reporting
-  -- all will be included if nothing is listed
-  -- (exclude overrules include, do not include
-  -- the .lua extension)
-  ['exclude'] = {
-    'src/libs/*',
-    'luacov$',
-    'luacov.reporter$',
-    'luacov.defaults$',
-    'luacov.runner$',
-    'luacov.stats$',
-    'luacov.tick$',
-    'term$',
-    'term.colors$',
-    'term.cursor$',
-    'term.init$',
-    'copas$',
-    'coxpcall$',
-    'mediator$',
-    'moonscript.*$',
+  exclude = {
+    'src/libs/*'
   },
 }

@@ -2,6 +2,25 @@
 
 Create and share your own custom quests in World of Warcraft: Classic!
 
+## Running unit tests w/ Docker in Windows
+
+From the repo directory, run:
+
+```bash
+./scripts/docker.cmd
+```
+
+This will launch a bash shell in in the Docker container. From there, run:
+
+```bash
+make setup
+
+# then
+make test
+# or
+make test-coverage
+```
+
 ## Planned Features
 
 This isn't really a roadmap, just brainstorming some features I would like to see in the addon, in no particular order.

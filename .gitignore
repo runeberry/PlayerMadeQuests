@@ -1,4 +1,7 @@
 scratch.lua
-*.out
-*.out.index
 *.zip
+
+luacov.stats.out
+lcov.info
+lcov.info.index
+coverage
