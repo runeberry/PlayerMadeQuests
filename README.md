@@ -10,15 +10,12 @@ From the repo directory, run:
 ./scripts/docker.cmd
 ```
 
-This will launch a bash shell in in the Docker container. From there, run:
+This will launch a bash shell in in the Docker container. From there, run any of the Makefile commands:
 
 ```bash
-make setup
-
-# then
-make test
-# or
-make test-coverage
+make test # runs unit tests
+make test-coverage # runs unit tests and prints code coverage to console
+make test-report # runs unit tests and prints code coverage as a detailed HTML report
 ```
 
 ## Planned Features
@@ -31,7 +28,7 @@ This isn't really a roadmap, just brainstorming some features I would like to se
   * ✔️ Kill Mob (v0.0.1-alpha)
   * ✔️ Talk to NPC (v0.0.1-alpha)
   * Buy from / sell to merchant
-  * Visit location
+  * ✔️ Visit location (v0.0.3-alpha)
   * ✔️ Use emote on NPC (v0.0.1-alpha)
   * Acquire a buff/debuff
   * Obtain an item
@@ -46,8 +43,8 @@ This isn't really a roadmap, just brainstorming some features I would like to se
   * having a certain item(s) in your bag
   * having a certain item(s) equipped
   * being a certain stance or form
-  * being in a certain zone
-  * being within a certain radius of coordinates
+  * ✔️ being in a certain zone (v0.0.3-alpha)
+  * ✔️ being within a certain radius of coordinates (v0.0.3-alpha)
 * Requirements or Recommendations
   * Level range
   * Must be a certain class
@@ -72,15 +69,15 @@ This isn't really a roadmap, just brainstorming some features I would like to se
   * Figure out a good way to save window size/position
 * Add some basic objectives
   * ✔️ Talk to NPC (v0.0.1-alpha)
-  * Go to location
-  * Use emote
+  * ✔️ Go to location (v0.0.3-alpha)
+  * ✔️ Use emote (v0.0.1-alpha)
 * ✔️ Simplify adding custom quests in Lua - since Quest Builder UI is pretty far off (v0.0.1-alpha, as DemoQuests and the QuestScript editor)
 
 ### For Beta-ready
 
 * ✔️ Add objective conditions - complete objective while... (v0.0.1-alpha)
   * A certain item is equipped
-  * In a certain location
+  * ✔️ In a certain location (v0.0.3-alpha)
 * Binary objective conditions - (A or B) and (X or Y)
 * ✔️ Share quest over addon message channels (v0.0.1-alpha)
 * ✔️ Add quest descriptions (v0.0.1-alpha)
