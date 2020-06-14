@@ -23,7 +23,13 @@ addon.G = {
 
   CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo,
   CreateFrame = CreateFrame,
+  GetBestMapForUnit = C_Map.GetBestMapForUnit,
+  GetMapInfo = C_Map.GetMapInfo,
+  GetPlayerMapPosition = C_Map.GetPlayerMapPosition,
   GetUnitName = GetUnitName,
+  GetRealZoneText = GetRealZoneText,
+  GetSubZoneText = GetSubZoneText,
+  GetZoneText = GetZoneText,
   PlaySoundFile = PlaySoundFile,
   SlashCmdList = SlashCmdList,
   StaticPopupDialogs = StaticPopupDialogs,

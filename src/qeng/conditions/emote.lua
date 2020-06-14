@@ -3,9 +3,9 @@ addon:traceFile("conditions/emote.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
 
-compiler:AddScript(tokens.COND_EMOTE, tokens.METHOD_CHECK_COND, function(obj, emoteNames)
+compiler:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_CHECK_COND, function(obj, emoteNames)
   local eem = obj:GetMetadata("ExpectedEmoteMessages")
-  local expectTargetedEmote = obj:HasCondition("target")
+  local expectTargetedEmote = obj:HasCondition(tokens.PARAM_TARGET)
 
   if eem == nil then
     eem = {}

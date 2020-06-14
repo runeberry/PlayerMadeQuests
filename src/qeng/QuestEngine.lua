@@ -23,6 +23,12 @@ local function objective_HasCondition(obj, name)
   return obj.conditions and obj.conditions[name] and true
 end
 
+local function objective_GetConditionValue(obj, name)
+  if obj.conditions then
+    return obj.conditions[name]
+  end
+end
+
 local function objective_SetMetadata(obj, name, value, persistent)
   if persistent then
     -- These values will be written to SavedVariables
@@ -43,7 +49,7 @@ local function objective_GetMetadata(obj, name)
 end
 
 local function objective_GetDisplayText(obj)
-  if obj._parent.scripts.GetDisplayText then
+  if obj._parent.scripts and obj._parent.scripts.GetDisplayText then
     return obj._parent.scripts.GetDisplayText(obj)
   else
     return obj.name
@@ -55,6 +61,10 @@ local function objective_GetConditionDisplayText(obj, condName, defaultIfZero)
 
   if condVal == nil then
     return defaultIfZero or ""
+  end
+
+  if type(condVal) ~= "table" then
+    return condVal
   end
 
   local len = addon:tlen(condVal)
@@ -97,6 +107,7 @@ local function evaluateObjective(objective, obj, ...)
 
   -- CheckCondition is expected to return a boolean value only:
   -- true if the condition was met, false otherwise
+  local anyFailed
   for name, val in pairs(obj.conditions) do
     local condition = objective._paramsByName[name]
     -- CheckCondition receives 2 args: The obj being evaluated, and the value(s) for this condition
@@ -105,10 +116,13 @@ local function evaluateObjective(objective, obj, ...)
       logger:Error("Error evaluating condition '", name,"' for '", obj.id, "':", checkResult)
       return
     elseif checkResult ~= true  then
-      -- If any result was not true, stop evaluating conditions
+      -- If any result was not true, keep evaluating conditions, but set checkResult to false when it's all done
       logger:Trace("Condition '"..name.."' evaluated:", checkResult)
-      break
+      anyFailed = true
     end
+  end
+  if anyFailed then
+    checkResult = false
   end
 
   -- AfterCheckConditions may take the result from CheckCondition and make a final ruling by
@@ -154,7 +168,7 @@ local function wrapObjectiveHandler(objective)
         -- The objective is already completed, nothing to do
         completed[id] = obj
       else
-        local result = evaluateObjective(objective, obj, ...)
+        local result = evaluateObjective(objective, obj, ...) or 0
         logger:Debug("    Result:", result)
 
         if result > 0 then
@@ -227,6 +241,7 @@ function addon.QuestEngine:Build(parameters)
 
     -- Add predefined methods here
     obj.HasCondition = objective_HasCondition
+    obj.GetConditionValue = objective_GetConditionValue
     obj.GetMetadata = objective_GetMetadata
     obj.SetMetadata = objective_SetMetadata
     obj.GetDisplayText = objective_GetDisplayText

@@ -30,7 +30,7 @@ local function isUniqueTargetGuid(obj, targetUnitGuid)
   return true
 end
 
-compiler:AddScript(tokens.COND_TARGET, tokens.METHOD_CHECK_COND, function(obj, unitNames)
+compiler:AddScript(tokens.PARAM_TARGET, tokens.METHOD_CHECK_COND, function(obj, unitNames)
   local targetUnitName = obj:GetMetadata("TargetUnitName") or GetUnitName("target")
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name

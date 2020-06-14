@@ -2,11 +2,9 @@ local _, addon = ...
 
 local tokens = {
   OBJ_EMOTE = "emote",
+  OBJ_EXPLORE = "explore",
   OBJ_KILL = "kill",
   OBJ_TALKTO = "talkto",
-
-  COND_EMOTE = "emote",
-  COND_TARGET = "target",
 
   CMD_DEFINE = "define",
   CMD_DESC = "description",
@@ -24,16 +22,19 @@ local tokens = {
 
   PARAM_DESCRIPTION = "description",
   PARAM_DIFFICULTY = "difficulty",
+  PARAM_EMOTE = "emote",
   PARAM_GOAL = "goal",
   PARAM_MAX = "max",
   PARAM_MIN = "min",
   PARAM_NAME = "name",
+  PARAM_POSX = "posx",
+  PARAM_POSY = "posy",
+  PARAM_RADIUS = "radius",
   PARAM_SIDE = "side",
+  PARAM_SUBZONE = "subzone",
+  PARAM_TARGET = "target",
   PARAM_TEXT = "text",
   PARAM_VARNAME = "varname",
-  PARAM_X = "x",
-  PARAM_Y = "y",
-  PARAM_Z = "z",
   PARAM_ZONE = "zone",
 
   FLAG_REQUIRED = "required",
@@ -49,7 +50,7 @@ local objectives = {
     },
     params = {
       {
-        name = tokens.COND_EMOTE,
+        name = tokens.PARAM_EMOTE,
         alias = "em",
         position = 1,
         required = true,
@@ -59,13 +60,60 @@ local objectives = {
         }
       },
       {
-        name = tokens.COND_TARGET,
+        name = tokens.PARAM_TARGET,
         alias = { "tar", "t" },
         position = 2,
         multiple = true,
         scripts = {
           tokens.METHOD_CHECK_COND,
         }
+      },
+    }
+  },
+  {
+    name = "explore",
+    scripts = {
+      tokens.METHOD_PRE_COND,
+      tokens.METHOD_POST_COND,
+      tokens.METHOD_DISPLAY_TEXT,
+    },
+    params = {
+      {
+        name = tokens.PARAM_ZONE,
+        position = 1,
+        scripts = {
+          tokens.METHOD_CHECK_COND
+        }
+      },
+      {
+        name = tokens.PARAM_POSX,
+        alias = "x",
+        position = 2,
+        type = "number",
+        scripts = {
+          tokens.METHOD_CHECK_COND
+        }
+      },
+      {
+        name = tokens.PARAM_POSY,
+        alias = "y",
+        position = 3,
+        type = "number",
+        scripts = {
+          tokens.METHOD_CHECK_COND
+        }
+      },
+      {
+        name = tokens.PARAM_SUBZONE,
+        alias = "sz",
+        scripts = {
+          tokens.METHOD_CHECK_COND
+        }
+      },
+      {
+        name = tokens.PARAM_RADIUS,
+        alias = { "rad", "r" },
+        type = "number",
       },
     }
   },
@@ -78,7 +126,7 @@ local objectives = {
     },
     params = {
       {
-        name = tokens.COND_TARGET,
+        name = tokens.PARAM_TARGET,
         alias = { "tar", "t" },
         position = 1,
         required = true,
@@ -97,7 +145,7 @@ local objectives = {
     },
     params = {
       {
-        name = tokens.COND_TARGET,
+        name = tokens.PARAM_TARGET,
         alias = { "tar", "t" },
         position = 1,
         required = true,

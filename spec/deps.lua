@@ -39,6 +39,8 @@ function deps:Init(addon)
     ScheduleTimer = function(self, func, delay, ...)
       addon:AddTimerFunction(func, ...)
     end,
+    ScheduleRepeatingTimer = mock:NewMock( mock:Returns(1) ), -- todo: Create a mock implementation of this
+    CancelTimer = mock:NewMock(), -- todo: Create a mock implementation of this
     Serialize = function(self, t)
       local serialized = addon:CreateID("serialize-mock-%i")
       self._stable[serialized] = addon:CopyTable(t)
@@ -102,7 +104,13 @@ function deps:Init(addon)
 
     CombatLogGetCurrentEventInfo = mock:NewMock(),
     CreateFrame = mock:NewMock( mock:Returns({}) ),
+    GetBestMapForUnit = mock:NewMock( mock:Returns({}) ),
+    GetMapInfo = mock:NewMock( mock:Returns({}) ),
+    GetPlayerMapPosition = mock:NewMock( mock:Returns({}) ),
     GetUnitName = mock:NewMock( mock:Returns("name") ),
+    GetRealZoneText = mock:NewMock( mock:Returns("zone") ),
+    GetSubZoneText = mock:NewMock( mock:Returns("subzone") ),
+    GetZoneText = mock:NewMock( mock:Returns("zone") ),
     PlaySoundFile = mock:NewMock(),
     SlashCmdList = {},
     StaticPopupDialogs = {},

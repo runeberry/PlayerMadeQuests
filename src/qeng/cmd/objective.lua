@@ -64,9 +64,16 @@ compiler:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
   args._parent = objInfo
 
   for _, param in ipairs(objInfo.params) do
-    local val = args:GetValues(param.name)
-    if val then
-      objective.conditions[param.name] = addon:DistinctSet(val)
+    if param.multiple then
+      -- If multiple arg values are allowed, then they will be passed to the
+      -- condition handler as a set, such as { value1 = true, value2 = true }
+      local val = args:GetValues(param.name)
+      if val then
+        objective.conditions[param.name] = addon:DistinctSet(val)
+      end
+    else
+      -- Otherwise, simply pass a single value to the condition handler
+      objective.conditions[param.name] = args:GetValue(param.name)
     end
   end
 
