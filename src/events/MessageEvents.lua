@@ -1,6 +1,7 @@
 local _, addon = ...
 addon:traceFile("MessageEvents.lua")
 local Ace, unpack = addon.Ace, addon.G.unpack
+local GetUnitName = addon.G.GetUnitName
 local encoder = addon.LibCompress:GetAddonEncodeTable()
 
 local PMQ_MESSAGE_PREFIX = "PMQ"
@@ -11,6 +12,7 @@ local defaultDetails = {
   priority = "NORMAL" -- also allowed: "BULK", "ALERT"
 }
 local internalPublish
+local playerName
 
 addon.MessageEvents = addon.Events:CreateBroker("MessageEvent")
 addon.MessageEvents:SetLogLevel(addon.LogLevel.trace)
@@ -29,6 +31,8 @@ addon.MessageEvents:EnableAsync()
 --]]
 
 local function onCommReceived(prefix, message, distribution, sender)
+  addon.Logger:Trace("Message received for", distribution, "from", sender)
+  if sender == playerName then return end -- Don't handle messages that you also sent out
   local decoded = encoder:Decode(message)
   local payload = addon:DecompressTable(decoded)
   internalPublish(addon.MessageEvents, payload.e, distribution, sender, unpack(payload.p))
@@ -44,7 +48,7 @@ local function broker_publishMessage(self, event, details, ...)
   local compressed = addon:CompressTable(payload)
   local encoded = encoder:Encode(compressed)
   if USE_INTERNAL then
-    onCommReceived(PMQ_MESSAGE_PREFIX, encoded, details.distribution, "yourself")
+    onCommReceived(PMQ_MESSAGE_PREFIX, encoded, details.distribution, "*yourself*")
     return
   end
   Ace:SendCommMessage(PMQ_MESSAGE_PREFIX, encoded, details.distribution, details.target, details.priority)
@@ -63,5 +67,6 @@ function addon.MessageEvents:Start()
 end
 
 addon:onload(function()
+  playerName = GetUnitName("player")
   addon.MessageEvents:Start()
 end)
