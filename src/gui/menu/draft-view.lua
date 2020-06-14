@@ -23,6 +23,12 @@ local function navBack()
   addon.MainMenu:NavToMenuScreen("drafts")
 end
 
+local function writeFields(draft)
+  draft.parameters.name = currentFrame.nameField:GetText()
+  draft.parameters.description = currentFrame.descField:GetText()
+  draft.script = currentFrame.scriptEditor:GetText()
+end
+
 local function button_Back()
   if checkDirty() then
     confirmBack:Show()
@@ -31,9 +37,24 @@ local function button_Back()
   end
 end
 
+local function compile()
+  local draftCopy = addon:CopyTable(currentDraft)
+  writeFields(draftCopy)
+  local ok, parameters = pcall(addon.QuestScriptCompiler.Compile, addon.QuestEngine, draftCopy.script, draftCopy.parameters)
+  if not ok then
+    return ok, parameters
+  end
+  local quest
+  ok, quest = pcall(addon.QuestEngine.Build, addon.QuestEngine, parameters)
+  if not ok then
+    return ok, quest
+  end
+  return true, quest
+end
+
 local function button_Validate()
   if not currentDraft then return end
-  local ok, quest = addon.QuestDrafts:CompileDraft(currentDraft.id)
+  local ok, quest = compile()
   if not ok then
     addon.Logger:Warn("Your quest contains an error:")
     addon.Logger:Warn(quest)
@@ -44,9 +65,7 @@ end
 
 local function button_Save()
   if not currentDraft then return end
-  currentDraft.parameters.name = currentFrame.nameField:GetText()
-  currentDraft.parameters.description = currentFrame.descField:GetText()
-  currentDraft.script = currentFrame.scriptEditor:GetText()
+  writeFields(currentDraft)
   QuestDrafts:Save(currentDraft)
   cleanForm()
   addon.Logger:Info("Draft Saved -", currentDraft.parameters.name)
