@@ -11,6 +11,12 @@ local function getFontHeight(fontInstance)
   return math.floor(height+0.5)
 end
 
+local function editBox_OnTextChanged(editBox, isUserInput)
+  if isUserInput then
+    editBox._widget.isDirty = true
+  end
+end
+
 local function editBox_OnEnterPressed(editBox)
   local parent = editBox._widget
   if parent.onSubmit then
@@ -49,6 +55,14 @@ local function widget_OnEnterPressed(self, fn)
   self.onSubmit = fn
 end
 
+local function widget_IsDirty(self)
+  return self.isDirty or false
+end
+
+local function widget_SetDirty(self, bool)
+  self.isDirty = bool
+end
+
 function widget:Create(parent, labelText, editBoxText, multiline)
   labelText = labelText or ""
   editBoxText = editBoxText or ""
@@ -65,6 +79,7 @@ function widget:Create(parent, labelText, editBoxText, multiline)
   editBox:SetFontObject("ChatFontNormal")
   editBox:SetText(editBoxText or "")
   editBox:SetScript("OnEscapePressed", editBox_OnEscapePressed)
+  editBox:SetScript("OnTextChanged", editBox_OnTextChanged)
   editBox:SetTextInsets(textInset, textInset, textInset, textInset)
   addon:ApplyBackgroundStyle(editBox)
 
@@ -98,6 +113,8 @@ function widget:Create(parent, labelText, editBoxText, multiline)
   frame.SetText = widget_SetText
   frame.GetText = widget_GetText
   frame.OnEnterPressed = widget_OnEnterPressed
+  frame.IsDirty = widget_IsDirty
+  frame.SetDirty = widget_SetDirty
 
   return frame
 end

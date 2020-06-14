@@ -6,15 +6,16 @@ local widget = addon.CustomWidgets:NewWidget("TextInputScrolling")
 local labelSpacer = "  "
 local textInset = 8
 local scrollDelay = 0.033 -- approximately 1 frame @ 30 FPS
-local backdrop = {
-	bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
-	edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]], edgeSize = 16,
-	insets = { left = 4, right = 3, top = 4, bottom = 3 }
-}
 
 local function editBox_OnEscapePressed(editBox)
   if editBox._widget.clearFocusOnEscape then
     editBox:ClearFocus()
+  end
+end
+
+local function editBox_OnTextChanged(editBox, isUserInput)
+  if isUserInput then
+    editBox._widget.isDirty = true
   end
 end
 
@@ -75,6 +76,14 @@ local function widget_ScrollTo(self, anchor, offset)
   end
 end
 
+local function widget_IsDirty(self)
+  return self.isDirty or false
+end
+
+local function widget_SetDirty(self, bool)
+  self.isDirty = bool
+end
+
 function widget:Create(parent, labelText, editBoxText)
   labelText = labelText or ""
   editBoxText = editBoxText or ""
@@ -110,6 +119,7 @@ function widget:Create(parent, labelText, editBoxText)
   editBox:SetWidth(scrollFrame:GetWidth())
   editBox:SetScript("OnEscapePressed", editBox_OnEscapePressed)
   editBox:SetScript("OnCursorChanged", editBox_OnCursorChanged)
+  editBox:SetScript("OnTextChanged", editBox_OnTextChanged)
 
   -- Wrap an invisible button over the editBox frame to expand its clickable area
   local clickHandler = CreateFrame("Button", nil, editBoxBorderFrame)
@@ -134,6 +144,8 @@ function widget:Create(parent, labelText, editBoxText)
   frame.SetText = widget_SetText
   frame.GetText = widget_GetText
   frame.ScrollTo = widget_ScrollTo
+  frame.IsDirty = widget_IsDirty
+  frame.SetDirty = widget_SetDirty
 
   return frame
 end

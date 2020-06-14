@@ -4,10 +4,31 @@ local QuestDrafts = addon.QuestDrafts
 local menu = addon.MainMenu:NewMenuScreen("draft-view")
 
 local currentFrame
-local currentDraft = nil
+local currentDraft
+local confirmBack
+
+local function checkDirty()
+  return currentFrame.nameField:IsDirty() or
+    currentFrame.descField:IsDirty() or
+    currentFrame.scriptEditor:IsDirty()
+end
+
+local function cleanForm()
+  currentFrame.nameField:SetDirty(false)
+  currentFrame.descField:SetDirty(false)
+  currentFrame.scriptEditor:SetDirty(false)
+end
+
+local function navBack()
+  addon.MainMenu:NavToMenuScreen("drafts")
+end
 
 local function button_Back()
-  addon.MainMenu:NavToMenuScreen("drafts")
+  if checkDirty() then
+    confirmBack:Show()
+  else
+    navBack()
+  end
 end
 
 local function button_Validate()
@@ -27,6 +48,7 @@ local function button_Save()
   currentDraft.parameters.description = currentFrame.descField:GetText()
   currentDraft.script = currentFrame.scriptEditor:GetText()
   QuestDrafts:Save(currentDraft)
+  cleanForm()
   addon.Logger:Info("Draft Saved -", currentDraft.parameters.name)
 end
 
@@ -50,6 +72,17 @@ function menu:Create(frame)
   scriptEditor:SetPoint("TOPLEFT", descField, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
 
+  confirmBack = addon.StaticPopups:NewPopup("ConfirmDraftBack")
+  confirmBack:SetText("You have unsaved changes. Would you like to save?")
+  confirmBack:SetYesButton("Discard", function()
+    navBack()
+  end)
+  confirmBack:SetNoButton("Cancel")
+  confirmBack:SetOtherButton("Save", function()
+    button_Save()
+    navBack()
+  end)
+
   frame.nameField = nameField
   frame.descField = descField
   frame.scriptEditor = scriptEditor
@@ -70,6 +103,7 @@ function menu:OnShowMenu(frame, draftId)
   frame.nameField:SetText(currentDraft.parameters.name)
   frame.descField:SetText(currentDraft.parameters.description)
   frame.scriptEditor:SetText(currentDraft.script)
+  cleanForm()
 end
 
 function menu:OnLeaveMenu(frame)
