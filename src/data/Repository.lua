@@ -2,7 +2,7 @@ local _, addon = ...
 addon:traceFile("Repository.lua")
 
 addon.Data = {}
-local logger = addon.Logger:NewLogger("Data")
+local logger = addon.Logger:NewLogger("Data", addon.LogLevel.info)
 local repos = {}
 local defaultPkey = "id"
 local transactionLogs = addon.TRANSACTION_LOGS or false
