@@ -21,6 +21,21 @@ local colinfo = {
 }
 
 local draftRows = {}
+local buttons = {}
+
+local function setButtonState(row)
+  if row then
+    buttons[2]:Enable()
+    buttons[3]:Enable()
+    buttons[4]:Enable()
+    buttons[5]:Enable()
+  else
+    buttons[2]:Disable()
+    buttons[3]:Disable()
+    buttons[4]:Disable()
+    buttons[5]:Disable()
+  end
+end
 
 local function getDrafts()
   draftRows = {}
@@ -46,6 +61,7 @@ function menu:Create(frame)
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getDrafts)
   dataTable:SubscribeToEvents("DraftSaved", "DraftDeleted")
+  dataTable:OnRowSelected(setButtonState)
   frame.dataTable = dataTable
 
   local newDraft = function()
@@ -108,16 +124,19 @@ function menu:Create(frame)
     addon.Logger:Info("Sharing quest -", row[1])
   end
 
-  buttonPane:AddButton("New", newDraft)
-  buttonPane:AddButton("Edit", editDraft)
-  buttonPane:AddButton("Delete", deleteDraft)
-  buttonPane:AddButton("Accept Quest", acceptQuest)
-  buttonPane:AddButton("Share Quest", shareQuest)
+  buttons[1] = buttonPane:AddButton("New", newDraft)
+  buttons[2] = buttonPane:AddButton("Edit", editDraft)
+  buttons[3] = buttonPane:AddButton("Delete", deleteDraft)
+  buttons[4] = buttonPane:AddButton("Accept Quest", acceptQuest)
+  buttons[5] = buttonPane:AddButton("Share Quest", shareQuest)
+
+  setButtonState(nil)
 end
 
 function menu:OnShowMenu(frame)
   frame.dataTable:RefreshData()
   frame.dataTable:EnableUpdates(true)
+  setButtonState(frame.dataTable:GetSelectedRow())
 end
 
 function menu:OnLeaveMenu(frame)

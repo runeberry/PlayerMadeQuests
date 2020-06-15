@@ -18,9 +18,22 @@ local colinfo = {
 }
 
 local dqRows = {}
+local buttons = {}
 
 local function getDemoQuests()
   return dqRows
+end
+
+local function setButtonState(row)
+  if row then
+    buttons[1]:Enable()
+    buttons[2]:Enable()
+    buttons[3]:Enable()
+  else
+    buttons[1]:Disable()
+    buttons[2]:Disable()
+    buttons[3]:Disable()
+  end
 end
 
 function menu:Create(frame)
@@ -39,7 +52,8 @@ function menu:Create(frame)
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getDemoQuests)
   dataTable:RefreshData()
-  -- frame.dataTable = dataTable
+  dataTable:OnRowSelected(setButtonState)
+  frame.dataTable = dataTable
 
   local acceptQuest = function()
     local row = dataTable:GetSelectedRow()
@@ -71,7 +85,13 @@ function menu:Create(frame)
     addon.Logger:Info("Demo quest copied to drafts.")
   end
 
-  buttonPane:AddButton("Accept Quest", acceptQuest)
-  buttonPane:AddButton("View Code", viewCode)
-  buttonPane:AddButton("Copy to Drafts", copyToDrafts)
+  buttons[1] = buttonPane:AddButton("Accept Quest", acceptQuest)
+  buttons[2] = buttonPane:AddButton("View Code", viewCode)
+  buttons[3] = buttonPane:AddButton("Copy to Drafts", copyToDrafts)
+
+  setButtonState(nil)
+end
+
+function menu:OnShow(frame)
+  setButtonState(frame.dataTable:GetSelectedRow())
 end

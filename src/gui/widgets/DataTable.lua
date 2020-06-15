@@ -69,6 +69,10 @@ local function dt_ClearSelection(self)
   return self._scrollingTable:ClearSelection()
 end
 
+local function dt_OnRowSelected(self, fn)
+  self.onRowSelected = fn
+end
+
 function widget:Create(parent, colinfo, datasource, ...)
   local frame = CreateFrame("Frame", nil, parent)
   frame:SetAllPoints(true)
@@ -103,6 +107,15 @@ function widget:Create(parent, colinfo, datasource, ...)
   st:EnableSelection(true)
   addon:ApplyBackgroundStyle(st.frame)
 
+  -- In order to detect row selection, wrap the base SetSelected in this custom function
+  local origSetSelection = st.SetSelection
+  st.SetSelection = function(self, row)
+    origSetSelection(self, row)
+    if frame.onRowSelected then
+      frame.onRowSelected(row)
+    end
+  end
+
   frame._dataSource = datasource
   frame._enableUpdates = true
   frame._filters = {}
@@ -117,6 +130,7 @@ function widget:Create(parent, colinfo, datasource, ...)
   frame.UnsubscribeFromEvents = dt_UnsubscribeFromEvents
   frame.GetSelectedRow = dt_GetSelectedRow
   frame.ClearSelection = dt_ClearSelection
+  frame.OnRowSelected = dt_OnRowSelected
 
   return frame
 end
