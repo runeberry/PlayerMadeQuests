@@ -95,7 +95,7 @@ local function indexAllData(repo)
       addItemToIndex(indexTable, item, indexProp)
     end
   end
-  repo.logger:Trace("Reindexed repository:", addon:tlen(repo.index), "index(es)")
+  -- repo.logger:Trace("Reindexed repository:", addon:tlen(repo.index), "index(es)")
 end
 
 local function deindexAllData(repo)
@@ -475,7 +475,7 @@ local methods = {
         return
       end
       self._hasDataSource = true
-      self.logger:Trace("SetSaveDataSource to", saveDataField, ":", addon:tlen(self.data), "item(s)")
+      -- self.logger:Trace("SetSaveDataSource to", saveDataField, ":", addon:tlen(self.data), "item(s)")
     end)
   end,
   ["SetTableSource"] = function(self, dataSource)
