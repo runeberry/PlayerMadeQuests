@@ -100,8 +100,11 @@ end)
 
 local function publish()
   local map = GetBestMapForUnit("player")
-  local position = GetPlayerMapPosition(map, "player")
-  local x, y = position:GetXY()
+  local x, y = 0, 0
+  if map then
+    local position = GetPlayerMapPosition(map, "player")
+    x, y = position:GetXY()
+  end
 
   local ld = {
     zone = GetZoneText(),
