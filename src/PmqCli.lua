@@ -31,6 +31,28 @@ SlashCmdList.PMQ = function(msg, editbox)
       addon:ShowQuestLog(not(addon.PlayerSettings.IsQuestLogShown))
     elseif cmd == "print" then
       addon.QuestLog:Print()
+    elseif cmd == "dump" then
+      local varname = args[2]
+      local parts = { strsplit(".", varname) }
+      local var
+      for i, part in ipairs(parts) do
+        if i == 1 then
+          if part == "addon" then
+            var = addon
+          else
+            var = _G[part]
+          end
+        else
+          var = var[part]
+        end
+      end
+
+      if type(var) == "table" then
+        addon.Logger:Table(var)
+        addon.Logger:Debug("^ Dumped table value for:", varname)
+      else
+        addon.Logger:Debug(varname..":", var)
+      end
     else
       if firstShow then
         -- Go to drafts on first open per session
