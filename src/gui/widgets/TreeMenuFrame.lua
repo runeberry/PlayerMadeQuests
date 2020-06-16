@@ -41,10 +41,43 @@ end
 -- Expand this menu tree
 local function setTreeDepth(tree, layerDepth, targetDepth, groups)
   for _, menu in ipairs(tree) do
-    groups[menu.value] = layerDepth < targetDepth
     if menu.children then
+      groups[menu.value] = layerDepth < targetDepth
       setTreeDepth(menu.children, layerDepth + 1, targetDepth, groups)
     end
+  end
+end
+
+local function findMenuItemByValue(tree, value, groups)
+  for _, menu in ipairs(tree) do
+    if menu.value == value then
+      return menu
+    elseif menu.children then
+      local found = findMenuItemByValue(menu.children, value, groups)
+      if found then
+        groups[menu.value] = true -- The parent was on the path - expand it!
+        return found
+      end
+    end
+  end
+end
+
+-- This seems to be the only reliable way to highlight the menu item programatically
+-- I don't entirely understand why it works
+local function simulateMenuItemClick(tmf, menuItem)
+  local button
+  for _, b in ipairs(tmf._aceTreeGroup.buttons) do
+    if b.value == menuItem.value then
+      button = b
+      break
+    end
+  end
+  if button then
+    button.selected = true
+    -- The button must be "clicked" on the frame after button.selected is set to true
+    addon.Ace:ScheduleTimer(function()
+      button:GetScript("OnClick")(button)
+    end, 0.033)
   end
 end
 
@@ -59,8 +92,18 @@ local methods = {
     return st
   end,
   ["NavToMenuScreen"] = function(self, menuId, ...)
-    -- bug: This doesn't properly expand the menu when the menu at this id is nested
-    self._aceTreeGroup:SelectByValue(menuId)
+    addon.MainMenu:Show()
+    local statusTable = self._aceTreeGroup.status
+    local menuItem = findMenuItemByValue(self._aceMenuTree, menuId, statusTable.groups)
+    if menuItem then
+      -- Expand the menu tree to show the path to this item
+      self._aceTreeGroup:SetStatusTable(statusTable)
+      -- "Click" on the item so that it's highlighted
+      simulateMenuItemClick(self, menuItem)
+      -- Even still, you have to navigate to the item by value to ensure OnGroupSelected fires
+      -- This will likely result in it firing twice, but oh well
+      self._aceTreeGroup:SelectByValue(menuItem.value)
+    end
   end,
   ["ShowMenuScreen"] = function(self, menuId, ...)
     self:Show()
@@ -91,9 +134,10 @@ local methods = {
     self._aceTreeGroup:SetTree(menuTree)
   end,
   ["SetVisibleTreeDepth"] = function(self, depth)
-    local groups = {}
+    local statusTable, groups = self._aceTreeGroup.status, {}
+    statusTable.groups = groups
     setTreeDepth(self._aceMenuTree, 1, depth, groups)
-    self._aceTreeGroup:SetStatusTable({ groups = groups })
+    self._aceTreeGroup:SetStatusTable(statusTable)
   end
 }
 
@@ -114,6 +158,7 @@ function widget:Create()
   aceTreeGroup:SetCallback("OnGroupSelected", function(...)
     addon:catch(OnGroupSelected, ...)
   end)
+  aceTreeGroup:SetStatusTable({}) -- For some reason, this is not set by default
   aceFrame:AddChild(aceTreeGroup)
 
   -- This container is the first parameter passed to OnGroupSelect
