@@ -33,7 +33,7 @@ SlashCmdList.PMQ = function(msg, editbox)
       addon.QuestLog:Print()
     elseif cmd == "dump" then
       local varname = args[2]
-      local parts = { strsplit(".", varname) }
+      local parts, sofar = { strsplit(".", varname) }
       local var
       for i, part in ipairs(parts) do
         if i == 1 then
@@ -42,8 +42,16 @@ SlashCmdList.PMQ = function(msg, editbox)
           else
             var = _G[part]
           end
+          sofar = part
         else
-          var = var[part]
+          if type(var) == "table" then
+            var = var[part]
+            sofar = sofar.."."..part
+          else
+            addon.Logger:Debug("Unable to index:", varname)
+            varname = sofar
+            break
+          end
         end
       end
 
