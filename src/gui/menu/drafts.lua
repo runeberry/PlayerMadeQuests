@@ -12,7 +12,7 @@ local colinfo = {
   },
   {
     name = "Version",
-    alight = "RIGHT"
+    align = "RIGHT"
   },
   {
     name = "Status",
