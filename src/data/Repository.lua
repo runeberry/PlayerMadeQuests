@@ -476,6 +476,7 @@ local methods = {
       end
       self._hasDataSource = true
       -- self.logger:Trace("SetSaveDataSource to", saveDataField, ":", addon:tlen(self.data), "item(s)")
+      addon.AppEvents:Publish(self.events.EntityDataLoaded, self)
     end)
   end,
   ["SetTableSource"] = function(self, dataSource)
@@ -506,7 +507,8 @@ local methods = {
       return
     end
     self._hasDataSource = true
-    self.logger:Trace("SetTableSource:", count, "item(s)")
+    -- self.logger:Trace("SetTableSource:", count, "item(s)")
+    addon.AppEvents:Publish(self.events.EntityDataLoaded, self)
   end,
   ["EnableCompression"] = function(self, flag)
     if flag and self._directReadEnabled then
@@ -544,7 +546,8 @@ function addon.Data:NewRepository(name, pkey)
     events = {
       EntityAdded = name.."Added",
       EntityUpdated = name.."Updated",
-      EntityDeleted = name.."Deleted"
+      EntityDeleted = name.."Deleted",
+      EntityDataLoaded = name.."DataLoaded"
     }
   }
 

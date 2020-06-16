@@ -60,7 +60,7 @@ function menu:Create(frame)
   tablePane:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getDrafts)
-  dataTable:SubscribeToEvents("DraftSaved", "DraftDeleted")
+  dataTable:SubscribeToEvents("DraftSaved", "DraftDeleted", "DraftDataLoaded")
   dataTable:OnRowSelected(setButtonState)
   frame.dataTable = dataTable
 
