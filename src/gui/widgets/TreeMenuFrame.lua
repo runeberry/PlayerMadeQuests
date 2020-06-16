@@ -38,6 +38,16 @@ local function getOrCreateScreen(frame, menuId)
   return container
 end
 
+-- Expand this menu tree
+local function setTreeDepth(tree, layerDepth, targetDepth, groups)
+  for _, menu in ipairs(tree) do
+    groups[menu.value] = layerDepth < targetDepth
+    if menu.children then
+      setTreeDepth(menu.children, layerDepth + 1, targetDepth, groups)
+    end
+  end
+end
+
 local methods = {
   ["NewMenuScreen"] = function(self, menuId, headingText)
     local st = { headingText = headingText }
@@ -80,6 +90,11 @@ local methods = {
     self._aceMenuTree = menuTree
     self._aceTreeGroup:SetTree(menuTree)
   end,
+  ["SetVisibleTreeDepth"] = function(self, depth)
+    local groups = {}
+    setTreeDepth(self._aceMenuTree, 1, depth, groups)
+    self._aceTreeGroup:SetStatusTable({ groups = groups })
+  end
 }
 
 -- This is the entry point for accessing a primary menu screen
