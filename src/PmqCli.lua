@@ -3,7 +3,6 @@ addon:traceFile("PmqCli.lua")
 
 local SlashCmdList = addon.G.SlashCmdList
 local strsplit = addon.G.strsplit
-local firstShow = true
 
 SLASH_PMQ1 = "/pmq"
 
@@ -45,14 +44,7 @@ SlashCmdList.PMQ = function(msg, editbox)
         addon.Logger:Debug(varname..":", val)
       end
     else
-      if firstShow then
-        -- Go to drafts on first open per session
-        addon.MainMenu:NavToMenuScreen("drafts")
-        firstShow = false
-      else
-        -- Otherwise simply show the main menu in the last state it was in
-        addon.MainMenu:Show()
-      end
+      addon.MainMenu:Show()
     end
   end)
 end

@@ -2,6 +2,9 @@ local _, addon = ...
 addon:traceFile("MainMenu.lua")
 local UISpecialFrames = addon.G.UISpecialFrames
 
+local firstShow = true
+local defaultMenu = "drafts"
+
 addon.MainMenu = addon.CustomWidgets:CreateWidget("TreeMenuFrame")
 addon.MainMenu:SetTitle("PlayerMadeQuests")
 addon.MainMenu:SetStatusText("PMQ "..addon.ADDON_VERSION.." (thank you for testing! <3)")
@@ -22,6 +25,12 @@ addon.MainMenu:SetMenuTree({ -- value == menuId
     }
   },
 })
+addon.MainMenu:SetScript("OnShow", function()
+  if firstShow then
+    addon.MainMenu:NavToMenuScreen(defaultMenu)
+    firstShow = false
+  end
+end)
 
 -- Make closable with ESC
 local mmfGlobalName = "PMQ_MainMenuFrame"
@@ -31,6 +40,7 @@ table.insert(UISpecialFrames, mmfGlobalName)
 addon:OnSaveDataLoaded(function()
   addon.MainMenu:SetVisibleTreeDepth(2)
   if addon.SHOW_MENU_ON_START then
-    addon.MainMenu:NavToMenuScreen(addon.SHOW_MENU_ON_START)
+    defaultMenu = addon.SHOW_MENU_ON_START
+    addon.MainMenu:Show()
   end
 end)
