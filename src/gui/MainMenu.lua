@@ -6,12 +6,18 @@ addon.MainMenu = addon.CustomWidgets:CreateWidget("TreeMenuFrame")
 addon.MainMenu:SetTitle("PlayerMadeQuests")
 addon.MainMenu:SetStatusText("PMQ "..addon.ADDON_VERSION.." (thank you for testing! <3)")
 addon.MainMenu:SetMenuTree({ -- value == menuId
-  { value = "drafts", text = "My Questography" },
-  { value = "demo", text = "Demo Quests" },
+  { value = "quests", text = "Quests",
+    children = {
+      { value = "catalog", text = "Quest Catalog" },
+      { value = "demo", text = "Demo Quests" },
+      { value = "drafts", text = "My Drafts" },
+      { value = "questlog", text = "My Quest Log" },
+    }
+  },
   { value = "settings", text = "Settings" },
   { value = "help", text = "Help",
     children = {
-      { value = "about", text = "About PMQ" },
+      { value = "commands", text = "Commands" },
       { value = "faq", text = "FAQs" }
     }
   },

@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local menu = addon.MainMenu:NewMenuScreen("about")
+local menu = addon.MainMenu:NewMenuScreen("commands")
 
 local textStyles = {
   ["Header"] = {

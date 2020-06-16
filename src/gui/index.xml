@@ -19,11 +19,13 @@
   <Script file="gui/UIErrorsFrame.lua"/>
 
   <!-- MainMenu screens -->
-  <Script file="gui/menu/draft-view.lua"/>
-  <Script file="gui/menu/drafts.lua"/>
+  <Script file="gui/menu/catalog.lua"/>
+  <Script file="gui/menu/commands.lua"/>
   <Script file="gui/menu/demo.lua"/>
   <Script file="gui/menu/demo-view.lua"/>
-  <Script file="gui/menu/settings.lua"/>
-  <Script file="gui/menu/about.lua"/>
+  <Script file="gui/menu/draft-view.lua"/>
+  <Script file="gui/menu/drafts.lua"/>
   <Script file="gui/menu/faq.lua"/>
+  <Script file="gui/menu/questlog.lua"/>
+  <Script file="gui/menu/settings.lua"/>
 </Ui>

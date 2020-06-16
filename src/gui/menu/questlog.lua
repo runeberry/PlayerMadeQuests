@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local menu = addon.MainMenu:NewMenuScreen("settings")
+local menu = addon.MainMenu:NewMenuScreen("questlog")
 
 function menu:Create(frame)
   local label = frame:CreateFontString(nil, "BACKGROUND", "GameFontNormalLarge")
