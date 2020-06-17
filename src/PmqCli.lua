@@ -28,8 +28,6 @@ SlashCmdList.PMQ = function(msg, editbox)
       addon:ShowQuestLog(false)
     elseif cmd == "toggle" then
       addon:ShowQuestLog(not(addon.PlayerSettings.IsQuestLogShown))
-    elseif cmd == "print" then
-      addon.QuestLog:Print()
     elseif cmd == "dump" then
       local varname = args[2]
       local func = loadstring("return "..varname)
