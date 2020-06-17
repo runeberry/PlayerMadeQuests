@@ -5,7 +5,7 @@ local idCounter = 0
 -- Returns a string ID based on an incrementing counter and the current time
 function addon:CreateID(str)
   idCounter = idCounter + 1
-  local id = idCounter.."-"..time()
+  local id = time().."-"..idCounter
   if str then
     id = string.gsub(str, "%%i", id)
   end
