@@ -69,7 +69,6 @@ function addon.SaveData:LoadString(field, global)
 end
 
 -- Saves the value to the specified field in SavedVariables
--- If the value is a table, it is copied and cleaned before saving
 function addon.SaveData:Save(field, value, global)
   if not addon.SaveDataLoaded then
     error("Cannot Save: SaveData not ready")
