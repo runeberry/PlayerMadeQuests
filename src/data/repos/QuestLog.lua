@@ -1,5 +1,4 @@
 local _, addon = ...
-local Ace, LibCompress = addon.Ace, addon.LibCompress
 local QuestEngine, QuestStatus = addon.QuestEngine, addon.QuestStatus
 local logger = addon.Logger:NewLogger("QuestLog")
 
@@ -14,9 +13,7 @@ addon:OnSaveDataLoaded(function()
 end)
 
 function addon.QuestLog:Save()
-  local cleaned = addon:CleanTable(addon:CopyTable(quests))
-  local serialized = Ace:Serialize(cleaned)
-  local compressed = LibCompress:CompressHuffman(serialized)
+  local compressed = addon:CompressTable(quests)
   addon.SaveData:Save("QuestLog", compressed)
 end
 
@@ -27,17 +24,7 @@ function addon.QuestLog:Load()
     return
   end
 
-  local serialized, msg = LibCompress:Decompress(compressed)
-  if serialized == nil then
-    error("Error loading quest log: "..msg)
-  end
-
-  local ok, saved = Ace:Deserialize(serialized)
-  if not(ok) then
-    -- 2nd param is an error message if it failed
-    error("Error loading quest log: "..saved)
-  end
-
+  local saved = addon:DecompressTable(compressed)
   for _, q in pairs(saved) do
     local qc = QuestEngine:Build(q)
     if qc.status == QuestStatus.Active then
