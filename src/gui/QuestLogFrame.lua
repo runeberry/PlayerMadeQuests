@@ -120,6 +120,7 @@ local function BuildQuestLogFrame()
   container:SetTitle("PMQ Quest Log")
   container:SetCallback("OnClose", OnClose)
   container:SetLayout("Flow")
+  container.frame:SetFrameStrata("HIGH") -- default Ace frame strata is too high
   frames["main"] = container
 
   local questHeading = AceGUI:Create("Heading")
