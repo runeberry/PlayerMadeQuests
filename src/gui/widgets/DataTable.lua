@@ -112,7 +112,7 @@ function widget:Create(parent, colinfo, datasource, ...)
   st.SetSelection = function(self, row)
     origSetSelection(self, row)
     if frame.onRowSelected then
-      frame.onRowSelected(row)
+      frame.onRowSelected(frame:GetSelectedRow())
     end
   end
 
