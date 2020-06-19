@@ -13,7 +13,7 @@ local defaultRadius = 0.5
 local pollingFn
 local pollingObjectives = {}
 local pollingTimerId
-local pollingTimerInterval = 2
+local pollingTimerInterval = 1
 
 
 local function startPolling(obj)
