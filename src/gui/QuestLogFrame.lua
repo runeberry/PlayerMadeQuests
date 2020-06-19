@@ -215,7 +215,7 @@ end
 
 addon:OnSaveDataLoaded(function()
   savedSettings = addon.SaveData:LoadTable("Settings")
-  if savedSettings.IsQuestLogShown then
+  if savedSettings.IsQuestLogShown or savedSettings.IsQuestLogShown == nil then
     addon:ShowQuestLog(true)
   end
 end)
