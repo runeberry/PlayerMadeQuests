@@ -1,10 +1,22 @@
 local _, addon = ...
-local QuestEngine, QuestStatus = addon.QuestEngine, addon.QuestStatus
-local logger = addon.Logger:NewLogger("QuestLog")
+local QuestStatus = addon.QuestStatus
+local logger = addon.Logger
 
 addon.QuestLog = {}
 
 local quests = {}
+
+local function getQuestById(id)
+  local quest, index
+  for i, q in ipairs(quests) do
+    if q.id == id then
+      quest = q
+      index = i
+      break
+    end
+  end
+  return quest, index
+end
 
 addon:OnSaveDataLoaded(function()
   addon.AppEvents:Subscribe("EngineLoaded", function()
@@ -19,51 +31,76 @@ end
 
 function addon.QuestLog:Load()
   local compressed = addon.SaveData:LoadString("QuestLog")
-  if compressed == "" then
-    -- Nothing to load
-    return
+  if compressed and compressed ~= "" then
+    quests = addon:DecompressTable(compressed)
   end
-
-  local saved = addon:DecompressTable(compressed)
-  for _, q in pairs(saved) do
-    local qc = QuestEngine:Build(q)
-    if qc.status == QuestStatus.Active then
-      QuestEngine:StartTracking(qc)
-    end
-    quests[qc.id] = qc
-  end
-
   addon.AppEvents:Publish("QuestLogLoaded", quests)
+end
+
+function addon.QuestLog:FindAll()
+  return quests
+end
+
+function addon.QuestLog:FindByID(id)
+  local quest = getQuestById(id)
+  return quest
 end
 
 function addon.QuestLog:Clear()
-  for _, quest in pairs(quests) do
-    QuestEngine:StopTracking(quest)
-  end
   quests = {}
   self:Save()
-  addon.AppEvents:Publish("QuestLogLoaded", quests)
+  addon.AppEvents:Publish("QuestLogReset")
   logger:Info("Quest Log reset")
-  addon:PlaySound("QuestAbandoned")
-end
-
-function addon.QuestLog:Print()
-  logger:Info("=== You have", addon:tlen(quests), "quests in your log ===")
-  for _, q in pairs(quests) do
-    logger:Info(q.name, "(", q.status, ") [", q.id, "]")
-    for _, o in pairs(q.objectives) do
-      logger:Info("    ", o.name, o.progress, "/",  o.goal)
-    end
-  end
 end
 
 -- This expects a fully compiled and built quest
-function addon.QuestLog:AcceptQuest(quest)
+function addon.QuestLog:AddQuest(quest, status)
+  if not status then
+    addon.Logger:Error("Failed to add quest: status is required")
+    return
+  end
+  if not QuestStatus[status] then
+    addon.Logger:Error("Failed to add quest:", status, "is not a valid status")
+    return
+  end
+  if quest.id then
+    addon.Logger:Warn("Overwriting quest id:", quest.id)
+  end
+  quest.id = addon:CreateID("quest-%i")
   table.insert(quests, quest)
-  QuestEngine:StartTracking(quest)
-  addon.QuestLog:Save()
-  addon.AppEvents:Publish("QuestAccepted", quest)
-  logger:Info("Accepted quest:", quest.name)
-  addon:PlaySound("QuestAccepted")
-  addon:ShowQuestLog(true)
+  quest.status = status
+  self:Save()
+  addon.AppEvents:Publish("QuestAdded", quest)
+end
+
+function addon.QuestLog:SetQuestStatus(id, status)
+  local quest = getQuestById(id)
+  if not quest then
+    addon.Logger:Error("Failed to set quest status: no quest by id", id)
+    return
+  end
+  if not status then
+    addon.Logger:Error("Failed to set quest status: status is required for quest", id)
+    return
+  end
+  if not QuestStatus[status] then
+    addon.Logger:Error("Failed to set quest status:", status, "is not a valid status")
+    return
+  end
+  if status ~= quest.status then
+    quest.status = status
+    self:Save()
+    addon.AppEvents:Publish("QuestStatusChanged", quest)
+  end
+end
+
+function addon.QuestLog:DeleteQuest(id)
+  local quest, index = getQuestById(id)
+  if not quest then
+    addon.Logger:Error("Failed to delete quest: no quest by id", id)
+    return
+  end
+  table.remove(quests, index)
+  self:Save()
+  addon.AppEvents:Publish("QuestDeleted", quest)
 end

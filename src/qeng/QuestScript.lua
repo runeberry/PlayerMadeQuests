@@ -71,7 +71,7 @@ local objectives = {
     }
   },
   {
-    name = "explore",
+    name = tokens.OBJ_EXPLORE,
     scripts = {
       tokens.METHOD_PRE_COND,
       tokens.METHOD_POST_COND,

@@ -9,9 +9,13 @@ addon.QuestEngine = {}
 local objectives = {}
 
 addon.QuestStatus = {
+  Invited = "Invited",
+  Declined = "Declined",
   Active = "Active",
   Failed = "Failed",
+  Abandoned = "Abandoned",
   Completed = "Completed",
+  Archived = "Archived",
 }
 local status = addon.QuestStatus
 
@@ -180,7 +184,6 @@ local function wrapObjectiveHandler(objective)
           obj.progress = math.max(math.floor(obj.progress), 0)
 
           addon.AppEvents:Publish("ObjectiveUpdated", obj)
-          addon.AppEvents:Publish("QuestUpdated", quest)
 
           if obj.progress >= obj.goal then
             -- Mark objective for removal from further checks
@@ -195,9 +198,7 @@ local function wrapObjectiveHandler(objective)
               end
             end
             if questCompleted then
-              quest.status = status.Completed
-              addon.AppEvents:Publish("QuestCompleted", quest)
-              addon.QuestEngine:StopTracking(quest)
+              addon.QuestLog:SetQuestStatus(quest.id, status.Completed)
             end
           end
         end
@@ -222,9 +223,7 @@ end
 function addon.QuestEngine:Build(parameters)
   parameters.name = parameters.name or error("Failed to create quest: quest name is required")
 
-  local quest = addon:CopyTable(parameters)
-  quest.id = quest.id or addon:CreateID("quest-%i")
-  quest.status = quest.status or status.Active
+  local quest = parameters
   quest.objectives = quest.objectives or {}
 
   for _, obj in pairs(quest.objectives) do
@@ -258,13 +257,10 @@ function addon.QuestEngine:Build(parameters)
     end
   end
 
-  if addon.IsAddonLoaded then
-    addon.AppEvents:Publish("QuestCreated", quest)
-  end
   return quest
 end
 
-function addon.QuestEngine:StartTracking(quest)
+local function startTracking(quest)
   -- All active instances of a created objective are stored together
   -- so that they can be quickly evaluated together
   for _, obj in pairs(quest.objectives) do
@@ -273,12 +269,40 @@ function addon.QuestEngine:StartTracking(quest)
   addon.AppEvents:Publish("QuestTrackingStarted", quest)
 end
 
-function addon.QuestEngine:StopTracking(quest)
+local function stopTracking(quest)
   for _, obj in pairs(quest.objectives) do
     obj._parent._active[obj.id] = nil
   end
   addon.AppEvents:Publish("QuestTrackingStopped", quest)
 end
+
+local function setTracking(quest)
+  if quest.status == status.Active then
+    -- If start tracking fails, let it throw an error
+    startTracking(quest)
+  else
+    -- If stop tracking fails, simply log the error
+    addon:catch(stopTracking, quest)
+  end
+end
+
+addon.AppEvents:Subscribe("QuestAdded", setTracking)
+addon.AppEvents:Subscribe("QuestStatusChanged", setTracking)
+addon.AppEvents:Subscribe("QuestDeleted", stopTracking)
+
+addon.AppEvents:Subscribe("QuestLogLoaded", function(quests)
+  for _, q in pairs(quests) do
+    addon.QuestEngine:Build(q)
+    setTracking(q)
+  end
+  addon.AppEvents:Publish("QuestLogBuilt", quests)
+end)
+
+addon.AppEvents:Subscribe("QuestLogReset", function()
+  for _, objective in pairs(objectives) do
+    objective._active = {}
+  end
+end)
 
 addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
   -- Ensure everything can be setup, then wire up objectives into the engine

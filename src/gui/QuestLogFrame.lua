@@ -2,14 +2,14 @@ local _, addon = ...
 addon:traceFile("QuestLogFrame.lua")
 
 local AceGUI = addon.AceGUI
-local strjoin = addon.G.strjoin
-local strsplit = addon.G.strsplit
+local strjoin, strsplit = addon.G.strjoin, addon.G.strsplit
 local UIParent = addon.G.UIParent
+local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
 local frames = {}
 local subscriptions = {}
 local savedSettings
-local qlog = {}
+
 local wp = {
   p1 = "RIGHT",
   p2 = "RIGHT",
@@ -17,6 +17,38 @@ local wp = {
   y = 0,
   w = 250,
   h = 300
+}
+
+local visConfig = {
+  showQuest = {
+    [QuestStatus.Active] = true,
+    [QuestStatus.Failed] = true,
+    [QuestStatus.Abandoned] = true,
+    [QuestStatus.Completed] = true,
+  },
+  showStatus = {
+    [QuestStatus.Failed] = true,
+    [QuestStatus.Abandoned] = true,
+    [QuestStatus.Completed] = true,
+  },
+  showObjectives = {
+    [QuestStatus.Active] = true
+  },
+  questColor = {
+    [QuestStatus.Active] = "yellow",
+    [QuestStatus.Failed] = "red",
+    [QuestStatus.Abandoned] = "red",
+    [QuestStatus.Completed] = "green",
+  }
+}
+
+local textRedrawEvents = {
+  "QuestLogBuilt",
+  "QuestAdded",
+  "QuestDeleted",
+  "QuestStatusChanged",
+  "QuestLogReset",
+  "ObjectiveUpdated",
 }
 
 -- For some reason GetPoint() returns the wrong position unless you move the window
@@ -54,9 +86,61 @@ local function LoadPosition(widget)
   widget:SetHeight(wp.h)
 end
 
+local function SetQuestText(label, quest)
+  local text = quest.name
+  if visConfig.showStatus[quest.status] then
+    text = text.." ("..quest.status..")"
+  end
+  local color = visConfig.questColor[quest.status]
+  if color then
+    text = addon:Colorize(color, text)
+  end
+  label:SetText(text)
+end
+
+local function SetObjectiveText(label, obj)
+  local displayText = obj:GetDisplayText()
+  label:SetText("    - "..displayText.." "..obj.progress.."/"..obj.goal)
+end
+
+local function AddQuest(questList, quest)
+  if not visConfig.showQuest[quest.status] then return end
+
+  local qLabel = AceGUI:Create("InteractiveLabel")
+  qLabel:SetFullWidth(true)
+  questList:AddChild(qLabel)
+  SetQuestText(qLabel, quest)
+
+  if not visConfig.showObjectives[quest.status] then return end
+
+  local objList = AceGUI:Create("SimpleGroup")
+  questList:AddChild(objList)
+
+  for _, obj in pairs(quest.objectives) do
+    local oLabel = AceGUI:Create("InteractiveLabel")
+    oLabel:SetFullWidth(true)
+    objList:AddChild(oLabel)
+    SetObjectiveText(oLabel, obj)
+  end
+end
+
+local function SetQuestLogText(questList, quests)
+  questList:ReleaseChildren()
+  for _, quest in pairs(quests) do
+    AddQuest(questList, quest)
+  end
+end
+
+local function refreshQuestText()
+  local quests = QuestLog:FindAll()
+  table.sort(quests, function(a,b) return a.id < b.id end)
+  SetQuestLogText(frames["questList"], quests)
+end
+
 local function OnOpen(widget)
   savedSettings.IsQuestLogShown = true
   LoadPosition(widget)
+  refreshQuestText()
 end
 
 local function OnClose(widget)
@@ -71,50 +155,6 @@ local function OnClose(widget)
   AceGUI:Release(widget)
 end
 
-local function SetQuestLogHeadingText(heading, qlog)
-  local numQuests = addon:tlen(qlog)
-  heading:SetText("You have "..numQuests.." "..addon:Pluralize(numQuests, "quest").." in your log.")
-end
-
-local function SetQuestText(label, quest)
-  local text = quest.name
-  if quest.status == addon.QuestStatus.Completed then
-    text = text.." (Complete)"
-  end
-  label:SetText(text)
-end
-
-local function SetObjectiveText(label, obj)
-  local displayText = obj:GetDisplayText()
-  label:SetText("    "..displayText.." "..obj.progress.."/"..obj.goal)
-end
-
-local function AddQuest(questList, quest)
-  local qLabel = AceGUI:Create("InteractiveLabel")
-  qLabel:SetFullWidth(true)
-  questList:AddChild(qLabel)
-  SetQuestText(qLabel, quest)
-  frames[quest.id] = qLabel
-
-  local objList = AceGUI:Create("SimpleGroup")
-  questList:AddChild(objList)
-
-  for _, obj in pairs(quest.objectives) do
-    local oLabel = AceGUI:Create("InteractiveLabel")
-    oLabel:SetFullWidth(true)
-    objList:AddChild(oLabel)
-    SetObjectiveText(oLabel, obj)
-    frames[obj.id] = oLabel
-  end
-end
-
-local function SetQuestLogText(questList, qlog)
-  questList:ReleaseChildren()
-  for _, quest in pairs(qlog) do
-    AddQuest(questList, quest)
-  end
-end
-
 local function BuildQuestLogFrame()
   local container = AceGUI:Create("Window")
   container:SetTitle("PMQ Quest Log")
@@ -122,11 +162,6 @@ local function BuildQuestLogFrame()
   container:SetLayout("Flow")
   container.frame:SetFrameStrata("HIGH") -- default Ace frame strata is too high
   frames["main"] = container
-
-  local questHeading = AceGUI:Create("Heading")
-  questHeading:SetFullWidth(true)
-  container:AddChild(questHeading)
-  frames["heading"] = questHeading
 
   local scrollGroup = AceGUI:Create("SimpleGroup")
   scrollGroup:SetFullWidth(true)
@@ -143,31 +178,9 @@ local function BuildQuestLogFrame()
   scroller:AddChild(questList)
   frames["questList"] = questList
 
-  SetQuestLogHeadingText(questHeading, qlog)
-  SetQuestLogText(questList, qlog)
-
-  local subKey
-  subKey = addon.AppEvents:Subscribe("QuestLogLoaded", function(qlog)
-    SetQuestLogHeadingText(frames["heading"], qlog)
-    SetQuestLogText(frames["questList"], qlog)
-  end)
-  subscriptions["QuestLogLoaded"] = subKey
-
-  subKey = addon.AppEvents:Subscribe("QuestAccepted", function(quest)
-    SetQuestLogHeadingText(frames["heading"], qlog)
-    AddQuest(frames["questList"], quest)
-  end)
-  subscriptions["QuestAccepted"] = subKey
-
-  subKey = addon.AppEvents:Subscribe("QuestCompleted", function(quest)
-    SetQuestText(frames[quest.id], quest)
-  end)
-  subscriptions["QuestCompleted"] = subKey
-
-  subKey = addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
-    SetObjectiveText(frames[obj.id], obj)
-  end)
-  subscriptions["ObjectiveUpdated"] = subKey
+  for _, event in ipairs(textRedrawEvents) do
+    subscriptions[event] = addon.AppEvents:Subscribe(event, refreshQuestText)
+  end
 
   OnOpen(container)
 end
@@ -188,8 +201,4 @@ addon:OnSaveDataLoaded(function()
   if savedSettings.IsQuestLogShown then
     addon:ShowQuestLog(true)
   end
-end)
-
-addon.AppEvents:Subscribe("QuestLogLoaded", function(quests)
-  qlog = quests
 end)

@@ -57,9 +57,17 @@ local function acceptButton_OnClick()
     addon.Logger:Warn("There is no quest to accept!")
     return
   end
-  addon.QuestLog:AcceptQuest(currentQuest)
+
+  if currentQuest.id and addon.QuestLog:FindByID(currentQuest.id) then
+    addon.QuestLog:SetQuestStatus(currentQuest.id, addon.QuestStatus.Active)
+  else
+    addon.QuestLog:AddQuest(currentQuest, addon.QuestStatus.Active)
+  end
+
   addon:ShowQuestInviteFrame(false)
   addon:PlaySound("BookClose")
+  addon:PlaySound("QuestAccepted")
+  addon:ShowQuestLog(true)
 end
 
 local function declineButton_OnClick()
@@ -181,8 +189,9 @@ addon:onload(function()
   -- This expects a fully compiled and built quest
   addon.AppEvents:Subscribe("QuestInvite", handleQuestInvite)
   addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
+    addon.QuestLog:AddQuest(quest, addon.QuestStatus.Invited)
     addon.Logger:Info("Quest invite received from:", sender)
-    quest = addon.QuestEngine:Build(quest) -- Quest is received in "compiled" but not "built" form from message
+    addon.QuestEngine:Build(quest) -- Quest is received in "compiled" but not "built" form from message
     handleQuestInvite(quest)
   end)
 end)
