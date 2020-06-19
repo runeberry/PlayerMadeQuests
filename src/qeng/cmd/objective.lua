@@ -19,7 +19,7 @@ compiler:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
     --id = addon:CreateID("objective:"..objName.."-%i"),
     --_parent = objectives[p1], -- The objective contains a reference to its parent definition
     name = objName,
-    displayText = objName.." %p/%g",
+    --displayText = nil,
     --progress = 0, -- All objectives start at 0 progress
     goal = 1, -- Objective goal will be 1 unless otherwise defined
     conditions = {}, -- The conditions under which this objective must be completed

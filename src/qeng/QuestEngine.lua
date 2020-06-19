@@ -53,7 +53,9 @@ local function objective_GetMetadata(obj, name)
 end
 
 local function objective_GetDisplayText(obj)
-  if obj._parent.scripts and obj._parent.scripts.GetDisplayText then
+  if obj.displayText then
+    return obj.displayText
+  elseif obj._parent.scripts and obj._parent.scripts.GetDisplayText then
     return obj._parent.scripts.GetDisplayText(obj)
   else
     return obj.name
