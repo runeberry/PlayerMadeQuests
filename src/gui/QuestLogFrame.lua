@@ -57,7 +57,9 @@ local function isInaccuratePoint(p1, p2, x, y)
   return p1 == "CENTER" and p2 == "CENTER" and x == 0 and y == 0
 end
 
-local function SavePosition(widget)
+local function SavePosition()
+  local widget = frames["main"]
+  if not widget then return end
   local p1, _, p2, x, y = widget:GetPoint()
   if isInaccuratePoint(p1, p2, x, y) then
     p1 = wp.p1
@@ -70,7 +72,9 @@ local function SavePosition(widget)
   -- addon.Logger:Debug("Saving position:", p1, p2, x, y, w, h)
 end
 
-local function LoadPosition(widget)
+local function LoadPosition()
+  local widget = frames["main"]
+  if not widget then return end
   if savedSettings.QuestLogPosition then
     local p1, p2, x, y, w, h = strsplit(",", savedSettings.QuestLogPosition)
     wp.p1 = p1
@@ -144,7 +148,7 @@ local function OnOpen(widget)
 end
 
 local function OnClose(widget)
-  addon:catch(SavePosition, widget)
+  addon:catch(SavePosition)
   savedSettings.IsQuestLogShown = nil
   frames = {}
   for event, key in pairs(subscriptions) do
@@ -161,6 +165,7 @@ local function BuildQuestLogFrame()
   container:SetCallback("OnClose", OnClose)
   container:SetLayout("Flow")
   container.frame:SetFrameStrata("HIGH") -- default Ace frame strata is too high
+  container.frame:SetScript("OnLeave", SavePosition)
   frames["main"] = container
 
   local scrollGroup = AceGUI:Create("SimpleGroup")
