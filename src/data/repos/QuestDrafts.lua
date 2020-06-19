@@ -18,6 +18,7 @@ addon.QuestDrafts = addon.Data:NewRepository("Draft")
 addon.QuestDrafts:SetSaveDataSource("Drafts")
 addon.QuestDrafts:EnableWrite(true)
 addon.QuestDrafts:EnablePrimaryKeyGeneration(true)
+addon.QuestDrafts:EnableCompression(true)
 
 addon.QuestDraftStatus = {
   Draft = "Draft",
