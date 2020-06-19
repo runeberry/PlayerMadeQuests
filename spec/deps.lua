@@ -7,6 +7,7 @@ local function newFrameMock()
     SetFrameStrata = mock:NewMock(),
     Show = mock:NewMock(),
     Hide = mock:NewMock(),
+    SetScript = mock:NewMock(),
   }
 end
 
@@ -22,7 +23,8 @@ local function newAceFrameMock()
     AddChild = mock:NewMock(),
     SelectByValue = mock:NewMock(),
     SetFullWidth = mock:NewMock(),
-    SetFullHeight = mock:NewMock()
+    SetFullHeight = mock:NewMock(),
+    SetStatusTable = mock:NewMock(),
   }
 
   aceFrameMock.content = { obj = aceFrameMock }
