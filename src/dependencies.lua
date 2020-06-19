@@ -29,6 +29,7 @@ addon.G = {
   GetUnitName = GetUnitName,
   GetRealZoneText = GetRealZoneText,
   GetSubZoneText = GetSubZoneText,
+  GetMinimapZoneText = GetMinimapZoneText,
   GetZoneText = GetZoneText,
   PlaySoundFile = PlaySoundFile,
   SlashCmdList = SlashCmdList,

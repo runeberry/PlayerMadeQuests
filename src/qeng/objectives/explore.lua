@@ -6,6 +6,7 @@ local GetBestMapForUnit = addon.G.GetBestMapForUnit
 local GetPlayerMapPosition = addon.G.GetPlayerMapPosition
 local GetRealZoneText = addon.G.GetRealZoneText
 local GetSubZoneText = addon.G.GetSubZoneText
+local GetMinimapZoneText = addon.G.GetMinimapZoneText
 local GetZoneText = addon.G.GetZoneText
 
 local defaultRadius = 0.5
@@ -110,6 +111,7 @@ local function publish()
     zone = GetZoneText(),
     realZone = GetRealZoneText(),
     subZone = GetSubZoneText(),
+    minimapZone = GetMinimapZoneText(),
     x = x * 100,
     y = y * 100
   }
@@ -121,5 +123,6 @@ addon:onload(function()
   addon.GameEvents:Subscribe("ZONE_CHANGED", publish)
   addon.GameEvents:Subscribe("ZONE_CHANGED_INDOORS", publish)
   addon.GameEvents:Subscribe("ZONE_CHANGED_NEW_AREA", publish)
+  addon.GameEvents:Subscribe("MINIMAP_ZONE_CHANGED", publish)
   addon.AppEvents:Subscribe("ObjectiveCompleted", stopPolling)
 end)

@@ -112,6 +112,7 @@ function deps:Init(addon)
     GetUnitName = mock:NewMock( mock:Returns("name") ),
     GetRealZoneText = mock:NewMock( mock:Returns("zone") ),
     GetSubZoneText = mock:NewMock( mock:Returns("subzone") ),
+    GetMinimapZoneText = mock:NewMock( mock:Returns("subzone") ),
     GetZoneText = mock:NewMock( mock:Returns("zone") ),
     PlaySoundFile = mock:NewMock(),
     SlashCmdList = {},

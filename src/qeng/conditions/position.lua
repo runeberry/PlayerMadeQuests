@@ -27,7 +27,7 @@ end)
 
 compiler:AddScript(tokens.PARAM_SUBZONE, tokens.METHOD_CHECK_COND, function(obj, targetSubzone)
   local pos = obj:GetMetadata("PlayerLocationData")
-  local match = pos.subZone == targetSubzone
+  local match = pos.subZone == targetSubzone or pos.minimapZone == targetSubzone
   obj:SetMetadata("PlayerIsInSubZone", match)
   return match
 end)
