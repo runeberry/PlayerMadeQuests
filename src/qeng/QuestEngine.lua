@@ -114,15 +114,17 @@ local function evaluateObjective(objective, obj, ...)
   local anyFailed
   for name, val in pairs(obj.conditions) do
     local condition = objective._paramsByName[name]
-    -- CheckCondition receives 2 args: The obj being evaluated, and the value(s) for this condition
-    ok, checkResult = pcall(condition.scripts.CheckCondition, obj, val)
-    if not(ok) then
-      logger:Error("Error evaluating condition '", name,"' for '", obj.id, "':", checkResult)
-      return
-    elseif checkResult ~= true  then
-      -- If any result was not true, keep evaluating conditions, but set checkResult to false when it's all done
-      logger:Trace("Condition '"..name.."' evaluated:", checkResult)
-      anyFailed = true
+    if condition.scripts and condition.scripts.CheckCondition then
+      -- CheckCondition receives 2 args: The obj being evaluated, and the value(s) for this condition
+      ok, checkResult = pcall(condition.scripts.CheckCondition, obj, val)
+      if not(ok) then
+        logger:Error("Error evaluating condition '", name,"' for '", obj.id, "':", checkResult)
+        return
+      elseif checkResult ~= true  then
+        -- If any result was not true, keep evaluating conditions, but set checkResult to false when it's all done
+        logger:Trace("Condition '"..name.."' evaluated:", checkResult)
+        anyFailed = true
+      end
     end
   end
   if anyFailed then
@@ -250,9 +252,6 @@ function addon.QuestEngine:Build(parameters)
       local condition = obj._parent._paramsByName[name]
       if not condition then
         error("Failed to create quest: '"..name.."' is not a valid condition for objective '"..obj._parent.name.."'")
-      end
-      if not condition.scripts or not condition.scripts.CheckCondition then
-        error("Failed to create quest: condition '"..name.."' does not have a CheckCondition script")
       end
     end
   end
