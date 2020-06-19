@@ -89,6 +89,10 @@ function addon.QuestLog:SetQuestStatus(id, status)
   end
   if status ~= quest.status then
     quest.status = status
+    for _, obj in pairs(quest.objectives) do
+      -- Reset all quest progress when status changes, this should only affect Active -> anything else
+      obj.progress = 0
+    end
     self:Save()
     addon.AppEvents:Publish("QuestStatusChanged", quest)
   end
