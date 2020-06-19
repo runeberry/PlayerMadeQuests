@@ -180,18 +180,12 @@ function addon:ShowQuestInviteFrame(flag, quest)
   end
 end
 
+-- This expects a fully compiled and built quest
 local function handleQuestInvite(quest)
   addon:ShowQuestInviteFrame(true, quest)
   addon:PlaySound("BookWrite")
 end
 
 addon:onload(function()
-  -- This expects a fully compiled and built quest
   addon.AppEvents:Subscribe("QuestInvite", handleQuestInvite)
-  addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
-    addon.Logger:Info(sender, "has invited you to a quest:", quest.name)
-    addon.QuestEngine:Build(quest) -- Quest is received in "compiled" but not "built" form from message
-    addon.QuestLog:AddQuest(quest, addon.QuestStatus.Invited)
-    handleQuestInvite(quest)
-  end)
 end)

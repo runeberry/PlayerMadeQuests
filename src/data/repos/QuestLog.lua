@@ -104,3 +104,12 @@ function addon.QuestLog:DeleteQuest(id)
   self:Save()
   addon.AppEvents:Publish("QuestDeleted", quest)
 end
+
+addon:onload(function()
+  addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
+    addon.Logger:Info(sender, "has invited you to a quest:", quest.name)
+    addon.QuestEngine:Build(quest) -- Quest is received in "compiled" but not "built" form from message
+    addon.QuestLog:AddQuest(quest, addon.QuestStatus.Invited)
+    addon.AppEvents:Publish("QuestInvite", quest)
+  end)
+end)
