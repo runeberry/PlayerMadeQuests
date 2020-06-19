@@ -178,6 +178,18 @@ local function BuildQuestLogFrame()
   scroller:SetLayout("Flow")
   scrollGroup:AddChild(scroller)
 
+  local buttonGroup = AceGUI:Create("SimpleGroup")
+  buttonGroup:SetFullWidth(true)
+  scroller:AddChild(buttonGroup)
+
+  local moreButton = AceGUI:Create("Button")
+  moreButton:SetText("View Log")
+  moreButton:SetWidth(100)
+  moreButton:SetCallback("OnClick", function()
+    addon.MainMenu:NavToMenuScreen("questlog")
+  end)
+  buttonGroup:AddChild(moreButton)
+
   local questList = AceGUI:Create("SimpleGroup")
   questList:SetFullWidth(true)
   scroller:AddChild(questList)
