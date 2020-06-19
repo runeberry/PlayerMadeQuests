@@ -120,9 +120,10 @@ end
 
 addon:onload(function()
   pollingFn = publish
+  addon.AppEvents:Subscribe("QuestAdded", publish)
+  addon.AppEvents:Subscribe("QuestLogBuilt", publish)
   addon.GameEvents:Subscribe("ZONE_CHANGED", publish)
   addon.GameEvents:Subscribe("ZONE_CHANGED_INDOORS", publish)
   addon.GameEvents:Subscribe("ZONE_CHANGED_NEW_AREA", publish)
-  addon.GameEvents:Subscribe("MINIMAP_ZONE_CHANGED", publish)
   addon.AppEvents:Subscribe("ObjectiveCompleted", stopPolling)
 end)
