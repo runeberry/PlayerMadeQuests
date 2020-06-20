@@ -20,4 +20,4 @@ make test-report # runs unit tests and prints code coverage as a detailed HTML r
 
 ## Planned Features
 
-Check out the [Issues](issues) page for features in the works for PMQ.
+Check out the [Issues](/../../issues) page for features in the works for PMQ.
