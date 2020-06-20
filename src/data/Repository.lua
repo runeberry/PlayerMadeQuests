@@ -109,8 +109,8 @@ local function readSaveData(repo)
 
   if repo._compressionEnabled then
     local compressed = addon.SaveData:LoadString(repo._saveDataField)
-    -- This expects the compressed data to already be a "distinct set"
-    repo.data = addon:DecompressTable(compressed)
+    local array = addon:DecompressTable(compressed)
+    repo.data = addon:DistinctSet(array)
   else
     local array = addon.SaveData:LoadTable(repo._saveDataField)
     repo.data = addon:DistinctSet(array)
@@ -121,7 +121,8 @@ local function writeSaveData(repo)
   if not repo._saveDataField then return end
 
   if repo._compressionEnabled then
-    local compressed = addon:CompressTable(repo.data)
+    local array = addon:SetToArray(repo.data)
+    local compressed = addon:CompressTable(array)
     addon.SaveData:Save(repo._saveDataField, compressed)
   else
     local array = addon:SetToArray(repo.data)
