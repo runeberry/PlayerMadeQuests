@@ -3,6 +3,7 @@ local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
 
 local questInviteFrame
 local currentQuest -- The quest being proposed in the window
+local currentQuestSender -- The player who sent the currently proposed quest
 
 local textStyles = {
   ["header"] = {
@@ -41,15 +42,17 @@ local function qf_SetContent(self, quest)
   else
     fsQuestObjectives:SetText("\n")
   end
-
 end
 
 local function qf_OnShow(self)
   self.scrollFrame:SetVerticalScroll(0)
+  addon:PlaySound("BookOpen")
 end
 
 local function qf_OnHide(self)
   currentQuest = nil
+  currentQuestSender = nil
+  addon:PlaySound("BookClose")
 end
 
 local function acceptButton_OnClick()
@@ -64,15 +67,22 @@ local function acceptButton_OnClick()
     addon.QuestLog:AddQuest(currentQuest, addon.QuestStatus.Active)
   end
 
+  if currentQuestSender then
+    addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.id)
+  end
+
   addon:ShowQuestInviteFrame(false)
-  addon:PlaySound("BookClose")
+
   addon:PlaySound("QuestAccepted")
   addon:ShowQuestLog(true)
 end
 
 local function declineButton_OnClick()
+  if currentQuestSender then
+    addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.id)
+    addon.QuestLog:SetQuestStatus(currentQuest.id, addon.QuestStatus.Declined)
+  end
   addon:ShowQuestInviteFrame(false)
-  addon:PlaySound("BookClose")
 end
 
 local function buildQuestInviteFrame()
@@ -159,9 +169,18 @@ local function buildQuestInviteFrame()
   return questFrame
 end
 
-function addon:ShowQuestInviteFrame(flag, quest)
+function addon:ShowQuestInviteFrame(flag, quest, sender)
   if flag == nil then flag = true end
   if flag then
+    if currentQuest then
+      -- Another quest is already being interacted with
+      if sender then
+        addon.Logger:Warn(sender, "invited you to a quest. View it in the Quest Log menu.")
+      else
+        addon.Logger:Warn("Accept or decline this quest before trying to view another one.")
+      end
+      return
+    end
     if not questInviteFrame then
       questInviteFrame = buildQuestInviteFrame()
     end
@@ -170,20 +189,22 @@ function addon:ShowQuestInviteFrame(flag, quest)
       questInviteFrame:SetContent(quest)
       -- questInviteFrame.scrollFrame:SetVerticalScroll(0)
       currentQuest = quest
+      currentQuestSender = sender
       questInviteFrame:Show()
+      addon:PlaySound("BookWrite")
     end
   else
     if questInviteFrame then
       currentQuest = nil
+      currentQuestSender = nil
       questInviteFrame:Hide()
     end
   end
 end
 
 -- This expects a fully compiled and built quest
-local function handleQuestInvite(quest)
-  addon:ShowQuestInviteFrame(true, quest)
-  addon:PlaySound("BookWrite")
+local function handleQuestInvite(quest, sender)
+  addon:ShowQuestInviteFrame(true, quest, sender)
 end
 
 addon:onload(function()

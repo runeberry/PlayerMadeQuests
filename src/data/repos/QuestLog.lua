@@ -56,17 +56,22 @@ end
 -- This expects a fully compiled and built quest
 function addon.QuestLog:AddQuest(quest, status)
   if not status then
-    addon.Logger:Error("Failed to add quest: status is required")
+    error("Failed to add quest: status is required")
     return
   end
   if not QuestStatus[status] then
-    addon.Logger:Error("Failed to add quest:", status, "is not a valid status")
+    error("Failed to add quest: "..status.." is not a valid status")
     return
   end
-  if quest.id then
-    addon.Logger:Warn("Overwriting quest id:", quest.id)
+  if not quest.id then
+    quest.id = addon:CreateID("quest-%i")
+  else
+    local existing = self:FindByID(quest.id)
+    if existing then
+      error("Failed to add quest: "..quest.id.." already exists")
+    end
   end
-  quest.id = addon:CreateID("quest-%i")
+
   table.insert(quests, quest)
   quest.status = status
   self:Save()
@@ -76,16 +81,13 @@ end
 function addon.QuestLog:SetQuestStatus(id, status)
   local quest = getQuestById(id)
   if not quest then
-    addon.Logger:Error("Failed to set quest status: no quest by id", id)
-    return
+    error("Failed to set quest status: no quest by id "..id)
   end
   if not status then
-    addon.Logger:Error("Failed to set quest status: status is required for quest", id)
-    return
+    error("Failed to set quest status: status is required for quest "..id)
   end
   if not QuestStatus[status] then
-    addon.Logger:Error("Failed to set quest status:", status, "is not a valid status")
-    return
+    error("Failed to set quest status: "..status.." is not a valid status")
   end
   if status ~= quest.status then
     quest.status = status
@@ -109,11 +111,40 @@ function addon.QuestLog:DeleteQuest(id)
   addon.AppEvents:Publish("QuestDeleted", quest)
 end
 
+local considerDuplicate = {
+  [QuestStatus.Active] = "is already on that quest.",
+  [QuestStatus.Completed] = "has already completed that quest.",
+  [QuestStatus.Archived] = "has archived that quest.",
+}
+
 addon:onload(function()
   addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
-    addon.Logger:Info(sender, "has invited you to a quest:", quest.name)
-    addon.QuestEngine:Build(quest) -- Quest is received in "compiled" but not "built" form from message
-    addon.QuestLog:AddQuest(quest, addon.QuestStatus.Invited)
-    addon.AppEvents:Publish("QuestInvite", quest)
+    local existing = addon.QuestLog:FindByID(quest.id)
+    if existing and considerDuplicate[existing.status] then
+      addon.MessageEvents:Publish("QuestInviteDuplicate", { distribution = "WHISPER", target = sender }, quest.id, quest.status)
+      return
+    end
+    addon.Logger:Warn(sender, "has invited you to a quest:", quest.name)
+    if existing then
+      quest = existing
+    else
+      addon.QuestEngine:Build(quest) -- Quest is received in "compiled" but not "built" form from message
+      addon.QuestLog:AddQuest(quest, addon.QuestStatus.Invited)
+    end
+    addon.AppEvents:Publish("QuestInvite", quest, sender)
+  end)
+
+  addon.MessageEvents:Subscribe("QuestInviteAccepted", function(distribution, sender, questId)
+    addon.Logger:Warn(sender, "accepted your quest.")
+  end)
+  addon.MessageEvents:Subscribe("QuestInviteDeclined", function(distribution, sender, questId)
+    addon.Logger:Warn(sender, "declined your quest.")
+  end)
+  addon.MessageEvents:Subscribe("QuestInviteDuplicate", function(distribution, sender, questId, status)
+    local reason = considerDuplicate[status] or "has already received that quest."
+    addon.Logger:Warn(sender, reason)
+  end)
+  addon.MessageEvents:Subscribe("QuestInviteRequirements", function(distribution, sender, questId)
+    addon.Logger:Warn(sender, "does not meet the requirements for that quest.")
   end)
 end)
