@@ -104,7 +104,11 @@ end
 
 local function SetObjectiveText(label, obj)
   local displayText = obj:GetDisplayText()
-  label:SetText("    - "..displayText.." "..obj.progress.."/"..obj.goal)
+  local text = "    - "..displayText.." "..obj.progress.."/"..obj.goal
+  if obj.progress >= obj.goal then
+    text = addon:Colorize("grey", text)
+  end
+  label:SetText(text)
 end
 
 local function AddQuest(questList, quest)
