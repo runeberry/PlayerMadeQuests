@@ -98,47 +98,6 @@ describe("Repository", function()
 
       assert.equals(0, #results)
     end)
-    it("can generate PK for a record without a PK, if enabled", function()
-      repo:EnablePrimaryKeyGeneration(true)
-      local entity = createTestEntity()
-      assert.is_nil(entity.id)
-
-      repo:Save(entity)
-      assert.is_not_nil(entity.id)
-
-      local result = repo:FindByID(entity.id)
-      assert.same(entity, result)
-    end)
-    it("can overwrite a record with an existing primary key", function()
-      local testData = createTestEntities(2)
-      local testId = "test-id"
-      testData[1].id = testId
-      testData[2].id = testId
-      assert.not_same(testData[1], testData[2])
-
-      repo:Save(testData[1])
-      local result = repo:FindByID(testId)
-      assert.same(testData[1], result)
-
-      repo:Save(testData[2])
-      result = repo:FindByID(testId)
-      assert.same(testData[2], result)
-    end)
-    it("can save a new record if the primary key is changed", function()
-      local entity = createTestEntity()
-      entity.id = "test-id"
-
-      repo:Save(entity)
-      entity.id = "different-id"
-      repo:Save(entity)
-
-      local result = repo:FindByID(entity.id)
-      assert.same(entity, result)
-
-      result = repo:FindByID("test-id")
-      assert.not_nil(result)
-      assert.equals(entity.name, result.name)
-    end)
     it("cannot save a record that violates a unique index", function()
       local testData = createTestEntities(2)
       testData[2].value = testData[1].value
@@ -156,6 +115,94 @@ describe("Repository", function()
 
       local results = repo:FindAll()
       assert.equals(1, #results)
+    end)
+    describe("New Entity", function()
+      it("can use the record's primary key, if already defined", function()
+        local entity = createTestEntity()
+        local testId = "just-a-test-identifier-of-some-sort"
+        entity.id = testId
+
+        repo:Save(entity)
+        assert.equals(testId, entity.id)
+
+        local result = repo:FindByID(testId)
+        assert.same(entity, result)
+      end)
+      it("can generate PK for a record without a PK, if enabled", function()
+        repo:EnablePrimaryKeyGeneration(true)
+        local entity = createTestEntity()
+        assert.is_nil(entity.id)
+
+        repo:Save(entity)
+        assert.is_not_nil(entity.id)
+
+        local result = repo:FindByID(entity.id)
+        assert.same(entity, result)
+      end)
+      it("fires an EntityAdded event", function()
+        local count, eid = 0
+        addon.AppEvents:Subscribe(repo.events.EntityAdded, function(ent)
+          count = count + 1
+          eid = ent.id
+        end)
+
+        repo:EnablePrimaryKeyGeneration(true)
+        local entity = createTestEntity()
+        repo:Save(entity)
+
+        addon:Advance()
+        assert.equals(1, count)
+        assert.equals(entity.id, eid)
+      end)
+    end)
+    describe("Existing Entity", function()
+      it("can overwrite a record with an existing primary key", function()
+        local testData = createTestEntities(2)
+        local testId = "test-id"
+        testData[1].id = testId
+        testData[2].id = testId
+        assert.not_same(testData[1], testData[2])
+
+        repo:Save(testData[1])
+        local result = repo:FindByID(testId)
+        assert.same(testData[1], result)
+
+        repo:Save(testData[2])
+        result = repo:FindByID(testId)
+        assert.same(testData[2], result)
+      end)
+      it("can save a new record if the primary key is changed", function()
+        local entity = createTestEntity()
+        entity.id = "test-id"
+
+        repo:Save(entity)
+        entity.id = "different-id"
+        repo:Save(entity)
+
+        local result = repo:FindByID(entity.id)
+        assert.same(entity, result)
+
+        result = repo:FindByID("test-id")
+        assert.not_nil(result)
+        assert.equals(entity.name, result.name)
+      end)
+      it("fires an EntityUpdated event", function()
+        local count, ename = 0
+        addon.AppEvents:Subscribe(repo.events.EntityUpdated, function(ent)
+          count = count + 1
+          ename = ent.name
+        end)
+
+        repo:EnablePrimaryKeyGeneration(true)
+        local entity = createTestEntity()
+        repo:Save(entity)
+        entity.name = entity.name.."updated"
+        repo:Save(entity)
+
+        addon:Advance()
+        assert.equals(1, count)
+        assert.equals(entity.name, ename)
+      end)
     end)
   end)
   describe("Delete", function()
@@ -177,7 +224,7 @@ describe("Repository", function()
       assert.is_nil(result)
     end)
     it("can delete a record by entity", function()
-      local toDelete = testData[1]
+      local toDelete = testData[2]
       repo:Delete(toDelete)
 
       local results = repo:FindAll()
@@ -187,13 +234,27 @@ describe("Repository", function()
       assert.is_nil(result)
     end)
     it("cannot delete a record by entity without a primary key", function()
-      local toDelete = testData[1]
+      local toDelete = testData[3]
       toDelete.id = nil
       repo.logger:SetLogLevel("silent") -- Hide intentional error
       repo:Delete(toDelete)
 
       local results = repo:FindAll()
       assert.equals(3, #results)
+    end)
+    it("fires an EntityDeleted event", function()
+      local count, eid = 0
+      addon.AppEvents:Subscribe(repo.events.EntityDeleted, function(ent)
+        count = count + 1
+        eid = ent.id
+      end)
+
+      local toDelete = testData[3]
+      repo:Delete(toDelete)
+
+      addon:Advance()
+      assert.equals(1, count)
+      assert.equals(toDelete.id, eid)
     end)
   end)
   describe("Indexing", function()
@@ -323,7 +384,6 @@ describe("Repository", function()
     end)
     it("can load compressed data", function()
       repo:EnableCompression(true)
-      -- Repo expects loaded data to already be a "distinct set"
       local compressed = tempAddon:CompressTable(testData)
       tempAddon.SaveData:Save(saveDataField, compressed)
       repo:SetSaveDataSource(saveDataField)
@@ -334,6 +394,20 @@ describe("Repository", function()
 
       local result = repo:FindByID(results[1].id)
       assert.same(results[1], result)
+    end)
+    it("fires an EntityDataLoaded event", function()
+      local count = 0
+      tempAddon.AppEvents:Subscribe(repo.events.EntityDataLoaded, function()
+        count = count + 1
+      end)
+
+      repo:EnableCompression(true)
+      local compressed = tempAddon:CompressTable(testData)
+      tempAddon.SaveData:Save(saveDataField, compressed)
+      repo:SetSaveDataSource(saveDataField)
+
+      tempAddon:Advance()
+      assert.equals(1, count)
     end)
   end)
   describe("SetTableSource", function()
@@ -379,6 +453,20 @@ describe("Repository", function()
 
       local results = repo:FindAll()
       assert.equals(0, #results)
+    end)
+    it("fires an EntityDataLoaded event", function()
+      local count = 0
+      addon.AppEvents:Subscribe(repo.events.EntityDataLoaded, function()
+        count = count + 1
+      end)
+
+      for _, v in pairs(testData) do
+        v.id = addon:CreateID("testData-%i")
+      end
+      repo:SetTableSource(testData)
+
+      addon:Advance()
+      assert.equals(1, count)
     end)
   end)
 end)
