@@ -8,7 +8,6 @@ local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
 local frames = {}
 local subscriptions = {}
-local savedSettings
 
 local wp = {
   p1 = "RIGHT",
@@ -68,15 +67,15 @@ local function SavePosition()
     y = wp.y
   end
   local w, h = widget.frame:GetSize()
-  savedSettings.QuestLogPosition = strjoin(",", p1, p2, x, y, w, h)
+  addon.PlayerSettings.QuestLogPosition = strjoin(",", p1, p2, x, y, w, h)
   -- addon.Logger:Debug("Saving position:", p1, p2, x, y, w, h)
 end
 
 local function LoadPosition()
   local widget = frames["main"]
   if not widget then return end
-  if savedSettings.QuestLogPosition then
-    local p1, p2, x, y, w, h = strsplit(",", savedSettings.QuestLogPosition)
+  if addon.PlayerSettings.QuestLogPosition then
+    local p1, p2, x, y, w, h = strsplit(",", addon.PlayerSettings.QuestLogPosition)
     wp.p1 = p1
     wp.p2 = p2
     wp.x = x
@@ -145,15 +144,15 @@ local function refreshQuestText()
   SetQuestLogText(frames["questList"], quests)
 end
 
-local function OnOpen(widget)
-  savedSettings.IsQuestLogShown = true
-  LoadPosition(widget)
+local function OnOpen()
+  addon.PlayerSettings.IsQuestLogShown = true
+  LoadPosition()
   refreshQuestText()
 end
 
 local function OnClose(widget)
   addon:catch(SavePosition)
-  savedSettings.IsQuestLogShown = nil
+  addon.PlayerSettings.IsQuestLogShown = false
   frames = {}
   for event, key in pairs(subscriptions) do
 
@@ -203,7 +202,7 @@ local function BuildQuestLogFrame()
     subscriptions[event] = addon.AppEvents:Subscribe(event, refreshQuestText)
   end
 
-  OnOpen(container)
+  OnOpen()
 end
 
 function addon:ShowQuestLog(show)
@@ -217,9 +216,8 @@ function addon:ShowQuestLog(show)
   end
 end
 
-addon:OnSaveDataLoaded(function()
-  savedSettings = addon.SaveData:LoadTable("Settings")
-  if savedSettings.IsQuestLogShown or savedSettings.IsQuestLogShown == nil then
+addon.AppEvents:Subscribe("QuestLogBuilt", function()
+  if addon.PlayerSettings.IsQuestLogShown or addon.PlayerSettings.IsQuestLogShown == nil then
     addon:ShowQuestLog(true)
   end
 end)
