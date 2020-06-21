@@ -108,11 +108,11 @@ local function readSaveData(repo)
   if not repo._saveDataField then return end
 
   if repo._compressionEnabled then
-    local compressed = addon.SaveData:LoadString(repo._saveDataField)
+    local compressed = addon.SaveData:LoadString(repo._saveDataField, repo._useGlobalSaveData)
     local array = addon:DecompressTable(compressed)
     repo.data = addon:DistinctSet(array)
   else
-    local array = addon.SaveData:LoadTable(repo._saveDataField)
+    local array = addon.SaveData:LoadTable(repo._saveDataField, repo._useGlobalSaveData)
     repo.data = addon:DistinctSet(array)
   end
 end
@@ -123,10 +123,10 @@ local function writeSaveData(repo)
   if repo._compressionEnabled then
     local array = addon:SetToArray(repo.data)
     local compressed = addon:CompressTable(array)
-    addon.SaveData:Save(repo._saveDataField, compressed)
+    addon.SaveData:Save(repo._saveDataField, compressed, repo._useGlobalSaveData)
   else
     local array = addon:SetToArray(repo.data)
-    addon.SaveData:Save(repo._saveDataField, array)
+    addon.SaveData:Save(repo._saveDataField, array, repo._useGlobalSaveData)
   end
 end
 
@@ -524,6 +524,9 @@ local methods = {
       return
     end
     self._directReadEnabled = flag
+  end,
+  ["EnableGlobalSaveData"] = function(self, flag)
+    self._useGlobalSaveData = flag
   end,
   ["EnablePrimaryKeyGeneration"] = function(self, flag)
     self._pkgenEnabled = flag

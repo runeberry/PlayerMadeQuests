@@ -19,6 +19,7 @@ addon.QuestDrafts:SetSaveDataSource("Drafts")
 addon.QuestDrafts:EnableWrite(true)
 addon.QuestDrafts:EnablePrimaryKeyGeneration(true)
 addon.QuestDrafts:EnableCompression(true)
+addon.QuestDrafts:EnableGlobalSaveData(true)
 
 addon.QuestDraftStatus = {
   Draft = "Draft",
