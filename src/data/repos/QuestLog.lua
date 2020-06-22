@@ -6,6 +6,14 @@ addon.QuestLog = {}
 
 local quests = {}
 
+local function resetQuestProgress(quest)
+  for _, obj in pairs(quest.objectives) do
+    obj.progress = 0
+    obj.metadata = {}
+    obj._tempdata = {}
+  end
+end
+
 local function getQuestById(id)
   local quest, index
   for i, q in ipairs(quests) do
@@ -72,6 +80,7 @@ function addon.QuestLog:AddQuest(quest, status)
 
   table.insert(quests, quest)
   quest.status = status
+  addon.QuestEngine:Build(quest)
   self:Save()
   addon.AppEvents:Publish("QuestAdded", quest)
 end
@@ -89,9 +98,8 @@ function addon.QuestLog:SetQuestStatus(id, status)
   end
   if status ~= quest.status then
     quest.status = status
-    for _, obj in pairs(quest.objectives) do
-      -- Reset all quest progress when status changes, this should only affect Active -> anything else
-      obj.progress = 0
+    if status == QuestStatus.Active then
+      resetQuestProgress(quest)
     end
     self:Save()
     addon.AppEvents:Publish("QuestStatusChanged", quest)

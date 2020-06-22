@@ -224,10 +224,10 @@ end
 -- Building and Tracking Quests --
 ----------------------------------
 
-function addon.QuestEngine:Build(parameters)
-  parameters.name = parameters.name or error("Failed to create quest: quest name is required")
+function addon.QuestEngine:Build(quest)
+  if quest._built then return end
+  quest.name = quest.name or error("Failed to create quest: quest name is required")
 
-  local quest = parameters
   quest.objectives = quest.objectives or {}
 
   for _, obj in pairs(quest.objectives) do
@@ -258,6 +258,7 @@ function addon.QuestEngine:Build(parameters)
     end
   end
 
+  quest._built = true
   return quest
 end
 
