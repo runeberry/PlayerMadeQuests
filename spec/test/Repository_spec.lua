@@ -1,4 +1,5 @@
 local builder = require("spec/addon-builder")
+local events = require("spec/events")
 local addon = builder:Build()
 local testLogger = addon.Logger:NewLogger("UnitTest", "debug")
 
@@ -20,14 +21,16 @@ local function createTestEntities(count)
 end
 
 describe("Repository", function()
-  local repo
+  local repo, eventSpy
 
   setup(function()
     addon:Init()
     addon:Advance()
+    eventSpy = events:SpyOnEvents(addon.AppEvents)
   end)
   before_each(function()
     repo = addon.Data:NewRepository("Test")
+    eventSpy:Reset()
   end)
   describe("FindAll", function()
     it("can return all entities", function()
@@ -140,19 +143,13 @@ describe("Repository", function()
         assert.same(entity, result)
       end)
       it("fires an EntityAdded event", function()
-        local count, eid = 0
-        addon.AppEvents:Subscribe(repo.events.EntityAdded, function(ent)
-          count = count + 1
-          eid = ent.id
-        end)
-
         repo:EnablePrimaryKeyGeneration(true)
         local entity = createTestEntity()
         repo:Save(entity)
 
         addon:Advance()
-        assert.equals(1, count)
-        assert.equals(entity.id, eid)
+        local payload = eventSpy:GetPublishPayload(repo.events.EntityAdded)
+        assert.same(entity, payload)
       end)
     end)
     describe("Existing Entity", function()
@@ -187,12 +184,6 @@ describe("Repository", function()
         assert.equals(entity.name, result.name)
       end)
       it("fires an EntityUpdated event", function()
-        local count, ename = 0
-        addon.AppEvents:Subscribe(repo.events.EntityUpdated, function(ent)
-          count = count + 1
-          ename = ent.name
-        end)
-
         repo:EnablePrimaryKeyGeneration(true)
         local entity = createTestEntity()
         repo:Save(entity)
@@ -200,8 +191,8 @@ describe("Repository", function()
         repo:Save(entity)
 
         addon:Advance()
-        assert.equals(1, count)
-        assert.equals(entity.name, ename)
+        local payload = eventSpy:GetPublishPayload(repo.events.EntityUpdated)
+        assert.same(entity, payload)
       end)
     end)
   end)
@@ -243,18 +234,12 @@ describe("Repository", function()
       assert.equals(3, #results)
     end)
     it("fires an EntityDeleted event", function()
-      local count, eid = 0
-      addon.AppEvents:Subscribe(repo.events.EntityDeleted, function(ent)
-        count = count + 1
-        eid = ent.id
-      end)
-
       local toDelete = testData[3]
       repo:Delete(toDelete)
 
       addon:Advance()
-      assert.equals(1, count)
-      assert.equals(toDelete.id, eid)
+      local payload = eventSpy:GetPublishPayload(repo.events.EntityDeleted)
+      assert.same(toDelete, payload)
     end)
   end)
   describe("Indexing", function()
@@ -296,7 +281,7 @@ describe("Repository", function()
     end)
   end)
   describe("SetSaveDataSource", function()
-    local saveDataField, testData, tempAddon
+    local saveDataField, testData, tempAddon, tempEventSpy
     before_each(function()
       -- Save data is stored in a global field, so to use fresh save data
       -- we need to specify a different field for every test
@@ -304,6 +289,7 @@ describe("Repository", function()
       testData = createTestEntities(3)
       tempAddon = builder:Build()
       tempAddon:Init()
+      tempEventSpy = events:SpyOnEvents(tempAddon.AppEvents)
       repo = tempAddon.Data:NewRepository("SaveDataTest")
       repo:EnablePrimaryKeyGeneration(true)
       repo:EnableWrite(true)
@@ -396,18 +382,13 @@ describe("Repository", function()
       assert.same(results[1], result)
     end)
     it("fires an EntityDataLoaded event", function()
-      local count = 0
-      tempAddon.AppEvents:Subscribe(repo.events.EntityDataLoaded, function()
-        count = count + 1
-      end)
-
       repo:EnableCompression(true)
       local compressed = tempAddon:CompressTable(testData)
       tempAddon.SaveData:Save(saveDataField, compressed)
       repo:SetSaveDataSource(saveDataField)
 
       tempAddon:Advance()
-      assert.equals(1, count)
+      tempEventSpy:AssertPublished(repo.events.EntityDataLoaded, 1)
     end)
   end)
   describe("SetTableSource", function()
@@ -455,18 +436,13 @@ describe("Repository", function()
       assert.equals(0, #results)
     end)
     it("fires an EntityDataLoaded event", function()
-      local count = 0
-      addon.AppEvents:Subscribe(repo.events.EntityDataLoaded, function()
-        count = count + 1
-      end)
-
       for _, v in pairs(testData) do
         v.id = addon:CreateID("testData-%i")
       end
       repo:SetTableSource(testData)
 
       addon:Advance()
-      assert.equals(1, count)
+      eventSpy:AssertPublished(repo.events.EntityDataLoaded, 1)
     end)
   end)
 end)
