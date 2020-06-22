@@ -57,11 +57,9 @@ end
 function addon.QuestLog:AddQuest(quest, status)
   if not status then
     error("Failed to add quest: status is required")
-    return
   end
   if not QuestStatus[status] then
     error("Failed to add quest: "..status.." is not a valid status")
-    return
   end
   if not quest.id then
     quest.id = addon:CreateID("quest-%i")
