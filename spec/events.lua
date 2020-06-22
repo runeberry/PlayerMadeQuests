@@ -12,9 +12,10 @@ local methods = {
   end,
   ["AssertNotPublished"] = function(self, event)
     local tracker = self.publish[event]
-    assert(not tracker,
-      string.format("%s was not expected to be published, but it was published %i time(s).",
-      event, tracker.count))
+    if tracker then
+      error(string.format("%s was not expected to be published, but it was published %i time(s).",
+        event, tracker.count))
+    end
   end,
   ["AssertHasSubscriptions"] = function(self, event, count)
     local tracker = self.subscriptions[event]
@@ -28,6 +29,11 @@ local methods = {
         string.format("Expected %s to have %i subscriptions, but has %i subscriptions.",
         event, count, totalSubs))
     end
+  end,
+  ["AssertHasNoSubscriptions"] = function(self, event)
+    local tracker = self.subscriptions[event]
+    assert(not tracker,
+      string.format("Expected %s to have no active subscriptions", event))
   end,
   ["GetPublishPayload"] = function(self, event, times)
     -- Unless otherwise, assume the event should have been Published exactly once
