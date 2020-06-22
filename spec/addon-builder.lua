@@ -62,7 +62,8 @@ function builder:Build(opts)
   local addon = {
     GLOBAL_LOG_MODE = "simple-unbuffered",
     GLOBAL_LOG_LEVEL = 5,
-    TRANSACTION_LOGS = false
+    TRANSACTION_LOGS = false,
+    USE_INTERNAL_MESSAGING = true,
   }
   for name, fn in pairs(testMethods) do
     addon[name] = fn

@@ -65,7 +65,19 @@ function deps:Init(addon)
     Decompress = function(self, compressed)
       return self._ctable[compressed] or error("Compressed value not mocked: "..compressed)
     end,
-    GetAddonEncodeTable = mock:NewMock()
+    GetAddonEncodeTable = function()
+      return {
+        _entable = {},
+        Encode = function(self, str)
+          local encoded = addon:CreateID("encode-mock-%i")
+          self._entable[encoded] = str
+          return encoded
+        end,
+        Decode = function(self, encoded)
+          return self._entable[encoded] or error("Encoded value not mocked: "..encoded)
+        end,
+      }
+    end
   }
   addon.LibScrollingTable = {}
 

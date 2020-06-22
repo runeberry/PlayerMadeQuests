@@ -5,7 +5,6 @@ local GetUnitName = addon.G.GetUnitName
 local encoder = addon.LibCompress:GetAddonEncodeTable()
 
 local PMQ_MESSAGE_PREFIX = "PMQ"
-local USE_INTERNAL = false -- for testing only
 local defaultDetails = {
   distribution = "PARTY", -- see: https://wow.gamepedia.com/API_C_ChatInfo.SendAddonMessage
   target = nil, -- player name, required only for "WHISPER"
@@ -47,7 +46,8 @@ local function broker_publishMessage(self, event, details, ...)
   local payload = { e = event, p = { ... } }
   local compressed = addon:CompressTable(payload)
   local encoded = encoder:Encode(compressed)
-  if USE_INTERNAL then
+  if addon.USE_INTERNAL_MESSAGING then
+    -- For development and unit testing only
     onCommReceived(PMQ_MESSAGE_PREFIX, encoded, details.distribution, "*yourself*")
     return
   end
