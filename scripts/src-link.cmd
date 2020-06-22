@@ -1,5 +1,4 @@
-:: Run as Administrator from your WoW Addons folder
-:: todo: revise this so that it can be run from within this folder
+:: Run the following in an elevated command prompt
 
-mklink \D PlayerMadeQuests "D:\Repos\PlayerMadeQuests\src"
-pause
+cd "C:\Program Files (x86)\World of Warcraft\_classic_\Interface\AddOns"
+mklink /d PlayerMadeQuests "D:\Repos\PlayerMadeQuests\src"
