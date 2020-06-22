@@ -1,7 +1,7 @@
 local _, addon = ...
 local print = addon.G.print
 
-addon.ADDON_VERSION = "v0.0.2-alpha"
+addon.ADDON_VERSION = "v0.0.3-alpha"
 addon.IsAddonLoaded = false
 
 -- For quick testing
