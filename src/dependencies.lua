@@ -12,6 +12,7 @@ addon.Ace = LibStub("AceAddon-3.0"):NewAddon("PlayerMadeQuests", unpack(aceMixin
 addon.AceGUI = LibStub("AceGUI-3.0")
 addon.LibCompress = LibStub("LibCompress")
 addon.LibScrollingTable = LibStub("ScrollingTable")
+addon.ParseYaml = LibStub("TinyYaml").parse
 
 -- WoW Global Functions
 addon.G = {
