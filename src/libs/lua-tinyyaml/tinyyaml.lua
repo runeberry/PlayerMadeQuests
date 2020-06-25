@@ -32,9 +32,14 @@ SOFTWARE.
 -------------------------------------------------------------------------------
 
 -- (jb, 6/23/20) Add LibStub for use with WoW addons
-local MAJOR, MINOR = "TinyYaml", 10000;
-local TinyYaml, oldminor = LibStub:NewLibrary(MAJOR, MINOR);
-if not TinyYaml then return end
+local TinyYaml
+if LibStub then
+  local MAJOR, MINOR = "TinyYaml", 10000;
+  TinyYaml = LibStub:NewLibrary(MAJOR, MINOR);
+  if not TinyYaml then return end
+else
+  TinyYaml = {}
+end
 
 local table = table
 local string = string
@@ -807,3 +812,9 @@ end
 -- (jb, 6/23/20) Expose parse function through LibStub object
 TinyYaml.version = 0.1
 TinyYaml.parse = parse
+
+-- (jb, 6/24/20) Added to work with unit tests, without needing LibStub
+return {
+  version = TinyYaml.version,
+  parse = TinyYaml.parse
+}
