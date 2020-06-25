@@ -506,4 +506,29 @@ describe("Unpack", function()
       assert.equals(0.0, y)
     end)
   end)
+
+  describe("Types", function()
+    local testCases = {
+      { "5", "string", "5" },
+      { 0, "number", 0 },
+      { false, "boolean", false },
+      { "-5.62", "number", -5.62 },
+      { "true", "boolean", true },
+      { "false", "boolean", false },
+      { -5.62, "string", "-5.62" },
+      { 1, "boolean", true },
+      { 0, "boolean", false },
+      { true, "string", "true" },
+      { false, "string", "false" },
+      { true, "number", 1 },
+      { false, "number", 0 },
+    }
+    for _, tc in ipairs(testCases) do
+      it("can convert "..type(tc[1]).." to "..tc[2], function()
+        local input, toType, expected = tc[1], tc[2], tc[3]
+        local output = addon:ConvertValue(input, toType)
+        assert.equals(expected, output)
+      end)
+    end
+  end)
 end)
