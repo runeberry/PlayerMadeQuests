@@ -31,11 +31,10 @@ addon.DemoQuestDB = {
       description = descriptions["kill"].."These devious foes can be found around the farms directly south of Stormwind.",
     },
     script = [[
-      objectives:
-        - kill Cow
-        - kill 3 Chicken
-        - kill 5 "Mangy Wolf"
-    ]]
+objectives:
+  - kill Cow
+  - kill 3 Chicken
+  - kill 5 "Mangy Wolf"]]
   },
   {
     id = "tutorial-kill-horde",
@@ -45,11 +44,10 @@ addon.DemoQuestDB = {
       description = descriptions["kill"].."These fiendish beasts can be found at or east of Jaggedswine Farm, just outside of Orgrimmar.",
     },
     script = [[
-      objectives:
-        - kill 'Bloodtalon Scythemaw'
-        - kill 3 Swine
-        - kill 5 'Elder Mottled Boar'
-    ]]
+objectives:
+  - kill 'Bloodtalon Scythemaw'
+  - kill 3 Swine
+  - kill 5 'Elder Mottled Boar']]
   },
   {
     id = "tutorial-talkto-ally",
@@ -59,11 +57,10 @@ addon.DemoQuestDB = {
       description = descriptions["talkto"].."These fine folks can be found in Goldshire, south of Stormwind.",
     },
     script = [[
-      objectives:
-        - talkto 'Brog Hamfist'
-        - talkto 'Innkeeper Farley'
-        - talkto 2 "Stormwind Guard"
-    ]]
+objectives:
+  - talkto 'Brog Hamfist'
+  - talkto 'Innkeeper Farley'
+  - talkto 2 "Stormwind Guard"]]
   },
   {
     id = "tutorial-talkto-horde",
@@ -73,11 +70,10 @@ addon.DemoQuestDB = {
       description = descriptions["talkto"].."These upstanding citizens can be found at the zeppelin tower outside of Orgrimmar.",
     },
     script = [[
-      objectives:
-        - talkto Frezza
-        - talkto "Snurk Bucksquick"
-        - talkto 2 "Orgrimmar Grunt"
-    ]]
+objectives:
+  - talkto Frezza
+  - talkto "Snurk Bucksquick"
+  - talkto 2 "Orgrimmar Grunt"]]
   },
   {
     id = "tutorial-emote-ally",
@@ -87,11 +83,10 @@ addon.DemoQuestDB = {
       description = descriptions["emote"].."These eager participants are waiting for you in Goldshire, south of Stormwind",
     },
     script = [[
-      objectives:
-        - emote roar
-        - emote cry Tomas
-        - emote fart 2 "Stormwind Guard"
-    ]]
+objectives:
+  - emote roar
+  - emote cry Tomas
+  - emote fart 2 "Stormwind Guard"]]
   },
   {
     id = "tutorial-emote-horde",
@@ -101,12 +96,11 @@ addon.DemoQuestDB = {
       description = descriptions["emote"].."These willing volunteers can be found in or around the Orgrimmar inn.",
     },
     script = [[
-      objectives:
-        - emote dance
-        - emote clap Sarok
-        - emote smile Kozish
-        - emote salute 2 "Orgrimmar Grunt"
-    ]]
+objectives:
+  - emote dance
+  - emote clap Sarok
+  - emote smile Kozish
+  - emote salute 2 "Orgrimmar Grunt"]]
   },
   {
     id = "tutorial-explore-ally",
@@ -116,18 +110,17 @@ addon.DemoQuestDB = {
       description = descriptions["explore"].."These locations are around Goldshire, south of Stormwind."
     },
     script = [[
-      objectives:
-        - explore "Elwynn Forest"
-        - explore "Elwynn Forest" 40.2 74.6
-        - explore:
-            zone: "Elwynn Forest"
-            subzone: "Lion's Pride Inn"
-        - explore:
-            zone: "Elwynn Forest"
-            subzone: "Goldshire"
-            posx: 39.5
-            posy: 64.5
-    ]]
+objectives:
+  - explore "Elwynn Forest"
+  - explore "Elwynn Forest" 40.2 74.6
+  - explore:
+      zone: "Elwynn Forest"
+      subzone: "Lion's Pride Inn"
+  - explore:
+      zone: "Elwynn Forest"
+      subzone: "Goldshire"
+      posx: 39.5
+      posy: 64.5]]
   },
   {
     id = "tutorial-explore-horde",
@@ -137,17 +130,16 @@ addon.DemoQuestDB = {
       description = descriptions["explore"].."These locations are in northern Durotar, just outside of Orgrimmar."
     },
     script = [[
-      objectives:
-        - explore Durotar
-        - explore Durotar 48 12.2
-        - explore:
-            zone: Durotar
-            subzone: "Skull Rock"
-        - explore:
-            zone: Durotar
-            subzone: "Jaggedswine Farm"
-            posx: 48.7
-            posy: 17.2
-    ]]
+objectives:
+  - explore Durotar
+  - explore Durotar 48 12.2
+  - explore:
+      zone: Durotar
+      subzone: "Skull Rock"
+  - explore:
+      zone: Durotar
+      subzone: "Jaggedswine Farm"
+      posx: 48.7
+      posy: 17.2]]
   }
 }
