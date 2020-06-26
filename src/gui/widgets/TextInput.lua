@@ -11,57 +11,56 @@ local function getFontHeight(fontInstance)
   return math.floor(height+0.5)
 end
 
-local function editBox_OnTextChanged(editBox, isUserInput)
-  if isUserInput then
-    editBox._widget.isDirty = true
+local editBoxScripts = {
+  ["OnEnterPressed"] = function(editBox)
+    local parent = editBox._widget
+    if not parent.multiline then
+      -- OnSubmit will only react to single-line text boxes
+      if parent.onSubmit then
+        parent.onSubmit(parent:GetText())
+      end
+      if parent.clearFocusOnEnter then
+        editBox:ClearFocus()
+      end
+    end
+  end,
+  ["OnEscapePressed"] = function (editBox)
+    if editBox._widget.clearFocusOnEscape then
+      editBox:ClearFocus()
+    end
+  end,
+  ["OnTextChanged"] = function(editBox, isUserInput)
+    if isUserInput then
+      editBox._widget.isDirty = true
+    end
   end
-end
+}
 
-local function editBox_OnEnterPressed(editBox)
-  local parent = editBox._widget
-  if parent.onSubmit then
-    parent.onSubmit(parent:GetText())
+local widgetMethods = {
+  ["GetText"] = function(self)
+    return self.editBox:GetText()
+  end,
+  ["IsDirty"] = function(self)
+    return self.isDirty or false
+  end,
+  ["OnEnterPressed"] = function(self, fn)
+    self.onSubmit = fn
+  end,
+  ["SetDirty"] = function(self, bool)
+    self.isDirty = bool
+  end,
+  ["SetEnabled"] = function(self, flag)
+    if flag == nil then flag = true end
+    self.editBox:SetEnabled(flag)
+  end,
+  ["SetLabel"] = function(self, text)
+    text = text or ""
+    self.label:SetText(labelSpacer..text)
+  end,
+  ["SetText"] = function(self, text)
+    self.editBox:SetText(text or "")
   end
-  if parent.clearFocusOnEnter then
-    editBox:ClearFocus()
-  end
-end
-
-local function editBox_OnEscapePressed(editBox)
-  if editBox._widget.clearFocusOnEscape then
-    editBox:ClearFocus()
-  end
-end
-
-local function widget_SetEnabled(self, flag)
-  if flag == nil then flag = true end
-  self.editBox:SetEnabled(flag)
-end
-
-local function widget_SetLabel(self, text)
-  text = text or ""
-  self.label:SetText(labelSpacer..text)
-end
-
-local function widget_SetText(self, text)
-  self.editBox:SetText(text or "")
-end
-
-local function widget_GetText(self)
-  return self.editBox:GetText()
-end
-
-local function widget_OnEnterPressed(self, fn)
-  self.onSubmit = fn
-end
-
-local function widget_IsDirty(self)
-  return self.isDirty or false
-end
-
-local function widget_SetDirty(self, bool)
-  self.isDirty = bool
-end
+}
 
 function widget:Create(parent, labelText, editBoxText, multiline)
   labelText = labelText or ""
@@ -78,16 +77,13 @@ function widget:Create(parent, labelText, editBoxText, multiline)
   editBox:SetAutoFocus(false)
   editBox:SetFontObject("ChatFontNormal")
   editBox:SetText(editBoxText or "")
-  editBox:SetScript("OnEscapePressed", editBox_OnEscapePressed)
-  editBox:SetScript("OnTextChanged", editBox_OnTextChanged)
   editBox:SetTextInsets(textInset, textInset, textInset, textInset)
   addon:ApplyBackgroundStyle(editBox)
-
   if multiline then
     editBox:SetMultiLine(true)
-  else
-    -- OnSubmit will only react to single-line text boxes
-    editBox:SetScript("OnEnterPressed", editBox_OnEnterPressed)
+  end
+  for name, fn in pairs(editBoxScripts) do
+    editBox:SetScript(name, fn)
   end
 
   label:SetPoint("TOPLEFT", frame, "TOPLEFT")
@@ -104,17 +100,14 @@ function widget:Create(parent, labelText, editBoxText, multiline)
   editBox._widget = frame
   frame.label = label
   frame.editBox = editBox
+  frame.multiline = multiline
 
   frame.clearFocusOnEnter = true
   frame.clearFocusOnEscape = true
 
-  frame.SetEnabled = widget_SetEnabled
-  frame.SetLabel = widget_SetLabel
-  frame.SetText = widget_SetText
-  frame.GetText = widget_GetText
-  frame.OnEnterPressed = widget_OnEnterPressed
-  frame.IsDirty = widget_IsDirty
-  frame.SetDirty = widget_SetDirty
+  for name, fn in pairs(widgetMethods) do
+    frame[name] = fn
+  end
 
   return frame
 end
