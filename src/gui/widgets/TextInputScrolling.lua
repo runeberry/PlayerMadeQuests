@@ -113,9 +113,7 @@ function widget:Create(parent, labelText, editBoxText)
   editBox:SetFontObject("ChatFontNormal")
   editBox:SetText(editBoxText)
   editBox:SetWidth(scrollFrame:GetWidth())
-  for name, fn in pairs(editBoxScripts) do
-    editBox:SetScript(name, fn)
-  end
+  addon.CustomWidgets:ApplyScripts(frame, editBox, editBoxScripts)
 
   -- Wrap an invisible button over the editBox frame to expand its clickable area
   local clickHandler = CreateFrame("Button", nil, editBoxBorderFrame)

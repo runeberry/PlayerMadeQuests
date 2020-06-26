@@ -11,19 +11,20 @@ local function getFontHeight(fontInstance)
   return math.floor(height+0.5)
 end
 
-local editBoxScripts = {
+local singleLineEditBoxScripts = {
   ["OnEnterPressed"] = function(editBox)
     local parent = editBox._widget
-    if not parent.multiline then
-      -- OnSubmit will only react to single-line text boxes
-      if parent.onSubmit then
-        parent.onSubmit(parent:GetText())
-      end
-      if parent.clearFocusOnEnter then
-        editBox:ClearFocus()
-      end
+    -- OnSubmit will only react to single-line text boxes
+    if parent.onSubmit then
+      parent.onSubmit(parent:GetText())
     end
-  end,
+    if parent.clearFocusOnEnter then
+      editBox:ClearFocus()
+    end
+  end
+}
+
+local editBoxScripts = {
   ["OnEscapePressed"] = function (editBox)
     if editBox._widget.clearFocusOnEscape then
       editBox:ClearFocus()
@@ -42,9 +43,6 @@ local widgetMethods = {
   end,
   ["IsDirty"] = function(self)
     return self.isDirty or false
-  end,
-  ["OnEnterPressed"] = function(self, fn)
-    self.onSubmit = fn
   end,
   ["SetDirty"] = function(self, bool)
     self.isDirty = bool
@@ -78,12 +76,13 @@ function widget:Create(parent, labelText, editBoxText, multiline)
   editBox:SetFontObject("ChatFontNormal")
   editBox:SetText(editBoxText or "")
   editBox:SetTextInsets(textInset, textInset, textInset, textInset)
+  addon.CustomWidgets:ApplyScripts(frame, editBox, editBoxScripts)
   addon:ApplyBackgroundStyle(editBox)
   if multiline then
     editBox:SetMultiLine(true)
-  end
-  for name, fn in pairs(editBoxScripts) do
-    editBox:SetScript(name, fn)
+  else
+    -- Don't want to mess with the OnEnter behavior of a multiline editbox
+    addon.CustomWidgets:ApplyScripts(frame, editBox, singleLineEditBoxScripts)
   end
 
   label:SetPoint("TOPLEFT", frame, "TOPLEFT")
