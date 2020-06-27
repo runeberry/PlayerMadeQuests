@@ -15,12 +15,14 @@ local function wrapScriptSet(event)
   end
 end
 
-local function wrapScriptRun(fn)
+local function wrapScriptRun(fn, event)
   return function(self, ...)
     fn(self, ...)
 
-    for _, f in ipairs(self._parent._scripts) do
-      f(self._parent, ...)
+    if self._parent._scripts[event] then
+      for _, f in pairs(self._parent._scripts[event]) do
+        f(self._parent, ...)
+      end
     end
   end
 end
@@ -65,7 +67,7 @@ function addon.CustomWidgets:ApplyScripts(widgetFrame, scriptFrame, methodTable)
   widgetFrame._scripts = {}
 
   for event, fn in pairs(methodTable) do
-    scriptFrame:SetScript(event, wrapScriptRun(fn))
+    scriptFrame:SetScript(event, wrapScriptRun(fn, event))
     widgetFrame[event] = wrapScriptSet(event)
   end
 end
