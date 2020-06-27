@@ -13,7 +13,6 @@ addon.AceGUI = LibStub("AceGUI-3.0")
 addon.LibCompress = LibStub("LibCompress")
 addon.LibScrollingTable = LibStub("ScrollingTable")
 addon.ParseYaml = LibStub("TinyYaml").parse
-addon.Indent = LibStub("IndentationLibYaml")
 
 -- WoW Global Functions
 addon.G = {

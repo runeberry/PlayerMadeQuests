@@ -13,5 +13,4 @@
 
   <Script file="libs\ScrollingTable\Core.lua"/>
   <Script file="libs\lua-tinyyaml\tinyyaml.lua"/>
-  <Script file="libs\IndentationLibYaml\indent.lua"/>
 </Ui>
