@@ -87,7 +87,7 @@ function menu:Create(frame)
   buttonPane:AddButton("Save", button_Save, { anchor = "RIGHT" })
   buttonPane:AddButton("Validate", button_Validate, { anchor = "RIGHT" })
 
-  local scriptEditor = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "Script")
+  local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Script")
   scriptEditor:SetPoint("TOPLEFT", descField, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
 

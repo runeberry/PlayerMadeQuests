@@ -44,8 +44,12 @@ local editBoxScripts = {
 }
 
 local widgetMethods = {
-  ["GetText"] = function(self)
-    return self.editBox:GetText()
+  ["GetText"] = function(self, rawFlag)
+    if rawFlag then
+      return self.editBox:GetText()
+    else
+      return self.editBox:GetDisplayText()
+    end
   end,
   ["IsDirty"] = function(self)
     return self.isDirty or false
