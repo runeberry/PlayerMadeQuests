@@ -29,6 +29,5 @@ end
 function widget:Create(parent, labelText, editBoxText)
   local textInputScrolling = addon.CustomWidgets:CreateWidget("TextInputScrolling", parent, labelText, editBoxText)
   textInputScrolling:OnTextChanged(widget_OnTextChanged)
-  -- addon.Indent.enable(textInputScrolling.editBox)
   return textInputScrolling
 end
