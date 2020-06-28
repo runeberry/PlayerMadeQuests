@@ -2,7 +2,7 @@ local _, addon = ...
 
 local widget = addon.CustomWidgets:NewWidget("ScriptEditor")
 
-local cursorMarker = "\2"
+local cursorMarker = "\003"
 
 local function setCursorMarker(text, pos)
   return text:sub(1, pos)..cursorMarker..text:sub(pos + 1)
