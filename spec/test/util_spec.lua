@@ -58,21 +58,87 @@ describe("Sounds", function()
 end)
 
 describe("Strings", function()
-  local str
-  before_each(function()
-    str = "test string"
+  describe("Colorize", function()
+    local str = "test string"
+    it("can colorize with named color", function()
+      local colorized = addon:Colorize("red", str)
+      assert.not_equals(str, colorized)
+    end)
+    it("can colorize with custom color", function()
+      local colorized = addon:Colorize("|cffaf9023", str)
+      assert.not_equals(str, colorized)
+    end)
+    it("can colorize default", function()
+      local colorized = addon:Colorize(nil, str)
+      assert.not_equals(str, colorized)
+    end)
   end)
-  it("can colorize with named color", function()
-    local colorized = addon:Colorize("red", str)
-    assert.not_equals(str, colorized)
-  end)
-  it("can colorize with custom color", function()
-    local colorized = addon:Colorize("|cffaf9023", str)
-    assert.not_equals(str, colorized)
-  end)
-  it("can colorize default", function()
-    local colorized = addon:Colorize(nil, str)
-    assert.not_equals(str, colorized)
+  describe("strmod", function()
+    local i
+    local testCases = {
+      {
+        desc = "can mod at beginning of string",
+        str = "fieldname: parameter: context:",
+        pattern = "^%S-:",
+        expected = "1: parameter: context:",
+        mod = function(s)
+          i = i + 1
+          return i..":"
+        end
+      },
+      {
+        desc = "can mod at end of string",
+        str = "fieldname: # This is a comment",
+        pattern = "#.-$",
+        expected = "fieldname: ##1##",
+        mod = function(s)
+          i = i + 1
+          return "##"..i.."##"
+        end
+      },
+      {
+        desc = "can mod multiline strings",
+        str = [[
+Line A
+Line B
+
+
+Line C]],
+        pattern = "\n",
+        expected = "Line A1Line B234Line C",
+        mod = function(s)
+          i = i + 1
+          return tostring(i)
+        end
+      },
+      {
+        desc = "can mod in a shorter string",
+        str = "Phrase A, phrase B, phrase C",
+        pattern = "[Pp]hrase ",
+        expected = "PA, pB, pC",
+        mod = function(s)
+          return s:sub(1, 1)
+        end
+      },
+      {
+        desc = "can mod in a longer string",
+        str = "Phrase A, phrase B, phrase C",
+        pattern = "[Pp]hrase",
+        expected = "PhrasePhrase A, phrasephrase B, phrasephrase C",
+        mod = function(s)
+          return s..s
+        end
+      }
+    }
+    before_each(function()
+      i = 0
+    end)
+    for _, tc in ipairs(testCases) do
+      it(tc.desc, function()
+        local actual = addon:strmod(tc.str, tc.pattern, tc.mod)
+        assert.equals(tc.expected, actual)
+      end)
+    end
   end)
 end)
 
