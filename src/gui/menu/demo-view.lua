@@ -45,7 +45,7 @@ function menu:Create(frame)
   buttonPane:AddButton("Accept", button_Accept, { anchor = "RIGHT" })
   buttonPane:AddButton("Copy to Drafts", button_CopyToDrafts, { anchor = "RIGHT" })
 
-  local scriptEditor = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "Script")
+  local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Script")
   scriptEditor:SetEnabled(false)
   scriptEditor:SetPoint("TOPLEFT", descField, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
@@ -68,6 +68,8 @@ function menu:OnShowMenu(frame, demoId)
   frame.nameField:SetText(demo.parameters.name)
   frame.descField:SetText(demo.parameters.description)
   frame.scriptEditor:SetText(demo.script)
+
+  frame.scriptEditor:RefreshStyle()
 end
 
 function menu:OnLeaveMenu(frame)

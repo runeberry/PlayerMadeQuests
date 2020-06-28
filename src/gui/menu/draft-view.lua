@@ -123,6 +123,8 @@ function menu:OnShowMenu(frame, draftId)
   frame.descField:SetText(currentDraft.parameters.description)
   frame.scriptEditor:SetText(currentDraft.script)
   cleanForm()
+
+  frame.scriptEditor:RefreshStyle()
 end
 
 function menu:OnLeaveMenu(frame)
