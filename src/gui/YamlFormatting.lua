@@ -45,7 +45,8 @@ local patterns = {
   },
   { -- Comments
     pattern = "#(.-)"..capeol,
-    mod = "ColorComments"
+    mod = "ColorComments",
+    color = colors.darkGreen
   },
   { -- Remove BOF/EOF
     pattern = bofmarker.."(.-)"..eofmarker,
@@ -54,7 +55,7 @@ local patterns = {
 }
 addon:catch(function()
   for _, p in ipairs(patterns) do
-    if p.color then
+    if p.color and p.result then
       p.result = p.result:gsub("|c", "|c"..p.color)
     end
   end
@@ -65,9 +66,8 @@ local function deColor(text)
 end
 
 -- strmod functions - for when gsub isn't enough
-local commentColor = colors.darkGreen
-mods["ColorComments"] = function(comment)
-  return "|c"..commentColor..deColor(comment).."|r"
+mods["ColorComments"] = function(comment, color)
+  return "|c"..color..deColor(comment).."|r"
 end
 
 local function setColors(text)
@@ -75,7 +75,7 @@ local function setColors(text)
     if colorInfo.result then
       text = text:gsub(colorInfo.pattern, colorInfo.result)
     elseif colorInfo.mod then
-      text = addon:strmod(text, colorInfo.pattern, mods[colorInfo.mod])
+      text = addon:strmod(text, colorInfo.pattern, mods[colorInfo.mod], colorInfo.color)
     end
   end
 
