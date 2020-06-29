@@ -30,10 +30,11 @@ addon.DemoQuestDB = {
       name = "Objective: Kill X (Alliance)",
       description = descriptions["kill"].."These devious foes can be found around the farms directly south of Stormwind.",
     },
-    script =
-[[objective kill Cow
-objective kill 3 Chicken
-objective kill 5 "Mangy Wolf"]]
+    script = [[
+objectives:
+  - kill Cow
+  - kill 3 Chicken
+  - kill 5 "Mangy Wolf"]]
   },
   {
     id = "tutorial-kill-horde",
@@ -42,10 +43,11 @@ objective kill 5 "Mangy Wolf"]]
       name = "Objective: Kill X (Horde)",
       description = descriptions["kill"].."These fiendish beasts can be found at or east of Jaggedswine Farm, just outside of Orgrimmar.",
     },
-    script =
-[[objective kill 'Bloodtalon Scythemaw'
-objective kill 3 Swine
-objective kill 5 'Elder Mottled Boar']]
+    script = [[
+objectives:
+  - kill 'Bloodtalon Scythemaw'
+  - kill 3 Swine
+  - kill 5 'Elder Mottled Boar']]
   },
   {
     id = "tutorial-talkto-ally",
@@ -54,10 +56,11 @@ objective kill 5 'Elder Mottled Boar']]
       name = "Objective: Talk to NPC (Alliance)",
       description = descriptions["talkto"].."These fine folks can be found in Goldshire, south of Stormwind.",
     },
-    script =
-[[obj talkto 'Brog Hamfist'
-obj talkto 'Innkeeper Farley'
-obj talkto 2 "Stormwind Guard"]]
+    script = [[
+objectives:
+  - talkto 'Brog Hamfist'
+  - talkto 'Innkeeper Farley'
+  - talkto 2 "Stormwind Guard"]]
   },
   {
     id = "tutorial-talkto-horde",
@@ -66,10 +69,11 @@ obj talkto 2 "Stormwind Guard"]]
       name = "Objective: Talk to NPC (Horde)",
       description = descriptions["talkto"].."These upstanding citizens can be found at the zeppelin tower outside of Orgrimmar.",
     },
-    script =
-[[obj talkto Frezza
-obj talkto "Snurk Bucksquick"
-obj talkto 2 "Orgrimmar Grunt"]]
+    script = [[
+objectives:
+  - talkto Frezza
+  - talkto "Snurk Bucksquick"
+  - talkto 2 "Orgrimmar Grunt"]]
   },
   {
     id = "tutorial-emote-ally",
@@ -78,10 +82,11 @@ obj talkto 2 "Orgrimmar Grunt"]]
       name = "Objective: Use emote (Alliance)",
       description = descriptions["emote"].."These eager participants are waiting for you in Goldshire, south of Stormwind",
     },
-    script =
-[[obj emote roar
-obj emote cry Tomas
-obj emote 2 fart "Stormwind Guard"]]
+    script = [[
+objectives:
+  - emote roar
+  - emote cry Tomas
+  - emote fart 2 "Stormwind Guard"]]
   },
   {
     id = "tutorial-emote-horde",
@@ -90,11 +95,12 @@ obj emote 2 fart "Stormwind Guard"]]
       name = "Objective: Use emote (Horde)",
       description = descriptions["emote"].."These willing volunteers can be found in or around the Orgrimmar inn.",
     },
-    script =
-[[obj emote dance
-obj emote clap Sarok
-obj emote smile Kozish
-obj emote 2 salute "Orgrimmar Grunt"]]
+    script = [[
+objectives:
+  - emote dance
+  - emote clap Sarok
+  - emote smile Kozish
+  - emote salute 2 "Orgrimmar Grunt"]]
   },
   {
     id = "tutorial-explore-ally",
@@ -103,11 +109,18 @@ obj emote 2 salute "Orgrimmar Grunt"]]
       name = "Objective: Explore (Alliance)",
       description = descriptions["explore"].."These locations are around Goldshire, south of Stormwind."
     },
-    script =
-[[obj explore "Elwynn Forest"
-obj explore "Elwynn Forest" 40.2 74.6
-obj explore "Elwynn Forest" subzone="Lion's Pride Inn"
-obj explore zone="Elwynn Forest" subzone=Goldshire x=39.5 y=64.5]]
+    script = [[
+objectives:
+  - explore "Elwynn Forest"
+  - explore "Elwynn Forest" 40.2 74.6
+  - explore:
+      zone: "Elwynn Forest"
+      subzone: "Lion's Pride Inn"
+  - explore:
+      zone: "Elwynn Forest"
+      subzone: "Goldshire"
+      posx: 39.5
+      posy: 64.5]]
   },
   {
     id = "tutorial-explore-horde",
@@ -116,10 +129,17 @@ obj explore zone="Elwynn Forest" subzone=Goldshire x=39.5 y=64.5]]
       name = "Objective: Explore (Horde)",
       description = descriptions["explore"].."These locations are in northern Durotar, just outside of Orgrimmar."
     },
-    script =
-[[obj explore Durotar
-obj explore Durotar 48 12.2
-obj explore Durotar subzone="Skull Rock"
-obj explore zone=Durotar subzone="Jaggedswine Farm" x=48.7 y=17.2]]
+    script = [[
+objectives:
+  - explore Durotar
+  - explore Durotar 48 12.2
+  - explore:
+      zone: Durotar
+      subzone: "Skull Rock"
+  - explore:
+      zone: Durotar
+      subzone: "Jaggedswine Farm"
+      posx: 48.7
+      posy: 17.2]]
   }
 }

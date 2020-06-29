@@ -11,7 +11,7 @@ local tokens = {
   CMD_FACTION = "faction",
   CMD_LEVEL = "level",
   CMD_LOC = "location",
-  CMD_OBJ = "objective",
+  CMD_OBJ = "objectives",
   CMD_QUEST = "quest",
 
   METHOD_PARSE = "Parse",
@@ -41,18 +41,45 @@ local tokens = {
   FLAG_RECOMMENDED = "recommended",
 }
 
+local spec = [[
+  quest:
+    name: "string"
+    description: "string"
+  objectives:
+    - kill 5 Chicken # [1] = "kill 5 Chicken"
+    - kill: 5 Chicken # [2] = { kill = "5 Chicken" }
+    - kill: # [3] = { kill = yaml.null, goal = 5, target = "Chicken" }
+      goal: 5
+      target: Chicken
+    - kill: # [4] = { kill = { goal = 5, target = "Chicken" } }
+        goal: 5
+        target: Chicken
+    - kill: { goal: 5, target: Chicken } # [5] = same as [4]
+]]
+
 local objectives = {
   {
     name = tokens.OBJ_EMOTE,
+    shorthand = {
+      tokens.PARAM_EMOTE,
+      tokens.PARAM_GOAL,
+      tokens.PARAM_TARGET,
+    },
     scripts = {
       tokens.METHOD_PRE_COND,
       tokens.METHOD_DISPLAY_TEXT,
     },
     params = {
       {
+        name = tokens.PARAM_GOAL,
+        type = "number",
+        default = 1
+      },
+      {
+        name = tokens.PARAM_TEXT,
+      },
+      {
         name = tokens.PARAM_EMOTE,
-        alias = "em",
-        position = 1,
         required = true,
         multiple = true,
         scripts = {
@@ -61,8 +88,6 @@ local objectives = {
       },
       {
         name = tokens.PARAM_TARGET,
-        alias = { "tar", "t" },
-        position = 2,
         multiple = true,
         scripts = {
           tokens.METHOD_CHECK_COND,
@@ -72,6 +97,13 @@ local objectives = {
   },
   {
     name = tokens.OBJ_EXPLORE,
+    shorthand = {
+      tokens.PARAM_ZONE,
+      tokens.PARAM_SUBZONE,
+      tokens.PARAM_POSX,
+      tokens.PARAM_POSY,
+      tokens.PARAM_RADIUS,
+    },
     scripts = {
       tokens.METHOD_PRE_COND,
       tokens.METHOD_POST_COND,
@@ -79,16 +111,21 @@ local objectives = {
     },
     params = {
       {
+        name = tokens.PARAM_GOAL,
+        type = "number",
+        default = 1
+      },
+      {
+        name = tokens.PARAM_TEXT,
+      },
+      {
         name = tokens.PARAM_ZONE,
-        position = 1,
         scripts = {
           tokens.METHOD_CHECK_COND
         }
       },
       {
         name = tokens.PARAM_POSX,
-        alias = "x",
-        position = 2,
         type = "number",
         scripts = {
           tokens.METHOD_CHECK_COND
@@ -96,8 +133,6 @@ local objectives = {
       },
       {
         name = tokens.PARAM_POSY,
-        alias = "y",
-        position = 3,
         type = "number",
         scripts = {
           tokens.METHOD_CHECK_COND
@@ -105,20 +140,22 @@ local objectives = {
       },
       {
         name = tokens.PARAM_SUBZONE,
-        alias = "sz",
         scripts = {
           tokens.METHOD_CHECK_COND
         }
       },
       {
         name = tokens.PARAM_RADIUS,
-        alias = { "rad", "r" },
         type = "number",
       },
     }
   },
   {
     name = tokens.OBJ_KILL,
+    shorthand = {
+      tokens.PARAM_GOAL,
+      tokens.PARAM_TARGET,
+    },
     scripts = {
       tokens.METHOD_PRE_COND,
       tokens.METHOD_POST_COND,
@@ -126,9 +163,15 @@ local objectives = {
     },
     params = {
       {
+        name = tokens.PARAM_GOAL,
+        type = "number",
+        default = 1
+      },
+      {
+        name = tokens.PARAM_TEXT,
+      },
+      {
         name = tokens.PARAM_TARGET,
-        alias = { "tar", "t" },
-        position = 1,
         required = true,
         multiple = true,
         scripts = {
@@ -139,15 +182,24 @@ local objectives = {
   },
   {
     name = tokens.OBJ_TALKTO,
-    alias = "talk",
+    shorthand = {
+      tokens.PARAM_GOAL,
+      tokens.PARAM_TARGET,
+    },
     scripts = {
       tokens.METHOD_DISPLAY_TEXT,
     },
     params = {
       {
+        name = tokens.PARAM_GOAL,
+        type = "number",
+        default = 1
+      },
+      {
+        name = tokens.PARAM_TEXT,
+      },
+      {
         name = tokens.PARAM_TARGET,
-        alias = { "tar", "t" },
-        position = 1,
         required = true,
         multiple = true,
         scripts = {
@@ -173,19 +225,16 @@ local commands = {
   -- },
   {
     name = tokens.CMD_QUEST,
+    shorthand = { tokens.PARAM_NAME, tokens.PARAM_DESCRIPTION },
     scripts = {
       tokens.METHOD_PARSE,
     },
     params = {
       {
         name = tokens.PARAM_NAME,
-        alias = "n",
-        position = 1,
       },
       {
         name = tokens.PARAM_DESCRIPTION,
-        alias = "desc",
-        position = 2,
       }
     }
   },
@@ -265,25 +314,14 @@ local commands = {
   -- },
   {
     name = tokens.CMD_OBJ,
-    alias = { "obj", "o" },
     scripts = {
       tokens.METHOD_PARSE,
     },
     params = {
       {
         name = tokens.PARAM_NAME,
-        position = 1,
         required = true,
       },
-      {
-        name = tokens.PARAM_GOAL,
-        alias = "g",
-        position = 2,
-        type = "number",
-      },
-      {
-        name = tokens.PARAM_TEXT,
-      }
     }
   }
 }

@@ -76,7 +76,7 @@ function menu:Create(frame)
   nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
   nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
 
-  local descField = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "Quest Description")
+  local descField = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "Description")
   descField:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
   descField:SetPoint("TOPRIGHT", nameField, "BOTTOMRIGHT")
   descField:SetHeight(100)
@@ -87,7 +87,7 @@ function menu:Create(frame)
   buttonPane:AddButton("Save", button_Save, { anchor = "RIGHT" })
   buttonPane:AddButton("Validate", button_Validate, { anchor = "RIGHT" })
 
-  local scriptEditor = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "QuestScript")
+  local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Script")
   scriptEditor:SetPoint("TOPLEFT", descField, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
 
@@ -123,6 +123,8 @@ function menu:OnShowMenu(frame, draftId)
   frame.descField:SetText(currentDraft.parameters.description)
   frame.scriptEditor:SetText(currentDraft.script)
   cleanForm()
+
+  frame.scriptEditor:RefreshStyle()
 end
 
 function menu:OnLeaveMenu(frame)

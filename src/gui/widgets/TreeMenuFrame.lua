@@ -196,7 +196,3 @@ function widget:Create()
   frame:Hide()
   return frame
 end
-
-function widget:OnShow(frame, id, ...)
-
-end

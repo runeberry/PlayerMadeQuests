@@ -1,6 +1,7 @@
 local _, addon = ...
-
+local ParseYaml = addon.ParseYaml
 local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
+local unpack = addon.G.unpack
 
 addon.QuestScriptCompiler = {}
 
@@ -9,216 +10,76 @@ local objectives = {}
 local scripts = {}
 local cleanNamePattern = "^[%l%d]+$"
 
-local function getPositionalArgValue(args, position)
-  local val = args.ordered[position]
-  if val then
-    return val.value
-  end
+local function tryConvert(val, toType)
+  local ok, converted = pcall(addon.ConvertValue, addon, val, toType)
+  if ok then return converted end
 end
 
-local function getNamedArgValues(args, name)
-  local val = args.named[name]
-  if val then
-    local arr = {}
-    for i, v in ipairs(val) do
-      arr[i] = v.value
-    end
-    return arr
-  end
-end
+-- Each parse mode returns: "objective name", { objective parameters }
+local parseMode
+parseMode = {
+  -- mode: (Shorthand String)
+  -- yaml: - kill 5 Chicken
+  --  lua: "kill 5 Chicken"
+  [1] = function(obj)
+    local words = addon:SplitWords(obj)
+    local objName, args = words[1], {}
 
-local function getAliases(param)
-  -- A param's name is always its primary alias
-  local aliases = { param.name }
-  if type(param.alias) == "string" then
-    -- Single alias
-    table.insert(aliases, param.alias)
-  elseif type(param.alias) == "table" then
-    -- Multiple aliases
-    for _, a in ipairs(param.alias) do
-      table.insert(aliases, a)
-    end
-  end
-  if param.position then
-    table.insert(aliases, param.position)
-  end
-  return aliases
-end
-
---[[
-  Returns the string value of the requested arg
-  If multiple keys are specified, the first one found will be returned
-  If multiple values were set, returns the last value specified
-  If no value was set, returns nil
---]]
-local function args_GetValue(args, token)
-  local aliases = getAliases(args._parent._paramsByName[token])
-  local val
-  for _, alias in pairs(aliases) do
-    if type(alias) == "number" then
-      val = getPositionalArgValue(args, alias)
-      if val then return val end
-    else
-      val = getNamedArgValues(args, alias)
-      -- In case multiple values were specified, return the last one only
-      if val then return val[#val] end
-    end
-  end
-end
-
---[[
-  Returns all string values specified for this arg in the order that they were set
-  If multiple keys are specified, the values for all will be returned
-  If a single value was set, it's returned as a table with one element
-  If no value was set, returns nil
---]]
-local function args_GetValues(args, token)
-  local aliases = getAliases(args._parent._paramsByName[token])
-  local ret, val
-  for _, alias in pairs(aliases) do
-    if type(alias) == "number" then
-      val = getPositionalArgValue(args, alias)
-      if val then
-        -- Positional arg values takes the lowest priority, after any named aliases
-        -- If there is already one or more named values, do not add positionals
-        if not ret then
-          -- If you've gotten to this point, just return the single positional value
-          return { val }
-        end
-      end
-    else
-      val = getNamedArgValues(args, alias)
-      if val then
-        ret = ret or {}
-        for _, v in ipairs(val) do
-          table.insert(ret, v)
-        end
-      end
-    end
-  end
-  return ret
-end
-
-local Q_start_ptn, Q_end_ptn = [=[^(['"])]=], [=[(['"])$]=]
-local SQ_start_ptn, DQ_start_ptn, SQ_end_ptn, DQ_end_ptn = [[^(')]], [[^(")]], [[(')$]], [[(")$]]
-local escSQ_end_ptn, escDQ_end_ptn = [[(\)(')]], [[(\)(")]]
-local esc_ptn = [=[(\*)['"]$]=]
-
--- Parser tries to convert values to each of the following types, in the order listed
--- If the coercer retruns nil, parser will try to convert to the next type in the chain
-local coercers = {
-  function(str) -- quoted string
-    -- Remove the quotes from either side of the raw string
-    local dequoted = str:gsub(Q_start_ptn, ""):gsub(Q_end_ptn, "")
-    -- If this made any difference in the raw string, then the value was quoted and must be a string
-    if dequoted ~= str then
-      -- Since it was quoted, remove escape characters from these inner characters: ["'=]
-      return dequoted:gsub([=[(\)(["'=])]=], "%2")
-    end
-  end,
-  function(str) -- number
-    return tonumber(str)
-  end,
-  function(str) -- boolean
-    str = str:lower()
-    if str == "true" then
-      return true
-    elseif str == "false" then
-      return false
-    end
-  end,
-  function(str) -- unquoted string
-    return str
-  end
-}
-
-local function parseArgs(line)
-  -- Normalize spacing around named arguments
-  line = line:gsub([=[([^\])%s*=%s*(%S)]=], "%1= %2")
-
-  -- Split parts on space, but keep quoted groups together
-  -- Solution adapted from: https://stackoverflow.com/a/28664691
-  local args = {
-    ordered = {},
-    named = {}
-  }
-
-  local buf, quoted, pname
-  for str in line:gmatch("%S+") do
-    local SQ_start = str:match(SQ_start_ptn)
-    local SQ_end = str:match(SQ_end_ptn)
-    local DQ_start = str:match(DQ_start_ptn)
-    local DQ_end = str:match(DQ_end_ptn)
-    local escSQ_end = str:match(escSQ_end_ptn)
-    local escDQ_end = str:match(escDQ_end_ptn)
-    local escaped = str:match(esc_ptn)
-    if not quoted and SQ_start and (not SQ_end or escSQ_end) then
-      buf, quoted = str, SQ_start
-    elseif not quoted and DQ_start and (not DQ_end or escDQ_end) then
-      buf, quoted = str, DQ_start
-    elseif buf and (SQ_end == quoted or DQ_end == quoted) and #escaped % 2 == 0 then
-      str, buf, quoted = buf .. ' ' .. str, nil, nil
-    elseif buf then
-      buf = buf .. ' ' .. str
-    end
-    if not buf then
-      --[[
-        Create an object to store all relevant information about the parameter
-        pvalue model: {
-          raw = "string",   -- The literal value input, quotes and all
-          value = any,      -- The type-coerced value, as determined by the coercers
-          type = "string",  -- The type of the value
-          key = "string"    -- The original pname or position that this value came from
-        }
-      --]]
-      local pvalue = { raw = str }
-
-      -- Attempt each type coercion until a successful result is found
-      for _, coercer in ipairs(coercers) do
-        pvalue.value = coercer(str)
-        if pvalue.value ~= nil then
-          pvalue.type = type(pvalue.value)
-          break
-        end
-      end
-
-      if pname then
-        -- If the last arg was a param name, then this is its value
-        pvalue.key = pname
-        local namedValues = args.named[pname]
-        if not namedValues then
-          namedValues = {}
-          args.named[pname] = namedValues
-        end
-        table.insert(namedValues, pvalue)
-        pname = nil
-      else
-        local pn = pvalue.raw:match("^(%w-)=$")
-        if pn then
-          -- This is the param name, next str will be the value
-          pname = pn
-        else
-          -- This an ordered (unnamed) value
-          if not args._parentName then
-            -- The first unordered arg is always the command name, so
-            -- it does not go into the ordered list
-            args._parentName = pvalue
-            pvalue.key = 0
-          else
-            table.insert(args.ordered, pvalue)
-            pvalue.key = #args.ordered
+    -- All types will be strings when converting from shorthand
+    -- Try to convert them in the same way the yaml parser would
+    for i, word in ipairs(words) do
+      if i > 1 then
+        local converted = tryConvert(word, "number")
+        if not converted then
+          converted = tryConvert(word, "boolean")
+          if not converted then
+            converted = word
           end
         end
+        args[i-1] = converted
       end
     end
-  end
-  if buf then error("Missing matching quote for: "..buf) end
 
-  return args
-end
+    return objName, args
+  end,
+  -- mode: (Shorthand string, with optional colon)
+  -- yaml: - kill: 5 Chicken
+  --  lua: { kill = "5 Chicken" }
+  [2] = function(obj)
+    local str
+    for k, v in pairs(obj) do
+      str = k.." "..v
+      break
+    end
+    return parseMode[1](str)
+  end,
+  -- mode: (Kinda malformed table, but I'll allow it)
+  -- yaml: - kill:
+  --         goal: 5
+  --         target: Chicken
+  --  lua: { kill = "yaml.null", goal = 5, target = "Chicken" }
+  [3] = function(obj)
+    for k, v in pairs(obj) do
+      if tostring(v) == "yaml.null" then
+        local objName = k
+        obj[k] = nil
+        return objName, obj
+      end
+    end
+  end,
+  -- mode: (Properly formed table, flow style also works)
+  -- yaml: - kill:
+  --           goal: 5
+  --           target: Chicken
+  --  lua: { kill = { goal = 5, target = "Chicken" } }
+  [4] = function(obj)
+    for k, v in pairs(obj) do
+      return k, v
+    end
+  end,
+}
 
-local function getCommand(args)
-  local commandName = args._parentName.value
+local function getCommand(commandName)
   if not commandName then
     error("No command name specified")
   end
@@ -232,51 +93,144 @@ local function getCommand(args)
   return command
 end
 
-local function processLine(line, parameters)
-  local args = parseArgs(line)
-  local command = getCommand(args)
+local function yamlToQuest(quest, yaml)
+  for cmd, args in pairs(yaml) do
+    local command = getCommand(cmd)
+    command.scripts.Parse(quest, args)
+  end
+end
 
-  args._parent = command
-  args.GetValue = args_GetValue
-  args.GetValues = args_GetValues
+local function determineParseMode(obj)
+  if type(obj) == "string" then
+    return 1
+  elseif type(obj) == "table" then
+    local len, v1 = 0
+    for k, v in pairs(obj) do
+      len = len + 1
+      if len == 1 then
+        v1 = v
+      end
+    end
+    if len == 1 then
+      if type(v1) == "string" then
+        return 2
+      elseif type(v1) == "table" then
+        return 4
+      end
+    else
+      return 3
+    end
+  end
+end
 
-  command.scripts.Parse(parameters, args)
+local function getTypeValidatedParameterValue(val, paramInfo, convert)
+  local expectedType = paramInfo.type or "string"
+  local actualType = type(val)
+
+  if expectedType == actualType then
+    -- Single type is allowed, and they already match
+    -- print("    single-type match", paramInfo.name, val, expectedType)
+    return val
+  elseif type(expectedType) == "table" then
+    -- Multiple types are allowed, check for any matches
+    for _, t in ipairs(expectedType) do
+      if t == actualType then
+        -- print("    multi-type match", paramInfo.name, val, t)
+        return val
+      end
+    end
+  elseif actualType == "table" and paramInfo.multiple then
+    -- Multiple values are supplied, each value must match an expected type
+    local val2 = {}
+    for k, v in pairs(val) do
+      local v2 = getTypeValidatedParameterValue(v, paramInfo, convert)
+      if not v2 then
+        -- print("    multi-value failure", paramInfo.name, v, actualType, expectedType)
+        return
+      end
+      val2[k] = v2
+    end
+    return val2
+  elseif convert then
+    -- All else fails, try to convert the value to an expected type
+    if type(expectedType) == "table" then
+      for _, t in ipairs(expectedType) do
+        -- Multiple types are allowed, try converting to all of them
+        local ok, converted = pcall(addon.ConvertValue, addon, val, t)
+        if ok then
+          -- print("    multi-type conversion", paramInfo.name, converted, t)
+          return converted
+        end
+      end
+    else
+      -- Single type is allowed, try to convert to that type
+      local ok, converted = pcall(addon.ConvertValue, addon, val, expectedType)
+      if ok then
+        -- print("    single-type conversion", paramInfo.name, converted, expectedType)
+        return converted
+      end
+    end
+  end
+  -- print("    type validation failure", paramInfo.name, val, actualType, expectedType)
+end
+
+local function getTypeValidatedParameterValueOrDefault(val, paramInfo, convert)
+  if val == nil and not paramInfo.required then
+    -- Non-required parameters can have a default value
+    -- If no default value is specified, then nil will be returned
+    return paramInfo.default
+  end
+
+  return getTypeValidatedParameterValue(val, paramInfo, convert)
+end
+
+local function assignShorthandArgs(args, objInfo)
+  local shorthand = objInfo.shorthand
+  if not shorthand then
+    error("Objective "..objInfo.name.." does not have a shorthand form")
+  end
+  if #args > #shorthand then
+    error("Objective "..objInfo.name.." recognizes up to "..#shorthand.." ordered parameters, but got "..#args)
+  end
+
+  local skipped = 0
+  -- print("----------------")
+  for i, paramName in pairs(shorthand) do
+    local paramInfo = objInfo._paramsByName[paramName]
+    if not paramInfo then
+      -- If this happens, then a bad token was assigned in QuestScript configuration
+      error("Unrecognized shorthand parameter: "..paramName)
+    end
+    local argValue = args[i - skipped]
+    if getTypeValidatedParameterValue(argValue, paramInfo) then
+      -- print("assignment", paramName, argValue)
+      args[paramName] = argValue
+      args[i - skipped] = nil
+    else
+      -- Loop to the next shorthand param, but try with this arg value again
+      -- print("skipping", paramName, argValue)
+      skipped = skipped + 1
+    end
+  end
 end
 
 local function initQuestScript(qsconfig)
   local function validateAndRegister(set, name, param)
     if not name or name == "" then
-      error("Name/alias cannot be nil or empty")
+      error("Name cannot be nil or empty")
     end
     if type(name) ~= "string" or not name:match(cleanNamePattern) then
-      error("Name/alias must only contain lowercase alphanumeric characters")
+      error("Name must only contain lowercase alphanumeric characters")
     end
     if set[name] and set[name] ~= param then
-      error("An item is already registered with name/alias: "..name)
+      error("An item is already registered with name: "..name)
     end
     set[name] = param
   end
 
   local function setup(set, param)
     local name = param.name
-    -- An param's primary alias is its name
     validateAndRegister(set, name, param)
-
-    local alias = param.alias
-    if alias then
-      if type(alias) == "string" then
-        -- Single alias
-        validateAndRegister(set, alias, param)
-      elseif type(alias) == "table" then
-        -- Multiple aliases
-        for _, al in ipairs(alias) do
-          validateAndRegister(set, al, param)
-        end
-      else
-        error("Unrecognized alias type ("..type(alias)..") for:"..name)
-      end
-    end
-    param._aliases = getAliases(param)
 
     local itemScripts = param.scripts
     if itemScripts then
@@ -286,6 +240,9 @@ local function initQuestScript(qsconfig)
         local method = scripts[name]
         if not method then
           error("No scripts registered for: "..name)
+        end
+        if type(methodName) ~= "string" then
+          error("Non-string registered as methodName for "..name)
         end
         method = method[methodName]
         if not method then
@@ -373,6 +330,67 @@ function addon.QuestScriptCompiler:GetObjectiveInfo(objToken, paramToken)
   return obj._paramsByName[paramToken]
 end
 
+function addon.QuestScriptCompiler:ParseObjective(obj)
+  local mode = determineParseMode(obj)
+  if not mode then
+    error("Cannot determine how to parse objective (type: "..type(obj)..")")
+  end
+
+  local objName, args = parseMode[mode](obj)
+  if not objName then
+    error("Cannot determine name of objective")
+  end
+
+  objName = objName:lower()
+  local objInfo = objectives[objName]
+  if not objInfo then
+    error("Unknown objective name: "..objName)
+  end
+
+  if args[1] then
+    assignShorthandArgs(args, objInfo)
+  end
+
+  local objective = {
+    --id = addon:CreateID("objective:"..objName.."-%i"),
+    --_parent = objectives[p1], -- The objective contains a reference to its parent definition
+    name = objName,
+    --displayText = nil,
+    --progress = 0, -- All objectives start at 0 progress
+    conditions = {}, -- The conditions under which this objective must be completed
+    --metadata = {}, -- Additional data for this objective that can be written to save
+    --tempdata = {} -- Additional data that will not be written to save
+  }
+
+  objective.goal = getTypeValidatedParameterValueOrDefault(args.goal, objInfo._paramsByName["goal"], true)
+  args.goal = nil
+
+  objective.displayText = getTypeValidatedParameterValueOrDefault(args.text, objInfo._paramsByName["text"], true)
+  args.text = nil
+
+  args._parentName = objName
+  args._parent = objInfo
+
+  for _, param in ipairs(objInfo.params) do
+    if param.multiple then
+      -- If multiple arg values are allowed, then they will be passed to the
+      -- condition handler as a set, such as { value1 = true, value2 = true }
+      local val = args[param.name]
+      if val then
+        if type(param.name) ~= "table" then
+          val = { val }
+        end
+        objective.conditions[param.name] = addon:DistinctSet(val)
+      end
+    else
+      -- Otherwise, simply pass a single value to the condition handler
+      objective.conditions[param.name] = args[param.name]
+    end
+  end
+
+  return objective
+end
+
 --[[
   Parses a QuestScript "file" (set of lines) into an unvalidated quest object.
   The returned object takes on the following format:
@@ -392,31 +410,21 @@ end
     }
   }
 --]]
-local newline_ptn, empty_ptn, comment_ptn = "[^\r\n]+", "^%s*$", "^#"
 function addon.QuestScriptCompiler:Compile(script, params)
-  local parameters
+  local quest
   if params then
-    parameters = addon:CopyTable(params)
+    quest = addon:CopyTable(params)
   else
-    parameters = {}
+    quest = {}
   end
   if script ~= nil and script ~= "" then
-    local lnum, ok, err = 0
-    for line in script:gmatch(newline_ptn) do
-      lnum = lnum + 1
-      if line:match(comment_ptn) or line:match(empty_ptn) then
-        -- Ignore comments and empty lines
-      else
-        ok, err = pcall(processLine, line, parameters)
-        if not ok then
-          error("Error on line "..lnum..": "..err)
-        end
-      end
-    end
+    local yaml = ParseYaml(script)
+    -- addon.Logger:Table(yaml)
+    yamlToQuest(quest, yaml)
   end
   logger:Trace("Quest compiled")
-  -- logger:Table(quest)
-  return parameters
+  -- addon.Logger:Table(quest)
+  return quest
 end
 
 addon:onload(function()

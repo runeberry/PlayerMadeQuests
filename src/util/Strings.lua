@@ -31,60 +31,75 @@ function addon:Pluralize(num, singular, plural)
   end
 end
 
--- Adapted from the CSV parser found here: http://lua-users.org/wiki/LuaCsv
--- function addon:strWords(line)
---   local res = {}
---   local pos = 1
---   local sep = " "
---   while true do
---     local c = string.sub(line,pos,pos)
---     if (c == "") then break end
---     if (c == '"') then
---       -- quoted value (ignore separator within)
---       local txt = ""
---       repeat
---         local startp,endp = string.find(line,'^%b""',pos)
---         txt = txt..string.sub(line,startp+1,endp-1)
---         pos = endp + 1
---         c = string.sub(line,pos,pos)
---         if (c == '"') then txt = txt..'"' end
---         -- check first char AFTER quoted string, if it is another
---         -- quoted string without separator, then append it
---         -- this is the way to "escape" the quote char in a quote. example:
---         --   value1,"blub""blip""boing",value3  will result in blub"blip"boing  for the middle
---       until (c ~= '"')
---       table.insert(res,txt)
---       assert(c == sep or c == "")
---       pos = pos + 1
---     elseif (c == "'") then -- jb: this parser supports single and double quotes
---       -- quoted value (ignore separator within)
---       local txt = ""
---       repeat
---         local startp,endp = string.find(line,"^%b''",pos)
---         txt = txt..string.sub(line,startp+1,endp-1)
---         pos = endp + 1
---         c = string.sub(line,pos,pos)
---         if (c == "'") then txt = txt.."'" end
---         -- check first char AFTER quoted string, if it is another
---         -- quoted string without separator, then append it
---         -- this is the way to "escape" the quote char in a quote. example:
---         --   value1,"blub""blip""boing",value3  will result in blub"blip"boing  for the middle
---       until (c ~= "'")
---       table.insert(res,txt)
---       assert(c == sep or c == "")
---       pos = pos + 1
---     else
---       -- no quotes used, just look for the first separator
---       local startp,endp = string.find(line,sep,pos)
---       if (startp) then
---         table.insert(res,string.sub(line,pos,startp-1))
---         pos = endp + 1
---       else
---         -- no separator found -> use rest of string and terminate
---         table.insert(res,string.sub(line,pos))
---         break
---       end
---     end
---   end
---   return res
--- end
+-- Modifies each substring with the provided function
+-- and inserts it back into the original string
+-- Returns the modified string
+function addon:strmod(str, findPattern, fn)
+  assert(type(str) == "string")
+  assert(type(findPattern) == "string")
+  assert(type(fn) == "function")
+
+  -- To start, find the first occurence of the pattern within the string
+  local from, to = 1
+  local before, middle, after
+
+  while true do
+    from, to = str:find(findPattern, from)
+    if not from then break end
+
+    -- Each time the pattern is matched, extract that match from the string as a whole
+    before = str:sub(1, from - 1)
+    middle = str:sub(from, to)
+    after = str:sub(to + 1, #str)
+    -- print(before.."|"..middle.."|"..after)
+
+    middle = fn(middle)
+    assert(type(middle) == "string", "strmod: mod function must return a string")
+    -- print(before.."|"..middle.."|"..after)
+
+    -- Merge the modfiied string with its non-matching brethren
+    str = before..middle..after
+
+    -- Start the next search from the end of the previous search
+    -- In case the modified string changed in size, adjust the pointer by the difference
+    from = #before + #middle + 1
+  end
+  return str
+end
+
+local Q_start_ptn, Q_end_ptn = [=[^(['"])]=], [=[(['"])$]=]
+local SQ_start_ptn, DQ_start_ptn, SQ_end_ptn, DQ_end_ptn = [[^(')]], [[^(")]], [[(')$]], [[(")$]]
+local escSQ_end_ptn, escDQ_end_ptn = [[(\)(')]], [[(\)(")]]
+local esc_ptn = [=[(\*)['"]$]=]
+
+-- Splits a string into words, keeping quoted phrases intact
+function addon:SplitWords(line)
+  -- Solution adapted from: https://stackoverflow.com/a/28664691
+  local words, buf, quoted = {}
+  for str in line:gmatch("%S+") do
+    local SQ_start = str:match(SQ_start_ptn)
+    local SQ_end = str:match(SQ_end_ptn)
+    local DQ_start = str:match(DQ_start_ptn)
+    local DQ_end = str:match(DQ_end_ptn)
+    local escSQ_end = str:match(escSQ_end_ptn)
+    local escDQ_end = str:match(escDQ_end_ptn)
+    local escaped = str:match(esc_ptn)
+    if not quoted and SQ_start and (not SQ_end or escSQ_end) then
+      buf, quoted = str, SQ_start
+    elseif not quoted and DQ_start and (not DQ_end or escDQ_end) then
+      buf, quoted = str, DQ_start
+    elseif buf and (SQ_end == quoted or DQ_end == quoted) and #escaped % 2 == 0 then
+      str, buf, quoted = buf .. ' ' .. str, nil, nil
+    elseif buf then
+      buf = buf .. ' ' .. str
+    end
+    if not buf then
+      -- Remove outer quotes and unescape escaped quotes
+      str = str:gsub(Q_start_ptn,""):gsub(Q_end_ptn,""):gsub([=[(\)(["'])]=], "%2")
+      table.insert(words, str)
+    end
+  end
+  if buf then error("Missing matching quote for: "..buf) end
+
+  return words
+end

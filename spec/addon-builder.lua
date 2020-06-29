@@ -64,6 +64,8 @@ function builder:Build(opts)
     GLOBAL_LOG_LEVEL = 5,
     TRANSACTION_LOGS = false,
     USE_INTERNAL_MESSAGING = true,
+    -- Exception: I want to include the TinyYaml lib for parsing quests
+    ParseYaml = loadfile([[src/libs/lua-tinyyaml/tinyyaml.lua]])().parse
   }
   for name, fn in pairs(testMethods) do
     addon[name] = fn

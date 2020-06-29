@@ -4,9 +4,12 @@ local addon = builder:Build()
 local engine, compiler = addon.QuestEngine, addon.QuestScriptCompiler
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
-local goodScript = [[objective kill 5 Chicken
-objective talkto 3 "Stormwind Guard"
-objective emote 2 dance Cow]]
+local goodScript = [[
+  objectives:
+    - kill 5 Chicken
+    - talkto 3 "Stormwind Guard"
+    - emote dance 2 Cow
+]]
 
 -- For testing: compiles a script with some default parameters
 local function makeParams(script)
