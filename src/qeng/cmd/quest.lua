@@ -10,13 +10,4 @@ compiler:AddScript(tokens.CMD_QUEST, tokens.METHOD_PARSE, function(quest, args)
   if args.description then
     quest.description = args.description
   end
-  -- local name = args:GetValue(tokens.PARAM_NAME)
-  -- if name then
-  --   quest.name = name
-  -- end
-
-  -- local description = args:GetValue(tokens.PARAM_DESCRIPTION)
-  -- if description then
-  --   quest.description = description
-  -- end
 end)

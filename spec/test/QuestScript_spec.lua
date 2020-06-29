@@ -132,37 +132,4 @@ describe("QuestScriptCompiler", function()
       assertMatch(expected, yaml)
     end)
   end)
-  -- describe("type coercion", function()
-  --   it("can recognize quoted string values", function()
-  --     script = [[quest name="Adventure Quest"]]
-  --     local result = compile(script)
-  --     assert.same("Adventure Quest", result.name)
-  --   end)
-  --   it("can recognize number values", function()
-  --     -- todo: this won't work once type validation is in place
-  --     tc = { 10, 1, 0, -1, -10 }
-  --     for _, v in ipairs(tc) do
-  --       script = string.format("quest name=%s", v)
-  --       local result = compile(script)
-  --       assert.same(v, result.name)
-  --     end
-  --   end)
-  --   it("can recognize boolean true", function()
-  --     -- todo: this won't work once type validation is in place
-  --     script = "quest name=true"
-  --     local result = compile(script)
-  --     assert.same(true, result.name)
-  --   end)
-  --   -- it("can recognize boolean false", function()
-  --   --   -- todo: this won't work once type validation is in place
-  --   --   script = "quest name=false"
-  --   --   local result = compile(script)
-  --   --   assert.same(false, result.name)
-  --   -- end)
-  --   it("can recognize unquoted string values", function()
-  --     script = [[quest name=AdventureQuest]]
-  --     local result = compile(script)
-  --     assert.same("AdventureQuest", result.name)
-  --   end)
-  -- end)
 end)
