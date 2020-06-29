@@ -84,8 +84,8 @@ local objectives = {
       },
       log = "/%em [%t] [%g2:%p/%g]",
       progress = "/%em [%t]: %p/%g",
-      quest = "/%em [%t:on_%g2_%t|[%g2:%g2 times]]",
-      full = "Use emote /%em [%t:on_%g2_%t|[%g2:%g2 times]]"
+      quest = "/%em [%t:on_%g2_%t|[%g2:%g2_times]]",
+      full = "Use emote /%em [%t:on_%g2_%t|[%g2:%g2_times]]"
     },
     params = {
       {
