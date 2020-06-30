@@ -5,6 +5,7 @@ local compiler = addon.QuestScriptCompiler
 describe("QuestScriptCompiler", function()
   setup(function()
     addon:Init()
+    addon:Advance()
   end)
   it("can compile valid script", function()
     local script = [[
@@ -256,5 +257,80 @@ describe("QuestScriptCompiler", function()
         end)
       end
     end
+    describe("custom text parameters", function()
+      it("can accept simple text overrides", function()
+        local script = [[
+          objectives:
+            - kill:
+                target: Chicken
+                text: "%t obliterated: %p/%g"
+        ]]
+        local quest = compiler:Compile(script)
+        local obj = quest.objectives[1]
+        assert.equals("Chicken obliterated: 0/1", compiler:GetDisplayText(obj, "log"))
+        assert.equals("Chicken obliterated: 0/1", compiler:GetDisplayText(obj, "progress"))
+        assert.equals("Chicken obliterated: 0/1", compiler:GetDisplayText(obj, "quest"))
+        assert.equals("Kill Chicken", compiler:GetDisplayText(obj, "full")) -- Cannot be overridden
+      end)
+      it("can accept partial text overrides", function()
+        local script = [[
+          objectives:
+            - kill:
+                target: Chicken
+                text:
+                  quest: Commit an unthinkable atrocity against %t
+        ]]
+        local quest = compiler:Compile(script)
+        local obj = quest.objectives[1]
+        assert.equals("Chicken 0/1", compiler:GetDisplayText(obj, "log"))
+        assert.equals("Chicken slain: 0/1", compiler:GetDisplayText(obj, "progress"))
+        assert.equals("Commit an unthinkable atrocity against Chicken", compiler:GetDisplayText(obj, "quest"))
+        assert.equals("Kill Chicken", compiler:GetDisplayText(obj, "full"))
+      end)
+      it("can accept complete text overrides", function()
+        local script = [[
+          objectives:
+            - kill:
+                target: Chicken
+                text:
+                  log: Be kind to %t
+                  progress: "%t SAVED: %p/%g"
+                  quest: This isn't a genocide playthrough, you know
+        ]]
+        local quest = compiler:Compile(script)
+        local obj = quest.objectives[1]
+        assert.equals("Be kind to Chicken", compiler:GetDisplayText(obj, "log"))
+        assert.equals("Chicken SAVED: 0/1", compiler:GetDisplayText(obj, "progress"))
+        assert.equals("This isn't a genocide playthrough, you know", compiler:GetDisplayText(obj, "quest"))
+        assert.equals("Kill Chicken", compiler:GetDisplayText(obj, "full"))
+      end)
+      it("can use the %inc var properly", function()
+        local script = [[
+          quest:
+            name: inc test
+          objectives:
+            - explore Durotar
+            - kill:
+                target: Swine
+                goal: 5
+                text: "Complete task #%inc"
+            - talkto: Orgrimmar Grunt
+            - kill:
+                target: Bloodtalon Scythemaw
+                goal: 3
+                text: "Complete task #%inc"
+            - explore:
+                zone: Durotar
+                subzone: Skull Rock
+                text: "Complete task #%inc"
+        ]]
+        local quest = compiler:Compile(script)
+        addon.QuestEngine:Build(quest)
+        local objs = quest.objectives
+        assert.equals("Complete task #1", compiler:GetDisplayText(objs[2]))
+        assert.equals("Complete task #2", compiler:GetDisplayText(objs[4]))
+        assert.equals("Complete task #3", compiler:GetDisplayText(objs[5]))
+      end)
+    end)
   end)
 end)
