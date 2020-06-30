@@ -379,4 +379,5 @@ addon.QuestScript = {
   tokens = tokens,
   objectives = objectives,
   commands = commands,
+  globalDisplayTextVars = globalDisplayTextVars,
 }
