@@ -41,12 +41,19 @@ local tokens = {
   FLAG_RECOMMENDED = "recommended",
 }
 
--- todo: add "objective number" (1, 2, 3...) that can be used in displaytext
 local globalDisplayTextVars = {
   ["g"] = function(obj) return obj.goal end,
   ["g2"] = function(obj) if obj.goal > 1 then return obj.goal end end,
   ["p"] = function(obj) return obj.progress end,
   ["p2"] = function(obj) if obj.progress < obj.goal then return obj.progress end end,
+  ["inc"] = function(obj) -- incrementing counter tied to this objective, only works after quest is built
+    if obj._inc then return obj._inc end
+    if not obj._quest then return 0 end
+    obj._quest._inc = obj._quest._inc or 0
+    obj._quest._inc = obj._quest._inc + 1
+    obj._inc = obj._quest._inc
+    return obj._inc
+  end
 }
 
 local objectives = {
@@ -66,10 +73,10 @@ local objectives = {
         ["em"] = tokens.PARAM_EMOTE,
         ["t"] = tokens.PARAM_TARGET,
       },
-      log = "/%em [%t] [%g2:%p/%g]",
-      progress = "/%em [%t]: %p/%g",
-      quest = "/%em [%t:on %g2 %t|[%g2:%g2 times]]",
-      full = "Use emote /%em [%t:on %g2 %t|[%g2:%g2 times]]"
+      log = "/%em[%t: with %t][%g2: %p/%g]",
+      progress = "/%em[%t: with %t]: %p/%g",
+      quest = "/%em[%t: with [%g2]%t|[%g2: %g2 times]]",
+      full = "Use emote /%em[%t: on [%g2]%t|[%g2: %g2 times]]"
     },
     params = {
       {
@@ -79,6 +86,7 @@ local objectives = {
       },
       {
         name = tokens.PARAM_TEXT,
+        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_EMOTE,
@@ -119,10 +127,10 @@ local objectives = {
         ["sz"] = tokens.PARAM_SUBZONE,
         ["r"] = tokens.PARAM_RADIUS,
       },
-      log = "[%sz|%z]",
-      progress = "[%sz|%z] explored: %p/%g",
-      quest = "Explore [%sz:%sz in] %z",
-      full = "Go [%r:within %r units of|to] [%x:(%x, %y) in] [%sz:%sz in] %z"
+      log = "Go to [%x:Point #%inc in ][%sz|%z]",
+      progress = "[%x:Point #%inc in ][%sz|%z] explored: %p/%g",
+      quest = "Explore [%x:Point #%inc in ][%sz:%sz in ]%z",
+      full = "Go [%r:within %r units of|to] [%x:(%x, %y) in ][%sz:%sz in ]%z"
     },
     params = {
       { -- todo: remove goal from explore, should always be 1
@@ -132,6 +140,7 @@ local objectives = {
       },
       {
         name = tokens.PARAM_TEXT,
+        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_ZONE,
@@ -182,8 +191,8 @@ local objectives = {
       },
       log = "%t %p/%g",
       progress = "%t slain: %p/%g",
-      quest = "Kill [%g2] %t",
-      full = "Kill [%g2] %t"
+      quest = "Kill [%g2]%t",
+      full = "Kill [%g2]%t"
     },
     params = {
       {
@@ -193,6 +202,7 @@ local objectives = {
       },
       {
         name = tokens.PARAM_TEXT,
+        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_TARGET,
@@ -217,10 +227,10 @@ local objectives = {
       vars = {
         ["t"] = tokens.PARAM_TARGET,
       },
-      log = "Talk to %t %p/%g",
+      log = "Talk to %t[%g2: %p/%g]",
       progress = "Talk to %t: %p/%g",
-      quest = "Talk to [%g2] %t",
-      full = "Talk to [%g2] %t"
+      quest = "Talk to [%g2]%t",
+      full = "Talk to [%g2]%t"
     },
     params = {
       {
@@ -230,6 +240,7 @@ local objectives = {
       },
       {
         name = tokens.PARAM_TEXT,
+        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_TARGET,
