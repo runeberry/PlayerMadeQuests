@@ -147,6 +147,15 @@ Line C]],
         mod = function(s)
           return 42
         end
+      },
+      {
+        desc = "can convert nil to empty string",
+        str = "Remove <this> piece!",
+        pattern = "<this>",
+        expected = "Remove  piece!",
+        mod = function(s)
+          return nil
+        end
       }
     }
     before_each(function()
