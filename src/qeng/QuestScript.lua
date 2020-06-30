@@ -41,22 +41,6 @@ local tokens = {
   FLAG_RECOMMENDED = "recommended",
 }
 
-local spec = [[
-  quest:
-    name: "string"
-    description: "string"
-  objectives:
-    - kill 5 Chicken # [1] = "kill 5 Chicken"
-    - kill: 5 Chicken # [2] = { kill = "5 Chicken" }
-    - kill: # [3] = { kill = yaml.null, goal = 5, target = "Chicken" }
-      goal: 5
-      target: Chicken
-    - kill: # [4] = { kill = { goal = 5, target = "Chicken" } }
-        goal: 5
-        target: Chicken
-    - kill: { goal: 5, target: Chicken } # [5] = same as [4]
-]]
-
 -- todo: add "objective number" (1, 2, 3...) that can be used in displaytext
 local globalDisplayTextVars = {
   ["g"] = function(obj) return obj.goal end,
