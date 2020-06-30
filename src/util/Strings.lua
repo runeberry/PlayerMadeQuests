@@ -55,7 +55,7 @@ function addon:strmod(str, findPattern, fn, ...)
     -- print(before.."|"..middle.."|"..after)
 
     middle = fn(middle, ...)
-    assert(type(middle) == "string", "strmod: mod function must return a string")
+    middle = tostring(middle)
     -- print(before.."|"..middle.."|"..after)
 
     -- Merge the modfiied string with its non-matching brethren

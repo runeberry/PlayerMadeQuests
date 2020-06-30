@@ -138,6 +138,15 @@ Line C]],
         mod = function(s, v1, v2)
           return s..v1..v2
         end
+      },
+      {
+        desc = "can convert non-string values",
+        str = "The number is (secret)",
+        pattern = "%(secret%)",
+        expected = "The number is 42",
+        mod = function(s)
+          return 42
+        end
       }
     }
     before_each(function()
