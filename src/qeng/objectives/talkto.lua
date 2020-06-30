@@ -3,10 +3,6 @@ addon:traceFile("objectives/talkto.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 local UnitExists = addon.G.UnitExists
 
-compiler:AddScript(tokens.OBJ_TALKTO, tokens.METHOD_DISPLAY_TEXT, function(obj)
-  return "Talk to "..obj:GetConditionDisplayText("target", "anyone")
-end)
-
 -- Publish the TalkTo event anytime the player targets a friendly unit
 -- that activates one of the registered events below
 local function publishEvent()

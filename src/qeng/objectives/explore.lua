@@ -74,31 +74,6 @@ compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_COND, function(obj)
   end
 end)
 
-compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_DISPLAY_TEXT, function(obj)
-  local text = "Go to"
-
-  local hasCoords = obj:HasCondition(tokens.PARAM_POSX) and obj:HasCondition(tokens.PARAM_POSY)
-  if hasCoords then
-    local x, y = obj:GetConditionDisplayText(tokens.PARAM_POSX), obj:GetConditionDisplayText(tokens.PARAM_POSY)
-    text = text..string.format(" (%s, %s)", x, y)
-  end
-  local hasSub = obj:HasCondition(tokens.PARAM_SUBZONE)
-  if hasSub then
-    if hasCoords then
-      text = text.." in"
-    end
-    text = text.." "..obj:GetConditionDisplayText(tokens.PARAM_SUBZONE)
-  end
-  local hasZone = obj:HasCondition(tokens.PARAM_ZONE)
-  if hasZone then
-    if hasCoords or hasSub then
-      text = text.." in"
-    end
-    text = text.." "..obj:GetConditionDisplayText(tokens.PARAM_ZONE)
-  end
-  return text
-end)
-
 local function publish()
   local map = GetBestMapForUnit("player")
   local x, y = 0, 0

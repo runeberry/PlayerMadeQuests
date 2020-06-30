@@ -18,7 +18,6 @@ local tokens = {
   METHOD_PRE_COND = "BeforeCheckConditions",
   METHOD_CHECK_COND = "CheckCondition",
   METHOD_POST_COND = "AfterCheckConditions",
-  METHOD_DISPLAY_TEXT = "GetDisplayText",
 
   PARAM_DESCRIPTION = "description",
   PARAM_DIFFICULTY = "difficulty",
@@ -41,21 +40,20 @@ local tokens = {
   FLAG_RECOMMENDED = "recommended",
 }
 
-local spec = [[
-  quest:
-    name: "string"
-    description: "string"
-  objectives:
-    - kill 5 Chicken # [1] = "kill 5 Chicken"
-    - kill: 5 Chicken # [2] = { kill = "5 Chicken" }
-    - kill: # [3] = { kill = yaml.null, goal = 5, target = "Chicken" }
-      goal: 5
-      target: Chicken
-    - kill: # [4] = { kill = { goal = 5, target = "Chicken" } }
-        goal: 5
-        target: Chicken
-    - kill: { goal: 5, target: Chicken } # [5] = same as [4]
-]]
+local globalDisplayTextVars = {
+  ["g"] = function(obj) return obj.goal end,
+  ["g2"] = function(obj) if obj.goal > 1 then return obj.goal end end,
+  ["p"] = function(obj) return obj.progress end,
+  ["p2"] = function(obj) if obj.progress < obj.goal then return obj.progress end end,
+  ["inc"] = function(obj) -- incrementing counter tied to this objective, only works after quest is built
+    if obj._inc then return obj._inc end
+    if not obj._quest then return 0 end
+    obj._quest._inc = obj._quest._inc or 0
+    obj._quest._inc = obj._quest._inc + 1
+    obj._inc = obj._quest._inc
+    return obj._inc
+  end
+}
 
 local objectives = {
   {
@@ -67,7 +65,16 @@ local objectives = {
     },
     scripts = {
       tokens.METHOD_PRE_COND,
-      tokens.METHOD_DISPLAY_TEXT,
+    },
+    displaytext = {
+      vars = {
+        ["em"] = tokens.PARAM_EMOTE,
+        ["t"] = tokens.PARAM_TARGET,
+      },
+      log = "/%em[%t: with %t][%g2: %p/%g]",
+      progress = "/%em[%t: with %t]: %p/%g",
+      quest = "/%em[%t: with [%g2]%t|[%g2: %g2 times]]",
+      full = "Use emote /%em[%t: on [%g2]%t|[%g2: %g2 times]]"
     },
     params = {
       {
@@ -77,6 +84,7 @@ local objectives = {
       },
       {
         name = tokens.PARAM_TEXT,
+        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_EMOTE,
@@ -107,16 +115,29 @@ local objectives = {
     scripts = {
       tokens.METHOD_PRE_COND,
       tokens.METHOD_POST_COND,
-      tokens.METHOD_DISPLAY_TEXT,
+    },
+    displaytext = {
+      vars = {
+        ["z"] = tokens.PARAM_ZONE,
+        ["x"] = tokens.PARAM_POSX,
+        ["y"] = tokens.PARAM_POSY,
+        ["sz"] = tokens.PARAM_SUBZONE,
+        ["r"] = tokens.PARAM_RADIUS,
+      },
+      log = "Go to [%x:Point #%inc in ][%sz|%z]",
+      progress = "[%x:Point #%inc in ][%sz|%z] explored: %p/%g",
+      quest = "Explore [%x:Point #%inc in ][%sz:%sz in ]%z",
+      full = "Go [%r:within %r units of|to] [%x:(%x, %y) in ][%sz:%sz in ]%z"
     },
     params = {
-      {
+      { -- todo: remove goal from explore, should always be 1
         name = tokens.PARAM_GOAL,
         type = "number",
         default = 1
       },
       {
         name = tokens.PARAM_TEXT,
+        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_ZONE,
@@ -159,7 +180,15 @@ local objectives = {
     scripts = {
       tokens.METHOD_PRE_COND,
       tokens.METHOD_POST_COND,
-      tokens.METHOD_DISPLAY_TEXT,
+    },
+    displaytext = {
+      vars = {
+        ["t"] = tokens.PARAM_TARGET,
+      },
+      log = "%t %p/%g",
+      progress = "%t slain: %p/%g",
+      quest = "Kill [%g2]%t",
+      full = "Kill [%g2]%t"
     },
     params = {
       {
@@ -169,6 +198,7 @@ local objectives = {
       },
       {
         name = tokens.PARAM_TEXT,
+        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_TARGET,
@@ -186,8 +216,14 @@ local objectives = {
       tokens.PARAM_GOAL,
       tokens.PARAM_TARGET,
     },
-    scripts = {
-      tokens.METHOD_DISPLAY_TEXT,
+    displaytext = {
+      vars = {
+        ["t"] = tokens.PARAM_TARGET,
+      },
+      log = "Talk to %t[%g2: %p/%g]",
+      progress = "Talk to %t: %p/%g",
+      quest = "Talk to [%g2]%t",
+      full = "Talk to [%g2]%t"
     },
     params = {
       {
@@ -197,6 +233,7 @@ local objectives = {
       },
       {
         name = tokens.PARAM_TEXT,
+        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_TARGET,
@@ -330,4 +367,5 @@ addon.QuestScript = {
   tokens = tokens,
   objectives = objectives,
   commands = commands,
+  globalDisplayTextVars = globalDisplayTextVars,
 }

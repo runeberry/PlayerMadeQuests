@@ -75,6 +75,7 @@ describe("Strings", function()
   end)
   describe("strmod", function()
     local i
+    local val1, val2 = "extra", "stuff"
     local testCases = {
       {
         desc = "can mod at beginning of string",
@@ -128,6 +129,33 @@ Line C]],
         mod = function(s)
           return s..s
         end
+      },
+      {
+        desc = "can pass parameters through varargs",
+        str = "The varargs values are: ",
+        pattern = ": ",
+        expected = "The varargs values are: "..val1..val2,
+        mod = function(s, v1, v2)
+          return s..v1..v2
+        end
+      },
+      {
+        desc = "can convert non-string values",
+        str = "The number is (secret)",
+        pattern = "%(secret%)",
+        expected = "The number is 42",
+        mod = function(s)
+          return 42
+        end
+      },
+      {
+        desc = "can convert nil to empty string",
+        str = "Remove <this> piece!",
+        pattern = "<this>",
+        expected = "Remove  piece!",
+        mod = function(s)
+          return nil
+        end
       }
     }
     before_each(function()
@@ -135,7 +163,7 @@ Line C]],
     end)
     for _, tc in ipairs(testCases) do
       it(tc.desc, function()
-        local actual = addon:strmod(tc.str, tc.pattern, tc.mod)
+        local actual = addon:strmod(tc.str, tc.pattern, tc.mod, val1, val2)
         assert.equals(tc.expected, actual)
       end)
     end

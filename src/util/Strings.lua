@@ -33,8 +33,9 @@ end
 
 -- Modifies each substring with the provided function
 -- and inserts it back into the original string
+-- Additional parameters can be passed to the function through varargs
 -- Returns the modified string
-function addon:strmod(str, findPattern, fn)
+function addon:strmod(str, findPattern, fn, ...)
   assert(type(str) == "string")
   assert(type(findPattern) == "string")
   assert(type(fn) == "function")
@@ -53,8 +54,12 @@ function addon:strmod(str, findPattern, fn)
     after = str:sub(to + 1, #str)
     -- print(before.."|"..middle.."|"..after)
 
-    middle = fn(middle)
-    assert(type(middle) == "string", "strmod: mod function must return a string")
+    middle = fn(middle, ...)
+    if middle == nil then
+      middle = ""
+    else
+      middle = tostring(middle)
+    end
     -- print(before.."|"..middle.."|"..after)
 
     -- Merge the modfiied string with its non-matching brethren
