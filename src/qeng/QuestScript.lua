@@ -84,8 +84,8 @@ local objectives = {
       },
       log = "/%em [%t] [%g2:%p/%g]",
       progress = "/%em [%t]: %p/%g",
-      quest = "/%em [%t:on_%g2_%t|[%g2:%g2_times]]",
-      full = "Use emote /%em [%t:on_%g2_%t|[%g2:%g2_times]]"
+      quest = "/%em [%t:on %g2 %t|[%g2:%g2 times]]",
+      full = "Use emote /%em [%t:on %g2 %t|[%g2:%g2 times]]"
     },
     params = {
       {
@@ -137,8 +137,8 @@ local objectives = {
       },
       log = "[%sz|%z]",
       progress = "[%sz|%z] explored: %p/%g",
-      quest = "Explore [%sz:%sz_in] %z",
-      full = "Go [%r:within_%r_units_of|to] [%x:(%x,_%y)_in] [%sz:%sz_in] %z"
+      quest = "Explore [%sz:%sz in] %z",
+      full = "Go [%r:within %r units of|to] [%x:(%x, %y) in] [%sz:%sz in] %z"
     },
     params = {
       { -- todo: remove goal from explore, should always be 1
