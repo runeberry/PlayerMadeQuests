@@ -1,5 +1,6 @@
 local _, addon = ...
 local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
+local compiler = addon.QuestScriptCompiler
 
 local questInviteFrame
 local currentQuest -- The quest being proposed in the window
@@ -36,7 +37,7 @@ local function qf_SetContent(self, quest)
   if quest.objectives then
     local objString = ""
     for _, obj in ipairs(quest.objectives) do
-      objString = objString.."* "..obj:GetDisplayText().."\n"
+      objString = objString.."* "..compiler:GetDisplayText(obj, "quest").."\n"
     end
     fsQuestObjectives:SetText(objString)
   else

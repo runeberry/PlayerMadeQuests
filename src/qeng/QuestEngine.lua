@@ -52,49 +52,6 @@ local function objective_GetMetadata(obj, name)
   return nil
 end
 
-local function objective_GetDisplayText(obj)
-  if obj.displayText then
-    return obj.displayText
-  elseif obj._parent.scripts and obj._parent.scripts.GetDisplayText then
-    return obj._parent.scripts.GetDisplayText(obj)
-  else
-    return obj.name
-  end
-end
-
-local function objective_GetConditionDisplayText(obj, condName, defaultIfZero)
-  local condVal = obj.conditions and obj.conditions[condName]
-
-  if condVal == nil then
-    return defaultIfZero or ""
-  end
-
-  if type(condVal) ~= "table" then
-    return condVal
-  end
-
-  local len = addon:tlen(condVal)
-  if len == 0 then
-    return defaultIfZero or ""
-  end
-  if len == 1 then
-    for v in pairs(condVal) do
-      return v
-    end
-  elseif len > 1 then
-    local ret = ""
-    local i = 1
-    for v in pairs(condVal) do
-      if i == len then
-        return ret.." or "..v
-      else
-        ret = ret..", "..v
-      end
-      i = i + 1
-    end
-  end
-end
-
 ---------------------------------------------------
 -- Private functions: Quest objective evaluation --
 ---------------------------------------------------
@@ -247,8 +204,6 @@ function addon.QuestEngine:Build(quest)
     obj.GetConditionValue = objective_GetConditionValue
     obj.GetMetadata = objective_GetMetadata
     obj.SetMetadata = objective_SetMetadata
-    obj.GetDisplayText = objective_GetDisplayText
-    obj.GetConditionDisplayText = objective_GetConditionDisplayText
 
     for name, _ in pairs(obj.conditions) do
       local condition = obj._parent._paramsByName[name]

@@ -18,7 +18,6 @@ local tokens = {
   METHOD_PRE_COND = "BeforeCheckConditions",
   METHOD_CHECK_COND = "CheckCondition",
   METHOD_POST_COND = "AfterCheckConditions",
-  METHOD_DISPLAY_TEXT = "GetDisplayText",
 
   PARAM_DESCRIPTION = "description",
   PARAM_DIFFICULTY = "difficulty",
@@ -66,7 +65,6 @@ local objectives = {
     },
     scripts = {
       tokens.METHOD_PRE_COND,
-      tokens.METHOD_DISPLAY_TEXT,
     },
     displaytext = {
       vars = {
@@ -117,7 +115,6 @@ local objectives = {
     scripts = {
       tokens.METHOD_PRE_COND,
       tokens.METHOD_POST_COND,
-      tokens.METHOD_DISPLAY_TEXT,
     },
     displaytext = {
       vars = {
@@ -183,7 +180,6 @@ local objectives = {
     scripts = {
       tokens.METHOD_PRE_COND,
       tokens.METHOD_POST_COND,
-      tokens.METHOD_DISPLAY_TEXT,
     },
     displaytext = {
       vars = {
@@ -219,9 +215,6 @@ local objectives = {
     shorthand = {
       tokens.PARAM_GOAL,
       tokens.PARAM_TARGET,
-    },
-    scripts = {
-      tokens.METHOD_DISPLAY_TEXT,
     },
     displaytext = {
       vars = {
