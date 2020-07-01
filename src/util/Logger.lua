@@ -166,60 +166,57 @@ local logMethods = {
   end
 }
 
--- This method is attached to the Logger and sets the "system" level of the logger (defined by code)
-local function logger_SetLogLevel(self, loglevel)
-  local value = getLogLevel(loglevel)
-  if not value then return end
-  logLevels.system[self.name] = value
-end
-
-local function logger_SetLogMode(self, logmode)
-  self.Log = logMethods[logmode]
-end
-
--- Shorthand methods for logging
-local function logger_Fatal(self, str, ...) self:Log(ll.fatal, str, ...) end
-local function logger_Error(self, str, ...) self:Log(ll.error, str, ...) end
-local function logger_Warn(self, str, ...) self:Log(ll.warn, str, ...) end
-local function logger_Info(self, str, ...) self:Log(ll.info, str, ...) end
-local function logger_Debug(self, str, ...) self:Log(ll.debug, str, ...) end
-local function logger_Trace(self, str, ...) self:Log(ll.trace, str, ...) end
-
-local function logger_Varargs(self, ...)
-  local vals = {}
-  for n=1, select('#', ...) do
-    local val = select(n, ...)
-    vals[#vals+1] = tostring(val)
-  end
-  self:Debug("Variadic args: [" .. table.concat(vals, ", ") .. "]")
-end
-
-local function logger_Table(self, t, key, indent, circ)
-  if t == nil then
-    self:Debug("Table is nil")
-    return
-  end
-  indent = indent or ""
-  circ = circ or {}
-  circ[t] = true
-  if key then
-    self:Debug(indent, key, "=", t, "(", addon:tlen(t), "elements )")
-  else
-    self:Debug(t, "(", addon:tlen(t), "elements )")
-  end
-  indent = indent.."  "
-  for k, v in pairs(t) do
-    if type(v) == "table" then
-      if circ[v] then
-        self:Debug(indent, k, "=", v, "(Dupe)")
-      else
-        self:Table(v, k, indent, circ)
-      end
-    else
-      self:Debug(indent, k, "=", v)
+local methods = {
+  -- This method is attached to the Logger and sets the "system" level of the logger (defined by code)
+  ["SetLogLevel"] = function(self, loglevel)
+    local value = getLogLevel(loglevel)
+    if not value then return end
+    logLevels.system[self.name] = value
+  end,
+  ["SetLogMode"] = function(self, logmode)
+    self.Log = logMethods[logmode]
+  end,
+  ["Fatal"] = function(self, str, ...) self:Log(ll.fatal, str, ...) end,
+  ["Error"] = function(self, str, ...) self:Log(ll.error, str, ...) end,
+  ["Warn"] = function(self, str, ...) self:Log(ll.warn, str, ...) end,
+  ["Info"] = function(self, str, ...) self:Log(ll.info, str, ...) end,
+  ["Debug"] = function(self, str, ...) self:Log(ll.debug, str, ...) end,
+  ["Trace"] = function(self, str, ...) self:Log(ll.trace, str, ...) end,
+  ["Varargs"] = function(self, ...)
+    local vals = {}
+    for n=1, select('#', ...) do
+      local val = select(n, ...)
+      vals[#vals+1] = tostring(val)
     end
-  end
-end
+    self:Debug("Variadic args: [" .. table.concat(vals, ", ") .. "]")
+  end,
+  ["Table"] = function(self, t, key, indent, circ)
+    if t == nil then
+      self:Debug("Table is nil")
+      return
+    end
+    indent = indent or ""
+    circ = circ or {}
+    circ[t] = true
+    if key then
+      self:Debug(indent, key, "=", t, "(", addon:tlen(t), "elements )")
+    else
+      self:Debug(t, "(", addon:tlen(t), "elements )")
+    end
+    indent = indent.."  "
+    for k, v in pairs(t) do
+      if type(v) == "table" then
+        if circ[v] then
+          self:Debug(indent, k, "=", v, "(Dupe)")
+        else
+          self:Table(v, k, indent, circ)
+        end
+      else
+        self:Debug(indent, k, "=", v)
+      end
+    end
+  end,
+}
 
 local function logger_NewLogger(self, name, min)
   if self then
@@ -241,20 +238,12 @@ local function logger_NewLogger(self, name, min)
     stats = newStatsTable(),
 
     NewLogger = logger_NewLogger,
-    SetLogLevel = logger_SetLogLevel,
-    SetLogMode = logger_SetLogMode,
-
     Log = logMethods[globalLogMode],
-    Fatal = logger_Fatal,
-    Error = logger_Error,
-    Warn = logger_Warn,
-    Info = logger_Info,
-    Debug = logger_Debug,
-    Trace = logger_Trace,
-
-    Varargs = logger_Varargs,
-    Table = logger_Table
   }
+
+  for fname, method in pairs(methods) do
+    logger[fname] = method
+  end
 
   if not min then
     min = ll.info
