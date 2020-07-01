@@ -4,10 +4,6 @@ local print = addon.G.print
 addon.ADDON_VERSION = "v0.0.3-alpha"
 addon.IsAddonLoaded = false
 
--- For quick testing
-addon.SHOW_MENU_ON_START = nil
-addon.USE_INTERNAL_MESSAGING = addon.USE_INTERNAL_MESSAGING or false
-
 function addon.Ace:OnInitialize()
   addon:catch(function()
 

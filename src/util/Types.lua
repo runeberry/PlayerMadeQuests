@@ -1,12 +1,24 @@
 local _, addon = ...
 
+local boolTable = {
+  ["true"] = true,
+  ["enable"] = true,
+  ["on"] = true,
+  ["yes"] = true,
+
+  ["false"] = false,
+  ["disable"] = false,
+  ["off"] = false,
+  ["no"] = false,
+}
+
 local converters = {
   ["string:number"] = function(str)
     return tonumber(str)
   end,
   ["string:boolean"] = function(str)
     str = str:lower()
-    if str == "true" then return true elseif str == "false" then return false end
+    if boolTable[str] ~= nil then return boolTable[str] end
   end,
   ["number:string"] = function(num)
     return tostring(num)
@@ -35,4 +47,14 @@ function addon:ConvertValue(val, toType)
   assert(converted ~= nil, "Failed to convert value "..tostring(val).." from type "..fromType.." to "..toType)
 
   return converted
+end
+
+function addon:TryConvertString(str)
+  local converted = converters["string:number"](str)
+  if converted then return converted end
+
+  converted = converters["string:boolean"](str)
+  if converted then return converted end
+
+  return str
 end

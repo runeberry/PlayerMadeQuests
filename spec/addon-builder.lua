@@ -61,7 +61,6 @@ function builder:Build(opts)
 
   local addon = {
     GLOBAL_LOG_MODE = "simple-unbuffered",
-    GLOBAL_LOG_LEVEL = 5,
     TRANSACTION_LOGS = false,
     USE_INTERNAL_MESSAGING = true,
     -- Exception: I want to include the TinyYaml lib for parsing quests
@@ -79,11 +78,11 @@ function builder:Build(opts)
   end
 
   -- Logger is silent unless manually enabled by a test
-  addon.Logger:SetLogLevel(addon.LogLevel.silent)
+  addon:SetGlobalLogFilter(addon.LogLevel.silent)
   -- Removes color codes and prints logs immediately instead of buffering them
   if opts then
     if opts.LOG_LEVEL then
-      addon.Logger:SetLogLevel(opts.LOG_LEVEL)
+      addon:SetGlobalLogFilter(opts.LOG_LEVEL)
     end
     if opts.LOG_MODE then
       addon.Logger:SetLogMode(opts.LOG_MODE)

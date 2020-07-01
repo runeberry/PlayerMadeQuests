@@ -46,7 +46,7 @@ local function broker_publishMessage(self, event, details, ...)
   local payload = { e = event, p = { ... } }
   local compressed = addon:CompressTable(payload)
   local encoded = encoder:Encode(compressed)
-  if addon.USE_INTERNAL_MESSAGING then
+  if addon.PlayerSettings["internal-messaging"] or addon.USE_INTERNAL_MESSAGING then
     -- For development and unit testing only
     onCommReceived(PMQ_MESSAGE_PREFIX, encoded, details.distribution, "*yourself*")
     return
