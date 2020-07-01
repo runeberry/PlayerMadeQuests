@@ -64,4 +64,39 @@ handlers = {
       addon.Logger:Debug(varname..":", val)
     end
   end,
+  ["get"] = function(name)
+    if not name then
+      addon.Logger:Table(addon.PlayerSettings)
+      return
+    end
+
+    addon.Logger:Info(name..":", addon.PlayerSettings[name] or "not configured")
+  end,
+  ["set"] = function(name, value)
+    if not name or not value then
+      addon.Logger:Warn("/pmq set - name and value are required")
+      return
+    end
+
+    addon.PlayerSettings[name] = value
+    addon.SaveData:Save("Settings", addon.PlayerSettings)
+    addon.Logger:Info(name..":", addon.PlayerSettings[name])
+  end,
+  ["unset"] = function(name)
+    if not name then
+      addon.Logger:Warn("/pmq unset - name or \"all\" is required")
+      return
+    end
+
+    if name == "all" then
+      addon.PlayerSettings = {}
+      addon.SaveData:Save("Settings", addon.PlayerSettings)
+      addon.Logger:Info("All player settings have been cleared.")
+      return
+    end
+
+    addon.PlayerSettings[name] = nil
+    addon.SaveData:Save("Settings", addon.PlayerSettings)
+    addon.Logger:Info("Cleared setting:", name)
+  end
 }
