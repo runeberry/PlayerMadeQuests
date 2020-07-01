@@ -39,8 +39,16 @@ handlers = {
     addon.QuestLog:AddQuest(quest, addon.QuestStatus.Active)
     addon:PlaySound("QuestAccepted")
   end,
-  ["log"] = function(logLevel)
-    addon.PlayerSettings.MinLogLevel = addon:SetGlobalLogLevel(logLevel)
+  ["log"] = function(name, level)
+    addon:SetUserLogLevel(name, level)
+  end,
+  ["logstats"] = function()
+    local stats = addon:GetLogStats()
+    table.sort(stats, function(a, b) return a.name < b.name end)
+    addon.Logger:Info("Logger stats:")
+    for _, stat in pairs(stats) do
+      addon.Logger:Info("    ", stat.name, "("..stat.stats.printed, "printed,", stat.stats.received, "received @", stat.levelname..")")
+    end
   end,
   ["show"] = function()
     addon:ShowQuestLog(true)
