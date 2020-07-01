@@ -78,7 +78,7 @@ handlers = {
       return
     end
 
-    addon.PlayerSettings[name] = value
+    addon.PlayerSettings[name] = addon:TryConvertString(value)
     addon.SaveData:Save("Settings", addon.PlayerSettings)
     addon.Logger:Info(name..":", addon.PlayerSettings[name])
   end,
