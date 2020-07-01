@@ -184,35 +184,39 @@ local methods = {
   ["Trace"] = function(self, str, ...) self:Log(ll.trace, str, ...) end,
   ["Varargs"] = function(self, ...)
     local vals = {}
+    -- These logs are only intended for debugging, so just print them at the lowest visible log level
+    local level = getMinLogLevel(self.name)
     for n=1, select('#', ...) do
       local val = select(n, ...)
       vals[#vals+1] = tostring(val)
     end
-    self:Debug("Variadic args: [" .. table.concat(vals, ", ") .. "]")
+    self:Log(level, "Variadic args: [" .. table.concat(vals, ", ") .. "]")
   end,
   ["Table"] = function(self, t, key, indent, circ)
+    -- These logs are only intended for debugging, so just print them at the lowest visible log level
+    local level = getMinLogLevel(self.name)
     if t == nil then
-      self:Debug("Table is nil")
+      self:Log(level, "Table is nil")
       return
     end
     indent = indent or ""
     circ = circ or {}
     circ[t] = true
     if key then
-      self:Debug(indent, key, "=", t, "(", addon:tlen(t), "elements )")
+      self:Log(level, indent, key, "=", t, "(", addon:tlen(t), "elements )")
     else
-      self:Debug(t, "(", addon:tlen(t), "elements )")
+      self:Log(level, t, "(", addon:tlen(t), "elements )")
     end
     indent = indent.."  "
     for k, v in pairs(t) do
       if type(v) == "table" then
         if circ[v] then
-          self:Debug(indent, k, "=", v, "(Dupe)")
+          self:Log(level, indent, k, "=", v, "(Dupe)")
         else
           self:Table(v, k, indent, circ)
         end
       else
-        self:Debug(indent, k, "=", v)
+        self:Log(level, indent, k, "=", v)
       end
     end
   end,
