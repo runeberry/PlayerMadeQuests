@@ -324,7 +324,7 @@ local methods = {
       end
     end)
     local event, msg
-    local existing = findEntitiesByIndex(self, self.pkey, entity.id)
+    local existing = findEntitiesByIndex(self, self.pkey, entity[self.pkey])
     if existing then
       -- If an entity exists by this ID, then it's an update
       if existing == entity then
