@@ -31,6 +31,21 @@ function addon:Pluralize(num, singular, plural)
   end
 end
 
+function addon:Enquote(str, quotes)
+  str = tostring(str) or ""
+  quotes = quotes or "\""
+
+  if #quotes == 1 then
+    return quotes..str..quotes
+  else
+    local first = quotes:sub(1, 2)
+    local last = quotes:sub(2)
+    return first..str..last
+  end
+
+  return str
+end
+
 -- Modifies each substring with the provided function
 -- and inserts it back into the original string
 -- Additional parameters can be passed to the function through varargs
