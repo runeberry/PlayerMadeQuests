@@ -157,7 +157,6 @@ end
 ----------------------------------
 
 function addon.QuestEngine:Validate(quest)
-  assert(not quest.id, "quest.id should no longer be used")
   assert(type(quest.questId) == "string" and quest.questId ~= "", "questId is required")
   assert(type(quest.name) == "string" and quest.name ~= "", "quest name is required")
   assert(type(quest.objectives) == "table", "quest objectives must be defined")
