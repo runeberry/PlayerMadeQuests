@@ -103,8 +103,10 @@ handlers = {
       return
     end
 
-    addon.PlayerSettings[name] = nil
-    addon.SaveData:Save("Settings", addon.PlayerSettings)
-    addon.Logger:Info("Cleared setting:", name)
+    if addon.PlayerSettings[name] then
+      addon.PlayerSettings[name] = nil
+      addon.SaveData:Save("Settings", addon.PlayerSettings)
+      addon.Logger:Info("Cleared setting:", name)
+    end
   end
 }
