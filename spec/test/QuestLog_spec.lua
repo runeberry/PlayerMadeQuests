@@ -48,6 +48,9 @@ describe("QuestLog", function()
       assert.equals(1, #results)
 
       local result = QuestLog:FindByID(quest.questId)
+      -- remove timestamps for object comparison
+      result.cd = nil
+      result.ud = nil
       assert.same(result, quest)
 
       local payload = eventSpy:GetPublishPayload("QuestAdded", 1)

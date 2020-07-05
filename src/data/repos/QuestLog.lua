@@ -6,6 +6,7 @@ addon.QuestLog = addon.Data:NewRepository("Quest", "questId")
 addon.QuestLog:SetSaveDataSource("QuestLog")
 addon.QuestLog:EnableWrite(true)
 addon.QuestLog:EnableCompression(true)
+addon.QuestLog:EnableTimestamps(true)
 
 local statusTracker = {}
 

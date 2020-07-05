@@ -62,6 +62,9 @@ describe("QuestEngine", function()
         QuestLog:SaveWithStatus(quest, QuestStatus.Active)
         addon:Advance()
         quest = QuestLog:FindByID(quest.questId)
+        -- remove timestamps for object comparison
+        quest.cd = nil
+        quest.ud = nil
       end)
       it("then quest tracking is started", function()
         local payload = eventSpy:GetPublishPayload("QuestTrackingStarted")

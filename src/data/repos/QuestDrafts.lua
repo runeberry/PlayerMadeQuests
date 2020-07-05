@@ -17,6 +17,7 @@ addon.QuestDrafts:SetSaveDataSource("Drafts")
 addon.QuestDrafts:EnableWrite(true)
 addon.QuestDrafts:EnableCompression(true)
 addon.QuestDrafts:EnableGlobalSaveData(true)
+addon.QuestDrafts:EnableTimestamps(true)
 
 addon.QuestDraftStatus = {
   Draft = "Draft",
