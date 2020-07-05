@@ -303,3 +303,4 @@ end
 
 -- Cannot create the global logger until this method is available
 addon.Logger = logger_NewLogger(nil, "PMQ", ll.trace)
+addon.UILogger = addon.Logger:NewLogger("UI", ll.info)

@@ -29,11 +29,11 @@ end
 
 function addon.CustomWidgets:NewWidget(name)
   if name == nil or name == "" then
-    addon.Logger:Error("Unable to create CustomWidget: name is required")
+    addon.UILogger:Error("Unable to create CustomWidget: name is required")
     return {}
   end
   if widgets[name] then
-    addon.Logger:Warn("Unable to create CustomWidget: widget already exists with name '"..name.."'")
+    addon.UILogger:Warn("Unable to create CustomWidget: widget already exists with name '"..name.."'")
     return {}
   end
 

@@ -23,12 +23,12 @@ local editBoxScripts = {
       -- Cursor is below the visible area
       local scroll = math.ceil(yPos + lineHeight - h)
       scrollFrame:SetVerticalScroll(scroll)
-      -- addon.Logger:Debug("Scrolled down from", vs, "to", scroll, "at Y:", yPos)
+      -- addon.UILogger:Debug("Scrolled down from", vs, "to", scroll, "at Y:", yPos)
     elseif yPos < vs then
       -- Cursor is above the visible area
       local scroll = yPos
       scrollFrame:SetVerticalScroll(scroll)
-      -- addon.Logger:Debug("Scrolled up from", vs, "to", scroll, "at Y:", yPos)
+      -- addon.UILogger:Debug("Scrolled up from", vs, "to", scroll, "at Y:", yPos)
     end
   end,
   ["OnEscapePressed"] = function(editBox)

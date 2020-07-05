@@ -85,7 +85,7 @@ local methods = {
   ["NewMenuScreen"] = function(self, menuId, headingText)
     local st = { headingText = headingText }
     if self._menus[menuId] then
-      addon.Logger:Error("Failed to register NewMenuScreen: screen already exists with id", menuId)
+      addon.UILogger:Error("Failed to register NewMenuScreen: screen already exists with id", menuId)
       return st
     end
     self._menus[menuId] = st
@@ -118,7 +118,7 @@ local methods = {
       end
       self._selectedScreen = screen
 
-      addon.Logger:Trace("Showing menu with id:", menuId)
+      addon.UILogger:Trace("Showing menu with id:", menuId)
       screen:OnShowMenu(...)
       screen:Show()
     end

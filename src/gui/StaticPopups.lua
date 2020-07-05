@@ -49,7 +49,7 @@ end
 function addon.StaticPopups:NewPopup(id)
   local globalId = "PMQ_"..id
   if StaticPopupDialogs[globalId] then
-    addon.Logger:Error("Popup already exists with id:", id)
+    addon.UILogger:Error("Popup already exists with id:", id)
     return
   end
 
@@ -69,14 +69,14 @@ function addon.StaticPopups:NewPopup(id)
   }
 
   StaticPopupDialogs["PMQ_"..id] = popup
-  addon.Logger:Trace("Registered static popup:", id)
+  addon.UILogger:Trace("Registered static popup:", id)
   return popup
 end
 
 function addon.StaticPopups:ShowPopup(id)
   local popup = StaticPopupDialogs["PMQ_"..id]
   if not popup then
-    addon.Logger:Error("No popup exists with id:", id)
+    addon.UILogger:Error("No popup exists with id:", id)
     return
   end
   popup:Show()

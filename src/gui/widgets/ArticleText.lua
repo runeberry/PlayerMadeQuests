@@ -30,7 +30,7 @@ local function buildFontStrings(frame)
   for _, tx in ipairs(frame.text) do
     local textStyle = frame.textStyles[tx.textStyleName]
     if not textStyle then
-      addon.Logger:Warn("No style defined for:", tx.textStyleName)
+      addon.UILogger:Warn("No style defined for:", tx.textStyleName)
       textStyle = frame.textStyles["default"]
     end
     local fontString = frame:CreateFontString(nil, "BACKGROUND", textStyle.inheritsFrom)

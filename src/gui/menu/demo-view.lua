@@ -31,7 +31,6 @@ function menu:Create(frame)
   nameField:SetEnabled(false)
   nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
   nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
-  nameField:OnEnterPressed(function(text) addon.Logger:Info(text) end)
 
   local descField = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "Description")
   descField:SetEnabled(false)
