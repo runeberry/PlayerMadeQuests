@@ -1,10 +1,13 @@
 local _, addon = ...
 addon:traceFile("Repository.lua")
+local time = addon.G.time
 
 addon.Data = {}
 local logger = addon.Logger:NewLogger("Data", addon.LogLevel.info)
 local repos = {}
 local defaultPkey = "id"
+local createDateKey = "cd"
+local updateDateKey = "ud"
 local transactionLogs = addon.TRANSACTION_LOGS or false
 
 local function addItemToIndex(indexTable, item, indexProp)
@@ -329,12 +332,30 @@ local methods = {
           -- todo: I do not know how to recover if this happens
           error("Reindexing failed, unrecoverable error")
         end)
+        if self._timestampsEnabled then
+          local ts, origUpdateDate = time()
+          transaction:AddStep(function()
+            origUpdateDate = entity[updateDateKey]
+            entity[updateDateKey] = ts
+          end, function()
+            entity[updateDateKey] = origUpdateDate
+          end)
+        end
       elseif self.data[existing] then
         event, msg = self.events.EntityUpdated, "Entity updated"
         local dsCopy
         transaction:AddStep(function()
           dsCopy = addon:CopyTable(entity)
         end)
+        if self._timestampsEnabled then
+          local ts, origUpdateDate = time()
+          transaction:AddStep(function()
+            origUpdateDate = dsCopy[updateDateKey]
+            dsCopy[updateDateKey] = ts
+          end, function()
+            dsCopy[updateDateKey] = origUpdateDate
+          end)
+        end
         transaction:AddStep(function()
           deindexItem(self, existing)
         end, function()
@@ -367,6 +388,16 @@ local methods = {
           insertable = addon:CopyTable(insertable)
         end
       end)
+      if self._timestampsEnabled then
+        local ts = time()
+        transaction:AddStep(function()
+          insertable[createDateKey] = ts
+          insertable[updateDateKey] = ts
+        end, function()
+          insertable[createDateKey] = nil
+          insertable[updateDateKey] = nil
+        end)
+      end
       transaction:AddStep(function()
         self.data[insertable] = true
       end, function()
@@ -521,6 +552,9 @@ local methods = {
   end,
   ["EnablePrimaryKeyGeneration"] = function(self, flag)
     self._pkgenEnabled = flag
+  end,
+  ["EnableTimestamps"] = function(self, flag)
+    self._timestampsEnabled = flag
   end,
   ["EnableWrite"] = function(self, flag)
     self._writeEnabled = flag
