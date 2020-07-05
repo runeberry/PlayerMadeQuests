@@ -139,7 +139,7 @@ end
 
 local function refreshQuestText()
   local quests = QuestLog:FindAll()
-  table.sort(quests, function(a,b) return a.id < b.id end)
+  table.sort(quests, function(a,b) return a.questId < b.questId end)
   SetQuestLogText(frames["questList"], quests)
 end
 

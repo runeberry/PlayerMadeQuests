@@ -5,8 +5,8 @@ local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
 
 addon.QuestEngine = {}
 
--- This will be replaced with a new table when the compiler loads
-local objectives = {}
+local objectivesByName = {}
+local questsByObjective = {}
 
 addon.QuestStatus = {
   Invited = "Invited",
@@ -19,51 +19,23 @@ addon.QuestStatus = {
 }
 local status = addon.QuestStatus
 
-------------------------
--- Predefined Methods --
-------------------------
-
-local function objective_HasCondition(obj, name)
-  return obj.conditions and obj.conditions[name] and true
-end
-
-local function objective_GetConditionValue(obj, name)
-  if obj.conditions then
-    return obj.conditions[name]
-  end
-end
-
-local function objective_SetMetadata(obj, name, value, persistent)
-  if persistent then
-    -- These values will be written to SavedVariables
-    obj.metadata[name] = value
-  else
-    -- These values will not be saved. Use for non-serializable data.
-    obj._tempdata[name] = value
-  end
-end
-
-local function objective_GetMetadata(obj, name)
-  if obj._tempdata[name] ~= nil then
-    return obj._tempdata[name]
-  elseif obj.metadata[name] ~= nil then
-    return obj.metadata[name]
-  end
-  return nil
-end
-
 ---------------------------------------------------
 -- Private functions: Quest objective evaluation --
 ---------------------------------------------------
 
 local function evaluateObjective(objective, obj, ...)
   local ok, beforeResult, checkResult, afterResult
+  logger:Trace("Evaluating objective", addon:Enquote(obj.name), addon:Enquote(obj.id, "()"))
+
   if objective.scripts and objective.scripts.BeforeCheckConditions then
+    -- Determine if the objective as a whole should be evaluated
     ok, beforeResult = pcall(objective.scripts.BeforeCheckConditions, obj, ...)
-    if not(ok) then
-      logger:Error("Error during BeforeCheckConditions for '", obj.id, "':", beforeResult)
+    if not ok then
+      logger:Error("Error during BeforeCheckConditions for", addon:Enquote(obj.id), ":", beforeResult)
       return
     elseif beforeResult == false then
+      -- If the objective's pre-condition returns boolean false, then do not continue evaluating the objective
+      logger:Trace("BeforeCheckConditions evaluated false for", obj.id..". Terminating early.")
       return
     end
   end
@@ -76,12 +48,13 @@ local function evaluateObjective(objective, obj, ...)
     if condition.scripts and condition.scripts.CheckCondition then
       -- CheckCondition receives 2 args: The obj being evaluated, and the value(s) for this condition
       ok, checkResult = pcall(condition.scripts.CheckCondition, obj, val)
-      if not(ok) then
-        logger:Error("Error evaluating condition '", name,"' for '", obj.id, "':", checkResult)
+      logger:Trace("    Condition", addon:Enquote(name), "evaluated:", checkResult)
+      if not ok then
+        logger:Error("Error evaluating condition", addon:Enquote(name), "for", addon:Enquote(obj.id), ":", checkResult)
         return
-      elseif checkResult ~= true  then
+      elseif checkResult ~= true then
         -- If any result was not true, keep evaluating conditions, but set checkResult to false when it's all done
-        logger:Trace("Condition '"..name.."' evaluated:", checkResult)
+        -- We keep evaluating because there might be side-effects from other conditions that are still required (not ideal, but oh well)
         anyFailed = true
       end
     end
@@ -95,11 +68,12 @@ local function evaluateObjective(objective, obj, ...)
   if objective.scripts and objective.scripts.AfterCheckConditions then
     ok, afterResult = addon:catch(objective.scripts.AfterCheckConditions, obj, checkResult, ...)
     if not(ok) then
-      logger:Error("Error during AfterCheckConditions for '", obj.id, "':", afterResult)
+      logger:Error("Error during AfterCheckConditions for", addon:Enquote(obj.id), ":", afterResult)
       return
     elseif afterResult ~= nil then
       -- If the After function returns a value, then that value will override the result of CheckCondition
       checkResult = afterResult
+      logger:Trace("    AfterCheckConditions overriding result with:", checkResult)
     end
   end
 
@@ -112,6 +86,7 @@ local function evaluateObjective(objective, obj, ...)
     checkResult = 0
   end
 
+  logger:Trace(obj.name, "evaluated:", checkResult)
   return checkResult
 end
 
@@ -139,7 +114,7 @@ local function wrapObjectiveHandler(objective)
         if result > 0 then
           anychanged = true
           obj.progress = obj.progress + result
-          local quest = obj._quest
+          local quest = questsByObjective[obj.id]
 
           -- Sanity checks: progress must be >= 0, and progress must be an integer
           obj.progress = math.max(math.floor(obj.progress), 0)
@@ -159,7 +134,7 @@ local function wrapObjectiveHandler(objective)
               end
             end
             if questCompleted then
-              addon.QuestLog:SetQuestStatus(quest.id, status.Completed)
+              addon.QuestLog:SetQuestStatus(quest.questId, status.Completed)
             end
           end
         end
@@ -181,59 +156,51 @@ end
 -- Building and Tracking Quests --
 ----------------------------------
 
-function addon.QuestEngine:Build(quest)
-  if quest._built then return end
-  quest.name = quest.name or error("Failed to create quest: quest name is required")
+function addon.QuestEngine:Validate(quest)
+  assert(not quest.id, "quest.id should no longer be used")
+  assert(type(quest.questId) == "string" and quest.questId ~= "", "questId is required")
+  assert(type(quest.name) == "string" and quest.name ~= "", "quest name is required")
+  assert(type(quest.objectives) == "table", "quest objectives must be defined")
 
-  quest.objectives = quest.objectives or {}
+  for _, obj in ipairs(quest.objectives) do
+    assert(type(obj.id) == "string" and obj.id ~= "", "objective id is required")
+    assert(type(obj.name) == "string" and obj.name ~= "", "objective name is required")
 
-  for _, obj in pairs(quest.objectives) do
-    obj.name = obj.name or error("Failed to create quest: objective name is required")
-    obj._parent = objectives[obj.name] or error("Failed to create quest: '"..obj.name.."' is not a valid objective")
-    obj._quest = quest -- Add reference back to this obj's quest
-    obj._tempdata = {}
+    local objTemplate = objectivesByName[obj.name]
+    assert(objTemplate, addon:Enquote(obj.name).." is not a valid objective")
 
-    obj.id = obj.id or addon:CreateID("objective-"..obj.name.."-%i")
-    obj.progress = obj.progress or 0
-    obj.goal = obj.goal or 1
-    obj.conditions = obj.conditions or {}
-    obj.metadata = obj.metadata or {}
+    assert(type(obj.goal) == "number" and obj.goal > 0, addon:Enquote(obj.name).." objective must have a goal > 0")
+    assert(type(obj.progress) == "number" and obj.progress >= 0, addon:Enquote(obj.progress).." objective must have progress >= 0")
 
-    -- Add predefined methods here
-    obj.HasCondition = objective_HasCondition
-    obj.GetConditionValue = objective_GetConditionValue
-    obj.GetMetadata = objective_GetMetadata
-    obj.SetMetadata = objective_SetMetadata
-
-    for name, _ in pairs(obj.conditions) do
-      local condition = obj._parent._paramsByName[name]
-      if not condition then
-        error("Failed to create quest: '"..name.."' is not a valid condition for objective '"..obj._parent.name.."'")
-      end
+    assert(type(obj.conditions) == "table", addon:Enquote(obj.name).." must have conditions defined")
+    for condName, _ in pairs(obj.conditions) do
+      local condition = objTemplate._paramsByName[condName]
+      assert(condition, addon:Enquote(condName).." is not a valid condition for objective "..addon:Enquote(objTemplate.name))
     end
   end
-
-  quest._built = true
-  return quest
 end
 
 local function startTracking(quest)
   -- All active instances of a created objective are stored together
   -- so that they can be quickly evaluated together
   for _, obj in pairs(quest.objectives) do
-    obj._parent._active[obj.id] = obj
+    questsByObjective[obj.id] = quest
+    objectivesByName[obj.name]._active[obj.id] = obj
   end
   addon.AppEvents:Publish("QuestTrackingStarted", quest)
 end
 
 local function stopTracking(quest)
   for _, obj in pairs(quest.objectives) do
-    obj._parent._active[obj.id] = nil
+    questsByObjective[obj.id] = nil
+    objectivesByName[obj.name]._active[obj.id] = nil
   end
   addon.AppEvents:Publish("QuestTrackingStopped", quest)
 end
 
 local function setTracking(quest)
+  -- sanity check: validate quest before tracking it
+  addon.QuestEngine:Validate(quest)
   if quest.status == status.Active then
     -- If start tracking fails, let it throw an error
     startTracking(quest)
@@ -249,22 +216,26 @@ addon.AppEvents:Subscribe("QuestDeleted", stopTracking)
 
 addon.AppEvents:Subscribe("QuestLogLoaded", function(quests)
   for _, q in pairs(quests) do
-    addon.QuestEngine:Build(q)
-    setTracking(q)
+    local ok, err = pcall(setTracking, q)
+    if ok then
+      setTracking(q)
+    else
+      logger:Error("Failed to set quest tracking:", err)
+    end
   end
   addon.AppEvents:Publish("QuestLogBuilt", quests)
 end)
 
 addon.AppEvents:Subscribe("QuestLogReset", function()
-  for _, objective in pairs(objectives) do
+  for _, objective in pairs(objectivesByName) do
     objective._active = {}
   end
 end)
 
 addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
   -- Ensure everything can be setup, then wire up objectives into the engine
-  objectives = qsObjectives
-  for _, objective in pairs(objectives) do
+  objectivesByName = addon:CopyTable(qsObjectives)
+  for _, objective in pairs(objectivesByName) do
     objective._active = {} -- Every active instance of this objective will be tracked
     addon.QuestEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))
   end

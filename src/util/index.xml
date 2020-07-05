@@ -2,6 +2,7 @@
   <Script file="util/Strings.lua"/>
   <Script file="util/Tables.lua"/>
   <Script file="util/Identifiers.lua"/>
+  <Script file="util/Location.lua"/>
   <Script file="util/Logger.lua"/>
   <Script file="util/Sounds.lua"/>
   <Script file="util/Types.lua"/>

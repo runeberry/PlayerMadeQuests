@@ -23,6 +23,7 @@ local tokens = {
   PARAM_DIFFICULTY = "difficulty",
   PARAM_EMOTE = "emote",
   PARAM_GOAL = "goal",
+  PARAM_KILLTARGET = "killtarget",
   PARAM_MAX = "max",
   PARAM_MIN = "min",
   PARAM_NAME = "name",
@@ -40,18 +41,27 @@ local tokens = {
   FLAG_RECOMMENDED = "recommended",
 }
 
+local incTable = {}
+
 local globalDisplayTextVars = {
   ["g"] = function(obj) return obj.goal end,
   ["g2"] = function(obj) if obj.goal > 1 then return obj.goal end end,
   ["p"] = function(obj) return obj.progress end,
   ["p2"] = function(obj) if obj.progress < obj.goal then return obj.progress end end,
   ["inc"] = function(obj) -- incrementing counter tied to this objective, only works after quest is built
-    if obj._inc then return obj._inc end
-    if not obj._quest then return 0 end
-    obj._quest._inc = obj._quest._inc or 0
-    obj._quest._inc = obj._quest._inc + 1
-    obj._inc = obj._quest._inc
-    return obj._inc
+    local qinc = incTable[obj.questId]
+    if not qinc then
+      qinc = {}
+      incTable[obj.questId] = qinc
+    end
+
+    local incVal = qinc[obj.id]
+    if not incVal then
+      incVal = addon:tlen(qinc) + 1
+      qinc[obj.id] = incVal
+    end
+
+    return incVal
   end
 }
 
@@ -62,9 +72,6 @@ local objectives = {
       tokens.PARAM_EMOTE,
       tokens.PARAM_GOAL,
       tokens.PARAM_TARGET,
-    },
-    scripts = {
-      tokens.METHOD_PRE_COND,
     },
     displaytext = {
       vars = {
@@ -113,7 +120,6 @@ local objectives = {
       tokens.PARAM_RADIUS,
     },
     scripts = {
-      tokens.METHOD_PRE_COND,
       tokens.METHOD_POST_COND,
     },
     displaytext = {
@@ -177,13 +183,9 @@ local objectives = {
       tokens.PARAM_GOAL,
       tokens.PARAM_TARGET,
     },
-    scripts = {
-      tokens.METHOD_PRE_COND,
-      tokens.METHOD_POST_COND,
-    },
     displaytext = {
       vars = {
-        ["t"] = tokens.PARAM_TARGET,
+        ["t"] = tokens.PARAM_KILLTARGET,
       },
       log = "%t %p/%g",
       progress = "%t slain: %p/%g",
@@ -201,7 +203,8 @@ local objectives = {
         type = { "string", "table" }
       },
       {
-        name = tokens.PARAM_TARGET,
+        name = tokens.PARAM_KILLTARGET,
+        alias = tokens.PARAM_TARGET,
         required = true,
         multiple = true,
         scripts = {

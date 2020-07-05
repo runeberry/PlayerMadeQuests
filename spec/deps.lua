@@ -121,7 +121,7 @@ function deps:Init(addon)
     GetBestMapForUnit = mock:NewMock( mock:Returns({}) ),
     GetMapInfo = mock:NewMock( mock:Returns({}) ),
     GetPlayerMapPosition = mock:NewMock( mock:Returns({}) ),
-    GetUnitName = mock:NewMock( mock:Returns("name") ),
+    GetUnitName = mock:NewMock( mock:Returns("unitname") ),
     GetRealZoneText = mock:NewMock( mock:Returns("zone") ),
     GetSubZoneText = mock:NewMock( mock:Returns("subzone") ),
     GetMinimapZoneText = mock:NewMock( mock:Returns("subzone") ),

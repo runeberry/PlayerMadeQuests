@@ -3,11 +3,14 @@ addon:traceFile("conditions/emote.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
 
-compiler:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_CHECK_COND, function(obj, emoteNames)
-  local eem = obj:GetMetadata("ExpectedEmoteMessages")
-  local expectTargetedEmote = obj:HasCondition(tokens.PARAM_TARGET)
+-- Expected chat messages indexed by the objective they're expected for
+local expectedEmoteMessages = {}
 
-  if eem == nil then
+compiler:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_CHECK_COND, function(obj, emoteNames)
+  local eem = expectedEmoteMessages[obj.id]
+  local expectTargetedEmote = obj.conditions[tokens.PARAM_TARGET]
+
+  if not eem then
     eem = {}
 
     for emoteName in pairs(emoteNames) do
@@ -21,10 +24,12 @@ compiler:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_CHECK_COND, function(obj, e
         end
       end
     end
-    obj:SetMetadata("ExpectedEmoteMessages", eem)
+    expectedEmoteMessages[obj.id] = eem
   end
 
-  local pem = obj:GetMetadata("PlayerEmoteMessage")
+  local pem = addon.LastEmoteMessage
+  if not pem then return end
+
   if UnitExists("target") then
     -- Replace the emote message from chat with a %t placeholder
     -- so we can compare to the generic emote message.

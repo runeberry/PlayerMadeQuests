@@ -107,9 +107,9 @@ end
 local function getQuests()
   questLogRows = {}
   local quests = QuestLog:FindAll()
-  table.sort(quests, function(a, b) return a.id < b.id end)
+  table.sort(quests, function(a, b) return a.questId < b.questId end)
   for _, quest in pairs(quests) do
-    local row = { quest.name, quest.status, quest.id }
+    local row = { quest.name, quest.status, quest.questId }
     table.insert(questLogRows, row)
   end
   return questLogRows

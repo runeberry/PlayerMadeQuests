@@ -12,18 +12,12 @@ local goodScript = [[
 ]]
 
 -- For testing: compiles a script with some default parameters
-local function makeParams(script)
+local function makeQuest(script)
   local params = {
     name = "Test Quest",
     description = "I sure hope these tests pass!"
   }
   return compiler:Compile(script, params)
-end
-
--- For testing: given a script, creates a built quest with some default parameters
-local function quickBuild(script)
-  local p = makeParams(script)
-  return engine:Build(p)
 end
 
 describe("QuestLog", function()
@@ -35,7 +29,7 @@ describe("QuestLog", function()
     messageSpy = events:SpyOnEvents(addon.MessageEvents)
   end)
   before_each(function()
-    quest = quickBuild(goodScript)
+    quest = makeQuest(goodScript)
     QuestLog:Clear()
     addon:Advance()
     eventSpy:Reset()
@@ -58,7 +52,7 @@ describe("QuestLog", function()
       local results = QuestLog:FindAll()
       assert.equals(1, #results)
 
-      local result = QuestLog:FindByID(quest.id)
+      local result = QuestLog:FindByID(quest.questId)
       assert.same(result, quest)
 
       local payload = eventSpy:GetPublishPayload("QuestAdded", 1)
@@ -85,8 +79,8 @@ describe("QuestLog", function()
       eventSpy:Reset()
     end)
     it("can set quest status", function()
-      QuestLog:SetQuestStatus(quest.id, QuestStatus.Archived)
-      local result = QuestLog:FindByID(quest.id)
+      QuestLog:SetQuestStatus(quest.questId, QuestStatus.Archived)
+      local result = QuestLog:FindByID(quest.questId)
       assert.equals(QuestStatus.Archived, result.status)
     end)
     it("cannot set a non-existent quest", function()
@@ -94,24 +88,24 @@ describe("QuestLog", function()
       eventSpy:AssertNotPublished("QuestStatusChanged")
     end)
     it("cannot set when status is missing", function()
-      assert.has_error(function() QuestLog:SetQuestStatus(quest.id) end)
+      assert.has_error(function() QuestLog:SetQuestStatus(quest.questId) end)
       eventSpy:AssertNotPublished("QuestStatusChanged")
     end)
     it("cannot set an invalid status", function()
-      assert.has_error(function() QuestLog:SetQuestStatus(quest.id, "invalid") end)
+      assert.has_error(function() QuestLog:SetQuestStatus(quest.questId, "invalid") end)
       eventSpy:AssertNotPublished("QuestStatusChanged")
     end)
     it("does not publish event on same status", function()
-      QuestLog:SetQuestStatus(quest.id, quest.status)
+      QuestLog:SetQuestStatus(quest.questId, quest.status)
       eventSpy:AssertNotPublished("QuestStatusChanged")
     end)
     it("resets quest progress on status change", function()
       quest.objectives[1].progress = 1
-      QuestLog:SetQuestStatus(quest.id, QuestStatus.Active)
+      QuestLog:SetQuestStatus(quest.questId, QuestStatus.Active)
       assert.equals(0, quest.objectives[1].progress)
     end)
     it("publishes event on status change", function()
-      QuestLog:SetQuestStatus(quest.id, QuestStatus.Active)
+      QuestLog:SetQuestStatus(quest.questId, QuestStatus.Active)
       eventSpy:AssertPublished("QuestStatusChanged")
     end)
   end)
@@ -122,12 +116,12 @@ describe("QuestLog", function()
       eventSpy:Reset()
     end)
     it("can delete a quest", function()
-      QuestLog:DeleteQuest(quest.id)
+      QuestLog:DeleteQuest(quest.questId)
 
       local results = QuestLog:FindAll()
       assert.equals(0, #results)
 
-      local result = QuestLog:FindByID(quest.id)
+      local result = QuestLog:FindByID(quest.questId)
       assert.is_nil(result)
 
       local payload = eventSpy:GetPublishPayload("QuestDeleted")

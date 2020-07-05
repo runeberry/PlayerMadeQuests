@@ -40,16 +40,7 @@ end
 local function compile()
   local draftCopy = addon:CopyTable(currentDraft)
   writeFields(draftCopy)
-  local ok, parameters = pcall(addon.QuestScriptCompiler.Compile, addon.QuestEngine, draftCopy.script, draftCopy.parameters)
-  if not ok then
-    return ok, parameters
-  end
-  local quest
-  ok, quest = pcall(addon.QuestEngine.Build, addon.QuestEngine, parameters)
-  if not ok then
-    return ok, quest
-  end
-  return true, quest
+  return addon.QuestScriptCompiler:TryCompile(currentDraft.script, currentDraft.parameters)
 end
 
 local function button_Validate()

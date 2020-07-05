@@ -2,19 +2,10 @@ local _, addon = ...
 addon:traceFile("objectives/explore.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 
-local GetBestMapForUnit = addon.G.GetBestMapForUnit
-local GetPlayerMapPosition = addon.G.GetPlayerMapPosition
-local GetRealZoneText = addon.G.GetRealZoneText
-local GetSubZoneText = addon.G.GetSubZoneText
-local GetMinimapZoneText = addon.G.GetMinimapZoneText
-local GetZoneText = addon.G.GetZoneText
-
-local defaultRadius = 0.5
 local pollingFn
 local pollingObjectives = {}
 local pollingTimerId
 local pollingTimerInterval = 1
-
 
 local function startPolling(obj)
   -- Indicate that this objective is being polled for
@@ -37,35 +28,14 @@ local function stopPolling(obj)
   addon.Logger:Trace("Stop polling for player location")
 end
 
-local function setRadius(obj)
-  if obj._didSetRadius then return end
-  local radius = obj:GetConditionValue(tokens.PARAM_RADIUS) or defaultRadius
-  obj:SetMetadata("PlayerLocationRadius", radius)
-  obj._didSetRadius = true
-end
-
-compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_PRE_COND, function(obj, locData)
-  setRadius(obj)
-  obj:SetMetadata("PlayerLocationData", locData)
-end)
-
-compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_COND, function(obj)
-  obj:SetMetadata("PlayerLocationData", nil)
-
-  if obj:HasCondition(tokens.PARAM_POSX) or obj:HasCondition(tokens.PARAM_POSY) then
+compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_COND, function(obj, result, locData)
+  if obj.conditions[tokens.PARAM_POSX] or obj.conditions[tokens.PARAM_POSY] then
     -- If the objective specifies an X or Y position, then begin polling for X/Y changes
-    -- on an interval whenever a player enters the correct zone
-    local inZone, inSubZone
-    if obj:HasCondition(tokens.PARAM_ZONE) then
-      inZone = obj:GetMetadata("PlayerIsInZone")
-    else
-      inZone = true
-    end
-    if obj:HasCondition(tokens.PARAM_SUBZONE) then
-      inSubZone = obj:GetMetadata("PlayerIsInSubZone")
-    else
-      inSubZone = true
-    end
+    -- on an interval whenever a player enters the correct zone(s)
+    local z, sz = obj.conditions[tokens.PARAM_ZONE], obj.conditions[tokens.PARAM_SUBZONE]
+    local inZone = (not z) or addon:CheckPlayerInZone(z)
+    local inSubZone = (not sz) or addon:CheckPlayerInZone(sz)
+
     if inZone and inSubZone then
       startPolling(obj)
     else
@@ -75,31 +45,18 @@ compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_COND, function(obj)
 end)
 
 local function publish()
-  local map = GetBestMapForUnit("player")
-  local x, y = 0, 0
-  if map then
-    local position = GetPlayerMapPosition(map, "player")
-    x, y = position:GetXY()
-  end
-
-  local ld = {
-    zone = GetZoneText(),
-    realZone = GetRealZoneText(),
-    subZone = GetSubZoneText(),
-    minimapZone = GetMinimapZoneText(),
-    x = x * 100,
-    y = y * 100
-  }
-  addon.QuestEvents:Publish(tokens.OBJ_EXPLORE, ld)
+  -- Calling GPL(true) here will ensure the data is refreshed for all conditions
+  addon.QuestEvents:Publish(tokens.OBJ_EXPLORE, addon:GetPlayerLocation(true))
 end
 
 addon:onload(function()
-  pollingFn = publish
   addon.AppEvents:Subscribe("QuestAdded", publish)
   addon.AppEvents:Subscribe("QuestLogBuilt", publish)
   addon.AppEvents:Subscribe("QuestTrackingStarted", publish)
   addon.GameEvents:Subscribe("ZONE_CHANGED", publish)
   addon.GameEvents:Subscribe("ZONE_CHANGED_INDOORS", publish)
   addon.GameEvents:Subscribe("ZONE_CHANGED_NEW_AREA", publish)
+
+  pollingFn = publish
   addon.AppEvents:Subscribe("ObjectiveCompleted", stopPolling)
 end)

@@ -9,6 +9,8 @@ describe("QuestScriptCompiler", function()
   end)
   it("can compile valid script", function()
     local script = [[
+      quest:
+        name: Hello World
       objectives:
         - kill something
     ]]
@@ -28,39 +30,46 @@ describe("QuestScriptCompiler", function()
   describe("objective parse modes", function()
     local expected = {
       name = "Test Quest Name",
+      questId = "test-quest-id",
       objectives = {
         {
+          questId = "test-quest-id",
           name = "kill",
           progress = 0,
           goal = 1,
           conditions = {
-            target = { ["Cow"] = true }
+            killtarget = { ["Cow"] = true }
           }
         },
         {
+          questId = "test-quest-id",
           name = "kill",
           progress = 0,
           goal = 3,
           conditions = {
-            target = { ["Chicken"] = true }
+            killtarget = { ["Chicken"] = true }
           }
         },
         {
+          questId = "test-quest-id",
           name = "kill",
           progress = 0,
           goal = 5,
           conditions = {
-            target = { ["Mangy Wolf"] = true }
+            killtarget = { ["Mangy Wolf"] = true }
           }
         }
       }
     }
     local quest = {
-      name = "Test Quest Name"
+      name = expected.name,
+      questId = "test-quest-id"
     }
     local function assertMatch(expected, yaml)
       local compiled = compiler:Compile(yaml, quest)
       for i, obj in ipairs(compiled.objectives) do
+        assert(obj.id, "compiled objective should have an id")
+        obj.id = nil -- objective ids are assigned at compile time, no need to match
         assert.same(expected.objectives[i], obj)
       end
     end
@@ -170,10 +179,9 @@ describe("QuestScriptCompiler", function()
       {
         objective = "explore Westfall 25.2 38.4",
         expected = {
-          -- Expecting Point #0 because %inc doesn't work until quest is built
-          log = "Go to Point #0 in Westfall",
-          progress = "Point #0 in Westfall explored: 0/1",
-          quest = "Explore Point #0 in Westfall",
+          log = "Go to Point #1 in Westfall",
+          progress = "Point #1 in Westfall explored: 0/1",
+          quest = "Explore Point #1 in Westfall",
           full = "Go to (25.2, 38.4) in Westfall"
         }
       },
@@ -189,18 +197,18 @@ describe("QuestScriptCompiler", function()
       {
         objective = "explore: { zone: Elwynn Forest, posx: 32, posy: 20, radius: 5 }",
         expected = {
-          log = "Go to Point #0 in Elwynn Forest",
-          progress = "Point #0 in Elwynn Forest explored: 0/1",
-          quest = "Explore Point #0 in Elwynn Forest",
+          log = "Go to Point #1 in Elwynn Forest",
+          progress = "Point #1 in Elwynn Forest explored: 0/1",
+          quest = "Explore Point #1 in Elwynn Forest",
           full = "Go within 5 units of (32, 20) in Elwynn Forest"
         }
       },
       {
         objective = "explore: { zone: Elwynn Forest, subzone: Goldshire, posx: 32, posy: 20, radius: 5 }",
         expected = {
-          log = "Go to Point #0 in Goldshire",
-          progress = "Point #0 in Goldshire explored: 0/1",
-          quest = "Explore Point #0 in Goldshire in Elwynn Forest",
+          log = "Go to Point #1 in Goldshire",
+          progress = "Point #1 in Goldshire explored: 0/1",
+          quest = "Explore Point #1 in Goldshire in Elwynn Forest",
           full = "Go within 5 units of (32, 20) in Goldshire in Elwynn Forest"
         }
       },
@@ -243,6 +251,8 @@ describe("QuestScriptCompiler", function()
     }
     for num, tc in ipairs(testCases) do
       local script = [[
+        quest:
+          name: Display text parser test
         objectives:
           - ]]..tc.objective
       local quest = compiler:Compile(script)
@@ -260,6 +270,8 @@ describe("QuestScriptCompiler", function()
     describe("custom text parameters", function()
       it("can accept simple text overrides", function()
         local script = [[
+          quest:
+            name: Parser test
           objectives:
             - kill:
                 target: Chicken
@@ -274,6 +286,8 @@ describe("QuestScriptCompiler", function()
       end)
       it("can accept partial text overrides", function()
         local script = [[
+          quest:
+            name: Parser test
           objectives:
             - kill:
                 target: Chicken
@@ -289,6 +303,8 @@ describe("QuestScriptCompiler", function()
       end)
       it("can accept complete text overrides", function()
         local script = [[
+          quest:
+            name: Parser test
           objectives:
             - kill:
                 target: Chicken
@@ -325,7 +341,6 @@ describe("QuestScriptCompiler", function()
                 text: "Complete task #%inc"
         ]]
         local quest = compiler:Compile(script)
-        addon.QuestEngine:Build(quest)
         local objs = quest.objectives
         assert.equals("Complete task #1", compiler:GetDisplayText(objs[2]))
         assert.equals("Complete task #2", compiler:GetDisplayText(objs[4]))

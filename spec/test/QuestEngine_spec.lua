@@ -5,110 +5,95 @@ local engine, compiler = addon.QuestEngine, addon.QuestScriptCompiler
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
 local goodScript = [[
+  quest:
+    name: Test Quest
+    description: I sure hope these tests pass!
   objectives:
     - kill 5 Chicken
     - talkto 3 "Stormwind Guard"
     - emote dance 2 Cow
 ]]
 
--- For testing: compiles a script with some default parameters
-local function makeParams(script)
-  local params = {
-    name = "Test Quest",
-    description = "I sure hope these tests pass!"
-  }
-  return compiler:Compile(script, params)
-end
-
--- For testing: given a script, creates a built quest with some default parameters
-local function quickBuild(script)
-  local p = makeParams(script)
-  return engine:Build(p)
-end
-
-local function assertBuilt(quest)
-  assert(quest._built, "quest has not been built")
-end
-
 describe("QuestEngine", function()
-  local params, quest, eventSpy
+  local quest, eventSpy
   setup(function()
     addon:Init()
     addon:Advance()
     eventSpy = events:SpyOnEvents(addon.AppEvents)
   end)
   before_each(function()
-    params = nil
+    quest = nil
     quest = nil
     eventSpy:Reset()
   end)
-  describe("Build", function()
-    it("cannot build a quest with no name", function()
-      params = makeParams()
-      params.name = nil
-      assert.has_error(function() engine:Build(params) end)
+  describe("Validate", function()
+    it("cannot validate a quest with no name", function()
+      quest = compiler:Compile(goodScript)
+      quest.name = nil
+      assert.has_error(function() engine:Validate(quest) end)
     end)
-    it("can build a quest with no objectives", function()
-      quest = quickBuild()
-      assertBuilt(quest)
-      assert.equals(0, #quest.objectives)
+    it("can validate a quest with no objectives", function()
+      quest = compiler:Compile(nil, { name = "Objectiveless Quest" })
+      engine:Validate(quest)
     end)
-    it("can build a quest with objectives", function()
-      quest = quickBuild(goodScript)
-      assertBuilt(quest)
+    it("can validate a quest with objectives", function()
+      quest = compiler:Compile(goodScript)
+      engine:Validate(quest)
       assert.equals(3, #quest.objectives)
     end)
     it("cannot build a quest with an invalid objective", function()
-      local script = [[objective milk 5 Cow]]
-      assert.has_error(function() quickBuild(script) end)
+      local script = [[
+        quest:
+          name: bad quest
+        objectives:
+          - milk 5 Cow]]
+          -- todo: is this error in the compiler or the engine?
+      assert.has_error(function() compiler:Compile(script) end)
     end)
   end)
   describe("when a quest is added to the QuestLog", function()
     before_each(function()
       QuestLog:Clear()
       addon:Advance()
-      params = makeParams(goodScript)
+      quest = compiler:Compile(goodScript)
     end)
     describe("in the Active status", function()
       before_each(function()
-        QuestLog:AddQuest(params, QuestStatus.Active)
+        QuestLog:AddQuest(quest, QuestStatus.Active)
         addon:Advance()
-        quest = QuestLog:FindByID(params.id)
+        quest = QuestLog:FindByID(quest.questId)
       end)
       it("then quest tracking is started", function()
         local payload = eventSpy:GetPublishPayload("QuestTrackingStarted")
-        assertBuilt(payload)
         assert.same(quest, payload)
       end)
       describe("and moved to another status", function()
         before_each(function()
-          QuestLog:SetQuestStatus(quest.id, QuestStatus.Abandoned)
+          QuestLog:SetQuestStatus(quest.questId, QuestStatus.Abandoned)
           addon:Advance()
         end)
         it("then quest tracking is stopped", function()
           local payload = eventSpy:GetPublishPayload("QuestTrackingStopped")
-          assertBuilt(payload)
           assert.same(quest, payload)
         end)
       end)
     end)
     describe("in any other status", function()
       before_each(function()
-        QuestLog:AddQuest(params, QuestStatus.Invited)
+        QuestLog:AddQuest(quest, QuestStatus.Invited)
         addon:Advance()
-        quest = QuestLog:FindByID(params.id)
+        quest = QuestLog:FindByID(quest.questId)
       end)
       it("then quest tracking is not started", function()
         eventSpy:AssertNotPublished("QuestTrackingStarted")
       end)
       describe("and moved to Active", function()
         before_each(function()
-          QuestLog:SetQuestStatus(quest.id, QuestStatus.Active)
+          QuestLog:SetQuestStatus(quest.questId, QuestStatus.Active)
           addon:Advance()
         end)
         it("then quest tracking is started", function()
           local payload = eventSpy:GetPublishPayload("QuestTrackingStarted")
-          assertBuilt(payload)
           assert.same(quest, payload)
         end)
       end)
@@ -118,8 +103,8 @@ describe("QuestEngine", function()
     before_each(function()
       QuestLog:Clear()
       addon:Advance()
-      params = makeParams(goodScript)
-      QuestLog:AddQuest(params, QuestStatus.Active)
+      quest = compiler:Compile(goodScript)
+      QuestLog:AddQuest(quest, QuestStatus.Active)
       addon:Advance()
     end)
   end)

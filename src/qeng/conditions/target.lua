@@ -3,15 +3,20 @@ addon:traceFile("conditions/target.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
 
-local function isUniqueTargetGuid(obj, targetUnitGuid)
-  -- If the objective is to target multiples of the same NPC (i.e. 3 guards),
-  -- make sure they're different by guid
-  local targetGuidHistory = obj:GetMetadata("TargetGuidHistory")
-  if not targetGuidHistory then
-    targetGuidHistory = {}
-    obj:SetMetadata("TargetGuidHistory", targetGuidHistory, true)
-  end
+local targetGuidHistory
 
+local function remGuidHistory(obj)
+  if obj and obj.id then
+    targetGuidHistory[obj.id] = nil
+  else
+    targetGuidHistory = {}
+  end
+  addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
+end
+
+-- If the objective is to target multiples of the same NPC (i.e. 3 guards),
+-- make sure they're different by guid
+local function isUniqueTargetGuid(obj, targetUnitGuid)
   -- Get the targeting history for this specific objective
   local objTargetGuidHistory = targetGuidHistory[obj.id]
   if not objTargetGuidHistory then
@@ -27,11 +32,12 @@ local function isUniqueTargetGuid(obj, targetUnitGuid)
 
   -- Otherwise, log this guid and progress the objective
   objTargetGuidHistory[targetUnitGuid] = true
+  addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
   return true
 end
 
 compiler:AddScript(tokens.PARAM_TARGET, tokens.METHOD_CHECK_COND, function(obj, unitNames)
-  local targetUnitName = obj:GetMetadata("TargetUnitName") or GetUnitName("target")
+  local targetUnitName = GetUnitName("target")
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name
     return false
@@ -40,5 +46,27 @@ compiler:AddScript(tokens.PARAM_TARGET, tokens.METHOD_CHECK_COND, function(obj, 
     -- Only one unit to target, so the objective is satisfied
     return true
   end
-  return isUniqueTargetGuid(obj, obj:GetMetadata("TargetUnitGuid") or UnitGUID("target"))
+  return isUniqueTargetGuid(obj, UnitGUID("target"))
+end)
+
+compiler:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_CHECK_COND, function(obj, unitNames)
+  if not addon.LastPartyKill then return end
+
+  local targetUnitName = addon.LastPartyKill.destName
+  if unitNames[targetUnitName] == nil then
+    -- The targeted unit's name does not match the objective's unit name
+    return false
+  end
+  if obj.goal == 1 then
+    -- Only one unit to target, so the objective is satisfied
+    return true
+  end
+  return isUniqueTargetGuid(obj, addon.LastPartyKill.destGuid)
+end)
+
+addon:OnSaveDataLoaded(function()
+  targetGuidHistory = addon.SaveData:LoadTable("TargetGuidHistory")
+
+  addon.AppEvents:Subscribe("ObjectiveCompleted", remGuidHistory)
+  addon.AppEvents:Subscribe("QuestLogReset", remGuidHistory)
 end)

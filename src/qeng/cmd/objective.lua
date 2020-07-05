@@ -11,9 +11,7 @@ compiler:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
       error("Failed to parse objective #"..i..": "..objective)
     end
 
-    if not quest.objectives then
-      quest.objectives = {}
-    end
+    objective.questId = quest.questId
 
     table.insert(quest.objectives, objective)
   end

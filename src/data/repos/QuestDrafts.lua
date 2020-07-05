@@ -50,14 +50,5 @@ function addon.QuestDrafts:CompileDraft(id)
   if not draft then
     return false, "No draft exists with id: "..id
   end
-  local ok, parameters = pcall(addon.QuestScriptCompiler.Compile, addon.QuestEngine, draft.script, draft.parameters)
-  if not ok then
-    return ok, parameters
-  end
-  local quest
-  ok, quest = pcall(addon.QuestEngine.Build, addon.QuestEngine, parameters)
-  if not ok then
-    return ok, quest
-  end
-  return true, quest
+  return addon.QuestScriptCompiler:TryCompile(draft.script, draft.parameters)
 end

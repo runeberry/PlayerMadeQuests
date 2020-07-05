@@ -1,7 +1,7 @@
 local _, addon = ...
 local ParseYaml = addon.ParseYaml
 local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
-local unpack = addon.G.unpack
+local GetUnitName = addon.G.GetUnitName
 
 addon.QuestScriptCompiler = {}
 
@@ -377,6 +377,9 @@ local function initQuestScript(qsconfig)
   local function setup(set, param)
     local name = param.name
     validateAndRegister(set, name, param)
+    if param.alias then
+      validateAndRegister(set, param.alias, param)
+    end
 
     local itemScripts = param.scripts
     if itemScripts then
@@ -519,13 +522,10 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
   end
 
   local objective = {
-    --id = addon:CreateID("objective:"..objName.."-%i"),
-    --_parent = objectives[p1], -- The objective contains a reference to its parent definition
+    id = addon:CreateID("objective-"..objName.."-%i"),
     name = objName,
     progress = 0, -- All objectives start at 0 progress
     conditions = {}, -- The conditions under which this objective must be completed
-    --metadata = {}, -- Additional data for this objective that can be written to save
-    --tempdata = {} -- Additional data that will not be written to save
   }
 
   objective.goal = getTypeValidatedParameterValueOrDefault(args.goal, objInfo._paramsByName["goal"], true)
@@ -550,14 +550,13 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
   end
   args.text = nil
 
-  args._parentName = objName
-  args._parent = objInfo
-
   for _, param in ipairs(objInfo.params) do
     if param.multiple then
       -- If multiple arg values are allowed, then they will be passed to the
       -- condition handler as a set, such as { value1 = true, value2 = true }
-      local val = args[param.name]
+      -- Note: values assigned to an alias in script will be assigned to the primary
+      --       condition name in the compiled quest
+      local val = args[param.name] or args[param.alias]
       if val then
         if type(param.name) ~= "table" then
           val = { val }
@@ -592,21 +591,36 @@ end
     }
   }
 --]]
+local function newQuest()
+  local playerName = GetUnitName("player", true)
+
+  return {
+    questId = addon:CreateID("quest-"..playerName.."-%i"),
+    objectives = {}
+  }
+end
+
 function addon.QuestScriptCompiler:Compile(script, params)
-  local quest
+  local quest = newQuest()
   if params then
-    quest = addon:CopyTable(params)
-  else
-    quest = {}
+    quest = addon:MergeTable(quest, params)
   end
+
   if script ~= nil and script ~= "" then
     local yaml = ParseYaml(script)
     -- addon.Logger:Table(yaml)
     yamlToQuest(quest, yaml)
   end
-  logger:Trace("Quest compiled")
+
+  addon.QuestEngine:Validate(quest)
+
+  logger:Trace("Quest compiled:", quest.questId)
   -- addon.Logger:Table(quest)
   return quest
+end
+
+function addon.QuestScriptCompiler:TryCompile(script, params)
+  return pcall(addon.QuestScriptCompiler.Compile, addon.QuestScriptCompiler, script, params)
 end
 
 addon:onload(function()

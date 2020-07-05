@@ -9,15 +9,13 @@ local quests = {}
 local function resetQuestProgress(quest)
   for _, obj in pairs(quest.objectives) do
     obj.progress = 0
-    obj.metadata = {}
-    obj._tempdata = {}
   end
 end
 
-local function getQuestById(id)
+local function getQuestById(questId)
   local quest, index
   for i, q in ipairs(quests) do
-    if q.id == id then
+    if q.questId == questId then
       quest = q
       index = i
       break
@@ -69,29 +67,27 @@ function addon.QuestLog:AddQuest(quest, status)
   if not QuestStatus[status] then
     error("Failed to add quest: "..status.." is not a valid status")
   end
-  if not quest.id then
-    quest.id = addon:CreateID("quest-%i")
-  else
-    local existing = self:FindByID(quest.id)
-    if existing then
-      error("Failed to add quest: "..quest.id.." already exists")
-    end
+  if not quest.questId then
+    error("Failed to add quest: questId is required")
+  end
+  if self:FindByID(quest.questId) then
+    error("Failed to add quest: "..quest.questId.." already exists")
   end
 
   table.insert(quests, quest)
   quest.status = status
-  addon.QuestEngine:Build(quest)
+  addon.QuestEngine:Validate(quest)
   self:Save()
   addon.AppEvents:Publish("QuestAdded", quest)
 end
 
-function addon.QuestLog:SetQuestStatus(id, status)
-  local quest = getQuestById(id)
+function addon.QuestLog:SetQuestStatus(questId, status)
+  local quest = getQuestById(questId)
   if not quest then
-    error("Failed to set quest status: no quest by id "..id)
+    error("Failed to set quest status: no quest by id "..questId)
   end
   if not status then
-    error("Failed to set quest status: status is required for quest "..id)
+    error("Failed to set quest status: status is required for quest "..questId)
   end
   if not QuestStatus[status] then
     error("Failed to set quest status: "..status.." is not a valid status")
@@ -125,16 +121,15 @@ local considerDuplicate = {
 
 addon:onload(function()
   addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
-    local existing = addon.QuestLog:FindByID(quest.id)
+    local existing = addon.QuestLog:FindByID(quest.questId)
     if existing and considerDuplicate[existing.status] then
-      addon.MessageEvents:Publish("QuestInviteDuplicate", { distribution = "WHISPER", target = sender }, quest.id, quest.status)
+      addon.MessageEvents:Publish("QuestInviteDuplicate", { distribution = "WHISPER", target = sender }, quest.questId, quest.status)
       return
     end
     addon.Logger:Warn(sender, "has invited you to a quest:", quest.name)
     if existing then
       quest = existing
     else
-      addon.QuestEngine:Build(quest) -- Quest is received in "compiled" but not "built" form from message
       addon.QuestLog:AddQuest(quest, addon.QuestStatus.Invited)
     end
     addon.AppEvents:Publish("QuestInvite", quest, sender)
