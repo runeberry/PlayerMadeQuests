@@ -38,7 +38,7 @@ function addon:Enquote(str, quotes)
   if #quotes == 1 then
     return quotes..str..quotes
   else
-    local first = quotes:sub(1, 2)
+    local first = quotes:sub(1, 1)
     local last = quotes:sub(2)
     return first..str..last
   end

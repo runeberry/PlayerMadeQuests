@@ -36,7 +36,7 @@ handlers = {
       addon.Logger:Error("Failed to add demo quest:", quest)
       return
     end
-    addon.QuestLog:AddQuest(quest, addon.QuestStatus.Active)
+    addon.QuestLog:SaveWithStatus(quest, addon.QuestStatus.Active)
     addon:PlaySound("QuestAccepted")
   end,
   ["log"] = function(name, level)

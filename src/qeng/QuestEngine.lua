@@ -6,7 +6,8 @@ local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
 addon.QuestEngine = {}
 
 local objectivesByName = {}
-local questsByObjective = {}
+local isEngineLoaded = false
+local isQuestDataLoaded = false
 
 addon.QuestStatus = {
   Invited = "Invited",
@@ -90,6 +91,58 @@ local function evaluateObjective(objective, obj, ...)
   return checkResult
 end
 
+local function updateQuestObjectiveProgress(obj)
+  local quest = addon.QuestLog:FindByID(obj.questId)
+  if not quest then
+    logger:Warn("Unable to update quest objective: no quest by id", obj.questId)
+    return
+  elseif quest.status ~= status.Active then
+    logger:Warn("Unable to update quest objective: quest", addon:Enquote(quest.name), "is not Active", addon:Enquote(quest.status, "()"))
+    return
+  end
+
+  local qobj
+  for _, qo in ipairs(quest.objectives) do
+    if qo.id == obj.id then
+      qobj = qo
+      break
+    end
+  end
+  if not qobj then
+    logger:Warn("Unable to update quest objective: no objective on quest", addon:Enquote(quest.name), "with id", obj.id)
+    return
+  end
+
+  qobj.progress = obj.progress
+  addon.QuestLog:Save(quest)
+
+  local isObjectiveCompleted, isQuestCompleted
+  -- objective is considered completed if progress is >= goal
+  if obj.progress >= obj.goal then
+    -- quest is only considered completed if all objectives would be considered completed
+    isQuestCompleted = true
+    for _, qo in pairs(quest.objectives) do
+      if qo.progress < qo.goal then
+        isQuestCompleted = false
+        break
+      end
+    end
+  end
+
+  if isQuestCompleted then
+    quest.status = status.Completed
+  end
+  addon.QuestLog:Save(quest)
+
+  if isObjectiveCompleted then
+    addon.AppEvents:Publish("ObjectiveCompleted", obj)
+  else
+    addon.AppEvents:Publish("ObjectiveUpdated", obj)
+  end
+
+  return isObjectiveCompleted, isQuestCompleted
+end
+
 local function wrapObjectiveHandler(objective)
   -- Given an arbitrary list of game event args, handle them as follows
   return function(...)
@@ -100,7 +153,6 @@ local function wrapObjectiveHandler(objective)
     -- logger:Table(objective._active)
     -- Completed objectives will be tracked and removed from the list
     local completed = {}
-    local anychanged = false
 
     -- For each active instance of this objective
     for id, obj in pairs(objective._active) do
@@ -112,30 +164,13 @@ local function wrapObjectiveHandler(objective)
         logger:Debug("    Result:", result)
 
         if result > 0 then
-          anychanged = true
           obj.progress = obj.progress + result
-          local quest = questsByObjective[obj.id]
-
           -- Sanity checks: progress must be >= 0, and progress must be an integer
           obj.progress = math.max(math.floor(obj.progress), 0)
-
-          addon.AppEvents:Publish("ObjectiveUpdated", obj)
-
-          if obj.progress >= obj.goal then
+          local isObjectiveCompleted = updateQuestObjectiveProgress(obj)
+          if isObjectiveCompleted then
             -- Mark objective for removal from further checks
             completed[id] = obj
-            addon.AppEvents:Publish("ObjectiveCompleted", obj)
-
-            local questCompleted = true
-            for _, qobj in pairs(quest.objectives) do
-              if qobj.progress < qobj.goal then
-                questCompleted = false
-                break
-              end
-            end
-            if questCompleted then
-              addon.QuestLog:SetQuestStatus(quest.questId, status.Completed)
-            end
           end
         end
       end
@@ -144,10 +179,6 @@ local function wrapObjectiveHandler(objective)
     for id, _ in pairs(completed) do
       -- Stop trying to update that objective on subsequent game events
       objective._active[id] = nil
-    end
-
-    if anychanged then
-      addon.QuestLog:Save()
     end
   end
 end
@@ -180,26 +211,37 @@ function addon.QuestEngine:Validate(quest)
 end
 
 local function startTracking(quest)
-  -- All active instances of a created objective are stored together
-  -- so that they can be quickly evaluated together
+  -- sanity check: validate quest before tracking it
+  addon.QuestEngine:Validate(quest)
+
+  local didStartTracking = false
   for _, obj in pairs(quest.objectives) do
-    questsByObjective[obj.id] = quest
-    objectivesByName[obj.name]._active[obj.id] = obj
+    -- All active instances of a created objective are stored together
+    -- so that they can be quickly evaluated together
+    if not objectivesByName[obj.name]._active[obj.id] then
+      objectivesByName[obj.name]._active[obj.id] = obj
+      didStartTracking = true
+    end
   end
-  addon.AppEvents:Publish("QuestTrackingStarted", quest)
+  if didStartTracking then
+    addon.AppEvents:Publish("QuestTrackingStarted", quest)
+  end
 end
 
 local function stopTracking(quest)
+  local didStopTracking = false
   for _, obj in pairs(quest.objectives) do
-    questsByObjective[obj.id] = nil
-    objectivesByName[obj.name]._active[obj.id] = nil
+    if objectivesByName[obj.name]._active[obj.id] then
+      objectivesByName[obj.name]._active[obj.id] = nil
+      didStopTracking = true
+    end
   end
-  addon.AppEvents:Publish("QuestTrackingStopped", quest)
+  if didStopTracking then
+    addon.AppEvents:Publish("QuestTrackingStopped", quest)
+  end
 end
 
 local function setTracking(quest)
-  -- sanity check: validate quest before tracking it
-  addon.QuestEngine:Validate(quest)
   if quest.status == status.Active then
     -- If start tracking fails, let it throw an error
     startTracking(quest)
@@ -209,20 +251,26 @@ local function setTracking(quest)
   end
 end
 
+local function startTrackingQuestLog()
+  local quests = addon.QuestLog:FindByQuery(function(q) return q.status == status.Active end)
+  for _, q in pairs(quests) do
+    local ok, err = pcall(startTracking, q)
+    if not ok then
+      logger:Error("Failed to start quest tracking for quest", addon:Enquote(q.name), ":", err)
+    end
+  end
+  addon.AppEvents:Publish("QuestLogBuilt", quests)
+end
+
 addon.AppEvents:Subscribe("QuestAdded", setTracking)
 addon.AppEvents:Subscribe("QuestStatusChanged", setTracking)
 addon.AppEvents:Subscribe("QuestDeleted", stopTracking)
 
-addon.AppEvents:Subscribe("QuestLogLoaded", function(quests)
-  for _, q in pairs(quests) do
-    local ok, err = pcall(setTracking, q)
-    if ok then
-      setTracking(q)
-    else
-      logger:Error("Failed to set quest tracking:", err)
-    end
+addon.AppEvents:Subscribe("QuestDataLoaded", function()
+  if isEngineLoaded then
+    startTrackingQuestLog()
   end
-  addon.AppEvents:Publish("QuestLogBuilt", quests)
+  isQuestDataLoaded = true
 end)
 
 addon.AppEvents:Subscribe("QuestLogReset", function()
@@ -239,5 +287,9 @@ addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
     addon.QuestEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))
   end
   logger:Debug("QuestEngine loaded OK!")
+  if isQuestDataLoaded then
+    startTrackingQuestLog()
+  end
+  isEngineLoaded = true
   addon.AppEvents:Publish("EngineLoaded")
 end)

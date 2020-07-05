@@ -294,17 +294,8 @@ local methods = {
   -------------------
   -- Write Methods --
   -------------------
-  -- ["Insert"] = function(self, entity)
-  --   local ok, err = pcall(validateWrite, self, entity)
-  --   if not ok then self.logger:Error("Failed to Insert:", err) end
-  --   self.logger:Warn("Insert method not implemented!")
-  -- end,
-  -- ["Update"] = function(self, entity)
-  --   local ok, err = pcall(validateWrite, self, entity)
-  --   if not ok then self.logger:Error("Failed to Update:", err) end
-  --   self.logger:Warn("Update method not implemented!")
-  -- end,
   ["Save"] = function(self, entity)
+    assert(entity ~= nil, "Failed to Save: Cannot save a nil entity")
     if not self._writeEnabled then
       self.logger:Error("Failed to Save: Repository is read-only")
       return

@@ -62,11 +62,7 @@ local function acceptButton_OnClick()
     return
   end
 
-  if addon.QuestLog:FindByID(currentQuest.questId) then
-    addon.QuestLog:SetQuestStatus(currentQuest.questId, addon.QuestStatus.Active)
-  else
-    addon.QuestLog:AddQuest(currentQuest, addon.QuestStatus.Active)
-  end
+  addon.QuestLog:SaveWithStatus(currentQuest, addon.QuestStatus.Active)
 
   if currentQuestSender then
     addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
@@ -81,7 +77,7 @@ end
 local function declineButton_OnClick()
   if currentQuestSender then
     addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
-    addon.QuestLog:SetQuestStatus(currentQuest.questId, addon.QuestStatus.Declined)
+    addon.QuestLog:SaveWithStatus(currentQuest, addon.QuestStatus.Declined)
   end
   addon:ShowQuestInviteFrame(false)
 end

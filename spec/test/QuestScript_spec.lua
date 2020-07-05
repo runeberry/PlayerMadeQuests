@@ -20,6 +20,25 @@ describe("QuestScriptCompiler", function()
     local script = [[bad juju]]
     assert.has_error(function() compiler:Compile(script) end)
   end)
+  it("can supply default properties", function()
+    local script = [[
+      quest:
+        name: Hello World
+    ]]
+    local quest = compiler:Compile(script)
+    assert.is_string(quest.questId)
+    assert.is_table(quest.objectives)
+  end)
+  it("can override questId with parameters", function()
+    local params = { name = "Test quest", questId = "id-override" }
+    local quest = compiler:Compile(nil, params)
+    assert.equals(params.questId, quest.questId)
+  end)
+  it("can supply additional parameters", function()
+    local params = { name = "Test quest", demoId = "extra-property" }
+    local quest = compiler:Compile(nil, params)
+    assert.equals(params.demoId, quest.demoId)
+  end)
   it("can compile all demo quests", function()
     -- todo: move this test to QuestDemos tests, if I ever make that
     local demos = addon.QuestDemos:FindAll()

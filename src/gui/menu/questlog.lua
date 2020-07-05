@@ -125,7 +125,7 @@ function menu:Create(frame)
   tablePane:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getQuests)
-  dataTable:SubscribeToEvents("QuestLogLoaded", "QuestAdded", "QuestDeleted", "QuestStatusChanged", "QuestLogReset")
+  dataTable:SubscribeToEvents("QuestDataLoaded", "QuestAdded", "QuestDeleted", "QuestStatusChanged", "QuestLogReset")
   dataTable:OnRowSelected(setButtonState)
   frame.dataTable = dataTable
 
@@ -149,7 +149,9 @@ function menu:Create(frame)
   confirmQuestAbandon:SetYesButton("OK", function()
     local row = dataTable:GetSelectedRow()
     if not row or not row[3] then return end
-    QuestLog:SetQuestStatus(row[3], QuestStatus.Abandoned)
+    local quest = QuestLog:FindByID(row[3])
+    quest.status = QuestStatus.Abandoned
+    QuestLog:Save(quest)
     addon:PlaySound("QuestAbandoned")
   end)
   confirmQuestAbandon:SetNoButton("Cancel")
@@ -162,7 +164,9 @@ function menu:Create(frame)
   confirmQuestArchive:SetYesButton("OK", function()
     local row = dataTable:GetSelectedRow()
     if not row or not row[3] then return end
-    QuestLog:SetQuestStatus(row[3], QuestStatus.Archived)
+    local quest = QuestLog:FindByID(row[3])
+    quest.status = QuestStatus.Archived
+    QuestLog:Save(quest)
   end)
   confirmQuestArchive:SetNoButton("Cancel")
 
@@ -174,7 +178,7 @@ function menu:Create(frame)
   confirmQuestDelete:SetYesButton("OK", function()
     local row = dataTable:GetSelectedRow()
     if not row or not row[3] then return end
-    QuestLog:DeleteQuest(row[3])
+    QuestLog:Delete(row[3])
   end)
   confirmQuestDelete:SetNoButton("Cancel")
 
