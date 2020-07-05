@@ -38,7 +38,7 @@ end
 
 function menu:Create(frame)
   for _, dq in pairs(QuestDemos:FindAll()) do
-    table.insert(dqRows, { dq.parameters.name, dq.id, dq.order })
+    table.insert(dqRows, { dq.parameters.name, dq.demoId, dq.order })
   end
   table.sort(dqRows, function(a, b) return a[3] < b[3] end)
 

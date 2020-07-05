@@ -62,7 +62,7 @@ local function acceptButton_OnClick()
     return
   end
 
-  if currentQuest.questId and addon.QuestLog:FindByID(currentQuest.questId) then
+  if addon.QuestLog:FindByID(currentQuest.questId) then
     addon.QuestLog:SetQuestStatus(currentQuest.questId, addon.QuestStatus.Active)
   else
     addon.QuestLog:AddQuest(currentQuest, addon.QuestStatus.Active)

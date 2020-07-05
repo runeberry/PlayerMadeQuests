@@ -40,11 +40,10 @@ end
 local function getDrafts()
   draftRows = {}
   local drafts = QuestDrafts:FindAll()
-  table.sort(drafts, function(a, b) return a.id < b.id end)
+  table.sort(drafts, function(a, b) return a.draftId < b.draftId end)
   for _, draft in pairs(drafts) do
-    -- Use quest name by default, but fall back on draft name if unavailable for some reaosn
-    local draftName = draft.parameters.name or ("["..draft.name.."]")
-    local row = { draftName, draft.version, draft.status, draft.id }
+    local draftName = draft.parameters.name or "(untitled draft)"
+    local row = { draftName, draft.version, draft.status, draft.draftId }
     table.insert(draftRows, row)
   end
   return draftRows

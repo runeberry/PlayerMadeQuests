@@ -24,7 +24,7 @@ Just like with the 'talkto' objective, if you specify a goal number, you must us
 
 addon.DemoQuestDB = {
   {
-    id = "tutorial-kill-ally",
+    demoId = "tutorial-kill-ally",
     order = 1,
     parameters = {
       name = "Objective: Kill X (Alliance)",
@@ -37,7 +37,7 @@ objectives:
   - kill 5 "Mangy Wolf"]]
   },
   {
-    id = "tutorial-kill-horde",
+    demoId = "tutorial-kill-horde",
     order = 2,
     parameters = {
       name = "Objective: Kill X (Horde)",
@@ -50,7 +50,7 @@ objectives:
   - kill 5 'Elder Mottled Boar']]
   },
   {
-    id = "tutorial-talkto-ally",
+    demoId = "tutorial-talkto-ally",
     order = 3,
     parameters = {
       name = "Objective: Talk to NPC (Alliance)",
@@ -63,7 +63,7 @@ objectives:
   - talkto 2 "Stormwind Guard"]]
   },
   {
-    id = "tutorial-talkto-horde",
+    demoId = "tutorial-talkto-horde",
     order = 4,
     parameters = {
       name = "Objective: Talk to NPC (Horde)",
@@ -76,7 +76,7 @@ objectives:
   - talkto 2 "Orgrimmar Grunt"]]
   },
   {
-    id = "tutorial-emote-ally",
+    demoId = "tutorial-emote-ally",
     order = 5,
     parameters = {
       name = "Objective: Use emote (Alliance)",
@@ -89,7 +89,7 @@ objectives:
   - emote fart 2 "Stormwind Guard"]]
   },
   {
-    id = "tutorial-emote-horde",
+    demoId = "tutorial-emote-horde",
     order = 6,
     parameters = {
       name = "Objective: Use emote (Horde)",
@@ -103,11 +103,11 @@ objectives:
   - emote salute 2 "Orgrimmar Grunt"]]
   },
   {
-    id = "tutorial-explore-ally",
+    demoId = "tutorial-explore-ally",
     order = 7,
     parameters = {
       name = "Objective: Explore (Alliance)",
-      description = descriptions["explore"].."These locations are around Goldshire, south of Stormwind."
+      description = descriptions["explore"].."These locations are around Goldshire, south of Stormwind.",
     },
     script = [[
 objectives:
@@ -123,11 +123,11 @@ objectives:
       posy: 64.5]]
   },
   {
-    id = "tutorial-explore-horde",
+    demoId = "tutorial-explore-horde",
     order = 8,
     parameters = {
       name = "Objective: Explore (Horde)",
-      description = descriptions["explore"].."These locations are in northern Durotar, just outside of Orgrimmar."
+      description = descriptions["explore"].."These locations are in northern Durotar, just outside of Orgrimmar.",
     },
     script = [[
 objectives:

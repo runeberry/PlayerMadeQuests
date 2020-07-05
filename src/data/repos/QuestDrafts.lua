@@ -4,20 +4,17 @@ addon:traceFile("QuestDrafts.lua")
 --[[
   Draft model:
   {
-    id: "string",
-    name: "string",
+    draftId: "string",
     version: 1,
     status: "string",
-    listing: {}, -- Information about this quest in the catalog
-    quest: {}, -- Predefined parameters for the QuestEngine
-    script: "string" -- QuestScript that will be applied to the above "quest" object
+    parameters: {}, -- Predefined parameters for the QuestEngine
+    script: "string" -- QuestScript that will be applied to the parameters
   }
 --]]
 
-addon.QuestDrafts = addon.Data:NewRepository("Draft")
+addon.QuestDrafts = addon.Data:NewRepository("Draft", "draftId")
 addon.QuestDrafts:SetSaveDataSource("Drafts")
 addon.QuestDrafts:EnableWrite(true)
-addon.QuestDrafts:EnablePrimaryKeyGeneration(true)
 addon.QuestDrafts:EnableCompression(true)
 addon.QuestDrafts:EnableGlobalSaveData(true)
 
@@ -31,24 +28,35 @@ local status = addon.QuestDraftStatus
 
 function addon.QuestDrafts:NewDraft(name)
   local draft = {
-    name = name or "",
+    draftId = addon:CreateID("draft-%i"),
     version = 1,
     status = status.Draft,
-    listing = {},
-    parameters = { name = name or "" },
+    parameters = { name = name or "New Quest Draft" },
     script = ""
   }
 
   return draft
 end
 
-function addon.QuestDrafts:CompileDraft(id)
-  if not id then
-    return false, "Draft id is required"
+function addon.QuestDrafts:CompileDraft(draftId)
+  if not draftId then
+    return false, "draftId is required"
   end
-  local draft = self:FindByID(id)
+  local draft = self:FindByID(draftId)
   if not draft then
-    return false, "No draft exists with id: "..id
+    return false, "No draft exists with draftId: "..draftId
   end
-  return addon.QuestScriptCompiler:TryCompile(draft.script, draft.parameters)
+  local ok, quest = addon.QuestScriptCompiler:TryCompile(draft.script, draft.parameters)
+  if not ok then
+    return ok, quest
+  end
+  if not draft.parameters then
+    draft.parameters = {}
+  end
+  if not draft.parameters.questId then
+    -- This will ensure that the quest gets the same id on every recompilation of the draft
+    draft.parameters.questId = quest.questId
+    self:Save(draft)
+  end
+  return true, quest
 end
