@@ -138,11 +138,11 @@ local function buildQuestInfoFrame()
   questDetailScrollChildFrame:SetPoint("TOPLEFT", questFrameDetailPanel, "TOPLEFT")
   questDetailScrollFrame:SetScrollChild(questDetailScrollChildFrame)
 
-  local questInfoFrame = CreateFrame("Frame", nil, questDetailScrollChildFrame)
-  questInfoFrame:SetSize(300, 100)
-  questInfoFrame:SetAllPoints(true)
+  local questDetailInfoFrame = CreateFrame("Frame", nil, questDetailScrollChildFrame)
+  questDetailInfoFrame:SetSize(300, 100)
+  questDetailInfoFrame:SetAllPoints(true)
 
-  local article = addon.CustomWidgets:CreateWidget("ArticleText", questInfoFrame)
+  local article = addon.CustomWidgets:CreateWidget("ArticleText", questDetailInfoFrame)
   article:SetPageStyle(pageStyle)
   for name, style in pairs(textStyles) do
     article:SetTextStyle(name, style)
