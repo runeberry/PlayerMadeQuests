@@ -70,7 +70,8 @@ local validStatusTable = {
     [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
     [qs.Active] = valid(),
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
-    [qs.Abandoned] = valid(), -- todo: there needs to be a difference between "Completed (ready to turn-in)" and "Completed (turned in)"
+    [qs.Abandoned] = valid(), -- todo: (#52) there needs to be a difference between "Completed (ready to turn-in)" and "Completed (turned in)"
+    -- https://github.com/dolphinspired/PlayerMadeQuests/issues/52
     [qs.Completed] = valid(),
     [qs.Archived] = valid(),
   },

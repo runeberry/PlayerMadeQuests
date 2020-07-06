@@ -45,8 +45,9 @@ function addon.CombatLogEvents:Start()
   -- This function can be used to pipe Publish events from the Game Events broker
   -- this this broker's Publish function, whenever a CLEU event is captured
   local function wrapGameEventPublish()
-    -- todo: Should optimize this by only parsing combat logs
+    -- todo: (#47) Should optimize this by only parsing combat logs
     -- when we know there is a subscription for this combat log event
+    -- https://github.com/dolphinspired/PlayerMadeQuests/issues/47
     local cl = getClog()
     addon.CombatLogEvents:Publish(cl.event, cl)
   end

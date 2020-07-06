@@ -329,7 +329,7 @@ local methods = {
           deindexItem(self, entity)
           indexItem(self, entity)
         end, function()
-          -- todo: I do not know how to recover if this happens
+          -- I do not know how to recover if this happens
           error("Reindexing failed, unrecoverable error")
         end)
         if self._timestampsEnabled then

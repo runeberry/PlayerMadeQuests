@@ -136,7 +136,8 @@ local objectives = {
       full = "Go [%r:within %r units of|to] [%x:(%x, %y) in ][%sz:%sz in ]%z"
     },
     params = {
-      { -- todo: remove goal from explore, should always be 1
+      { -- todo: (#51) remove goal from explore, should always be 1
+        -- https://github.com/dolphinspired/PlayerMadeQuests/issues/51
         name = tokens.PARAM_GOAL,
         type = "number",
         default = 1

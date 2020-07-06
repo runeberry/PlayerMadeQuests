@@ -492,7 +492,6 @@ function addon.QuestScriptCompiler:GetDisplayText(obj, scope)
     local objTemplate = objectives[obj.name]
     assert(objTemplate, "Invalid objective: "..obj.name)
     assert(objTemplate.displaytext, "No default displaytext is defined for objective: "..obj.name)
-    -- todo: specify one of: log, progress, quest, full
     displayText = objTemplate.displaytext[scope]
   end
 
@@ -541,7 +540,8 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
     }
   elseif type(objective.displaytext) == "table" then
     -- Only whitelisted text values can be set at the objective level
-    -- todo: nested configuration tables should probably be configured in QuestScript
+    -- todo: (#54) nested configuration tables should probably be configured in QuestScript
+    -- https://github.com/dolphinspired/PlayerMadeQuests/issues/54
     objective.displaytext = {
       log = objective.displaytext.log,
       progress = objective.displaytext.progress,

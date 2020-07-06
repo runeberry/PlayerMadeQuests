@@ -41,8 +41,8 @@ function deps:Init(addon)
     ScheduleTimer = function(self, func, delay, ...)
       addon:AddTimerFunction(func, ...)
     end,
-    ScheduleRepeatingTimer = mock:NewMock( mock:Returns(1) ), -- todo: Create a mock implementation of this
-    CancelTimer = mock:NewMock(), -- todo: Create a mock implementation of this
+    ScheduleRepeatingTimer = mock:NewMock( mock:Returns(1) ), -- Create a mock implementation of this if needed
+    CancelTimer = mock:NewMock(), -- Create a mock implementation of this if needed
     Serialize = function(self, t)
       local serialized = addon:CreateID("serialize-mock-%i")
       self._stable[serialized] = addon:CopyTable(t)

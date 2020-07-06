@@ -8,8 +8,9 @@ local textInset = 8
 local scrollDelay = 0.033 -- approximately 1 frame @ 30 FPS
 
 local editBoxScripts = {
-  -- todo: scrolling is a little buggy when you insert a new line
+  -- todo: (#53) scrolling is a little buggy when you insert a new line
   -- possibly because OnCursorChanged is fired twice when Enter is pressed
+  -- https://github.com/dolphinspired/PlayerMadeQuests/issues/53
   ["OnCursorChanged"] = function(editBox, xPos, yPos, _, lineHeight)
     -- Cool formula, but I don't need it right now
     -- local lineNum = math.floor((-1*yPos / lineHeight) + 0.5) + 1

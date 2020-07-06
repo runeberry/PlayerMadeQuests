@@ -45,7 +45,7 @@ describe("QuestEngine", function()
           name: bad quest
         objectives:
           - milk 5 Cow]]
-          -- todo: is this error in the compiler or the engine?
+      -- this error actually happens in Validate, but Compile now calls Validate so... ¯\_(ツ)_/¯
       assert.has_error(function() compiler:Compile(script) end)
     end)
   end)
