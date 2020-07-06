@@ -25,6 +25,15 @@ SlashCmdList.PMQ = function(msg)
   end)
 end
 
+local function dumpToConsole(name, val)
+  if type(val) == "table" then
+    addon.Logger:Table(val)
+    addon.Logger:Debug("^ Dumped table value for:", name)
+  else
+    addon.Logger:Debug(name..":", val)
+  end
+end
+
 handlers = {
   ["reset"] = function()
     addon.QuestLog:Clear()
@@ -64,12 +73,17 @@ handlers = {
     setfenv(func, addon)
     local val = func()
     varname = "addon."..varname
-
-    if type(val) == "table" then
-      addon.Logger:Table(val)
-      addon.Logger:Debug("^ Dumped table value for:", varname)
+    dumpToConsole(varname, val)
+  end,
+  ["dump-quest"] = function(nameOrId)
+    local quest = addon.QuestLog:FindByID(nameOrId)
+    if not quest then
+      quest = addon.QuestLog:FindByQuery(function(q) return q.name == nameOrId end)
+    end
+    if not quest then
+      addon.Logger:Warn("Quest not found:", nameOrId)
     else
-      addon.Logger:Debug(varname..":", val)
+      dumpToConsole(nameOrId, quest)
     end
   end,
   ["get"] = function(name)
