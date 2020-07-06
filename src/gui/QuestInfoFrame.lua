@@ -2,7 +2,7 @@ local _, addon = ...
 local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
 local compiler = addon.QuestScriptCompiler
 
-local questInviteFrame
+local questInfoFrame
 local currentQuest -- The quest being proposed in the window
 local currentQuestSender -- The player who sent the currently proposed quest
 
@@ -68,7 +68,7 @@ local function acceptButton_OnClick()
     addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
   end
 
-  addon:ShowQuestInviteFrame(false)
+  addon:ShowQuestInfoFrame(false)
 
   addon:PlaySound("QuestAccepted")
   addon:ShowQuestLog(true)
@@ -79,10 +79,10 @@ local function declineButton_OnClick()
     addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
     addon.QuestLog:SaveWithStatus(currentQuest, addon.QuestStatus.Declined)
   end
-  addon:ShowQuestInviteFrame(false)
+  addon:ShowQuestInfoFrame(false)
 end
 
-local function buildQuestInviteFrame()
+local function buildQuestInfoFrame()
   local questFrame = CreateFrame("Frame", nil, UIParent)
   --questFrame:SetTopLevel(true)
   questFrame:SetMovable(true)
@@ -166,7 +166,7 @@ local function buildQuestInviteFrame()
   return questFrame
 end
 
-function addon:ShowQuestInviteFrame(flag, quest, sender)
+function addon:ShowQuestInfoFrame(flag, quest, sender)
   if flag == nil then flag = true end
   if flag then
     if currentQuest then
@@ -178,30 +178,30 @@ function addon:ShowQuestInviteFrame(flag, quest, sender)
       end
       return
     end
-    if not questInviteFrame then
-      questInviteFrame = buildQuestInviteFrame()
+    if not questInfoFrame then
+      questInfoFrame = buildQuestInfoFrame()
     end
     if quest then
-      questInviteFrame:SetTitle("[PMQ] Quest Invite")
-      questInviteFrame:SetContent(quest)
-      -- questInviteFrame.scrollFrame:SetVerticalScroll(0)
+      questInfoFrame:SetTitle("[PMQ] Quest Info")
+      questInfoFrame:SetContent(quest)
+      -- questInfoFrame.scrollFrame:SetVerticalScroll(0)
       currentQuest = quest
       currentQuestSender = sender
-      questInviteFrame:Show()
+      questInfoFrame:Show()
       addon:PlaySound("BookWrite")
     end
   else
-    if questInviteFrame then
+    if questInfoFrame then
       currentQuest = nil
       currentQuestSender = nil
-      questInviteFrame:Hide()
+      questInfoFrame:Hide()
     end
   end
 end
 
 -- This expects a fully compiled and built quest
 local function handleQuestInvite(quest, sender)
-  addon:ShowQuestInviteFrame(true, quest, sender)
+  addon:ShowQuestInfoFrame(true, quest, sender)
 end
 
 addon:onload(function()
