@@ -71,12 +71,15 @@ local logLevels = {
 -- Each logger will also be indexed by name so they can be tracked globally
 local loggers = {}
 
+-- Temporarily set this to a log level to force all logs >= this level to print to print
+local forceLogs
+
 -- For any given logger, the priority is:
 -- User-defined level > system defined-level (defined by code) > initial level (defined when logger was created)
 -- If there is a global log filter in place, no logs shall be printed below that level (unless overriden by a User-defined level)
 -- By default, there is an info-level filter in place
 local function getMinLogLevel(name)
-  return logLevels.user[name] or math.min(globalLogFilter, (logLevels.system[name] or logLevels.initial[name] or ll.silent))
+  return forceLogs or logLevels.user[name] or math.min(globalLogFilter, (logLevels.system[name] or logLevels.initial[name] or ll.silent))
 end
 
 -- Returns the (number value) and (string name) of a given number or string representing a log level
@@ -298,6 +301,16 @@ function addon:SetGlobalLogFilter(level)
   if level then
     globalLogFilter = level
     return level
+  end
+end
+
+-- For testing only, forces all logs to print while this function runs
+function addon:ForceLogs(fn, level)
+  forceLogs = level or ll.trace
+  local ok, err = pcall(fn)
+  forceLogs = nil
+  if not ok then
+    error(err)
   end
 end
 
