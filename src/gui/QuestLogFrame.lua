@@ -22,12 +22,10 @@ local visConfig = {
   showQuest = {
     [QuestStatus.Active] = true,
     [QuestStatus.Failed] = true,
-    [QuestStatus.Abandoned] = true,
     [QuestStatus.Completed] = true,
   },
   showStatus = {
     [QuestStatus.Failed] = true,
-    [QuestStatus.Abandoned] = true,
     [QuestStatus.Completed] = true,
   },
   showObjectives = {
@@ -36,7 +34,6 @@ local visConfig = {
   questColor = {
     [QuestStatus.Active] = "yellow",
     [QuestStatus.Failed] = "red",
-    [QuestStatus.Abandoned] = "red",
     [QuestStatus.Completed] = "green",
   }
 }
