@@ -5,15 +5,6 @@ local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
 
 local targetGuidHistory
 
-local function remGuidHistory(obj)
-  if obj and obj.id then
-    targetGuidHistory[obj.id] = nil
-  else
-    targetGuidHistory = {}
-  end
-  addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
-end
-
 -- If the objective is to target multiples of the same NPC (i.e. 3 guards),
 -- make sure they're different by guid
 local function isUniqueTargetGuid(obj, targetUnitGuid)
@@ -67,6 +58,21 @@ end)
 addon:OnSaveDataLoaded(function()
   targetGuidHistory = addon.SaveData:LoadTable("TargetGuidHistory")
 
-  addon.AppEvents:Subscribe("ObjectiveCompleted", remGuidHistory)
-  addon.AppEvents:Subscribe("QuestLogReset", remGuidHistory)
+  -- Reset targetGuidHistory when appropriate
+  addon.AppEvents:Subscribe("ObjectiveCompleted", function(obj)
+    if obj.id and targetGuidHistory[obj.id] then
+      targetGuidHistory[obj.id] = nil
+      addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
+    end
+  end)
+  addon.AppEvents:Subscribe("QuestLogReset", function()
+    targetGuidHistory = {}
+    addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
+  end)
+  addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
+    for _, obj in ipairs(quest.objectives) do
+      targetGuidHistory[obj.id] = nil
+    end
+    addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
+  end)
 end)

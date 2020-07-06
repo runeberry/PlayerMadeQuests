@@ -1,4 +1,5 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="qeng/QuestStatus.lua"/>
   <Script file="qeng/QuestScript.lua"/>
   <Script file="qeng/QuestScriptCompiler.lua"/>
   <Script file="qeng/QuestEngine.lua"/>

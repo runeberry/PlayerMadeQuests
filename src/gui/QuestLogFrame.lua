@@ -44,10 +44,9 @@ local visConfig = {
 local textRedrawEvents = {
   "QuestLogBuilt",
   "QuestAdded",
+  "QuestUpdated",
   "QuestDeleted",
-  "QuestStatusChanged",
   "QuestLogReset",
-  "ObjectiveUpdated",
 }
 
 -- For some reason GetPoint() returns the wrong position unless you move the window

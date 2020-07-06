@@ -1,5 +1,9 @@
 local _, addon = ...
 addon:traceFile("QuestEngine.lua")
+local QuestLog, QuestStatus
+addon:onload(function()
+  QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
+end)
 
 local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
 
@@ -8,17 +12,6 @@ addon.QuestEngine = {}
 local objectivesByName = {}
 local isEngineLoaded = false
 local isQuestDataLoaded = false
-
-addon.QuestStatus = {
-  Invited = "Invited",
-  Declined = "Declined",
-  Active = "Active",
-  Failed = "Failed",
-  Abandoned = "Abandoned",
-  Completed = "Completed",
-  Archived = "Archived",
-}
-local status = addon.QuestStatus
 
 ---------------------------------------------------
 -- Private functions: Quest objective evaluation --
@@ -92,11 +85,11 @@ local function evaluateObjective(objective, obj, ...)
 end
 
 local function updateQuestObjectiveProgress(obj)
-  local quest = addon.QuestLog:FindByID(obj.questId)
+  local quest = QuestLog:FindByID(obj.questId)
   if not quest then
     logger:Warn("Unable to update quest objective: no quest by id", obj.questId)
     return
-  elseif quest.status ~= status.Active then
+  elseif quest.status ~= QuestStatus.Active then
     logger:Warn("Unable to update quest objective: quest", addon:Enquote(quest.name), "is not Active", addon:Enquote(quest.status, "()"))
     return
   end
@@ -114,7 +107,7 @@ local function updateQuestObjectiveProgress(obj)
   end
 
   qobj.progress = obj.progress
-  addon.QuestLog:Save(quest)
+  QuestLog:Save(quest)
 
   local isObjectiveCompleted, isQuestCompleted
   -- objective is considered completed if progress is >= goal
@@ -130,9 +123,9 @@ local function updateQuestObjectiveProgress(obj)
   end
 
   if isQuestCompleted then
-    quest.status = status.Completed
+    quest.status = QuestStatus.Completed
   end
-  addon.QuestLog:Save(quest)
+  QuestLog:Save(quest)
 
   if isObjectiveCompleted then
     addon.AppEvents:Publish("ObjectiveCompleted", obj)
@@ -242,7 +235,7 @@ local function stopTracking(quest)
 end
 
 local function setTracking(quest)
-  if quest.status == status.Active then
+  if quest.status == QuestStatus.Active then
     -- If start tracking fails, let it throw an error
     startTracking(quest)
   else
@@ -252,7 +245,7 @@ local function setTracking(quest)
 end
 
 local function startTrackingQuestLog()
-  local quests = addon.QuestLog:FindByQuery(function(q) return q.status == status.Active end)
+  local quests = QuestLog:FindByQuery(function(q) return q.status == QuestStatus.Active end)
   for _, q in pairs(quests) do
     local ok, err = pcall(startTracking, q)
     if not ok then
@@ -263,7 +256,16 @@ local function startTrackingQuestLog()
 end
 
 addon.AppEvents:Subscribe("QuestAdded", setTracking)
-addon.AppEvents:Subscribe("QuestStatusChanged", setTracking)
+addon.AppEvents:Subscribe("QuestStatusChanged", function(q)
+  if q.status == QuestStatus.Active then
+    -- Reset quest objective progress when the quest enters the Active status
+    for _, obj in ipairs(q.objectives) do
+      obj.progress = 0
+    end
+    QuestLog:Save(q)
+  end
+  setTracking(q)
+end)
 addon.AppEvents:Subscribe("QuestDeleted", stopTracking)
 
 addon.AppEvents:Subscribe("QuestDataLoaded", function()
