@@ -10,6 +10,7 @@ local qs = {
   Failed = "Failed",
   Abandoned = "Abandoned",
   Completed = "Completed",
+  Finished = "Finished",
   Archived = "Archived",
 }
 addon.QuestStatus = qs
@@ -27,6 +28,7 @@ local validStatusTable = {
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
     [qs.Abandoned] = invalid("A quest cannot be abandoned before it's been started."),
     [qs.Completed] = invalid("A quest can only be completed from the Active status."),
+    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
     [qs.Archived] = valid(),
   },
   [qs.Declined] = {
@@ -36,6 +38,7 @@ local validStatusTable = {
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
     [qs.Abandoned] = invalid("A quest cannot be abandoned before it's been started."),
     [qs.Completed] = invalid("A quest can only be completed from the Active status."),
+    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
     [qs.Archived] = valid(),
   },
   [qs.Active] = {
@@ -45,6 +48,7 @@ local validStatusTable = {
     [qs.Failed] = valid(),
     [qs.Abandoned] = valid(),
     [qs.Completed] = valid(),
+    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
     [qs.Archived] = valid(),
   },
   [qs.Failed] = {
@@ -54,6 +58,7 @@ local validStatusTable = {
     [qs.Failed] = valid(),
     [qs.Abandoned] = valid(),
     [qs.Completed] = invalid("A quest can only be completed from the Active status."),
+    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
     [qs.Archived] = valid(),
   },
   [qs.Abandoned] = {
@@ -63,6 +68,7 @@ local validStatusTable = {
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
     [qs.Abandoned] = valid(),
     [qs.Completed] = invalid("A quest can only be completed from the Active status."),
+    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
     [qs.Archived] = valid(),
   },
   [qs.Completed] = {
@@ -70,9 +76,19 @@ local validStatusTable = {
     [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
     [qs.Active] = valid(),
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
-    [qs.Abandoned] = valid(), -- todo: (#52) there needs to be a difference between "Completed (ready to turn-in)" and "Completed (turned in)"
-    -- https://github.com/dolphinspired/PlayerMadeQuests/issues/52
+    [qs.Abandoned] = valid(),
     [qs.Completed] = valid(),
+    [qs.Finished] = valid(),
+    [qs.Archived] = valid(),
+  },
+  [qs.Finished] = {
+    [qs.Invited] = invalid("You cannot be re-invited to a quest that you've already finished."),
+    [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
+    [qs.Active] = valid(),
+    [qs.Failed] = invalid("A quest can only be failed from the Active status."),
+    [qs.Abandoned] = invalid("A finished quest cannot be returned to the Abandoned status."),
+    [qs.Completed] = invalid("A finished quest cannot be returned to the Completed status."),
+    [qs.Finished] = valid(),
     [qs.Archived] = valid(),
   },
   [qs.Archived] = {
@@ -80,8 +96,9 @@ local validStatusTable = {
     [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
     [qs.Active] = valid(),
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
-    [qs.Abandoned] = invalid("A quest cannot be abandoned once it's already been finished."),
+    [qs.Abandoned] = invalid("A quest cannot be abandoned once it's already been archived."),
     [qs.Completed] = valid(),
+    [qs.Finished] = valid(),
     [qs.Archived] = valid(),
   },
 }

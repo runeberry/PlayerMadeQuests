@@ -43,6 +43,7 @@ end
 local considerDuplicate = {
   [QuestStatus.Active] = "is already on that quest.",
   [QuestStatus.Completed] = "has already completed that quest.",
+  [QuestStatus.Finished] = "has already finished that quest.",
   [QuestStatus.Archived] = "has archived that quest.",
 }
 
