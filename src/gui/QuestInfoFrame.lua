@@ -6,6 +6,11 @@ local questInfoFrame
 local currentQuest -- The quest being proposed in the window
 local currentQuestSender -- The player who sent the currently proposed quest
 
+local pageStyle = {
+  margins = { 8, 8, 10, 0 }, -- bottom spacing doesn't work on a scroll frame
+  spacing = 6
+}
+
 local textStyles = {
   ["header"] = {
     inheritsFrom = "QuestTitleFont",
@@ -17,70 +22,100 @@ local textStyles = {
   }
 }
 
-local pageStyle = {
-  margins = { 8, 8, 10, 0 }, -- bottom spacing doesn't work on a scroll frame
-  spacing = 6
+local buttons = {
+  ["Accept"] = {
+    text = "Accept",
+    action = function()
+      if not currentQuest then
+        addon.Logger:Warn("There is no quest to accept!")
+        return
+      end
+
+      addon.QuestLog:SaveWithStatus(currentQuest, addon.QuestStatus.Active)
+
+      if currentQuestSender then
+        addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
+      end
+
+      addon:ShowQuestInfoFrame(false)
+
+      addon:PlaySound("QuestAccepted")
+      addon:ShowQuestLog(true)
+    end
+  },
+  ["Decline"] = {
+    text = "Decline",
+    action = function()
+      if currentQuestSender then
+        addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
+        addon.QuestLog:SaveWithStatus(currentQuest, addon.QuestStatus.Declined)
+      end
+      addon:ShowQuestInfoFrame(false)
+    end
+  }
 }
 
-local function qf_SetTitle(self, str)
-  self.titleFontString:SetText(str)
-end
+local function setButtonBehavior(btn, behaviorId)
+  -- Start by clearing the current button behavior
+  btn._action = nil
+  btn:SetText("")
+  btn:Hide()
 
-local function qf_SetContent(self, quest)
-  local fsQuestName = self.article:GetFontString(1)
-  local fsQuestDescription = self.article:GetFontString(2)
-  local fsQuestObjectives = self.article:GetFontString(4)
+  if not behaviorId then return end
 
-  fsQuestName:SetText(quest.name)
-  fsQuestDescription:SetText(quest.description or " ")
-
-  if quest.objectives then
-    local objString = ""
-    for _, obj in ipairs(quest.objectives) do
-      objString = objString.."* "..compiler:GetDisplayText(obj, "quest").."\n"
-    end
-    fsQuestObjectives:SetText(objString)
-  else
-    fsQuestObjectives:SetText("\n")
-  end
-end
-
-local function qf_OnShow(self)
-  self.scrollFrame:SetVerticalScroll(0)
-  addon:PlaySound("BookOpen")
-end
-
-local function qf_OnHide(self)
-  currentQuest = nil
-  currentQuestSender = nil
-  addon:PlaySound("BookClose")
-end
-
-local function acceptButton_OnClick()
-  if not currentQuest then
-    addon.Logger:Warn("There is no quest to accept!")
+  local behavior = buttons[behaviorId]
+  if not behavior then
+    addon.UILogger:Warn(behaviorId, "is not a valid button behavior for QuestInfoFrame")
     return
   end
 
-  addon.QuestLog:SaveWithStatus(currentQuest, addon.QuestStatus.Active)
-
-  if currentQuestSender then
-    addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
-  end
-
-  addon:ShowQuestInfoFrame(false)
-
-  addon:PlaySound("QuestAccepted")
-  addon:ShowQuestLog(true)
+  -- The default OnClick behavior is wired up to run this action
+  btn._action = behavior.action
+  btn:SetText(behavior.text)
+  btn:Show()
 end
 
-local function declineButton_OnClick()
-  if currentQuestSender then
-    addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
-    addon.QuestLog:SaveWithStatus(currentQuest, addon.QuestStatus.Declined)
+local frameMethods = {
+  ["SetTitle"] = function(self, str)
+    self.titleFontString:SetText(str)
+  end,
+  ["SetContent"] = function(self, quest)
+    local fsQuestName = self.article:GetFontString(1)
+    local fsQuestDescription = self.article:GetFontString(2)
+    local fsQuestObjectives = self.article:GetFontString(4)
+
+    fsQuestName:SetText(quest.name)
+    fsQuestDescription:SetText(quest.description or " ")
+
+    if quest.objectives then
+      local objString = ""
+      for _, obj in ipairs(quest.objectives) do
+        objString = objString.."* "..compiler:GetDisplayText(obj, "quest").."\n"
+      end
+      fsQuestObjectives:SetText(objString)
+    else
+      fsQuestObjectives:SetText("\n")
+    end
+  end,
+  ["SetButtons"] = function(self, behaviorIdLeft, behaviorIdRight)
+    setButtonBehavior(self.leftButton, behaviorIdLeft)
+    setButtonBehavior(self.rightButton, behaviorIdRight)
   end
-  addon:ShowQuestInfoFrame(false)
-end
+}
+
+local frameScripts = {
+  ["OnShow"] = function(self)
+    self.scrollFrame:SetVerticalScroll(0)
+    addon:PlaySound("BookOpen")
+  end,
+  ["OnHide"] = function(self)
+    currentQuest = nil
+    currentQuestSender = nil
+    addon:PlaySound("BookClose")
+  end,
+  -- ["OnLoad"] = function() end,
+  -- ["OnEvent"] = function() end,
+}
 
 local function buildQuestInfoFrame()
   local questFrame = CreateFrame("Frame", nil, UIParent)
@@ -91,10 +126,9 @@ local function buildQuestInfoFrame()
   questFrame:SetSize(384, 512)
   questFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -104)
   questFrame:SetHitRectInsets(0, 30, 0, 70)
-  -- questFrame:SetScript("OnLoad", function() end)
-  -- questFrame:SetScript("OnEvent", function() end)
-  questFrame:SetScript("OnShow", qf_OnShow)
-  questFrame:SetScript("OnHide", qf_OnHide)
+  for event, handler in pairs(frameScripts) do
+    questFrame:SetScript(event, handler)
+  end
 
   local questFramePortrait = questFrame:CreateTexture(nil, "ARTWORK")
   questFramePortrait:SetSize(60, 60)
@@ -119,17 +153,29 @@ local function buildQuestInfoFrame()
   questFrameDetailPanel:SetScript("OnUpdate", function() end)
   --questFrameDetailPanel:Hide()
 
-  local questFrameDeclineButton = CreateFrame("Button", nil, questFrameDetailPanel, "UIPanelButtonTemplate")
-  questFrameDeclineButton:SetText("Decline")
-  questFrameDeclineButton:SetSize(78, 22)
-  questFrameDeclineButton:SetPoint("BOTTOMRIGHT", questFrame, "BOTTOMRIGHT", -39, 72)
-  questFrameDeclineButton:SetScript("OnClick", declineButton_OnClick)
+  local questFrameRightButton = CreateFrame("Button", nil, questFrameDetailPanel, "UIPanelButtonTemplate")
+  questFrameRightButton:SetText("RIGHT_BTN") -- PLaceholder text
+  questFrameRightButton:SetSize(78, 22)
+  questFrameRightButton:SetPoint("BOTTOMRIGHT", questFrame, "BOTTOMRIGHT", -39, 72)
+  questFrameRightButton:SetScript("OnClick", function()
+    if questFrameRightButton._action then
+      questFrameRightButton._action()
+    else
+      addon.UILogger:Warn("No action assigned to questFrameRightButton")
+    end
+  end)
 
-  local questFrameAcceptButton = CreateFrame("Button", nil, questFrameDetailPanel, "UIPanelButtonTemplate")
-  questFrameAcceptButton:SetText("Accept")
-  questFrameAcceptButton:SetSize(77, 22)
-  questFrameAcceptButton:SetPoint("BOTTOMLEFT", questFrame, "BOTTOMLEFT", 23, 72)
-  questFrameAcceptButton:SetScript("OnClick", acceptButton_OnClick)
+  local questFrameLeftButton = CreateFrame("Button", nil, questFrameDetailPanel, "UIPanelButtonTemplate")
+  questFrameLeftButton:SetText("LEFT_BTN") -- Placeholder text
+  questFrameLeftButton:SetSize(77, 22)
+  questFrameLeftButton:SetPoint("BOTTOMLEFT", questFrame, "BOTTOMLEFT", 23, 72)
+  questFrameLeftButton:SetScript("OnClick", function()
+    if questFrameLeftButton._action then
+      questFrameLeftButton._action()
+    else
+      addon.UILogger:Warn("No action assigned to questFrameLeftButton")
+    end
+  end)
 
   local questDetailScrollFrame = CreateFrame("ScrollFrame", nil, questFrameDetailPanel, "QuestScrollFrameTemplate")
   -- questDetailScrollFrame:SetAllPoints(true)
@@ -159,9 +205,12 @@ local function buildQuestInfoFrame()
   questFrame.scrollFrame = questDetailScrollFrame
   questFrame.titleFontString = questFrameNpcNameText
   questFrame.article = article
+  questFrame.leftButton = questFrameLeftButton
+  questFrame.rightButton = questFrameRightButton
 
-  questFrame.SetTitle = qf_SetTitle
-  questFrame.SetContent = qf_SetContent
+  for name, method in pairs(frameMethods) do
+    questFrame[name] = method
+  end
 
   return questFrame
 end
@@ -188,12 +237,14 @@ function addon:ShowQuestInfoFrame(flag, quest, sender)
       currentQuest = quest
       currentQuestSender = sender
       questInfoFrame:Show()
+      questInfoFrame:SetButtons("Accept", "Decline")
       addon:PlaySound("BookWrite")
     end
   else
     if questInfoFrame then
       currentQuest = nil
       currentQuestSender = nil
+      questInfoFrame:SetButtons(nil, nil)
       questInfoFrame:Hide()
     end
   end
