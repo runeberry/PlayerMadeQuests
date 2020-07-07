@@ -1,4 +1,4 @@
-## Interface: 11304
+## Interface: 11305
 ## Title: PlayerMadeQuests
 ## Author: dolphinspired
 ## Notes: Create your own quests and share them with other players!
