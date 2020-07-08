@@ -7,8 +7,9 @@ addon.QuestDemos:EnableDirectRead(true)
 
 function addon.QuestDemos:CopyToDrafts(demoId)
   local demo = self:FindByID(demoId)
-  local draft = addon.QuestDrafts:NewDraft(demo.name)
+  local draft = addon.QuestDrafts:NewDraft()
   draft.parameters = addon:CopyTable(demo.parameters)
+  draft.parameters.name = demo.name
   draft.parameters.questId = nil -- Each copy of the demo is considered a new quest
   draft.parameters.demoId = demo.demoId -- ..but it will still keep a reference to the demo it was created from
   draft.script = demo.script

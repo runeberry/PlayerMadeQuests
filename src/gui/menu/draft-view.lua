@@ -107,7 +107,9 @@ function menu:OnShowMenu(frame, draftId)
       return
     end
   else
-    currentDraft = QuestDrafts:NewDraft("New Quest")
+    currentDraft = QuestDrafts:NewDraft()
+    currentDraft.parameters.name = "New Quest"
+    currentDraft.script = "objectives:\n  - "
   end
 
   frame.nameField:SetText(currentDraft.parameters.name)

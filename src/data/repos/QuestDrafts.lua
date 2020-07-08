@@ -27,12 +27,12 @@ addon.QuestDraftStatus = {
 }
 local status = addon.QuestDraftStatus
 
-function addon.QuestDrafts:NewDraft(name)
+function addon.QuestDrafts:NewDraft()
   local draft = {
     draftId = addon:CreateID("draft-%i"),
     version = 1,
     status = status.Draft,
-    parameters = { name = name or "New Quest Draft" },
+    parameters = {},
     script = ""
   }
 
