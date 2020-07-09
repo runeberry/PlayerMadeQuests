@@ -7,7 +7,7 @@ local defaultMenu = "drafts"
 
 addon.MainMenu = addon.CustomWidgets:CreateWidget("TreeMenuFrame")
 addon.MainMenu:SetTitle("PlayerMadeQuests")
-addon.MainMenu:SetStatusText("PMQ "..addon.ADDON_VERSION.." (thank you for testing! <3)")
+addon.MainMenu:SetStatusText("PMQ "..addon:GetVersionText().." (thank you for testing! <3)")
 addon.MainMenu:SetMenuTree({ -- value == menuId
   { value = "quests", text = "Quests",
     children = {

@@ -31,6 +31,15 @@ function addon:Pluralize(num, singular, plural)
   end
 end
 
+function addon:GetVersionText()
+  local major, minor, patch = addon.VERSION / 10000, (addon.VERSION / 100) % 100, addon.VERSION % 100
+  local text = string.format("v%i.%i.%i", major, minor, patch)
+  if addon.BRANCH then
+    text = text.."-"..addon.BRANCH
+  end
+  return text
+end
+
 function addon:Enquote(str, quotes)
   str = tostring(str) or ""
   quotes = quotes or "\""

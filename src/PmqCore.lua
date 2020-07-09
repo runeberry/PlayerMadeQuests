@@ -1,12 +1,12 @@
 local _, addon = ...
 local print = addon.G.print
 
-addon.ADDON_VERSION = "v0.0.3-alpha"
+addon.VERSION = 3
+addon.BRANCH = "alpha"
 addon.IsAddonLoaded = false
 
 function addon.Ace:OnInitialize()
   addon:catch(function()
-
     -- addon.Logger:NewLogger("test")
     addon.IsAddonLoaded = true
     addon:load()
