@@ -1,9 +1,25 @@
 local _, addon = ...
-addon:traceFile("QuestDemos.lua")
+
+--[[
+  Demo model:
+    See DemoQuestDB.lua
+--]]
 
 addon.QuestDemos = addon.Data:NewRepository("DemoQuest", "demoId")
 addon.QuestDemos:SetTableSource(addon.DemoQuestDB)
 addon.QuestDemos:EnableDirectRead(true)
+
+function addon.QuestDemos:CompileDemo(demoId)
+  if not demoId then
+    return false, "demoId is required"
+  end
+  local demo = self:FindByID(demoId)
+  if not demo then
+    return false, "No demo exists with demoId: "..demoId
+  end
+  demo.parameters.questId = demoId
+  return addon.QuestScriptCompiler:TryCompile(demo.script, demo.parameters)
+end
 
 function addon.QuestDemos:CopyToDrafts(demoId)
   local demo = self:FindByID(demoId)
@@ -17,14 +33,11 @@ function addon.QuestDemos:CopyToDrafts(demoId)
   return draft
 end
 
-function addon.QuestDemos:CompileDemo(demoId)
-  if not demoId then
-    return false, "demoId is required"
+function addon.QuestDemos:StartDemo(demoId)
+  local ok, quest = self:CompileDemo(demoId)
+  if not ok then
+    addon.Logger:Error("Unable to start demo quest:", quest)
+    return
   end
-  local demo = self:FindByID(demoId)
-  if not demo then
-    return false, "No demo exists with demoId: "..demoId
-  end
-  demo.parameters.questId = demoId
-  return addon.QuestScriptCompiler:TryCompile(demo.script, demo.parameters)
+  addon:ShowQuestInfoFrame(true, quest)
 end

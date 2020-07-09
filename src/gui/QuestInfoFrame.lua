@@ -1,6 +1,7 @@
 local _, addon = ...
 local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
+local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogStatus
 local StaticPopups = addon.StaticPopups
 local compiler = addon.QuestScriptCompiler
 
@@ -29,6 +30,9 @@ local buttons = {
     width = 77,
     action = function(quest, sender)
       QuestLog:SaveWithStatus(quest, QuestStatus.Active)
+      if QuestCatalog:FindByID(quest.questId) then
+        QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
+      end
       if sender then
         addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = sender }, quest.questId)
       end
@@ -43,7 +47,7 @@ local buttons = {
     action = function(quest, sender)
       if sender then
         addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = sender }, quest.questId)
-        QuestLog:SaveWithStatus(quest, QuestStatus.Declined)
+        QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Declined)
       end
       addon:ShowQuestInfoFrame(false)
     end
@@ -68,8 +72,7 @@ local buttons = {
     text = "Share Quest",
     width = 122, -- todo: lookup actual width
     action = function(quest)
-      addon.MessageEvents:Publish("QuestInvite", nil, quest)
-      addon.Logger:Info("Sharing quest -", quest.name)
+      QuestLog:ShareQuest(quest.questId)
     end
   },
   ["Retry"] = {
@@ -114,7 +117,7 @@ local frameModes = {
     rightButton = buttons.Decline,
     busy = function(frame, quest, sender)
       if sender then
-        addon.Logger:Warn(sender, "invited you to a quest. View it in the Quest Log menu.")
+        addon.Logger:Warn(sender, "invited you to a quest. View it in your Quest Catalog.")
       else
         addon.Logger:Warn("Accept or decline this quest before trying to view another one.")
       end
@@ -234,9 +237,8 @@ local frameScripts = {
   -- ["OnEvent"] = function() end,
 }
 
+local defaultStatusMode = "NewQuest"
 local statusModeMap = {
-  [QuestStatus.Invited] = "NewQuest",
-  [QuestStatus.Declined] = "NewQuest",
   [QuestStatus.Active] = "ActiveQuest",
   [QuestStatus.Failed] = "TerminatedQuest",
   [QuestStatus.Abandoned] = "TerminatedQuest",
@@ -385,14 +387,14 @@ function addon:ShowQuestInfoFrame(flag, quest, sender, modeName)
       addon.UILogger:Error("Unable to show QuestInfoFrame: no quest provided")
       return
     end
-    if not quest.status then
-      addon.Logger:Error("Unable to show QuestInfoFrame: no quest status provided")
-      return
-    end
 
     -- Unless overridden, the mode that this frame displays in is determined directly by the quest's status
     if not modeName then
-      modeName = statusModeMap[quest.status]
+      if quest.status then
+        modeName = statusModeMap[quest.status]
+      else
+        modeName = defaultStatusMode
+      end
     end
     local mode = frameModes[modeName]
     if not mode then
@@ -404,11 +406,3 @@ function addon:ShowQuestInfoFrame(flag, quest, sender, modeName)
     questInfoFrame:CloseQuest()
   end
 end
-
-local function handleQuestInvite(quest, sender)
-  addon:ShowQuestInfoFrame(true, quest, sender)
-end
-
-addon:onload(function()
-  addon.AppEvents:Subscribe("QuestInvite", handleQuestInvite)
-end)

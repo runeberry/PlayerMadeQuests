@@ -10,14 +10,14 @@ local function button_Back()
   addon.MainMenu:NavToMenuScreen("demo")
 end
 
-local function button_Accept()
+local function button_Start()
   if not currentDemoId then return end
   local ok, quest = addon.QuestDemos:CompileDemo(currentDemoId)
   if not ok then
     addon.Logger:Error("Failed to accept demo quest:", quest)
     return
   end
-  addon.AppEvents:Publish("QuestInvite", quest)
+  addon.QuestDemos:StartDemo(currentDemoId)
 end
 
 local function button_CopyToDrafts()
@@ -41,7 +41,7 @@ function menu:Create(frame)
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "BOTTOM")
   -- bug: This should default to LEFT anchor, but it's defaulting to TOP for some reason? Investigate...
   buttonPane:AddButton("Back", button_Back, { anchor = "LEFT" })
-  buttonPane:AddButton("Accept", button_Accept, { anchor = "RIGHT" })
+  buttonPane:AddButton("Start Quest", button_Start, { anchor = "RIGHT" })
   buttonPane:AddButton("Copy to Drafts", button_CopyToDrafts, { anchor = "RIGHT" })
 
   local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Script")

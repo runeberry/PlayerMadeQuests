@@ -1,6 +1,5 @@
 local _, addon = ...
-local QuestStatus = addon.QuestStatus
-local logger = addon.Logger:NewLogger("QuestLog", addon.LogLevel.info)
+local GetUnitName = addon.G.GetUnitName
 
 addon.QuestLog = addon.Data:NewRepository("Quest", "questId")
 addon.QuestLog:SetSaveDataSource("QuestLog")
@@ -33,48 +32,28 @@ function addon.QuestLog:Clear()
     self:Delete(quest)
   end
   addon.AppEvents:Publish("QuestLogReset")
-  logger:Info("Quest Log reset")
+  addon.Logger:Info("Quest Log reset")
 end
 
 function addon.QuestLog:Validate(quest)
   addon:ValidateQuestStatusChange(quest)
 end
 
-local considerDuplicate = {
-  [QuestStatus.Active] = "is already on that quest.",
-  [QuestStatus.Completed] = "has already completed that quest.",
-  [QuestStatus.Finished] = "has already finished that quest.",
-  [QuestStatus.Archived] = "has archived that quest.",
-}
-
-addon:onload(function()
-  addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
-    local existing = addon.QuestLog:FindByID(quest.questId)
-    if existing and considerDuplicate[existing.status] then
-      addon.MessageEvents:Publish("QuestInviteDuplicate", { distribution = "WHISPER", target = sender }, quest.questId, quest.status)
-      return
+function addon.QuestLog:ShareQuest(questId)
+  local catalogItem = addon.QuestCatalog:FindByID(questId)
+  if not catalogItem then
+    -- If the quest is not in the player's catalog for some reason
+    -- create a temporary catalog item for the message.
+    -- This could happen when trying to share a demo quest.
+    local quest = self:FindByID(questId)
+    catalogItem = addon.QuestCatalog:NewCatalogItem(quest)
+    if quest.demoId then
+      catalogItem.metadata.demo = true
+      catalogItem.metadata.demoId = quest.demoId
     end
-    logger:Warn(sender, "has invited you to a quest:", quest.name)
-    if existing then
-      quest = existing
-    else
-      quest.status = QuestStatus.Invited
-      addon.QuestLog:Save(quest)
-    end
-    addon.AppEvents:Publish("QuestInvite", quest, sender)
-  end)
+  end
 
-  addon.MessageEvents:Subscribe("QuestInviteAccepted", function(distribution, sender, questId)
-    logger:Warn(sender, "accepted your quest.")
-  end)
-  addon.MessageEvents:Subscribe("QuestInviteDeclined", function(distribution, sender, questId)
-    logger:Warn(sender, "declined your quest.")
-  end)
-  addon.MessageEvents:Subscribe("QuestInviteDuplicate", function(distribution, sender, questId, status)
-    local reason = considerDuplicate[status] or "has already received that quest."
-    logger:Warn(sender, reason)
-  end)
-  addon.MessageEvents:Subscribe("QuestInviteRequirements", function(distribution, sender, questId)
-    logger:Warn(sender, "does not meet the requirements for that quest.")
-  end)
-end)
+  catalogItem.metadata.sender = GetUnitName("player", true)
+  addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
+  addon.Logger:Info("Sharing quest -", catalogItem.quest.name)
+end

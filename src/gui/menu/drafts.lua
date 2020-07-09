@@ -59,7 +59,7 @@ function menu:Create(frame)
   tablePane:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getDrafts)
-  dataTable:SubscribeToEvents("DraftSaved", "DraftDeleted", "DraftDataLoaded")
+  dataTable:SubscribeToEvents("DraftUpdated", "DraftDeleted", "DraftDataLoaded")
   dataTable:OnRowSelected(setButtonState)
   frame.dataTable = dataTable
 
@@ -95,38 +95,23 @@ function menu:Create(frame)
     confirmDraftDelete:Show()
   end
 
-  local acceptQuest = function()
+  local startQuest = function()
     local row = dataTable:GetSelectedRow()
-    if not row or not row[4] then
-      return
-    end
-    local ok, quest = addon.QuestDrafts:CompileDraft(row[4])
-    if not ok then
-      addon.Logger:Error("Failed to accept quest draft:", quest)
-      return
-    end
-    addon.AppEvents:Publish("QuestInvite", quest)
+    if not row then return end
+    addon.QuestDrafts:StartDraft(row[4])
     dataTable:ClearSelection()
   end
 
   local shareQuest = function()
     local row = dataTable:GetSelectedRow()
-    if not row or not row[4] then
-      return
-    end
-    local ok, quest = addon.QuestDrafts:CompileDraft(row[4])
-    if not ok then
-      addon.Logger:Error("Failed to share quest draft:", quest)
-      return
-    end
-    addon.MessageEvents:Publish("QuestInvite", nil, quest)
-    addon.Logger:Info("Sharing quest -", row[1])
+    if not row then return end
+    addon.QuestDrafts:ShareDraft(row[4])
   end
 
   buttons[1] = buttonPane:AddButton("New", newDraft)
   buttons[2] = buttonPane:AddButton("Edit", editDraft)
   buttons[3] = buttonPane:AddButton("Delete", deleteDraft)
-  buttons[4] = buttonPane:AddButton("Accept Quest", acceptQuest)
+  buttons[4] = buttonPane:AddButton("Start Quest", startQuest)
   buttons[5] = buttonPane:AddButton("Share Quest", shareQuest)
 
   setButtonState(nil)
