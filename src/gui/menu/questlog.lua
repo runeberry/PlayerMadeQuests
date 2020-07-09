@@ -65,8 +65,6 @@ local buttons = {
     anchor = "BOTTOM",
     enabled = "Row",
     status = {
-      [QuestStatus.Invited] = true,
-      [QuestStatus.Declined] = true,
       [QuestStatus.Active] = true,
       [QuestStatus.Failed] = true,
       [QuestStatus.Abandoned] = true,
@@ -202,14 +200,12 @@ function menu:Create(frame)
     ["info"] = function()
       local quest = getRowQuest()
       if not quest then return end
-      addon.AppEvents:Publish("QuestInvite", quest)
+      addon:ShowQuestInfoFrame(true, quest)
       dataTable:ClearSelection()
     end,
     ["share"] = function()
-      local quest = getRowQuest()
-      if not quest then return end
-      addon.MessageEvents:Publish("QuestInvite", nil, quest)
-      addon.Logger:Info("Sharing quest -", quest.name)
+      local row = dataTable:GetSelectedRow()
+      QuestLog:ShareQuest(row[3])
     end,
     ["abandon"] = function()
       confirmQuestAbandon:Show()

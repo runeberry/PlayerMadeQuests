@@ -1,6 +1,7 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
   <Script file="gui/Cli.lua"/>
   <Script file="gui/CustomWidgets.lua"/>
+  <Script file="gui/StaticPopups.lua"/>
   <Script file="gui/Styles.lua"/>
 
   <!-- Custom Widgets -->
@@ -17,7 +18,6 @@
   <Script file="gui/MainMenu.lua"/>
   <Script file="gui/QuestInfoFrame.lua"/>
   <Script file="gui/QuestLogFrame.lua"/>
-  <Script file="gui/StaticPopups.lua"/>
   <Script file="gui/UIErrorsFrame.lua"/>
   <Script file="gui/YamlFormatting.lua"/>
 

@@ -57,15 +57,8 @@ function menu:Create(frame)
 
   local acceptQuest = function()
     local row = dataTable:GetSelectedRow()
-    if not row or not row[2] then
-      return
-    end
-    local ok, quest = addon.QuestDemos:CompileDemo(row[2])
-    if not ok then
-      addon.Logger:Error("Failed to accept demo quest:", quest)
-      return
-    end
-    addon.AppEvents:Publish("QuestInvite", quest)
+    if not row then return end
+    addon.QuestDemos:StartDemo(row[2])
     dataTable:ClearSelection()
   end
 
@@ -85,7 +78,7 @@ function menu:Create(frame)
     addon.Logger:Info("Demo quest copied to drafts.")
   end
 
-  buttons[1] = buttonPane:AddButton("Accept Quest", acceptQuest)
+  buttons[1] = buttonPane:AddButton("Start Quest", acceptQuest)
   buttons[2] = buttonPane:AddButton("View Code", viewCode)
   buttons[3] = buttonPane:AddButton("Copy to Drafts", copyToDrafts)
 

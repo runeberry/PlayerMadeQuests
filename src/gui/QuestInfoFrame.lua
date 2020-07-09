@@ -1,10 +1,12 @@
 local _, addon = ...
 local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
+local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
+local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogStatus
+local StaticPopups = addon.StaticPopups
 local compiler = addon.QuestScriptCompiler
 
-local questInfoFrame
-local currentQuest -- The quest being proposed in the window
-local currentQuestSender -- The player who sent the currently proposed quest
+local popupAbandon = "ConfirmQuestAbandonQuestInfoFrame"
+local popupRetry = "ConfirmQuestRetryQuestInfoFrame"
 
 local pageStyle = {
   margins = { 8, 8, 10, 0 }, -- bottom spacing doesn't work on a scroll frame
@@ -25,96 +27,224 @@ local textStyles = {
 local buttons = {
   ["Accept"] = {
     text = "Accept",
-    action = function()
-      if not currentQuest then
-        addon.Logger:Warn("There is no quest to accept!")
-        return
+    width = 77,
+    action = function(quest, sender)
+      QuestLog:SaveWithStatus(quest, QuestStatus.Active)
+      if QuestCatalog:FindByID(quest.questId) then
+        QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
       end
-
-      addon.QuestLog:SaveWithStatus(currentQuest, addon.QuestStatus.Active)
-
-      if currentQuestSender then
-        addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
+      if sender then
+        addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = sender }, quest.questId)
       end
-
-      addon:ShowQuestInfoFrame(false)
-
       addon:PlaySound("QuestAccepted")
+      addon:ShowQuestInfoFrame(false)
       addon:ShowQuestLog(true)
     end
   },
   ["Decline"] = {
     text = "Decline",
-    action = function()
-      if currentQuestSender then
-        addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = currentQuestSender }, currentQuest.questId)
-        addon.QuestLog:SaveWithStatus(currentQuest, addon.QuestStatus.Declined)
+    width = 78,
+    action = function(quest, sender)
+      if sender then
+        addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = sender }, quest.questId)
+        QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Declined)
       end
       addon:ShowQuestInfoFrame(false)
     end
+  },
+  ["Complete"] = {
+    text = "Complete Quest",
+    width = 122, -- todo: lookup actual width
+    action = function(quest)
+      QuestLog:SaveWithStatus(quest, QuestStatus.Finished)
+      addon:PlaySound("QuestComplete")
+      addon:ShowQuestInfoFrame(false)
+    end
+  },
+  ["Abandon"] = {
+    text = "Abandon Quest",
+    width = 122, -- todo: lookup actual width
+    action = function()
+      StaticPopups:ShowPopup(popupAbandon)
+    end
+  },
+  ["Share"] = {
+    text = "Share Quest",
+    width = 122, -- todo: lookup actual width
+    action = function(quest)
+      QuestLog:ShareQuest(quest.questId)
+    end
+  },
+  ["Retry"] = {
+    text = "Replay Quest",
+    width = 122,
+    action = function()
+      StaticPopups:ShowPopup(popupRetry)
+    end
+  },
+  ["Empty"] = {
+    text = "",
+    width = 78,
+    action = function() end
   }
 }
 
-local function setButtonBehavior(btn, behaviorId)
+local function setButtonBehavior(btn, behavior)
   -- Start by clearing the current button behavior
   btn._action = nil
   btn:SetText("")
   btn:Hide()
 
-  if not behaviorId then return end
-
-  local behavior = buttons[behaviorId]
-  if not behavior then
-    addon.UILogger:Warn(behaviorId, "is not a valid button behavior for QuestInfoFrame")
-    return
-  end
+  -- If no behavior is supplied, do not show the button
+  if not behavior then return end
 
   -- The default OnClick behavior is wired up to run this action
   btn._action = behavior.action
   btn:SetText(behavior.text)
+  btn:SetWidth(behavior.width)
   btn:Show()
 end
 
-local frameMethods = {
-  ["SetTitle"] = function(self, str)
-    self.titleFontString:SetText(str)
-  end,
-  ["SetContent"] = function(self, quest)
-    local fsQuestName = self.article:GetFontString(1)
-    local fsQuestDescription = self.article:GetFontString(2)
-    local fsQuestObjectives = self.article:GetFontString(4)
-
-    fsQuestName:SetText(quest.name)
-    fsQuestDescription:SetText(quest.description or " ")
-
-    if quest.objectives then
-      local objString = ""
-      for _, obj in ipairs(quest.objectives) do
-        objString = objString.."* "..compiler:GetDisplayText(obj, "quest").."\n"
+-- Various display configurations for this frame, depending on quest status, etc.
+-- Properties:
+--   leftButton/rightButton - the button behaviors of the bottom buttons (or nil to hide)
+--   content - what to draw when the frame is shown in this mode
+--   busy - what to draw when a request is recieved to show the frame, but it's already shown
+--   clean - how to clean up the frame and leave an empty canvas for the next draw
+local frameModes = {
+  ["NewQuest"] = {
+    leftButton = buttons.Accept,
+    rightButton = buttons.Decline,
+    busy = function(frame, quest, sender)
+      if sender then
+        addon.Logger:Warn(sender, "invited you to a quest. View it in your Quest Catalog.")
+      else
+        addon.Logger:Warn("Accept or decline this quest before trying to view another one.")
       end
-      fsQuestObjectives:SetText(objString)
-    else
-      fsQuestObjectives:SetText("\n")
+    end,
+    content = function(frame, quest, sender)
+      frame.titleFontString:SetText("[PMQ] Quest Info")
+
+      frame.article:GetFontString(1):SetText(quest.name)
+      frame.article:GetFontString(2):SetText(quest.description or " ")
+      frame.article:GetFontString(3):SetText("Quest Objectives")
+
+      if quest.objectives then
+        local objString = ""
+        for _, obj in ipairs(quest.objectives) do
+          objString = objString.."* "..compiler:GetDisplayText(obj, "quest").."\n"
+        end
+        objString = objString.."\n\n" -- Spacer for bottom margin
+        frame.article:GetFontString(4):SetText(objString)
+      else
+        frame.article:GetFontString(4):SetText("\n")
+      end
+
+      addon:PlaySound("BookWrite")
+    end,
+  },
+  ["CompletedQuest"] = {
+    leftButton = buttons.Empty,
+    rightButton = buttons.Complete, -- todo: incorporate "Abandon" into this mode
+    busy = function(frame, quest, sender)
+
+    end,
+    content = function(frame, quest, sender)
+      -- todo: real stuff here
+      frame.article:GetFontString(2):SetText("You completed "..addon:Enquote(quest.name, '""!'))
+    end,
+  },
+  ["ActiveQuest"] = {
+    leftButton = buttons.Share,
+    rightButton = buttons.Abandon,
+    busy = function(frame, quest, sender)
+
+    end,
+    content = function(frame, quest, sender)
+      -- todo: real stuff here
+      frame.article:GetFontString(2):SetText("You are currently on "..addon:Enquote(quest.name, '""'))
+    end,
+  },
+  ["TerminatedQuest"] = {
+    leftButton = buttons.Share,
+    rightButton = buttons.Retry,
+    busy = function(frame, quest, sender)
+
+    end,
+    content = function(frame, quest, sender)
+      -- todo: real stuff here
+      frame.article:GetFontString(2):SetText("Try again?")
+    end,
+  }
+}
+
+local frameMethods = {
+  ["ShowQuest"] = function(self, quest, sender, mode)
+    if self._shown and mode.busy then
+      -- Another quest is already being interacted with
+      -- If no "busy" function is specified, will proceed to draw content as normal
+      mode.busy(self, quest, sender)
+      return
     end
+
+    self._quest = quest
+    self._sender = sender
+    self._shown = true
+
+    self:ClearContent()
+
+    mode.content(self, quest, sender)
+    setButtonBehavior(self.leftButton, mode.leftButton)
+    setButtonBehavior(self.rightButton, mode.rightButton)
+
+    self:Show()
   end,
-  ["SetButtons"] = function(self, behaviorIdLeft, behaviorIdRight)
-    setButtonBehavior(self.leftButton, behaviorIdLeft)
-    setButtonBehavior(self.rightButton, behaviorIdRight)
+  ["CloseQuest"] = function(self)
+    self._quest = nil
+    self._sender = nil
+    self._shown = nil
+
+    setButtonBehavior(self.leftButton, nil)
+    setButtonBehavior(self.rightButton, nil)
+
+    self:Hide()
+  end,
+  ["ClearContent"] = function(self)
+    self.titleFontString:SetText("")
+    self.article:GetFontString(1):SetText("")
+    self.article:GetFontString(2):SetText("")
+    self.article:GetFontString(3):SetText("")
+    self.article:GetFontString(4):SetText("")
+  end,
+  ["RefreshMode"] = function(self)
+    local quest, sender = self._quest, self._sender
+    addon:ShowQuestInfoFrame(false)
+    addon:ShowQuestInfoFrame(true, quest, sender)
   end
 }
 
 local frameScripts = {
   ["OnShow"] = function(self)
+    self._shown = true
     self.scrollFrame:SetVerticalScroll(0)
     addon:PlaySound("BookOpen")
   end,
   ["OnHide"] = function(self)
-    currentQuest = nil
-    currentQuestSender = nil
+    self._shown = nil
     addon:PlaySound("BookClose")
   end,
   -- ["OnLoad"] = function() end,
   -- ["OnEvent"] = function() end,
+}
+
+local defaultStatusMode = "NewQuest"
+local statusModeMap = {
+  [QuestStatus.Active] = "ActiveQuest",
+  [QuestStatus.Failed] = "TerminatedQuest",
+  [QuestStatus.Abandoned] = "TerminatedQuest",
+  [QuestStatus.Completed] = "CompletedQuest",
+  [QuestStatus.Finished] = "TerminatedQuest",
+  [QuestStatus.Archived] = "TerminatedQuest",
 }
 
 local function buildQuestInfoFrame()
@@ -155,11 +285,13 @@ local function buildQuestInfoFrame()
 
   local questFrameRightButton = CreateFrame("Button", nil, questFrameDetailPanel, "UIPanelButtonTemplate")
   questFrameRightButton:SetText("RIGHT_BTN") -- PLaceholder text
-  questFrameRightButton:SetSize(78, 22)
+  questFrameRightButton:SetSize(1, 22) -- Placeholder width
   questFrameRightButton:SetPoint("BOTTOMRIGHT", questFrame, "BOTTOMRIGHT", -39, 72)
   questFrameRightButton:SetScript("OnClick", function()
     if questFrameRightButton._action then
-      questFrameRightButton._action()
+      addon:catch(function()
+        questFrameRightButton._action(questFrame._quest, questFrame._sender)
+      end)
     else
       addon.UILogger:Warn("No action assigned to questFrameRightButton")
     end
@@ -167,11 +299,13 @@ local function buildQuestInfoFrame()
 
   local questFrameLeftButton = CreateFrame("Button", nil, questFrameDetailPanel, "UIPanelButtonTemplate")
   questFrameLeftButton:SetText("LEFT_BTN") -- Placeholder text
-  questFrameLeftButton:SetSize(77, 22)
+  questFrameLeftButton:SetSize(1, 22) -- Placeholder width
   questFrameLeftButton:SetPoint("BOTTOMLEFT", questFrame, "BOTTOMLEFT", 23, 72)
   questFrameLeftButton:SetScript("OnClick", function()
     if questFrameLeftButton._action then
-      questFrameLeftButton._action()
+      addon:catch(function()
+        questFrameLeftButton._action(questFrame._quest, questFrame._sender)
+      end)
     else
       addon.UILogger:Warn("No action assigned to questFrameLeftButton")
     end
@@ -195,12 +329,38 @@ local function buildQuestInfoFrame()
   end
 
   -- Placeholder text, the real values get popped in when a quest is received
-  article:AddText("QUEST_NAME", "header")
-  article:AddText("QUEST_DESCRIPTION")
-  article:AddText("Quest Objectives", "header") -- Except this one, that's a real header
-  article:AddText("QUEST_OBJECTIVES_TEXT")
-  article:AddText("\n\n") -- Spacer for bottom margin
+  article:AddText("HEADER_1", "header")
+  article:AddText("BODY_1")
+  article:AddText("HEADER_2", "header")
+  article:AddText("BODY_2")
   article:Assemble()
+
+  local confirmAbandon = StaticPopups:NewPopup(popupAbandon)
+  confirmAbandon:SetText(function()
+    return "Are you sure you want to abandon "..addon:Enquote(questFrame._quest.name, '""?')
+  end)
+  confirmAbandon:SetYesButton("OK", function()
+    QuestLog:SaveWithStatus(questFrame._quest, QuestStatus.Abandoned)
+    addon:PlaySound("QuestAbandoned")
+    questFrame:RefreshMode()
+  end)
+  confirmAbandon:SetNoButton("Cancel")
+
+  local confirmRetry = StaticPopups:NewPopup(popupRetry)
+  confirmRetry:SetText(function()
+    local quest = questFrame._quest
+    if quest.status == QuestStatus.Finished then
+      -- Provide an additional warning only if the quest has already been successfully finished
+      return "Replay "..addon:Enquote(quest.name, '""?').."\nThis will erase your previous completion of this quest."
+    else
+      return "Replay "..addon:Enquote(quest.name, '""?')
+    end
+  end)
+  confirmRetry:SetYesButton("OK", function()
+    QuestLog:SaveWithStatus(questFrame._quest, QuestStatus.Active)
+    questFrame:RefreshMode()
+  end)
+  confirmRetry:SetNoButton("Cancel")
 
   questFrame.scrollFrame = questDetailScrollFrame
   questFrame.titleFontString = questFrameNpcNameText
@@ -215,46 +375,34 @@ local function buildQuestInfoFrame()
   return questFrame
 end
 
-function addon:ShowQuestInfoFrame(flag, quest, sender)
+local questInfoFrame
+
+function addon:ShowQuestInfoFrame(flag, quest, sender, modeName)
   if flag == nil then flag = true end
+  if not questInfoFrame then
+    questInfoFrame = buildQuestInfoFrame()
+  end
   if flag then
-    if currentQuest then
-      -- Another quest is already being interacted with
-      if sender then
-        addon.Logger:Warn(sender, "invited you to a quest. View it in the Quest Log menu.")
-      else
-        addon.Logger:Warn("Accept or decline this quest before trying to view another one.")
-      end
+    if not quest then
+      addon.UILogger:Error("Unable to show QuestInfoFrame: no quest provided")
       return
     end
-    if not questInfoFrame then
-      questInfoFrame = buildQuestInfoFrame()
+
+    -- Unless overridden, the mode that this frame displays in is determined directly by the quest's status
+    if not modeName then
+      if quest.status then
+        modeName = statusModeMap[quest.status]
+      else
+        modeName = defaultStatusMode
+      end
     end
-    if quest then
-      questInfoFrame:SetTitle("[PMQ] Quest Info")
-      questInfoFrame:SetContent(quest)
-      -- questInfoFrame.scrollFrame:SetVerticalScroll(0)
-      currentQuest = quest
-      currentQuestSender = sender
-      questInfoFrame:Show()
-      questInfoFrame:SetButtons("Accept", "Decline")
-      addon:PlaySound("BookWrite")
+    local mode = frameModes[modeName]
+    if not mode then
+      addon.UILogger:Warn("Unable to show QuestInfoFrame:", modeName, "is not a valid view mode")
+      return
     end
+    questInfoFrame:ShowQuest(quest, sender, mode)
   else
-    if questInfoFrame then
-      currentQuest = nil
-      currentQuestSender = nil
-      questInfoFrame:SetButtons(nil, nil)
-      questInfoFrame:Hide()
-    end
+    questInfoFrame:CloseQuest()
   end
 end
-
--- This expects a fully compiled and built quest
-local function handleQuestInvite(quest, sender)
-  addon:ShowQuestInfoFrame(true, quest, sender)
-end
-
-addon:onload(function()
-  addon.AppEvents:Subscribe("QuestInvite", handleQuestInvite)
-end)

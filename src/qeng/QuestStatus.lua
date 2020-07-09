@@ -4,8 +4,6 @@ local _, addon = ...
 local statusTracker = {}
 
 local qs = {
-  Invited = "Invited",
-  Declined = "Declined",
   Active = "Active",
   Failed = "Failed",
   Abandoned = "Abandoned",
@@ -21,29 +19,7 @@ local function invalid(reason) return { valid = false, reason = reason } end
 -- Based on the table outlined here:
 -- https://docs.google.com/spreadsheets/d/1AbWMzTdotk8LcpgInZatYNd64RNvJnHOORzYzcjdwh0/edit?usp=sharing
 local validStatusTable = {
-  [qs.Invited] = {
-    [qs.Invited] = valid(),
-    [qs.Declined] = valid(),
-    [qs.Active] = valid(),
-    [qs.Failed] = invalid("A quest can only be failed from the Active status."),
-    [qs.Abandoned] = invalid("A quest cannot be abandoned before it's been started."),
-    [qs.Completed] = invalid("A quest can only be completed from the Active status."),
-    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
-    [qs.Archived] = valid(),
-  },
-  [qs.Declined] = {
-    [qs.Invited] = valid(),
-    [qs.Declined] = valid(),
-    [qs.Active] = valid(),
-    [qs.Failed] = invalid("A quest can only be failed from the Active status."),
-    [qs.Abandoned] = invalid("A quest cannot be abandoned before it's been started."),
-    [qs.Completed] = invalid("A quest can only be completed from the Active status."),
-    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
-    [qs.Archived] = valid(),
-  },
   [qs.Active] = {
-    [qs.Invited] = invalid("You cannot be re-invited to a quest that's already active."),
-    [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
     [qs.Active] = valid(),
     [qs.Failed] = valid(),
     [qs.Abandoned] = valid(),
@@ -52,8 +28,6 @@ local validStatusTable = {
     [qs.Archived] = valid(),
   },
   [qs.Failed] = {
-    [qs.Invited] = valid(),
-    [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
     [qs.Active] = valid(),
     [qs.Failed] = valid(),
     [qs.Abandoned] = valid(),
@@ -62,8 +36,6 @@ local validStatusTable = {
     [qs.Archived] = valid(),
   },
   [qs.Abandoned] = {
-    [qs.Invited] = valid(),
-    [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
     [qs.Active] = valid(),
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
     [qs.Abandoned] = valid(),
@@ -72,8 +44,6 @@ local validStatusTable = {
     [qs.Archived] = valid(),
   },
   [qs.Completed] = {
-    [qs.Invited] = invalid("You cannot be re-invited to a quest that you've already completed."),
-    [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
     [qs.Active] = valid(),
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
     [qs.Abandoned] = valid(),
@@ -82,8 +52,6 @@ local validStatusTable = {
     [qs.Archived] = valid(),
   },
   [qs.Finished] = {
-    [qs.Invited] = invalid("You cannot be re-invited to a quest that you've already finished."),
-    [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
     [qs.Active] = valid(),
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
     [qs.Abandoned] = invalid("A finished quest cannot be returned to the Abandoned status."),
@@ -92,8 +60,6 @@ local validStatusTable = {
     [qs.Archived] = valid(),
   },
   [qs.Archived] = {
-    [qs.Invited] = invalid("You cannot be re-invited to a quest that you've already archived."),
-    [qs.Declined] = invalid("A quest can only be declined from the Invited status."),
     [qs.Active] = valid(),
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
     [qs.Abandoned] = invalid("A quest cannot be abandoned once it's already been archived."),
