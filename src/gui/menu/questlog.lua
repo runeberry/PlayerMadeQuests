@@ -1,5 +1,6 @@
 local _, addon = ...
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
+local StaticPopups = addon.StaticPopups
 local CreateFrame = addon.G.CreateFrame
 
 local menu = addon.MainMenu:NewMenuScreen("questlog")
@@ -127,6 +128,9 @@ function menu:Create(frame)
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getQuests)
   dataTable:SubscribeToEvents("QuestDataLoaded", "QuestAdded", "QuestDeleted", "QuestStatusChanged", "QuestLogReset")
   dataTable:OnRowSelected(setButtonState)
+  dataTable:OnGetSelectedItem(function(row)
+    return QuestLog:FindByID(row[3])
+  end)
   frame.dataTable = dataTable
 
   local function getRowQuest()
@@ -141,57 +145,6 @@ function menu:Create(frame)
     end
     return quest
   end
-
-  local confirmQuestAbandon = addon.StaticPopups:NewPopup("ConfirmQuestAbandon")
-  confirmQuestAbandon:SetText(function()
-    return "Are you sure you want to abandon "..dataTable:GetSelectedRow()[1].."?"
-  end)
-  confirmQuestAbandon:SetYesButton("OK", function()
-    local row = dataTable:GetSelectedRow()
-    if not row or not row[3] then return end
-    local quest = QuestLog:FindByID(row[3])
-    quest.status = QuestStatus.Abandoned
-    QuestLog:Save(quest)
-    addon:PlaySound("QuestAbandoned")
-  end)
-  confirmQuestAbandon:SetNoButton("Cancel")
-
-  local confirmQuestArchive = addon.StaticPopups:NewPopup("ConfirmQuestArchive")
-  confirmQuestArchive:SetText(function()
-    return "Archive "..dataTable:GetSelectedRow()[1].."?\n"..
-           "This will hide the quest from your Quest Log, but PMQ will remember that you completed it."
-  end)
-  confirmQuestArchive:SetYesButton("OK", function()
-    local row = dataTable:GetSelectedRow()
-    if not row or not row[3] then return end
-    local quest = QuestLog:FindByID(row[3])
-    quest.status = QuestStatus.Archived
-    QuestLog:Save(quest)
-  end)
-  confirmQuestArchive:SetNoButton("Cancel")
-
-  local confirmQuestDelete = addon.StaticPopups:NewPopup("ConfirmQuestDelete")
-  confirmQuestDelete:SetText(function()
-    return "Are you sure you want to delete "..dataTable:GetSelectedRow()[1].."?\n"..
-           "This will delete the quest entirely from your log, and PMQ will forget you ever had it!"
-  end)
-  confirmQuestDelete:SetYesButton("OK", function()
-    local row = dataTable:GetSelectedRow()
-    if not row or not row[3] then return end
-    QuestLog:Delete(row[3])
-  end)
-  confirmQuestDelete:SetNoButton("Cancel")
-
-  local confirmQuestLogReset = addon.StaticPopups:NewPopup("ConfirmQuestLogReset")
-  confirmQuestLogReset:SetText(function()
-    return "Are you sure you want to reset your quest log?\n"..
-           "This will delete ALL quest log history, including archived quests!"
-  end)
-  confirmQuestLogReset:SetYesButton("OK", function()
-    QuestLog:Clear()
-    addon:PlaySound("QuestAbandoned")
-  end)
-  confirmQuestLogReset:SetNoButton("Cancel")
 
   local handlers = {
     ["toggle"] = function()
@@ -208,16 +161,16 @@ function menu:Create(frame)
       QuestLog:ShareQuest(row[3])
     end,
     ["abandon"] = function()
-      confirmQuestAbandon:Show()
+      StaticPopups:Show("AbandonQuest", dataTable:GetSelectedItem())
     end,
     ["archive"] = function()
-      confirmQuestArchive:Show()
+      StaticPopups:Show("ArchiveQuest", dataTable:GetSelectedItem())
     end,
     ["delete"] = function()
-      confirmQuestDelete:Show()
+      StaticPopups:Show("DeleteQuest", dataTable:GetSelectedItem())
     end,
     ["reset"] = function()
-      confirmQuestLogReset:Show()
+      StaticPopups:Show("ResetQuestLog", dataTable:GetSelectedItem())
     end,
   }
 

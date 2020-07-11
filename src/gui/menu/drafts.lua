@@ -74,25 +74,10 @@ function menu:Create(frame)
     addon.MainMenu:ShowMenuScreen("draft-view", draftId)
   end
 
-  local confirmDraftDelete = addon.StaticPopups:NewPopup("ConfirmDraftDelete")
-  confirmDraftDelete:SetText(function()
-    local selectedRow = dataTable:GetSelectedRow()
-    if not selectedRow then return end
-    return "Are you sure you want to delete "..selectedRow[1].."?"
-  end)
-  confirmDraftDelete:SetYesButton("OK", function()
-    local selectedRow = dataTable:GetSelectedRow()
-    if not selectedRow then return end
-    local draftId = selectedRow[4]
-    QuestDrafts:Delete(draftId)
-    addon.Logger:Info("Draft deleted:", selectedRow[1])
-  end)
-  confirmDraftDelete:SetNoButton("Cancel")
-
   local deleteDraft = function()
-    local selectedRow = dataTable:GetSelectedRow()
-    if not selectedRow then return end
-    confirmDraftDelete:Show()
+    local row = dataTable:GetSelectedRow()
+    if not row then return end
+    addon.StaticPopups:Show("DeleteDraft", row[4], row[1])
   end
 
   local startQuest = function()

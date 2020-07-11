@@ -29,7 +29,7 @@ local status = addon.QuestDraftStatus
 
 function addon.QuestDrafts:NewDraft()
   local draft = {
-    questId = addon:CreateID("draft-%i"),
+    draftId = addon:CreateID("draft-%i"),
     version = 1,
     status = status.Draft,
     parameters = {},

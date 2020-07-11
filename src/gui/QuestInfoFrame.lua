@@ -5,8 +5,8 @@ local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogS
 local StaticPopups = addon.StaticPopups
 local compiler = addon.QuestScriptCompiler
 
-local popupAbandon = "ConfirmQuestAbandonQuestInfoFrame"
-local popupRetry = "ConfirmQuestRetryQuestInfoFrame"
+
+local refreshQuestFrame = function() end -- replaced with real function on build
 
 local pageStyle = {
   margins = { 8, 8, 10, 0 }, -- bottom spacing doesn't work on a scroll frame
@@ -64,8 +64,8 @@ local buttons = {
   ["Abandon"] = {
     text = "Abandon Quest",
     width = 122, -- todo: lookup actual width
-    action = function()
-      StaticPopups:ShowPopup(popupAbandon)
+    action = function(quest)
+      StaticPopups:Show("AbandonQuest", quest):OnYes(refreshQuestFrame)
     end
   },
   ["Share"] = {
@@ -78,8 +78,8 @@ local buttons = {
   ["Retry"] = {
     text = "Replay Quest",
     width = 122,
-    action = function()
-      StaticPopups:ShowPopup(popupRetry)
+    action = function(quest)
+      StaticPopups:Show("RetryQuest", quest):OnYes(refreshQuestFrame)
     end
   },
   ["Empty"] = {
@@ -335,32 +335,9 @@ local function buildQuestInfoFrame()
   article:AddText("BODY_2")
   article:Assemble()
 
-  local confirmAbandon = StaticPopups:NewPopup(popupAbandon)
-  confirmAbandon:SetText(function()
-    return "Are you sure you want to abandon "..addon:Enquote(questFrame._quest.name, '""?')
-  end)
-  confirmAbandon:SetYesButton("OK", function()
-    QuestLog:SaveWithStatus(questFrame._quest, QuestStatus.Abandoned)
-    addon:PlaySound("QuestAbandoned")
+  refreshQuestFrame = function()
     questFrame:RefreshMode()
-  end)
-  confirmAbandon:SetNoButton("Cancel")
-
-  local confirmRetry = StaticPopups:NewPopup(popupRetry)
-  confirmRetry:SetText(function()
-    local quest = questFrame._quest
-    if quest.status == QuestStatus.Finished then
-      -- Provide an additional warning only if the quest has already been successfully finished
-      return "Replay "..addon:Enquote(quest.name, '""?').."\nThis will erase your previous completion of this quest."
-    else
-      return "Replay "..addon:Enquote(quest.name, '""?')
-    end
-  end)
-  confirmRetry:SetYesButton("OK", function()
-    QuestLog:SaveWithStatus(questFrame._quest, QuestStatus.Active)
-    questFrame:RefreshMode()
-  end)
-  confirmRetry:SetNoButton("Cancel")
+  end
 
   questFrame.scrollFrame = questDetailScrollFrame
   questFrame.titleFontString = questFrameNpcNameText

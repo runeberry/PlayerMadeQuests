@@ -55,27 +55,16 @@ function menu:Create(frame)
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getCatalog)
   dataTable:SubscribeToEvents("CatalogItemUpdated", "CatalogItemDeleted", "CatalogItemDataLoaded")
+  dataTable:OnGetSelectedItem(function(row)
+    return QuestCatalog:FindByID(row[3])
+  end)
   -- dataTable:OnRowSelected(setButtonState)
   frame.dataTable = dataTable
 
-  local confirmCatalogDelete = addon.StaticPopups:NewPopup("ConfirmCatalogDelete")
-  confirmCatalogDelete:SetText(function()
-    local selectedRow = dataTable:GetSelectedRow()
-    if not selectedRow then return end
-    return "Are you sure you want to delete "..selectedRow[1].."?"
-  end)
-  confirmCatalogDelete:SetYesButton("OK", function()
-    local row = dataTable:GetSelectedRow()
-    if not row then return end
-    QuestCatalog:Delete(row[3])
-    addon.Logger:Info("Catalog item deleted:", row[1])
-  end)
-  confirmCatalogDelete:SetNoButton("Cancel")
-
   local deleteCatalogItem = function()
-    local selectedRow = dataTable:GetSelectedRow()
-    if not selectedRow then return end
-    confirmCatalogDelete:Show()
+    local catalogItem = dataTable:GetSelectedItem()
+    if not catalogItem then return end
+    addon.StaticPopups:Show("DeleteCatalogItem", catalogItem)
   end
 
   local startQuest = function()

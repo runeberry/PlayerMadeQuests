@@ -15,63 +15,71 @@ local function wrapEventRefresh(dt)
   end
 end
 
--- Must be called before any data will be shown
-local function dt_RefreshData(self, ...)
-  local data = self._dataSource(...) or {}
-  self._scrollingTable:SetData(data, true) -- Only supporting minimal data format for now
-  for _, filter in pairs(self._filters) do
-    self._scrollingTable:SetFilter(filter)
-  end
-end
-
-local function dt_ApplyFilter(self, fnFilter)
-  table.insert(self._filters, fnFilter)
-end
-
-local function dt_ClearFilters(self)
-  self._filters = {}
-end
-
-local function dt_SubscribeToEvents(self, ...)
-  for _, appEvent in pairs({ ... }) do
-    if self._subscriptions[appEvent] then
-      error("DataTable is already subscribed to event: "..appEvent)
+local methods = {
+  -- Must be called before any data will be shown
+  ["RefreshData"] = function(self, ...)
+    local data = self._dataSource(...) or {}
+    self._scrollingTable:SetData(data, true) -- Only supporting minimal data format for now
+    for _, filter in pairs(self._filters) do
+      self._scrollingTable:SetFilter(filter)
     end
-    local subKey = addon.AppEvents:Subscribe(appEvent, wrapEventRefresh(self))
-    self._subscriptions[appEvent] = subKey
-  end
-end
-
-local function dt_EnableUpdates(self, flag)
-  if flag == nil then flag = true end
-  self._enableUpdates = flag
-end
-
-local function dt_UnsubscribeFromEvents(self, ...)
-  for _, appEvent in pairs({ ... }) do
-    local subKey = self._subscriptions[appEvent]
-    if subKey then
-      addon.AppEvents:Unsubscribe(appEvent, subKey)
-      self._subscriptions[appEvent] = nil
+  end,
+  ["ApplyFilter"] = function(self, fnFilter)
+    table.insert(self._filters, fnFilter)
+  end,
+  ["ClearFilters"] = function(self)
+    self._filters = {}
+  end,
+  ["SubscribeToEvents"] = function(self, ...)
+    for _, appEvent in pairs({ ... }) do
+      if self._subscriptions[appEvent] then
+        error("DataTable is already subscribed to event: "..appEvent)
+      end
+      local subKey = addon.AppEvents:Subscribe(appEvent, wrapEventRefresh(self))
+      self._subscriptions[appEvent] = subKey
     end
-  end
-end
-
-local function dt_GetSelectedRow(self)
-  local index = self._scrollingTable:GetSelection()
-  if not index then
-    return nil
-  end
-  return self._scrollingTable:GetRow(index)
-end
-
-local function dt_ClearSelection(self)
-  return self._scrollingTable:ClearSelection()
-end
-
-local function dt_OnRowSelected(self, fn)
-  self.onRowSelected = fn
-end
+  end,
+  ["EnableUpdates"] = function(self, flag)
+    if flag == nil then flag = true end
+    self._enableUpdates = flag
+  end,
+  ["UnsubscribeFromEvents"] = function(self, ...)
+    for _, appEvent in pairs({ ... }) do
+      local subKey = self._subscriptions[appEvent]
+      if subKey then
+        addon.AppEvents:Unsubscribe(appEvent, subKey)
+        self._subscriptions[appEvent] = nil
+      end
+    end
+  end,
+  ["GetSelectedRow"] = function(self)
+    local index = self._scrollingTable:GetSelection()
+    if not index then
+      return nil
+    end
+    return self._scrollingTable:GetRow(index)
+  end,
+  ["GetSelectedItem"] = function(self)
+    local row = self:GetSelectedRow()
+    if not row then return end
+    if self.onGetSelectedItem then
+      local ok = addon:catch(function()
+        row = self.onGetSelectedItem(row)
+      end)
+      if not ok then return end
+    end
+    return row
+  end,
+  ["ClearSelection"] = function(self)
+    return self._scrollingTable:ClearSelection()
+  end,
+  ["OnRowSelected"] = function(self, fn)
+    self.onRowSelected = fn
+  end,
+  ["OnGetSelectedItem"] = function(self, fn)
+    self.onGetSelectedItem = fn
+  end,
+}
 
 function widget:Create(parent, colinfo, datasource, ...)
   local frame = CreateFrame("Frame", nil, parent)
@@ -112,7 +120,9 @@ function widget:Create(parent, colinfo, datasource, ...)
   st.SetSelection = function(self, row)
     origSetSelection(self, row)
     if frame.onRowSelected then
-      frame.onRowSelected(frame:GetSelectedRow())
+      addon:catch(function()
+        frame.onRowSelected(frame:GetSelectedRow())
+      end)
     end
   end
 
@@ -122,15 +132,9 @@ function widget:Create(parent, colinfo, datasource, ...)
   frame._subscriptions = {}
   frame._scrollingTable = st
 
-  frame.ApplyFilter = dt_ApplyFilter
-  frame.ClearFilters = dt_ClearFilters
-  frame.RefreshData = dt_RefreshData
-  frame.SubscribeToEvents = dt_SubscribeToEvents
-  frame.EnableUpdates = dt_EnableUpdates
-  frame.UnsubscribeFromEvents = dt_UnsubscribeFromEvents
-  frame.GetSelectedRow = dt_GetSelectedRow
-  frame.ClearSelection = dt_ClearSelection
-  frame.OnRowSelected = dt_OnRowSelected
+  for name, method in pairs(methods) do
+    frame[name] = method
+  end
 
   return frame
 end

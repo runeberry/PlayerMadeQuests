@@ -32,7 +32,6 @@ function addon.QuestLog:Clear()
     self:Delete(quest)
   end
   addon.AppEvents:Publish("QuestLogReset")
-  addon.Logger:Info("Quest Log reset")
 end
 
 function addon.QuestLog:Validate(quest)

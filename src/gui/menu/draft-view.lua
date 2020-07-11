@@ -5,7 +5,6 @@ local menu = addon.MainMenu:NewMenuScreen("draft-view")
 
 local currentFrame
 local currentDraft
-local confirmBack
 
 local function checkDirty()
   return currentFrame.nameField:IsDirty() or
@@ -29,9 +28,17 @@ local function writeFields(draft)
   draft.script = currentFrame.scriptEditor:GetText()
 end
 
+local function button_Save()
+  if not currentDraft then return end
+  writeFields(currentDraft)
+  QuestDrafts:Save(currentDraft)
+  cleanForm()
+  addon.Logger:Info("Draft Saved -", currentDraft.parameters.name)
+end
+
 local function button_Back()
   if checkDirty() then
-    confirmBack:Show()
+    addon.StaticPopups:Show("ExitDraft", button_Save)
   else
     navBack()
   end
@@ -54,14 +61,6 @@ local function button_Validate()
   addon.Logger:Info("Your quest looks good! No errors detected.")
 end
 
-local function button_Save()
-  if not currentDraft then return end
-  writeFields(currentDraft)
-  QuestDrafts:Save(currentDraft)
-  cleanForm()
-  addon.Logger:Info("Draft Saved -", currentDraft.parameters.name)
-end
-
 function menu:Create(frame)
   local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Quest Name")
   nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
@@ -81,17 +80,6 @@ function menu:Create(frame)
   local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Script")
   scriptEditor:SetPoint("TOPLEFT", descField, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
-
-  confirmBack = addon.StaticPopups:NewPopup("ConfirmDraftBack")
-  confirmBack:SetText("You have unsaved changes. Would you like to save?")
-  confirmBack:SetYesButton("Discard", function()
-    navBack()
-  end)
-  confirmBack:SetNoButton("Cancel")
-  confirmBack:SetOtherButton("Save", function()
-    button_Save()
-    navBack()
-  end)
 
   frame.nameField = nameField
   frame.descField = descField
