@@ -6,11 +6,6 @@ local tokens = {
   OBJ_KILL = "kill",
   OBJ_TALKTO = "talkto",
 
-  CMD_DEFINE = "define",
-  CMD_DESC = "description",
-  CMD_FACTION = "faction",
-  CMD_LEVEL = "level",
-  CMD_LOC = "location",
   CMD_OBJ = "objectives",
   CMD_QUEST = "quest",
 
@@ -252,18 +247,6 @@ local objectives = {
 }
 
 local commands = {
-  -- {
-  --   name = tokens.CMD_DEFINE,
-  --   alias = "def",
-  --   multiple = true,
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_VARNAME,
-  --       position = 1,
-  --       required = true,
-  --     }
-  --   }
-  -- },
   {
     name = tokens.CMD_QUEST,
     shorthand = { tokens.PARAM_NAME, tokens.PARAM_DESCRIPTION },
@@ -279,80 +262,6 @@ local commands = {
       }
     }
   },
-  -- {
-  --   name = tokens.CMD_DESC,
-  --   alias = "desc",
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_TEXT,
-  --       position = 1,
-  --     }
-  --   },
-  -- },
-  -- {
-  --   name = tokens.CMD_LOC,
-  --   alias = "loc",
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_ZONE,
-  --       position = 1,
-  --       type = { "number", "string" },
-  --       required = true,
-  --     },
-  --     {
-  --       name = tokens.PARAM_X,
-  --       position = 2,
-  --       type = "number",
-  --     },
-  --     {
-  --       name = tokens.PARAM_Y,
-  --       position = 3,
-  --       type = "number",
-  --     },
-  --     {
-  --       name = tokens.PARAM_Z,
-  --       position = 4,
-  --       type = "number",
-  --     },
-  --   }
-  -- },
-  -- {
-  --   name = tokens.CMD_LEVEL,
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_DIFFICULTY,
-  --       alias = "diff",
-  --       position = 1,
-  --       type = "number",
-  --     },
-  --     {
-  --       name = tokens.PARAM_MIN,
-  --       type = "number",
-  --     },
-  --     {
-  --       name = tokens.PARAM_MAX,
-  --       type = "number",
-  --     }
-  --   },
-  --   flags = {
-  --     tokens.FLAG_REQUIRED,
-  --     tokens.FLAG_RECOMMENDED,
-  --   }
-  -- },
-  -- {
-  --   name = tokens.CMD_FACTION,
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_SIDE,
-  --       position = 1,
-  --       required = true,
-  --     }
-  --   },
-  --   flags = {
-  --     tokens.FLAG_REQUIRED,
-  --     tokens.FLAG_RECOMMENDED,
-  --   }
-  -- },
   {
     name = tokens.CMD_OBJ,
     scripts = {
