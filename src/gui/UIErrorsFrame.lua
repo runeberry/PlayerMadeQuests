@@ -1,9 +1,9 @@
 local _, addon = ...
 local frame = addon.G.UIErrorsFrame
-local compiler = addon.QuestScriptCompiler
+local localizer = addon.QuestScriptLocalizer
 
 addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
-  local msg = compiler:GetDisplayText(obj, "progress")
+  local msg = localizer:GetDisplayText(obj, "progress")
 
   if obj.progress >= obj.goal then
     msg = msg.." (Complete)"

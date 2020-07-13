@@ -4,7 +4,7 @@ addon:traceFile("QuestLogFrame.lua")
 local AceGUI = addon.AceGUI
 local strjoin, strsplit = addon.G.strjoin, addon.G.strsplit
 local UIParent = addon.G.UIParent
-local QuestLog, QuestStatus, compiler = addon.QuestLog, addon.QuestStatus, addon.QuestScriptCompiler
+local QuestLog, QuestStatus, localizer = addon.QuestLog, addon.QuestStatus, addon.QuestScriptLocalizer
 
 local frames = {}
 local subscriptions = {}
@@ -98,7 +98,7 @@ local function SetQuestText(label, quest)
 end
 
 local function SetObjectiveText(label, obj)
-  local displayText = string.format("    - %s", compiler:GetDisplayText(obj, "log"))
+  local displayText = string.format("    - %s", localizer:GetDisplayText(obj, "log"))
   if obj.progress >= obj.goal then
     displayText = addon:Colorize("grey", displayText)
   end

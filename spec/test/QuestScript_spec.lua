@@ -1,6 +1,6 @@
 local builder = require("spec/addon-builder")
 local addon = builder:Build()
-local compiler = addon.QuestScriptCompiler
+local compiler, localizer = addon.QuestScriptCompiler, addon.QuestScriptLocalizer
 
 describe("QuestScriptCompiler", function()
   setup(function()
@@ -282,7 +282,7 @@ describe("QuestScriptCompiler", function()
       for scope, ex in pairs(tc.expected) do
         it("can parse display text (#"..num..", "..scope..")", function()
           -- print("===== Test Case #"..num..", "..scope.." =====")
-          local text = compiler:GetDisplayText(objective, scope)
+          local text = localizer:GetDisplayText(objective, scope)
           assert.equals(ex, text)
         end)
       end
@@ -299,10 +299,10 @@ describe("QuestScriptCompiler", function()
         ]]
         local quest = compiler:Compile(script)
         local obj = quest.objectives[1]
-        assert.equals("Chicken obliterated: 0/1", compiler:GetDisplayText(obj, "log"))
-        assert.equals("Chicken obliterated: 0/1", compiler:GetDisplayText(obj, "progress"))
-        assert.equals("Chicken obliterated: 0/1", compiler:GetDisplayText(obj, "quest"))
-        assert.equals("Kill Chicken", compiler:GetDisplayText(obj, "full")) -- Cannot be overridden
+        assert.equals("Chicken obliterated: 0/1", localizer:GetDisplayText(obj, "log"))
+        assert.equals("Chicken obliterated: 0/1", localizer:GetDisplayText(obj, "progress"))
+        assert.equals("Chicken obliterated: 0/1", localizer:GetDisplayText(obj, "quest"))
+        assert.equals("Kill Chicken", localizer:GetDisplayText(obj, "full")) -- Cannot be overridden
       end)
       it("can accept partial text overrides", function()
         local script = [[
@@ -316,10 +316,10 @@ describe("QuestScriptCompiler", function()
         ]]
         local quest = compiler:Compile(script)
         local obj = quest.objectives[1]
-        assert.equals("Chicken 0/1", compiler:GetDisplayText(obj, "log"))
-        assert.equals("Chicken slain: 0/1", compiler:GetDisplayText(obj, "progress"))
-        assert.equals("Commit an unthinkable atrocity against Chicken", compiler:GetDisplayText(obj, "quest"))
-        assert.equals("Kill Chicken", compiler:GetDisplayText(obj, "full"))
+        assert.equals("Chicken 0/1", localizer:GetDisplayText(obj, "log"))
+        assert.equals("Chicken slain: 0/1", localizer:GetDisplayText(obj, "progress"))
+        assert.equals("Commit an unthinkable atrocity against Chicken", localizer:GetDisplayText(obj, "quest"))
+        assert.equals("Kill Chicken", localizer:GetDisplayText(obj, "full"))
       end)
       it("can accept complete text overrides", function()
         local script = [[
@@ -335,10 +335,10 @@ describe("QuestScriptCompiler", function()
         ]]
         local quest = compiler:Compile(script)
         local obj = quest.objectives[1]
-        assert.equals("Be kind to Chicken", compiler:GetDisplayText(obj, "log"))
-        assert.equals("Chicken SAVED: 0/1", compiler:GetDisplayText(obj, "progress"))
-        assert.equals("This isn't a genocide playthrough, you know", compiler:GetDisplayText(obj, "quest"))
-        assert.equals("Kill Chicken", compiler:GetDisplayText(obj, "full"))
+        assert.equals("Be kind to Chicken", localizer:GetDisplayText(obj, "log"))
+        assert.equals("Chicken SAVED: 0/1", localizer:GetDisplayText(obj, "progress"))
+        assert.equals("This isn't a genocide playthrough, you know", localizer:GetDisplayText(obj, "quest"))
+        assert.equals("Kill Chicken", localizer:GetDisplayText(obj, "full"))
       end)
       it("can use the %inc var properly", function()
         local script = [[
@@ -362,9 +362,9 @@ describe("QuestScriptCompiler", function()
         ]]
         local quest = compiler:Compile(script)
         local objs = quest.objectives
-        assert.equals("Complete task #1", compiler:GetDisplayText(objs[2]))
-        assert.equals("Complete task #2", compiler:GetDisplayText(objs[4]))
-        assert.equals("Complete task #3", compiler:GetDisplayText(objs[5]))
+        assert.equals("Complete task #1", localizer:GetDisplayText(objs[2]))
+        assert.equals("Complete task #2", localizer:GetDisplayText(objs[4]))
+        assert.equals("Complete task #3", localizer:GetDisplayText(objs[5]))
       end)
     end)
   end)

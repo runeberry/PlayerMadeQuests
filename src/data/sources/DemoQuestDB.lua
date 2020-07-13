@@ -141,5 +141,24 @@ objectives:
       subzone: "Jaggedswine Farm"
       posx: 48.7
       posy: 17.2]]
-  }
+  },
+  {
+    demoId = "tutorial-startcomplete-ally",
+    order = 9,
+    parameters = {
+      name = "Start/Complete Objectives (Alliance)"
+    },
+    script = [[
+quest:
+  description: "Will you help me with a task, traveler?"
+  completion: "Thank you! Please take this information to the innkeeper."
+start:
+  text: "%t needs you to gather information from the two guards nearby."
+  target: "Marshal Dughan"
+objectives:
+  - talkto 2 "Stormwind Guard"
+complete:
+  text: "Deliver the news to %t."
+  target: "Innkeeper Farley"]]
+  },
 }

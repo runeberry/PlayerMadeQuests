@@ -4,6 +4,7 @@ local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
 local GetUnitName = addon.G.GetUnitName
 
 addon.QuestScriptCompiler = {}
+local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 
 local commands = {}
 local objectives = {}
@@ -123,67 +124,6 @@ local function determineParseMode(obj)
   end
 end
 
-local function getTypeValidatedParameterValue(val, paramInfo, convert)
-  local expectedType = paramInfo.type or "string"
-  local actualType = type(val)
-
-  if expectedType == actualType then
-    -- Single type is allowed, and they already match
-    -- print("    single-type match", paramInfo.name, val, expectedType)
-    return val
-  elseif type(expectedType) == "table" then
-    -- Multiple types are allowed, check for any matches
-    for _, t in ipairs(expectedType) do
-      if t == actualType then
-        -- print("    multi-type match", paramInfo.name, val, t)
-        return val
-      end
-    end
-  elseif actualType == "table" and paramInfo.multiple then
-    -- Multiple values are supplied, each value must match an expected type
-    local val2 = {}
-    for k, v in pairs(val) do
-      local v2 = getTypeValidatedParameterValue(v, paramInfo, convert)
-      if not v2 then
-        -- print("    multi-value failure", paramInfo.name, v, actualType, expectedType)
-        return
-      end
-      val2[k] = v2
-    end
-    return val2
-  elseif convert then
-    -- All else fails, try to convert the value to an expected type
-    if type(expectedType) == "table" then
-      for _, t in ipairs(expectedType) do
-        -- Multiple types are allowed, try converting to all of them
-        local ok, converted = pcall(addon.ConvertValue, addon, val, t)
-        if ok then
-          -- print("    multi-type conversion", paramInfo.name, converted, t)
-          return converted
-        end
-      end
-    else
-      -- Single type is allowed, try to convert to that type
-      local ok, converted = pcall(addon.ConvertValue, addon, val, expectedType)
-      if ok then
-        -- print("    single-type conversion", paramInfo.name, converted, expectedType)
-        return converted
-      end
-    end
-  end
-  -- print("    type validation failure", paramInfo.name, val, actualType, expectedType)
-end
-
-local function getTypeValidatedParameterValueOrDefault(val, paramInfo, convert)
-  if val == nil and not paramInfo.required then
-    -- Non-required parameters can have a default value
-    -- If no default value is specified, then nil will be returned
-    return paramInfo.default
-  end
-
-  return getTypeValidatedParameterValue(val, paramInfo, convert)
-end
-
 local function assignShorthandArgs(args, objInfo)
   local shorthand = objInfo.shorthand
   if not shorthand then
@@ -202,7 +142,7 @@ local function assignShorthandArgs(args, objInfo)
       error("Unrecognized shorthand parameter: "..paramName)
     end
     local argValue = args[i - skipped]
-    if getTypeValidatedParameterValue(argValue, paramInfo) then
+    if compiler:GetValidatedParameterValue(paramName, { [paramName] = argValue }, objInfo) then
       -- print("assignment", paramName, argValue)
       args[paramName] = argValue
       args[i - skipped] = nil
@@ -212,152 +152,6 @@ local function assignShorthandArgs(args, objInfo)
       skipped = skipped + 1
     end
   end
-end
-
-local function parseConditionValueText(obj, condName)
-  local condVal = obj.conditions and obj.conditions[condName]
-    if condVal == nil then return end
-
-  if type(condVal) ~= "table" then
-    return condVal
-  end
-
-  local len = addon:tlen(condVal)
-  if len == 0 then return end
-  if len == 1 then
-    for v in pairs(condVal) do
-      return v
-    end
-  elseif len > 1 then
-    local ret = ""
-    local i = 1
-    for v in pairs(condVal) do
-      if i == len then
-        return ret.." or "..v
-      else
-        ret = ret..", "..v
-      end
-      i = i + 1
-    end
-  end
-end
-
-local parseDisplayText
-
-local rules
-rules = {
-  standard = {
-    { -- Contents of bracketed sets are analyzed recursively, innermost first
-      pattern = "%b[]",
-      fn = function(str, obj)
-        -- print("     match: []", str)
-        str = str:match("^%[(.+)%]$") -- extract contents from brackets
-
-        local condition, valIfTrue, valIfFalse
-        for _, br in ipairs(rules.bracketed) do
-          -- Pattern returns up to three capture groups
-          condition, valIfTrue, valIfFalse = str:match(br.pattern)
-          if condition then
-            -- If matched, an associated function will map to the appropriate values
-            condition, valIfTrue, valIfFalse = br.fn(condition, valIfTrue, valIfFalse)
-            -- print("     ^ ctf:", condition, valIfTrue, valIfFalse)
-            break
-          end
-        end
-
-        if not condition then
-          -- Unable to parse bracket formula, try to parse the string as a whole
-          -- print("     ^ unmatched bracket formula")
-          return parseDisplayText(str, obj)
-        end
-
-        -- Determine which text to parse next, based on condition's parsed value
-        local ret
-        condition = parseDisplayText(condition, obj)
-        if condition and condition ~= "" then
-          ret = valIfTrue
-        else
-          ret = valIfFalse
-        end
-        ret = ret or "" -- As a failsafe, never send nil to parse
-
-        return parseDisplayText(ret, obj)
-      end
-    },
-    { -- Any %var gets the value for the mapped condition returned
-      pattern = "%%%w+",
-      fn = function(str, obj)
-        -- print("     match: %var", str)
-        local template = objectives[obj.name]
-        if not template then return str end
-
-        str = str:sub(2) -- Remove the leading %
-        -- Look for global handlers for this var first, like %p and %g
-        local handler = addon.QuestScript.globalDisplayTextVars[str]
-        if not handler then
-          -- Otherwise, look for objective-specific handlers
-          local dt = objectives[obj.name].displaytext
-          if dt and dt.vars then
-            handler = dt.vars[str]
-          end
-        end
-        if type(handler) == "string" then
-          -- Token values represent the name of the condition value to return
-          -- print("     ^ handler:", handler)
-          return parseConditionValueText(obj, handler) or ""
-        elseif type(handler) == "function" then
-          -- Var handlers can be configured inline within QuestScript
-          -- print("     ^ handler: function")
-          return tostring(handler(obj) or "")
-        else
-          -- No valid handler found, return it raw
-          -- print("     ^ handler: none")
-          return "%"..str
-        end
-      end
-    }
-  },
-  bracketed = {
-    { -- If A, then show B, else show C
-      pattern = "^(.-):(.-)|(.-)$",
-      fn = function(a, b, c)
-        -- print("     ^ match: [a:b|c]")
-        return a, b, c
-      end
-    },
-    { -- If A, then show A, else show B
-      pattern = "^(.-)|(.-)$",
-      fn = function(a, b)
-        -- print("     ^ match: [a|b]")
-        return a, a, b
-      end
-    },
-    { -- If A, then show B, else show nothing
-      pattern = "^(.-):(.-)$",
-      fn = function(a, b)
-        -- print("     ^ match: [a:b]")
-        return a, b, nil
-      end
-    },
-    { -- If A, then show A, else show nothing
-      -- A courtesy space is added after the var to make this more useful
-      pattern = "^(.-)$",
-      fn = function(a)
-        -- print("     ^ match: [a]")
-        return a, a.." ", nil
-      end
-    }
-  }
-}
-
-parseDisplayText = function(text, obj)
-  -- print("=> received:", text)
-  for _, mod in ipairs(rules.standard) do
-    text = addon:strmod(text, mod.pattern, mod.fn, obj)
-  end
-  -- Once all substitutions are made, clean up extra spaces
-  -- print("<= resolved:", text)
-  return text
 end
 
 local function initQuestScript(qsconfig)
@@ -479,24 +273,117 @@ function addon.QuestScriptCompiler:GetObjectiveInfo(objToken, paramToken)
   return obj._paramsByName[paramToken]
 end
 
--- Valid values for scope are: log [default], progress, quest, full
-function addon.QuestScriptCompiler:GetDisplayText(obj, scope)
-  scope = scope or "log"
-  local displayText
-  if obj.displaytext then
-    -- Custom displayText is set for this instance of the objective
-    displayText = obj.displaytext[scope]
+function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info, options)
+  local val = args[token]
+  if not info._paramsByName then
+    addon.Logger:Table(info)
   end
-  if not displayText then
-    -- Otherwise, use default displayText for this objective
-    local objTemplate = objectives[obj.name]
-    assert(objTemplate, "Invalid objective: "..obj.name)
-    assert(objTemplate.displaytext, "No default displaytext is defined for objective: "..obj.name)
-    displayText = objTemplate.displaytext[scope]
+  local paramInfo = info._paramsByName[token]
+
+  if options and options.default then
+    if val == nil and not paramInfo.required then
+      -- Non-required parameters can have a default value
+      -- If no default value is specified, then nil will be returned
+      return paramInfo.default
+    end
   end
 
-  assert(displayText, "Cannot determine how to display text for objective: "..obj.name.." in scope.."..scope)
-  return parseDisplayText(displayText, obj)
+  local expectedType = paramInfo.type or "string"
+  local actualType = type(val)
+
+  if expectedType == actualType then
+    -- Single type is allowed, and they already match
+    -- print("    single-type match", paramInfo.name, val, expectedType)
+    return val
+  elseif type(expectedType) == "table" then
+    -- Multiple types are allowed, check for any matches
+    for _, t in ipairs(expectedType) do
+      if t == actualType then
+        -- print("    multi-type match", paramInfo.name, val, t)
+        return val
+      end
+    end
+  elseif actualType == "table" and paramInfo.multiple then
+    -- Multiple values are supplied, each value must match an expected type
+    local val2 = {}
+    for k, _ in pairs(val) do
+      local v = compiler:GetValidatedParameterValue(k, val, paramInfo, options)
+      if not v then
+        -- print("    multi-value failure", paramInfo.name, v, actualType, expectedType)
+        return
+      end
+      val2[k] = v
+    end
+    return val2
+  elseif options and options.convert then
+    -- All else fails, try to convert the value to an expected type
+    if type(expectedType) == "table" then
+      for _, t in ipairs(expectedType) do
+        -- Multiple types are allowed, try converting to all of them
+        local ok, converted = pcall(addon.ConvertValue, addon, val, t)
+        if ok then
+          -- print("    multi-type conversion", paramInfo.name, converted, t)
+          return converted
+        end
+      end
+    else
+      -- Single type is allowed, try to convert to that type
+      local ok, converted = pcall(addon.ConvertValue, addon, val, expectedType)
+      if ok then
+        -- print("    single-type conversion", paramInfo.name, converted, expectedType)
+        return converted
+      end
+    end
+  end
+  -- print("    type validation failure", paramInfo.name, val, actualType, expectedType)
+end
+
+function addon.QuestScriptCompiler:ParseConditions(params, args)
+  local conditions = {}
+
+  for _, param in ipairs(params) do
+    if param.multiple then
+      -- If multiple arg values are allowed, then they will be passed to the
+      -- condition handler as a set, such as { value1 = true, value2 = true }
+      -- Note: values assigned to an alias in script will be assigned to the primary
+      --       condition name in the compiled quest
+      local val = args[param.name] or args[param.alias]
+      if val then
+        if type(param.name) ~= "table" then
+          val = { val }
+        end
+        conditions[param.name] = addon:DistinctSet(val)
+      end
+    else
+      -- Otherwise, simply pass a single value to the condition handler
+      conditions[param.name] = args[param.name]
+    end
+  end
+
+  return conditions
+end
+
+-- Use this method at compile-time
+function addon.QuestScriptCompiler:ParseDisplayText(args, info)
+  local displaytext = compiler:GetValidatedParameterValue(tokens.PARAM_TEXT, args, info, { convert = true, default = true })
+  if type(displaytext) == "string" then
+    -- If a single text value is defined, it's used for all display texts
+    displaytext = {
+      log = displaytext,
+      progress = displaytext,
+      quest = displaytext,
+    }
+  elseif type(displaytext) == "table" then
+    -- Only whitelisted text values can be set at the objective level
+    -- todo: (#54) nested configuration tables should probably be configured in QuestScript
+    -- https://github.com/dolphinspired/PlayerMadeQuests/issues/54
+    displaytext = {
+      log = displaytext.log,
+      progress = displaytext.progress,
+      quest = displaytext.quest
+    }
+  end
+  return displaytext
 end
 
 function addon.QuestScriptCompiler:ParseObjective(obj)
@@ -524,50 +411,16 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
     id = addon:CreateID("objective-"..objName.."-%i"),
     name = objName,
     progress = 0, -- All objectives start at 0 progress
-    conditions = {}, -- The conditions under which this objective must be completed
+    conditions = nil, -- The conditions under which this objective must be completed
   }
 
-  objective.goal = getTypeValidatedParameterValueOrDefault(args.goal, objInfo._paramsByName["goal"], true)
-  args.goal = nil
+  objective.goal = compiler:GetValidatedParameterValue(tokens.PARAM_GOAL, args, objInfo, { convert = true, default = true })
+  args[tokens.PARAM_GOAL] = nil
 
-  objective.displaytext = getTypeValidatedParameterValueOrDefault(args.text, objInfo._paramsByName["text"], true)
-  if type(objective.displaytext) == "string" then
-    -- If a single text value is defined, it's used for all display texts
-    objective.displaytext = {
-      log = objective.displaytext,
-      progress = objective.displaytext,
-      quest = objective.displaytext,
-    }
-  elseif type(objective.displaytext) == "table" then
-    -- Only whitelisted text values can be set at the objective level
-    -- todo: (#54) nested configuration tables should probably be configured in QuestScript
-    -- https://github.com/dolphinspired/PlayerMadeQuests/issues/54
-    objective.displaytext = {
-      log = objective.displaytext.log,
-      progress = objective.displaytext.progress,
-      quest = objective.displaytext.quest
-    }
-  end
-  args.text = nil
+  objective.displaytext = compiler:ParseDisplayText(args, objInfo)
+  args[tokens.PARAM_TEXT] = nil
 
-  for _, param in ipairs(objInfo.params) do
-    if param.multiple then
-      -- If multiple arg values are allowed, then they will be passed to the
-      -- condition handler as a set, such as { value1 = true, value2 = true }
-      -- Note: values assigned to an alias in script will be assigned to the primary
-      --       condition name in the compiled quest
-      local val = args[param.name] or args[param.alias]
-      if val then
-        if type(param.name) ~= "table" then
-          val = { val }
-        end
-        objective.conditions[param.name] = addon:DistinctSet(val)
-      end
-    else
-      -- Otherwise, simply pass a single value to the condition handler
-      objective.conditions[param.name] = args[param.name]
-    end
-  end
+  objective.conditions = compiler:ParseConditions(objInfo.params, args)
 
   return objective
 end
@@ -620,11 +473,11 @@ function addon.QuestScriptCompiler:Compile(script, params)
 end
 
 function addon.QuestScriptCompiler:TryCompile(script, params)
-  return pcall(addon.QuestScriptCompiler.Compile, addon.QuestScriptCompiler, script, params)
+  return pcall(compiler.Compile, compiler, script, params)
 end
 
 addon:onload(function()
   initQuestScript(addon.QuestScript)
   logger:Debug("QuestScript loaded OK!")
-  addon.AppEvents:Publish("CompilerLoaded", objectives)
+  addon.AppEvents:Publish("CompilerLoaded", objectives, commands)
 end)
