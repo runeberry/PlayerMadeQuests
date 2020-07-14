@@ -426,23 +426,9 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
 end
 
 --[[
-  Parses a QuestScript "file" (set of lines) into an unvalidated quest object.
-  The returned object takes on the following format:
-  {
-    name = "string",
-    description = "string",
-    objectives = {
-      {
-        name = "string",
-        displayText = "string",
-        goal = 1,
-        conditions = {
-          emote = { "val1": true },
-          target = { "val2": true, "val3": true }
-        }
-      }
-    }
-  }
+  Parses a QuestScript "file" (set of lines) and/or a set of quest parameters
+  into a Quest that can be stored in the QuestLog and tracked.
+  See QuestLog.lua for the Quest data model.
 --]]
 local function newQuest()
   local playerName = GetUnitName("player", true)
