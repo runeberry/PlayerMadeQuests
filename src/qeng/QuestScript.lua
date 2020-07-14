@@ -1,9 +1,11 @@
 local _, addon = ...
 
 local tokens = {
+  OBJ_COMPLETE = "complete",
   OBJ_EMOTE = "emote",
   OBJ_EXPLORE = "explore",
   OBJ_KILL = "kill",
+  OBJ_START = "start",
   OBJ_TALKTO = "talkto",
 
   CMD_COMPLETE = "complete",
@@ -63,7 +65,71 @@ local globalDisplayTextVars = {
   end
 }
 
+local function startCompleteParams()
+  return {
+    {
+      name = tokens.PARAM_TEXT,
+      type = { "string", "table" }
+    },
+    {
+      name = tokens.PARAM_TARGET,
+      multiple = true,
+      scripts = {
+        tokens.METHOD_CHECK_COND,
+      }
+    },
+    {
+      name = tokens.PARAM_ZONE,
+      scripts = {
+        tokens.METHOD_CHECK_COND
+      }
+    },
+    {
+      name = tokens.PARAM_SUBZONE,
+      scripts = {
+        tokens.METHOD_CHECK_COND
+      }
+    },
+    {
+      name = tokens.PARAM_POSX,
+      type = "number",
+      scripts = {
+        tokens.METHOD_CHECK_COND
+      }
+    },
+    {
+      name = tokens.PARAM_POSY,
+      type = "number",
+      scripts = {
+        tokens.METHOD_CHECK_COND
+      }
+    },
+    {
+      name = tokens.PARAM_RADIUS,
+      type = "number",
+    },
+  }
+end
+
 local objectives = {
+  {
+    name = tokens.CMD_COMPLETE,
+    command = true, -- Only used to evaluate the "complete" command
+    displaytext = {
+      vars = {
+        ["t"] = tokens.PARAM_TARGET,
+        ["z"] = tokens.PARAM_ZONE,
+        ["x"] = tokens.PARAM_POSX,
+        ["y"] = tokens.PARAM_POSY,
+        ["sz"] = tokens.PARAM_SUBZONE,
+        ["r"] = tokens.PARAM_RADIUS,
+      },
+      log = "Go to [%t|[%x:Point #%inc]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
+      quest = "Go to [%t|[%x:(%x, %y)]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
+      full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
+    },
+    params = startCompleteParams()
+  },
   {
     name = tokens.OBJ_EMOTE,
     shorthand = {
@@ -213,6 +279,24 @@ local objectives = {
     }
   },
   {
+    name = tokens.OBJ_START,
+    command = true, -- Only used to evaluate the "start" command
+    displaytext = {
+      vars = {
+        ["t"] = tokens.PARAM_TARGET,
+        ["z"] = tokens.PARAM_ZONE,
+        ["x"] = tokens.PARAM_POSX,
+        ["y"] = tokens.PARAM_POSY,
+        ["sz"] = tokens.PARAM_SUBZONE,
+        ["r"] = tokens.PARAM_RADIUS,
+      },
+      log = "Go to [%t|[%x:Point #%inc]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
+      quest = "Go to [%t|[%x:(%x, %y)]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
+      full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
+    },
+    params = startCompleteParams()
+  },
+  {
     name = tokens.OBJ_TALKTO,
     shorthand = {
       tokens.PARAM_GOAL,
@@ -255,62 +339,7 @@ local commands = {
     scripts = {
       tokens.METHOD_PARSE,
     },
-    displaytext = {
-      vars = {
-        ["t"] = tokens.PARAM_TARGET,
-        ["z"] = tokens.PARAM_ZONE,
-        ["x"] = tokens.PARAM_POSX,
-        ["y"] = tokens.PARAM_POSY,
-        ["sz"] = tokens.PARAM_SUBZONE,
-        ["r"] = tokens.PARAM_RADIUS,
-      },
-      log = "Go to [%t|[%x:Point #%inc]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
-      quest = "Go to [%t|[%x:(%x, %y)]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
-      full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
-    },
-    params = {
-      {
-        name = tokens.PARAM_TEXT,
-        type = { "string", "table" }
-      },
-      {
-        name = tokens.PARAM_TARGET,
-        multiple = true,
-        scripts = {
-          tokens.METHOD_CHECK_COND,
-        }
-      },
-      {
-        name = tokens.PARAM_ZONE,
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
-      },
-      {
-        name = tokens.PARAM_SUBZONE,
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
-      },
-      {
-        name = tokens.PARAM_POSX,
-        type = "number",
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
-      },
-      {
-        name = tokens.PARAM_POSY,
-        type = "number",
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
-      },
-      {
-        name = tokens.PARAM_RADIUS,
-        type = "number",
-      },
-    }
+    params = startCompleteParams()
   },
   {
     name = tokens.CMD_QUEST,
@@ -347,62 +376,7 @@ local commands = {
     scripts = {
       tokens.METHOD_PARSE,
     },
-    displaytext = {
-      vars = {
-        ["t"] = tokens.PARAM_TARGET,
-        ["z"] = tokens.PARAM_ZONE,
-        ["x"] = tokens.PARAM_POSX,
-        ["y"] = tokens.PARAM_POSY,
-        ["sz"] = tokens.PARAM_SUBZONE,
-        ["r"] = tokens.PARAM_RADIUS,
-      },
-      log = "Go to [%t|[%x:Point #%inc]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
-      quest = "Go to [%t|[%x:(%x, %y)]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
-      full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
-    },
-    params = {
-      {
-        name = tokens.PARAM_TEXT,
-        type = { "string", "table" }
-      },
-      {
-        name = tokens.PARAM_TARGET,
-        multiple = true,
-        scripts = {
-          tokens.METHOD_CHECK_COND,
-        }
-      },
-      {
-        name = tokens.PARAM_ZONE,
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
-      },
-      {
-        name = tokens.PARAM_SUBZONE,
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
-      },
-      {
-        name = tokens.PARAM_POSX,
-        type = "number",
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
-      },
-      {
-        name = tokens.PARAM_POSY,
-        type = "number",
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
-      },
-      {
-        name = tokens.PARAM_RADIUS,
-        type = "number",
-      },
-    }
+    params = startCompleteParams()
   }
 }
 

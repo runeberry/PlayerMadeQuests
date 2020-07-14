@@ -28,6 +28,10 @@ local buttons = {
     text = "Accept",
     width = 77,
     action = function(quest, sender)
+      if not addon.QuestEngine:EvaluateStart(quest) then
+        addon.Logger:Warn("Unable to accept quest: start conditions are not met")
+        return
+      end
       QuestLog:SaveWithStatus(quest, QuestStatus.Active)
       if QuestCatalog:FindByID(quest.questId) then
         QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
@@ -55,6 +59,10 @@ local buttons = {
     text = "Complete Quest",
     width = 122, -- todo: lookup actual width
     action = function(quest)
+      if not addon.QuestEngine:EvaluateComplete(quest) then
+        addon.Logger:Warn("Unable to complete quest: completion conditions are not met")
+        return
+      end
       QuestLog:SaveWithStatus(quest, QuestStatus.Finished)
       addon:PlaySound("QuestComplete")
       addon:ShowQuestInfoFrame(false)

@@ -1,24 +1,20 @@
 local _, addon = ...
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 
-local function parseStartComplete(cmdToken, args)
-  local result = {}
-  local cmdInfo = compiler:GetCommandInfo(cmdToken)
-
-  result.displaytext = compiler:ParseDisplayText(args, cmdInfo)
-  args[tokens.PARAM_TEXT] = nil
-
-  result.conditions = compiler:ParseConditions(cmdInfo.params, args)
-
-  return result
+local function parseStartComplete(objToken, args)
+  local ok, objective = pcall(compiler.ParseObjective, compiler, { [objToken] = args })
+  if not ok then
+    error("Failed to parse "..objToken.." objective: "..objective)
+  end
+  return objective
 end
 
 compiler:AddScript(tokens.CMD_START, tokens.METHOD_PARSE, function(quest, args)
-  quest.start = parseStartComplete(tokens.CMD_START, args)
-  quest.start.name = tokens.CMD_START
+  quest.start = parseStartComplete(tokens.OBJ_START, args)
+  quest.start.questId = quest.questId
 end)
 
 compiler:AddScript(tokens.CMD_COMPLETE, tokens.METHOD_PARSE, function(quest, args)
-  quest.complete = parseStartComplete(tokens.CMD_COMPLETE, args)
-  quest.complete.name = tokens.CMD_COMPLETE
+  quest.complete = parseStartComplete(tokens.OBJ_COMPLETE, args)
+  quest.complete.questId = quest.questId
 end)

@@ -398,6 +398,7 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
 
   local objName, args = parseMode[mode](obj)
   if not objName then
+    logger:Table(obj)
     error("Cannot determine name of objective")
   end
 
@@ -418,8 +419,11 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
     conditions = nil, -- The conditions under which this objective must be completed
   }
 
-  objective.goal = compiler:GetValidatedParameterValue(tokens.PARAM_GOAL, args, objInfo, { convert = true, default = true })
-  args[tokens.PARAM_GOAL] = nil
+  -- Special case: command-level objectives like "start" and "complete" do not have a goal
+  if not objInfo.command then
+    objective.goal = compiler:GetValidatedParameterValue(tokens.PARAM_GOAL, args, objInfo, { convert = true, default = true })
+    args[tokens.PARAM_GOAL] = nil
+  end
 
   objective.displaytext = compiler:ParseDisplayText(args, objInfo)
   args[tokens.PARAM_TEXT] = nil

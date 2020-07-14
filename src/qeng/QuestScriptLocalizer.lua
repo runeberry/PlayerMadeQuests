@@ -1,9 +1,8 @@
 local _, addon = ...
 
 addon.QuestScriptLocalizer = {}
-local localizer = addon.QuestScriptLocalizer
 
-local directives = {} -- Objectives & commands indexed by name
+local objectives = {}
 local rules -- defined below
 
 local function parseConditionValueText(obj, condName)
@@ -48,7 +47,7 @@ rules = {
   standard = {
     { -- Contents of bracketed sets are analyzed recursively, innermost first
       pattern = "%b[]",
-      fn = function(str, dir)
+      fn = function(str, obj)
         -- print("     match: []", str)
         str = str:match("^%[(.+)%]$") -- extract contents from brackets
 
@@ -67,12 +66,12 @@ rules = {
         if not condition then
           -- Unable to parse bracket formula, try to parse the string as a whole
           -- print("     ^ unmatched bracket formula")
-          return populateDisplayText(str, dir)
+          return populateDisplayText(str, obj)
         end
 
         -- Determine which text to parse next, based on condition's parsed value
         local ret
-        condition = populateDisplayText(condition, dir)
+        condition = populateDisplayText(condition, obj)
         if condition and condition ~= "" then
           ret = valIfTrue
         else
@@ -80,14 +79,14 @@ rules = {
         end
         ret = ret or "" -- As a failsafe, never send nil to parse
 
-        return populateDisplayText(ret, dir)
+        return populateDisplayText(ret, obj)
       end
     },
     { -- Any %var gets the value for the mapped condition returned
       pattern = "%%%w+",
-      fn = function(str, dir)
+      fn = function(str, obj)
         -- print("     match: %var", str)
-        local template = directives[dir.name]
+        local template = objectives[obj.name]
         if not template then return str end
 
         str = str:sub(2) -- Remove the leading %
@@ -95,7 +94,7 @@ rules = {
         local handler = addon.QuestScript.globalDisplayTextVars[str]
         if not handler then
           -- Otherwise, look for objective-specific handlers
-          local dt = directives[dir.name].displaytext
+          local dt = objectives[obj.name].displaytext
           if dt and dt.vars then
             handler = dt.vars[str]
           end
@@ -103,11 +102,11 @@ rules = {
         if type(handler) == "string" then
           -- Token values represent the name of the condition value to return
           -- print("     ^ handler:", handler)
-          return parseConditionValueText(dir, handler) or ""
+          return parseConditionValueText(obj, handler) or ""
         elseif type(handler) == "function" then
           -- Var handlers can be configured inline within QuestScript
           -- print("     ^ handler: function")
-          return tostring(handler(dir) or "")
+          return tostring(handler(obj) or "")
         else
           -- No valid handler found, return it raw
           -- print("     ^ handler: none")
@@ -155,41 +154,30 @@ rules = {
 
 -- Valid values for scope are: log [default], progress, quest, full
 -- Use this method at runtime
-function addon.QuestScriptLocalizer:GetDisplayText(dir, scope)
+function addon.QuestScriptLocalizer:GetDisplayText(obj, scope)
   scope = scope or "log"
   local displayText
-  if dir.displaytext then
+  if obj.displaytext then
     -- Custom displayText is set for this instance of the objective
-    displayText = dir.displaytext[scope]
+    displayText = obj.displaytext[scope]
   end
   if not displayText then
     -- Otherwise, use default displayText for this objective
-    local dirTemplate = directives[dir.name]
-    assert(dirTemplate, "Invalid directive: "..dir.name)
-    assert(dirTemplate.displaytext, "No default displaytext is defined for directive: "..dir.name)
+    local dirTemplate = objectives[obj.name]
+    assert(dirTemplate, "Invalid directive: "..obj.name)
+    assert(dirTemplate.displaytext, "No default displaytext is defined for directive: "..obj.name)
     displayText = dirTemplate.displaytext[scope]
   end
 
-  assert(displayText, "Cannot determine how to display text for directive: "..dir.name.." in scope "..scope)
-  return populateDisplayText(displayText, dir)
+  assert(displayText, "Cannot determine how to display text for directive: "..obj.name.." in scope "..scope)
+  return populateDisplayText(displayText, obj)
 end
 
-addon.AppEvents:Subscribe("CompilerLoaded", function(objectives, commands)
-  local function addDirective(name, item)
-    if item.displaytext then
-      if directives[name] then
-        error("Failed to register displaytext: "..name.." is already defined")
-      end
-      directives[name] = addon:CopyTable(item)
-    end
-  end
+-----------------------
+-- Event Subscribers --
+-----------------------
 
-  for k, v in pairs(objectives) do
-    addDirective(k, v)
-  end
-  for k, v in pairs(commands) do
-    addDirective(k, v)
-  end
-
+addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
+  objectives = addon:CopyTable(qsObjectives)
   addon.AppEvents:Publish("LocalizerLoaded")
 end)

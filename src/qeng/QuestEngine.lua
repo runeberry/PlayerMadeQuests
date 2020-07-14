@@ -1,5 +1,6 @@
 local _, addon = ...
 addon:traceFile("QuestEngine.lua")
+local tokens = addon.QuestScript.tokens
 local QuestLog, QuestStatus
 addon:onload(function()
   QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
@@ -142,7 +143,7 @@ local function wrapObjectiveHandler(objective)
     local numActive = addon:tlen(objective._active)
     if numActive < 1 then return end
 
-    logger:Debug("Evaluating objective:", objective.name, "("..addon:tlen(objective._active).." active)")
+    logger:Debug("Evaluating objective:", objective.name, addon:Enquote(addon:tlen(objective._active), "( active)"))
     -- logger:Table(objective._active)
     -- Completed objectives will be tracked and removed from the list
     local completed = {}
@@ -176,9 +177,22 @@ local function wrapObjectiveHandler(objective)
   end
 end
 
-----------------------------------
--- Building and Tracking Quests --
-----------------------------------
+local function evaluateStartComplete(section, objToken)
+  if not section or not section.conditions then
+    -- Nothing to evaluate, the quest can be started/completed
+    return true
+  end
+
+  logger:Debug("Evaluating", objToken, "condition...")
+  local objective = objectivesByName[objToken]
+  local result = evaluateObjective(objective, section)
+  logger:Debug("    Result:", result)
+  return result > 0
+end
+
+--------------------
+-- Public methods --
+--------------------
 
 function addon.QuestEngine:Validate(quest)
   assert(type(quest.questId) == "string" and quest.questId ~= "", "questId is required")
@@ -202,6 +216,18 @@ function addon.QuestEngine:Validate(quest)
     end
   end
 end
+
+function addon.QuestEngine:EvaluateStart(quest)
+  return evaluateStartComplete(quest.start, tokens.OBJ_START)
+end
+
+function addon.QuestEngine:EvaluateComplete(quest)
+  return evaluateStartComplete(quest.complete, tokens.OBJ_COMPLETE)
+end
+
+-------------------------
+-- Event Subscriptions --
+-------------------------
 
 local function startTracking(quest)
   -- sanity check: validate quest before tracking it
