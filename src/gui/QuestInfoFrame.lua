@@ -1,5 +1,5 @@
 local _, addon = ...
-local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
+local CreateFrame, UIParent, UISpecialFrames = addon.G.CreateFrame, addon.G.UIParent, addon.G.UISpecialFrames
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogStatus
 local StaticPopups = addon.StaticPopups
@@ -379,6 +379,11 @@ local function buildQuestInfoFrame()
   for name, method in pairs(frameMethods) do
     questFrame[name] = method
   end
+
+  -- Make closable with ESC
+  local globalName = "PMQ_QuestInfoFrame"
+  _G[globalName] = questFrame
+  table.insert(UISpecialFrames, globalName)
 
   return questFrame
 end
