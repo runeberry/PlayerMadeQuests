@@ -219,6 +219,7 @@ local function startTracking(quest)
   if didStartTracking then
     addon.AppEvents:Publish("QuestTrackingStarted", quest)
   end
+  logger:Trace("Started tracking quest:", quest.name)
 end
 
 local function stopTracking(quest)
@@ -232,6 +233,7 @@ local function stopTracking(quest)
   if didStopTracking then
     addon.AppEvents:Publish("QuestTrackingStopped", quest)
   end
+  logger:Trace("Stopped tracking quest:", quest.name)
 end
 
 local function setTracking(quest)
@@ -279,6 +281,7 @@ addon.AppEvents:Subscribe("QuestLogReset", function()
   for _, objective in pairs(objectivesByName) do
     objective._active = {}
   end
+  logger:Trace("Stopped tracking all quests")
 end)
 
 addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
