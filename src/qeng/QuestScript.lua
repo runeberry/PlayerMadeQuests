@@ -1,24 +1,24 @@
 local _, addon = ...
 
 local tokens = {
+  OBJ_COMPLETE = "complete",
   OBJ_EMOTE = "emote",
   OBJ_EXPLORE = "explore",
   OBJ_KILL = "kill",
+  OBJ_START = "start",
   OBJ_TALKTO = "talkto",
 
-  CMD_DEFINE = "define",
-  CMD_DESC = "description",
-  CMD_FACTION = "faction",
-  CMD_LEVEL = "level",
-  CMD_LOC = "location",
+  CMD_COMPLETE = "complete",
   CMD_OBJ = "objectives",
   CMD_QUEST = "quest",
+  CMD_START = "start",
 
   METHOD_PARSE = "Parse",
   METHOD_PRE_COND = "BeforeCheckConditions",
   METHOD_CHECK_COND = "CheckCondition",
   METHOD_POST_COND = "AfterCheckConditions",
 
+  PARAM_COMPLETION = "completion",
   PARAM_DESCRIPTION = "description",
   PARAM_DIFFICULTY = "difficulty",
   PARAM_EMOTE = "emote",
@@ -65,7 +65,71 @@ local globalDisplayTextVars = {
   end
 }
 
+local function startCompleteParams()
+  return {
+    {
+      name = tokens.PARAM_TEXT,
+      type = { "string", "table" }
+    },
+    {
+      name = tokens.PARAM_TARGET,
+      multiple = true,
+      scripts = {
+        tokens.METHOD_CHECK_COND,
+      }
+    },
+    {
+      name = tokens.PARAM_ZONE,
+      scripts = {
+        tokens.METHOD_CHECK_COND
+      }
+    },
+    {
+      name = tokens.PARAM_SUBZONE,
+      scripts = {
+        tokens.METHOD_CHECK_COND
+      }
+    },
+    {
+      name = tokens.PARAM_POSX,
+      type = "number",
+      scripts = {
+        tokens.METHOD_CHECK_COND
+      }
+    },
+    {
+      name = tokens.PARAM_POSY,
+      type = "number",
+      scripts = {
+        tokens.METHOD_CHECK_COND
+      }
+    },
+    {
+      name = tokens.PARAM_RADIUS,
+      type = "number",
+    },
+  }
+end
+
 local objectives = {
+  {
+    name = tokens.CMD_COMPLETE,
+    command = true, -- Only used to evaluate the "complete" command
+    displaytext = {
+      vars = {
+        ["t"] = tokens.PARAM_TARGET,
+        ["z"] = tokens.PARAM_ZONE,
+        ["x"] = tokens.PARAM_POSX,
+        ["y"] = tokens.PARAM_POSY,
+        ["sz"] = tokens.PARAM_SUBZONE,
+        ["r"] = tokens.PARAM_RADIUS,
+      },
+      log = "Go to [%t|[%x:Point #%inc]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
+      quest = "Go to [%t|[%x:(%x, %y)]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
+      full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
+    },
+    params = startCompleteParams()
+  },
   {
     name = tokens.OBJ_EMOTE,
     shorthand = {
@@ -153,6 +217,12 @@ local objectives = {
         }
       },
       {
+        name = tokens.PARAM_SUBZONE,
+        scripts = {
+          tokens.METHOD_CHECK_COND
+        }
+      },
+      {
         name = tokens.PARAM_POSX,
         type = "number",
         scripts = {
@@ -162,12 +232,6 @@ local objectives = {
       {
         name = tokens.PARAM_POSY,
         type = "number",
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
-      },
-      {
-        name = tokens.PARAM_SUBZONE,
         scripts = {
           tokens.METHOD_CHECK_COND
         }
@@ -215,6 +279,24 @@ local objectives = {
     }
   },
   {
+    name = tokens.OBJ_START,
+    command = true, -- Only used to evaluate the "start" command
+    displaytext = {
+      vars = {
+        ["t"] = tokens.PARAM_TARGET,
+        ["z"] = tokens.PARAM_ZONE,
+        ["x"] = tokens.PARAM_POSX,
+        ["y"] = tokens.PARAM_POSY,
+        ["sz"] = tokens.PARAM_SUBZONE,
+        ["r"] = tokens.PARAM_RADIUS,
+      },
+      log = "Go to [%t|[%x:Point #%inc]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
+      quest = "Go to [%t|[%x:(%x, %y)]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
+      full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
+    },
+    params = startCompleteParams()
+  },
+  {
     name = tokens.OBJ_TALKTO,
     shorthand = {
       tokens.PARAM_GOAL,
@@ -252,18 +334,13 @@ local objectives = {
 }
 
 local commands = {
-  -- {
-  --   name = tokens.CMD_DEFINE,
-  --   alias = "def",
-  --   multiple = true,
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_VARNAME,
-  --       position = 1,
-  --       required = true,
-  --     }
-  --   }
-  -- },
+  {
+    name = tokens.CMD_COMPLETE,
+    scripts = {
+      tokens.METHOD_PARSE,
+    },
+    params = startCompleteParams()
+  },
   {
     name = tokens.CMD_QUEST,
     shorthand = { tokens.PARAM_NAME, tokens.PARAM_DESCRIPTION },
@@ -276,83 +353,12 @@ local commands = {
       },
       {
         name = tokens.PARAM_DESCRIPTION,
-      }
+      },
+      {
+        name = tokens.PARAM_COMPLETION,
+      },
     }
   },
-  -- {
-  --   name = tokens.CMD_DESC,
-  --   alias = "desc",
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_TEXT,
-  --       position = 1,
-  --     }
-  --   },
-  -- },
-  -- {
-  --   name = tokens.CMD_LOC,
-  --   alias = "loc",
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_ZONE,
-  --       position = 1,
-  --       type = { "number", "string" },
-  --       required = true,
-  --     },
-  --     {
-  --       name = tokens.PARAM_X,
-  --       position = 2,
-  --       type = "number",
-  --     },
-  --     {
-  --       name = tokens.PARAM_Y,
-  --       position = 3,
-  --       type = "number",
-  --     },
-  --     {
-  --       name = tokens.PARAM_Z,
-  --       position = 4,
-  --       type = "number",
-  --     },
-  --   }
-  -- },
-  -- {
-  --   name = tokens.CMD_LEVEL,
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_DIFFICULTY,
-  --       alias = "diff",
-  --       position = 1,
-  --       type = "number",
-  --     },
-  --     {
-  --       name = tokens.PARAM_MIN,
-  --       type = "number",
-  --     },
-  --     {
-  --       name = tokens.PARAM_MAX,
-  --       type = "number",
-  --     }
-  --   },
-  --   flags = {
-  --     tokens.FLAG_REQUIRED,
-  --     tokens.FLAG_RECOMMENDED,
-  --   }
-  -- },
-  -- {
-  --   name = tokens.CMD_FACTION,
-  --   params = {
-  --     {
-  --       name = tokens.PARAM_SIDE,
-  --       position = 1,
-  --       required = true,
-  --     }
-  --   },
-  --   flags = {
-  --     tokens.FLAG_REQUIRED,
-  --     tokens.FLAG_RECOMMENDED,
-  --   }
-  -- },
   {
     name = tokens.CMD_OBJ,
     scripts = {
@@ -364,6 +370,13 @@ local commands = {
         required = true,
       },
     }
+  },
+  {
+    name = tokens.CMD_START,
+    scripts = {
+      tokens.METHOD_PARSE,
+    },
+    params = startCompleteParams()
   }
 }
 

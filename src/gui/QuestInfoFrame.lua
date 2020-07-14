@@ -3,8 +3,7 @@ local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogStatus
 local StaticPopups = addon.StaticPopups
-local compiler = addon.QuestScriptCompiler
-
+local localizer = addon.QuestScriptLocalizer
 
 local refreshQuestFrame = function() end -- replaced with real function on build
 
@@ -29,6 +28,10 @@ local buttons = {
     text = "Accept",
     width = 77,
     action = function(quest, sender)
+      if not addon.QuestEngine:EvaluateStart(quest) then
+        addon.Logger:Warn("Unable to accept quest: start conditions are not met")
+        return
+      end
       QuestLog:SaveWithStatus(quest, QuestStatus.Active)
       if QuestCatalog:FindByID(quest.questId) then
         QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
@@ -56,6 +59,10 @@ local buttons = {
     text = "Complete Quest",
     width = 122, -- todo: lookup actual width
     action = function(quest)
+      if not addon.QuestEngine:EvaluateComplete(quest) then
+        addon.Logger:Warn("Unable to complete quest: completion conditions are not met")
+        return
+      end
       QuestLog:SaveWithStatus(quest, QuestStatus.Finished)
       addon:PlaySound("QuestComplete")
       addon:ShowQuestInfoFrame(false)
@@ -125,19 +132,29 @@ local frameModes = {
     content = function(frame, quest, sender)
       frame.titleFontString:SetText("[PMQ] Quest Info")
 
-      frame.article:GetFontString(1):SetText(quest.name)
-      frame.article:GetFontString(2):SetText(quest.description or " ")
-      frame.article:GetFontString(3):SetText("Quest Objectives")
+      local fs = frame.article:GetFontStrings()
 
+      -- Quest name & description
+      fs[1]:SetText(quest.name)
+      fs[2]:SetText(quest.description or " ")
+
+      -- Starting condition
+      if quest.start and quest.start.conditions then
+        fs[3]:SetText("Getting Started")
+        fs[4]:SetText(localizer:GetDisplayText(quest.start, "quest").."\n")
+      end
+
+      -- Quest objectives
+      fs[5]:SetText("Quest Objectives")
       if quest.objectives then
         local objString = ""
         for _, obj in ipairs(quest.objectives) do
-          objString = objString.."* "..compiler:GetDisplayText(obj, "quest").."\n"
+          objString = objString.."* "..localizer:GetDisplayText(obj, "quest").."\n"
         end
         objString = objString.."\n\n" -- Spacer for bottom margin
-        frame.article:GetFontString(4):SetText(objString)
+        fs[6]:SetText(objString)
       else
-        frame.article:GetFontString(4):SetText("\n")
+        fs[6]:SetText("\n")
       end
 
       addon:PlaySound("BookWrite")
@@ -150,8 +167,19 @@ local frameModes = {
 
     end,
     content = function(frame, quest, sender)
-      -- todo: real stuff here
-      frame.article:GetFontString(2):SetText("You completed "..addon:Enquote(quest.name, '""!'))
+      frame.titleFontString:SetText("[PMQ] Quest Completion")
+
+      local fs = frame.article:GetFontStrings()
+
+      -- Quest name & description
+      fs[1]:SetText(quest.name)
+      fs[2]:SetText(quest.completion or quest.description or " ")
+
+      -- Completion objectives
+      if quest.complete and quest.complete.conditions then
+        fs[3]:SetText("Finishing Up")
+        fs[4]:SetText(localizer:GetDisplayText(quest.complete, "quest").."\n")
+      end
     end,
   },
   ["ActiveQuest"] = {
@@ -211,10 +239,9 @@ local frameMethods = {
   end,
   ["ClearContent"] = function(self)
     self.titleFontString:SetText("")
-    self.article:GetFontString(1):SetText("")
-    self.article:GetFontString(2):SetText("")
-    self.article:GetFontString(3):SetText("")
-    self.article:GetFontString(4):SetText("")
+    for _, fs in ipairs(self.article:GetFontStrings()) do
+      fs:SetText("")
+    end
   end,
   ["RefreshMode"] = function(self)
     local quest, sender = self._quest, self._sender
@@ -333,6 +360,10 @@ local function buildQuestInfoFrame()
   article:AddText("BODY_1")
   article:AddText("HEADER_2", "header")
   article:AddText("BODY_2")
+  article:AddText("HEADER_3", "header")
+  article:AddText("BODY_3")
+  article:AddText("HEADER_4", "header")
+  article:AddText("BODY_4")
   article:Assemble()
 
   refreshQuestFrame = function()

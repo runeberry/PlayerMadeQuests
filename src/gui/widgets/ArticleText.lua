@@ -65,24 +65,26 @@ local function applyTextToPage(frame)
   end
 end
 
-local function widget_SetTextStyle(self, textStyleName, textStyle)
-  if type(textStyle) == "string" then
-    textStyle = { inheritsFrom = textStyle }
-  end
-  self.textStyles[textStyleName] = textStyle or globalDefaultTextStyle
-end
-
-local function widget_SetPageStyle(self, pageStyle)
-  self.pageStyle = pageStyle or globalDefaultPageStyle
-end
-
-local function widget_AddText(self, text, textStyleName)
-  table.insert(self.text, { text = text, textStyleName = textStyleName or "default" })
-end
-
-local function widget_GetFontString(self, i)
-  return self.fontStrings[i]
-end
+local methods = {
+  ["SetTextStyle"] = function(self, textStyleName, textStyle)
+    if type(textStyle) == "string" then
+      textStyle = { inheritsFrom = textStyle }
+    end
+    self.textStyles[textStyleName] = textStyle or globalDefaultTextStyle
+  end,
+  ["SetPageStyle"] = function(self, pageStyle)
+    self.pageStyle = pageStyle or globalDefaultPageStyle
+  end,
+  ["AddText"] = function(self, text, textStyleName)
+    table.insert(self.text, { text = text, textStyleName = textStyleName or "default" })
+  end,
+  ["GetFontStrings"] = function(self)
+    return self.fontStrings
+  end,
+  ["GetFontString"] = function(self, i)
+    return self.fontStrings[i]
+  end,
+}
 
 local function widget_OnShow(self)
   if not self.fontStrings then
@@ -102,10 +104,9 @@ function widget:Create(parent, defaultTextStyle, pageStyle)
   frame.textStyles = {}
   frame.text = {}
 
-  frame.SetTextStyle = widget_SetTextStyle
-  frame.SetPageStyle = widget_SetPageStyle
-  frame.AddText = widget_AddText
-  frame.GetFontString = widget_GetFontString
+  for name, method in pairs(methods) do
+    frame[name] = method
+  end
 
   frame:SetTextStyle("default", defaultTextStyle)
   frame:SetPageStyle(pageStyle)

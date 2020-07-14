@@ -1,6 +1,34 @@
 local _, addon = ...
 local GetUnitName = addon.G.GetUnitName
 
+--[[
+  Quest model:
+  {
+    questId: "string",        -- Required, globally unique between all users (can be safely shared)
+    name: "string",           -- Required
+    source: "string",         -- Indicates where the quest was before the QuestLog (catalog, demo, draft)
+    description: "string",    -- Flavor text shown on quest start
+    completion: "string",     -- Flavor text shown when quest is Completed
+    status = "string",        -- see QuestStatus.lua
+    objectives: {             -- array of trackable quest objectives
+      {
+        name = "string",          -- name of the QuestEvent which will trigger evaluation of this objective
+        displayText = {           -- variations of text that will be shown
+          log = "string",             -- shown in the quest log window (light details)
+          progress = "string",        -- shown when an objective is progressed (light details)
+          quest = "string",           -- shown in the QuestInfoFrame (most details)
+          full = "string",            -- shown for spoilers (full details)
+        },
+        goal = 1,                 -- number of times these conditions must be met to complete this objective (min. 1)
+        conditions = {            -- map of conditions <> expected value(s) for that condition (examples shown)
+          emote = { "val1": true },
+          target = { "val2": true, "val3": true },
+        }
+      }
+    }
+  }
+--]]
+
 addon.QuestLog = addon.Data:NewRepository("Quest", "questId")
 addon.QuestLog:SetSaveDataSource("QuestLog")
 addon.QuestLog:EnableWrite(true)
