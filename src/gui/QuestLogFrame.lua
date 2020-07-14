@@ -110,6 +110,10 @@ local function AddQuest(questList, quest)
 
   local qLabel = AceGUI:Create("InteractiveLabel")
   qLabel:SetFullWidth(true)
+  qLabel:SetHighlight(136810) -- Interface\\QuestFrame\\UI-QuestTitleHighlight
+  qLabel:SetCallback("OnClick", function()
+    addon:ShowQuestInfoFrame(true, quest)
+  end)
   questList:AddChild(qLabel)
   SetQuestText(qLabel, quest)
 
