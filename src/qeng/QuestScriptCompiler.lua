@@ -276,9 +276,13 @@ end
 function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info, options)
   local val = args[token]
   if not info._paramsByName then
+    -- Something didn't initialize properly, this will fail
     addon.Logger:Table(info)
   end
   local paramInfo = info._paramsByName[token]
+  if not paramInfo then
+    error(token.." is not a recognized parameter for "..info.name)
+  end
 
   if options and options.default then
     if val == nil and not paramInfo.required then
