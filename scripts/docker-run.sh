@@ -1,0 +1,1 @@
+docker run --name pmq -v $(pwd):/addon --rm -it dolphinspired/wow-addon-container
