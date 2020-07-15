@@ -76,6 +76,12 @@ local templates = {
     scripts = {
       [tokens.METHOD_PRE_COND] = { required = false },
       [tokens.METHOD_POST_COND] = { required = false },
+    },
+    params = {
+      {
+        name = tokens.PARAM_TEXT,
+        type = { "string", "table" },
+      }
     }
   },
   ["evaluated"] = {
@@ -85,7 +91,6 @@ local templates = {
   },
   ["startcomplete"] = {
     template = { "parsed", "evaluated" },
-    command = true, -- Used only to evaluate the "start" and "complete" commands
     displaytext = {
       vars = {
         ["t"] = tokens.PARAM_TARGET,
@@ -191,11 +196,6 @@ local objectives = {
       {
         name = tokens.PARAM_GOAL,
         type = "number",
-        default = 1
-      },
-      {
-        name = tokens.PARAM_TEXT,
-        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_EMOTE,
@@ -234,16 +234,6 @@ local objectives = {
       full = "Go [%r:within %r units of|to] [%x:(%x, %y) in ][%sz:%sz in ]%z"
     },
     params = {
-      { -- todo: (#51) remove goal from explore, should always be 1
-        -- https://github.com/dolphinspired/PlayerMadeQuests/issues/51
-        name = tokens.PARAM_GOAL,
-        type = "number",
-        default = 1
-      },
-      {
-        name = tokens.PARAM_TEXT,
-        type = { "string", "table" }
-      },
       {
         name = tokens.PARAM_ZONE,
         template = "evaluated",
@@ -288,11 +278,6 @@ local objectives = {
       {
         name = tokens.PARAM_GOAL,
         type = "number",
-        default = 1
-      },
-      {
-        name = tokens.PARAM_TEXT,
-        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_KILLTARGET,
@@ -327,11 +312,6 @@ local objectives = {
       {
         name = tokens.PARAM_GOAL,
         type = "number",
-        default = 1
-      },
-      {
-        name = tokens.PARAM_TEXT,
-        type = { "string", "table" }
       },
       {
         name = tokens.PARAM_TARGET,

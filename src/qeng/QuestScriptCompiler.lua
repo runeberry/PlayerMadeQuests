@@ -187,6 +187,16 @@ local function initQuestScript(qsconfig)
       param = applyTemplate(param, template.template)
     end
 
+    if param.params and template.params then
+      -- join template params onto base params, don't try to merge their contents
+      param = addon:CopyTable(param)
+      template = addon:CopyTable(template)
+      for _, tp in ipairs(template.params) do
+        param.params[#param.params+1] = tp
+      end
+      template.params = nil
+    end
+
     -- Merge the template table onto the param table, which will set and overwrite properties
     return addon:MergeTable(param, template)
   end
@@ -198,7 +208,7 @@ local function initQuestScript(qsconfig)
     local method = scripts[paramName]
     if not method then
       if not methodOptions.required then return nil end
-      error("No scripts registered for: "..paramName)
+      error("No scripts registered for: "..paramName.." (looking for "..methodName..")")
     end
 
     method = method[methodName]
@@ -319,15 +329,10 @@ function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info,
   end
   local paramInfo = info._paramsByName[token]
   if not paramInfo then
-    error(token.." is not a recognized parameter for "..info.name)
-  end
-
-  if options and options.default then
-    if val == nil and not paramInfo.required then
-      -- Non-required parameters can have a default value
-      -- If no default value is specified, then nil will be returned
-      return paramInfo.default
+    if options and options.optional then
+      return nil
     end
+    error(token.." is not a recognized parameter for "..info.name)
   end
 
   local expectedType = paramInfo.type or "string"
@@ -407,7 +412,7 @@ end
 
 -- Use this method at compile-time
 function addon.QuestScriptCompiler:ParseDisplayText(args, info)
-  local displaytext = compiler:GetValidatedParameterValue(tokens.PARAM_TEXT, args, info, { convert = true, default = true })
+  local displaytext = compiler:GetValidatedParameterValue(tokens.PARAM_TEXT, args, info, { convert = true })
   if type(displaytext) == "string" then
     -- If a single text value is defined, it's used for all display texts
     displaytext = {
@@ -457,14 +462,20 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
     conditions = nil, -- The conditions under which this objective must be completed
   }
 
-  -- Special case: command-level objectives like "start" and "complete" do not have a goal
-  if not objInfo.command then
-    objective.goal = compiler:GetValidatedParameterValue(tokens.PARAM_GOAL, args, objInfo, { convert = true, default = true })
-    args[tokens.PARAM_GOAL] = nil
-  end
-
+  -- All objectives should support a display text parameter
   objective.displaytext = compiler:ParseDisplayText(args, objInfo)
   args[tokens.PARAM_TEXT] = nil
+
+  -- If an objective supports a goal parameter, extract that and use it
+  objective.goal = compiler:GetValidatedParameterValue(tokens.PARAM_GOAL, args, objInfo, { convert = true, optional = true })
+  args[tokens.PARAM_GOAL] = nil
+
+  -- If the objective does not support a goal parameter,
+  -- or if the objective supports a goal parameter but none was specified,
+  -- then default the goal to 1
+  if not objective.goal then
+    objective.goal = 1
+  end
 
   objective.conditions = compiler:ParseConditions(objInfo.params, args)
 
