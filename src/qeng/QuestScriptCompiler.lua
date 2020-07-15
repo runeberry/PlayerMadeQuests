@@ -168,8 +168,60 @@ local function initQuestScript(qsconfig)
     set[name] = param
   end
 
+  local function applyTemplate(param, templateName)
+    local templateNameType = type(templateName)
+    assert(templateNameType == "string" or templateNameType == "table", "templateName must be a string or table")
+
+    if templateNameType == "table" then
+      for _, t in ipairs(templateName) do
+        param = applyTemplate(param, t)
+      end
+      return param
+    end
+
+    local template = qsconfig.templates[templateName]
+    assert(template, templateName.." is not a recognized template")
+
+    if template.template then
+      -- apply nested templates first
+      param = applyTemplate(param, template.template)
+    end
+
+    -- Merge the template table onto the param table, which will set and overwrite properties
+    return addon:MergeTable(param, template)
+  end
+
+  local function getMethodScript(paramName, methodName, methodOptions)
+    assert(type(methodName) == "string", "Non-string registered as methodName for "..paramName)
+    assert(type(methodOptions) == "table", "Non-table registered as methodOptions for "..paramName)
+
+    local method = scripts[paramName]
+    if not method then
+      if not methodOptions.required then return nil end
+      error("No scripts registered for: "..paramName)
+    end
+
+    method = method[methodName]
+    if not method then
+      if not methodOptions.required then return nil end
+      error("No script registered for "..paramName.." with name: "..methodName)
+    end
+
+    assert(type(method) == "function", "Non-function registered as script for "..paramName..": "..methodName)
+    return method
+  end
+
   local function setup(set, param)
     local name = param.name
+
+    -- Since merging tables changes the table reference, need to apply templates
+    -- before the param table is registered
+    local template = param.template
+    if template then
+      param = applyTemplate(param, template)
+      param.template = nil
+    end
+
     validateAndRegister(set, name, param)
     if param.alias then
       validateAndRegister(set, param.alias, param)
@@ -179,22 +231,8 @@ local function initQuestScript(qsconfig)
     if itemScripts then
       -- Replace the array of script names with a table like: { name = function }
       local newScripts = {}
-      for _, methodName in pairs(itemScripts) do
-        local method = scripts[name]
-        if not method then
-          error("No scripts registered for: "..name)
-        end
-        if type(methodName) ~= "string" then
-          error("Non-string registered as methodName for "..name)
-        end
-        method = method[methodName]
-        if not method then
-          error("No script registered for "..name.." with name: "..methodName)
-        end
-        if type(method) ~= "function" then
-          error("Non-function registered as script for "..name..": "..methodName)
-        end
-        newScripts[methodName] = method
+      for methodName, methodOptions in pairs(itemScripts) do
+        newScripts[methodName] = getMethodScript(name, methodName, methodOptions)
       end
       param.scripts = newScripts
     end

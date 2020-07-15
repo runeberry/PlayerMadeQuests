@@ -65,85 +65,27 @@ local globalDisplayTextVars = {
   end
 }
 
-local function startCompleteParams()
-  return {
-    {
-      name = tokens.PARAM_TEXT,
-      type = { "string", "table" }
-    },
-    {
-      name = tokens.PARAM_TARGET,
-      multiple = true,
-      scripts = {
-        tokens.METHOD_CHECK_COND,
-      }
-    },
-    {
-      name = tokens.PARAM_ZONE,
-      scripts = {
-        tokens.METHOD_CHECK_COND
-      }
-    },
-    {
-      name = tokens.PARAM_SUBZONE,
-      scripts = {
-        tokens.METHOD_CHECK_COND
-      }
-    },
-    {
-      name = tokens.PARAM_POSX,
-      type = "number",
-      scripts = {
-        tokens.METHOD_CHECK_COND
-      }
-    },
-    {
-      name = tokens.PARAM_POSY,
-      type = "number",
-      scripts = {
-        tokens.METHOD_CHECK_COND
-      }
-    },
-    {
-      name = tokens.PARAM_RADIUS,
-      type = "number",
-    },
-  }
-end
-
-local function reqParams()
-  return {
-    {
-      name = tokens.PARAM_CLASS,
-    },
-    {
-      name = tokens.PARAM_FACTION,
-    },
-    {
-      name = tokens.PARAM_LEVEL,
-      type = "number"
-    },
-    -- todo: test nested params to make sure this is possible
-    -- {
-    --   name = tokens.PARAM_REPUTATION,
-    --   params = {
-    --     {
-    --       name = tokens.PARAM_REPUTATION_NAME,
-    --       required = true,
-    --     },
-    --     {
-    --       name = tokens.PARAM_REPUTATION_LEVEL,
-    --       required = true,
-    --     }
-    --   }
-    -- }
-  }
-end
-
-local objectives = {
-  {
-    name = tokens.OBJ_COMPLETE,
-    command = true, -- Only used to evaluate the "complete" command
+local templates = {
+  ["parsed"] = {
+    scripts = {
+      [tokens.METHOD_PARSE] = { required = true },
+    }
+  },
+  ["objective"] = {
+    objective = true, -- Explicitly mark objectives so they can be evaluated during quest progression
+    scripts = {
+      [tokens.METHOD_PRE_COND] = { required = false },
+      [tokens.METHOD_POST_COND] = { required = false },
+    }
+  },
+  ["evaluated"] = {
+    scripts = {
+      [tokens.METHOD_CHECK_COND] = { required = true },
+    }
+  },
+  ["startcomplete"] = {
+    template = { "parsed", "evaluated" },
+    command = true, -- Used only to evaluate the "start" and "complete" commands
     displaytext = {
       vars = {
         ["t"] = tokens.PARAM_TARGET,
@@ -157,10 +99,79 @@ local objectives = {
       quest = "Go to [%t|[%x:(%x, %y)]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
       full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
     },
-    params = startCompleteParams()
+    params = {
+      {
+        name = tokens.PARAM_TEXT,
+        type = { "string", "table" }
+      },
+      {
+        name = tokens.PARAM_TARGET,
+        template = "evaluated",
+        multiple = true,
+      },
+      {
+        name = tokens.PARAM_ZONE,
+        template = "evaluated",
+      },
+      {
+        name = tokens.PARAM_SUBZONE,
+        template = "evaluated",
+      },
+      {
+        name = tokens.PARAM_POSX,
+        template = "evaluated",
+        type = "number",
+      },
+      {
+        name = tokens.PARAM_POSY,
+        template = "evaluated",
+        type = "number",
+      },
+      {
+        name = tokens.PARAM_RADIUS,
+        type = "number",
+      },
+    }
+  },
+  ["requirement"] = {
+    template = { "parsed", "evaluated" },
+    params = {
+      {
+        name = tokens.PARAM_CLASS,
+      },
+      {
+        name = tokens.PARAM_FACTION,
+      },
+      {
+        name = tokens.PARAM_LEVEL,
+        type = "number"
+      },
+      -- todo: test nested params to make sure this is possible
+      -- {
+      --   name = tokens.PARAM_REPUTATION,
+      --   params = {
+      --     {
+      --       name = tokens.PARAM_REPUTATION_NAME,
+      --       required = true,
+      --     },
+      --     {
+      --       name = tokens.PARAM_REPUTATION_LEVEL,
+      --       required = true,
+      --     }
+      --   }
+      -- }
+    }
+  }
+}
+
+local objectives = {
+  {
+    name = tokens.OBJ_COMPLETE,
+    template = "startcomplete",
   },
   {
     name = tokens.OBJ_EMOTE,
+    template = "objective",
     shorthand = {
       tokens.PARAM_EMOTE,
       tokens.PARAM_GOAL,
@@ -188,32 +199,26 @@ local objectives = {
       },
       {
         name = tokens.PARAM_EMOTE,
+        template = "evaluated",
         required = true,
         multiple = true,
-        scripts = {
-          tokens.METHOD_CHECK_COND,
-        }
       },
       {
         name = tokens.PARAM_TARGET,
+        template = "evaluated",
         multiple = true,
-        scripts = {
-          tokens.METHOD_CHECK_COND,
-        }
       },
     }
   },
   {
     name = tokens.OBJ_EXPLORE,
+    template = "objective",
     shorthand = {
       tokens.PARAM_ZONE,
       tokens.PARAM_SUBZONE,
       tokens.PARAM_POSX,
       tokens.PARAM_POSY,
       tokens.PARAM_RADIUS,
-    },
-    scripts = {
-      tokens.METHOD_POST_COND,
     },
     displaytext = {
       vars = {
@@ -241,29 +246,21 @@ local objectives = {
       },
       {
         name = tokens.PARAM_ZONE,
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
+        template = "evaluated",
       },
       {
         name = tokens.PARAM_SUBZONE,
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
+        template = "evaluated",
       },
       {
         name = tokens.PARAM_POSX,
+        template = "evaluated",
         type = "number",
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
       },
       {
         name = tokens.PARAM_POSY,
+        template = "evaluated",
         type = "number",
-        scripts = {
-          tokens.METHOD_CHECK_COND
-        }
       },
       {
         name = tokens.PARAM_RADIUS,
@@ -273,6 +270,7 @@ local objectives = {
   },
   {
     name = tokens.OBJ_KILL,
+    template = "objective",
     shorthand = {
       tokens.PARAM_GOAL,
       tokens.PARAM_TARGET,
@@ -299,34 +297,19 @@ local objectives = {
       {
         name = tokens.PARAM_KILLTARGET,
         alias = tokens.PARAM_TARGET,
+        template = "evaluated",
         required = true,
         multiple = true,
-        scripts = {
-          tokens.METHOD_CHECK_COND,
-        }
       },
     }
   },
   {
     name = tokens.OBJ_START,
-    command = true, -- Only used to evaluate the "start" command
-    displaytext = {
-      vars = {
-        ["t"] = tokens.PARAM_TARGET,
-        ["z"] = tokens.PARAM_ZONE,
-        ["x"] = tokens.PARAM_POSX,
-        ["y"] = tokens.PARAM_POSY,
-        ["sz"] = tokens.PARAM_SUBZONE,
-        ["r"] = tokens.PARAM_RADIUS,
-      },
-      log = "Go to [%t|[%x:Point #%inc]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
-      quest = "Go to [%t|[%x:(%x, %y)]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
-      full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
-    },
-    params = startCompleteParams()
+    template = "startcomplete",
   },
   {
     name = tokens.OBJ_TALKTO,
+    template = "objective",
     shorthand = {
       tokens.PARAM_GOAL,
       tokens.PARAM_TARGET,
@@ -352,11 +335,9 @@ local objectives = {
       },
       {
         name = tokens.PARAM_TARGET,
+        template = "evaluated",
         required = true,
         multiple = true,
-        scripts = {
-          tokens.METHOD_CHECK_COND,
-        },
       }
     }
   }
@@ -365,17 +346,11 @@ local objectives = {
 local commands = {
   {
     name = tokens.CMD_COMPLETE,
-    scripts = {
-      tokens.METHOD_PARSE,
-    },
-    params = startCompleteParams()
+    template = "startcomplete",
   },
   {
     name = tokens.CMD_QUEST,
-    shorthand = { tokens.PARAM_NAME, tokens.PARAM_DESCRIPTION },
-    scripts = {
-      tokens.METHOD_PARSE,
-    },
+    template = "parsed",
     params = {
       {
         name = tokens.PARAM_NAME,
@@ -390,9 +365,7 @@ local commands = {
   },
   {
     name = tokens.CMD_OBJ,
-    scripts = {
-      tokens.METHOD_PARSE,
-    },
+    template = "parsed",
     params = {
       {
         name = tokens.PARAM_NAME,
@@ -402,31 +375,21 @@ local commands = {
   },
   {
     name = tokens.CMD_REC,
-    scripts = {
-      tokens.METHOD_PARSE,
-      tokens.METHOD_CHECK_COND,
-    },
-    params = reqParams(),
+    template = "requirement",
   },
   {
     name = tokens.CMD_REQ,
-    scripts = {
-      tokens.METHOD_PARSE,
-      tokens.METHOD_CHECK_COND,
-    },
-    params = reqParams(),
+    template = "requirement",
   },
   {
     name = tokens.CMD_START,
-    scripts = {
-      tokens.METHOD_PARSE,
-    },
-    params = startCompleteParams()
+    template = "startcomplete",
   }
 }
 
 addon.QuestScript = {
   tokens = tokens,
+  templates = templates,
   objectives = objectives,
   commands = commands,
   globalDisplayTextVars = globalDisplayTextVars,

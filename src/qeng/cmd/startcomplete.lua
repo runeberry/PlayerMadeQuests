@@ -18,3 +18,7 @@ compiler:AddScript(tokens.CMD_COMPLETE, tokens.METHOD_PARSE, function(quest, arg
   quest.complete = parseStartComplete(tokens.OBJ_COMPLETE, args)
   quest.complete.questId = quest.questId
 end)
+
+-- todo: Populate these methods
+compiler:AddScript(tokens.CMD_START, tokens.METHOD_CHECK_COND, function() end)
+compiler:AddScript(tokens.CMD_COMPLETE, tokens.METHOD_CHECK_COND, function() end)
