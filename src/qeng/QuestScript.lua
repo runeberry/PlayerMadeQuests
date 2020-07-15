@@ -11,6 +11,8 @@ local tokens = {
   CMD_COMPLETE = "complete",
   CMD_OBJ = "objectives",
   CMD_QUEST = "quest",
+  CMD_REC = "recommended",
+  CMD_REQ = "required",
   CMD_START = "start",
 
   METHOD_PARSE = "Parse",
@@ -18,27 +20,25 @@ local tokens = {
   METHOD_CHECK_COND = "CheckCondition",
   METHOD_POST_COND = "AfterCheckConditions",
 
+  PARAM_CLASS = "class",
   PARAM_COMPLETION = "completion",
   PARAM_DESCRIPTION = "description",
-  PARAM_DIFFICULTY = "difficulty",
   PARAM_EMOTE = "emote",
+  PARAM_FACTION = "faction",
   PARAM_GOAL = "goal",
   PARAM_KILLTARGET = "killtarget",
-  PARAM_MAX = "max",
-  PARAM_MIN = "min",
+  PARAM_LEVEL = "level",
   PARAM_NAME = "name",
   PARAM_POSX = "posx",
   PARAM_POSY = "posy",
   PARAM_RADIUS = "radius",
-  PARAM_SIDE = "side",
+  -- PARAM_REPUTATION = "reputation",
+  -- PARAM_REPUTATION_NAME = "name",
+  -- PARAM_REPUTATION_LEVEL = "level",
   PARAM_SUBZONE = "subzone",
   PARAM_TARGET = "target",
   PARAM_TEXT = "text",
-  PARAM_VARNAME = "varname",
   PARAM_ZONE = "zone",
-
-  FLAG_REQUIRED = "required",
-  FLAG_RECOMMENDED = "recommended",
 }
 
 local incTable = {}
@@ -108,6 +108,35 @@ local function startCompleteParams()
       name = tokens.PARAM_RADIUS,
       type = "number",
     },
+  }
+end
+
+local function reqParams()
+  return {
+    {
+      name = tokens.PARAM_CLASS,
+    },
+    {
+      name = tokens.PARAM_FACTION,
+    },
+    {
+      name = tokens.PARAM_LEVEL,
+      type = "number"
+    },
+    -- todo: test nested params to make sure this is possible
+    -- {
+    --   name = tokens.PARAM_REPUTATION,
+    --   params = {
+    --     {
+    --       name = tokens.PARAM_REPUTATION_NAME,
+    --       required = true,
+    --     },
+    --     {
+    --       name = tokens.PARAM_REPUTATION_LEVEL,
+    --       required = true,
+    --     }
+    --   }
+    -- }
   }
 end
 
@@ -370,6 +399,22 @@ local commands = {
         required = true,
       },
     }
+  },
+  {
+    name = tokens.CMD_REC,
+    scripts = {
+      tokens.METHOD_PARSE,
+      tokens.METHOD_CHECK_COND,
+    },
+    params = reqParams(),
+  },
+  {
+    name = tokens.CMD_REQ,
+    scripts = {
+      tokens.METHOD_PARSE,
+      tokens.METHOD_CHECK_COND,
+    },
+    params = reqParams(),
   },
   {
     name = tokens.CMD_START,

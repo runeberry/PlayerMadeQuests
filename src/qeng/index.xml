@@ -7,6 +7,7 @@
 
   <Script file="qeng/cmd/objective.lua"/>
   <Script file="qeng/cmd/quest.lua"/>
+  <Script file="qeng/cmd/req.lua"/>
   <Script file="qeng/cmd/startcomplete.lua"/>
 
   <Script file="qeng/objectives/emote.lua"/>
