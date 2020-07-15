@@ -113,7 +113,7 @@ end
 
 local objectives = {
   {
-    name = tokens.CMD_COMPLETE,
+    name = tokens.OBJ_COMPLETE,
     command = true, -- Only used to evaluate the "complete" command
     displaytext = {
       vars = {
