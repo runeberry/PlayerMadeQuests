@@ -1,8 +1,12 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <!-- No Logger dependency -->
   <Script file="util/Strings.lua"/>
   <Script file="util/Tables.lua"/>
   <Script file="util/Identifiers.lua"/>
+
   <Script file="util/Logger.lua"/>
+
+  <!-- Possible Logger dependency -->
   <Script file="util/Location.lua"/>
   <Script file="util/Sounds.lua"/>
   <Script file="util/Types.lua"/>
