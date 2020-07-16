@@ -64,11 +64,13 @@ local globalDisplayTextVars = {
 }
 
 local templates = {
-  ["parsed"] = {
+  -- Template for all top-level QuestScript fields
+  ["toplevel"] = {
     scripts = {
       [tokens.METHOD_PARSE] = { required = true },
     }
   },
+  -- Template for all quest objectives that will be tracked by the QuestEngine
   ["objective"] = {
     questEvent = true, -- Listen for QuestEvents by this name when the QuestEngine starts up
     scripts = {
@@ -81,13 +83,18 @@ local templates = {
       }
     }
   },
-  ["evaluated"] = {
+  -- Template for all conditions that can be evaluated against in-game data
+  ["condition"] = {
     scripts = {
       [tokens.METHOD_EVAL] = { required = true },
     }
   },
+  -- Template for start/complete objectives
   ["startcomplete"] = {
-    template = { "parsed", "evaluated" },
+    template = { "toplevel" },
+    scripts = {
+      [tokens.METHOD_EVAL] = { required = true },
+    },
     displaytext = {
       vars = {
         ["t"] = tokens.PARAM_TARGET,
@@ -103,16 +110,20 @@ local templates = {
     },
     params = {
       [tokens.PARAM_TEXT] = { type = { "string", "table" } },
-      [tokens.PARAM_TARGET] = { template = "evaluated", multiple = true },
-      [tokens.PARAM_ZONE] = { template = "evaluated" },
-      [tokens.PARAM_SUBZONE] = { template = "evaluated" },
-      [tokens.PARAM_POSX] = { template = "evaluated", type = "number" },
-      [tokens.PARAM_POSY] = { template = "evaluated", type = "number" },
+      [tokens.PARAM_TARGET] = { template = "condition", multiple = true },
+      [tokens.PARAM_ZONE] = { template = "condition" },
+      [tokens.PARAM_SUBZONE] = { template = "condition" },
+      [tokens.PARAM_POSX] = { template = "condition", type = "number" },
+      [tokens.PARAM_POSY] = { template = "condition", type = "number" },
       [tokens.PARAM_RADIUS] = { type = "number" },
     }
   },
-  ["requirement"] = {
-    template = { "parsed", "evaluated" },
+  -- Template for quest recommendations and requirements
+  ["recreq"] = {
+    template = { "toplevel" },
+    scripts = {
+      [tokens.METHOD_EVAL] = { required = true },
+    },
     params = {
       [tokens.PARAM_CLASS] = {},
       [tokens.PARAM_FACTION] = {},
@@ -153,12 +164,12 @@ local objectives = {
     params = {
       [tokens.PARAM_GOAL] = { type = "number" },
       [tokens.PARAM_EMOTE] = {
-        template = "evaluated",
+        template = "condition",
         required = true,
         multiple = true,
       },
       [tokens.PARAM_TARGET] = {
-        template = "evaluated",
+        template = "condition",
         multiple = true,
       },
     }
@@ -186,10 +197,10 @@ local objectives = {
       full = "Go [%r:within %r units of|to] [%x:(%x, %y) in ][%sz:%sz in ]%z"
     },
     params = {
-      [tokens.PARAM_ZONE] = { template = "evaluated" },
-      [tokens.PARAM_SUBZONE] = { template = "evaluated" },
-      [tokens.PARAM_POSX] = { template = "evaluated", type = "number" },
-      [tokens.PARAM_POSY] = { template = "evaluated", type = "number" },
+      [tokens.PARAM_ZONE] = { template = "condition" },
+      [tokens.PARAM_SUBZONE] = { template = "condition" },
+      [tokens.PARAM_POSX] = { template = "condition", type = "number" },
+      [tokens.PARAM_POSY] = { template = "condition", type = "number" },
       [tokens.PARAM_RADIUS] = { type = "number" },
     }
   },
@@ -212,7 +223,7 @@ local objectives = {
       [tokens.PARAM_GOAL] = { type = "number" },
       [tokens.PARAM_KILLTARGET] = {
         alias = tokens.PARAM_TARGET,
-        template = "evaluated",
+        template = "condition",
         required = true,
         multiple = true,
       },
@@ -236,7 +247,7 @@ local objectives = {
     params = {
       [tokens.PARAM_GOAL] = { type = "number" },
       [tokens.PARAM_TARGET] = {
-        template = "evaluated",
+        template = "condition",
         required = true,
         multiple = true,
       }
@@ -245,9 +256,8 @@ local objectives = {
 }
 
 local commands = {
-  [tokens.CMD_COMPLETE] = { template = "startcomplete" },
   [tokens.CMD_QUEST] = {
-    template = "parsed",
+    template = "toplevel",
     params = {
       [tokens.PARAM_NAME] = {},
       [tokens.PARAM_DESCRIPTION] = {},
@@ -255,14 +265,17 @@ local commands = {
     }
   },
   [tokens.CMD_OBJ] = {
-    template = "parsed",
+    template = "toplevel",
     params = {
       [tokens.PARAM_NAME] = { required = true },
     }
   },
-  [tokens.CMD_REC] = { template = "requirement" },
-  [tokens.CMD_REQ] = { template = "requirement" },
+
+  [tokens.CMD_REC] = { template = "recreq" },
+  [tokens.CMD_REQ] = { template = "recreq" },
+
   [tokens.CMD_START] = { template = "startcomplete" },
+  [tokens.CMD_COMPLETE] = { template = "startcomplete" },
 }
 
 addon.QuestScript = {
