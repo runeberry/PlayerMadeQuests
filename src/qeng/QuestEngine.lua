@@ -39,7 +39,7 @@ local function evaluateObjective(objective, obj, ...)
   -- true if the condition was met, false otherwise
   local anyFailed
   for name, val in pairs(obj.conditions) do
-    local condition = objective._paramsByName[name]
+    local condition = objective.params[name]
     if condition.scripts and condition.scripts.CheckCondition then
       -- CheckCondition receives 2 args: The obj being evaluated, and the value(s) for this condition
       ok, checkResult = pcall(condition.scripts.CheckCondition, obj, val)
@@ -211,7 +211,7 @@ function addon.QuestEngine:Validate(quest)
 
     assert(type(obj.conditions) == "table", addon:Enquote(obj.name).." must have conditions defined")
     for condName, _ in pairs(obj.conditions) do
-      local condition = objTemplate._paramsByName[condName]
+      local condition = objTemplate.params[condName]
       assert(condition, addon:Enquote(condName).." is not a valid condition for objective "..addon:Enquote(objTemplate.name))
     end
   end

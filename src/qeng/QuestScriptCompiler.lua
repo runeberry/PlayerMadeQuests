@@ -97,6 +97,7 @@ end
 local function yamlToQuest(quest, yaml)
   for cmd, args in pairs(yaml) do
     local command = getCommand(cmd)
+    logger:Trace("Parsing command:", cmd)
     command.scripts.Parse(quest, args)
   end
 end
@@ -136,7 +137,7 @@ local function assignShorthandArgs(args, objInfo)
   local skipped = 0
   -- print("----------------")
   for i, paramName in pairs(shorthand) do
-    local paramInfo = objInfo._paramsByName[paramName]
+    local paramInfo = objInfo.params[paramName]
     if not paramInfo then
       -- If this happens, then a bad token was assigned in QuestScript configuration
       error("Unrecognized shorthand parameter: "..paramName)
@@ -187,16 +188,6 @@ local function initQuestScript(qsconfig)
       param = applyTemplate(param, template.template)
     end
 
-    if param.params and template.params then
-      -- join template params onto base params, don't try to merge their contents
-      param = addon:CopyTable(param)
-      template = addon:CopyTable(template)
-      for _, tp in ipairs(template.params) do
-        param.params[#param.params+1] = tp
-      end
-      template.params = nil
-    end
-
     -- Merge the template table onto the param table, which will set and overwrite properties
     return addon:MergeTable(param, template)
   end
@@ -221,8 +212,12 @@ local function initQuestScript(qsconfig)
     return method
   end
 
-  local function setup(set, param)
-    local name = param.name
+  local function setup(set, name, param)
+    assert(name, "name is required")
+    assert(type(name) == "string", type(name).." is not a valid type for name")
+    assert(param and type(param) == "table", "param is required")
+    assert(type(param) == "table", type(param).." is not a valid type for param")
+    param.name = name
 
     -- Since merging tables changes the table reference, need to apply templates
     -- before the param table is registered
@@ -249,28 +244,20 @@ local function initQuestScript(qsconfig)
 
     local params = param.params
     if params then
-      local nameIndexed, positionIndexed = {}, {}
-
-      for _, p in ipairs(params) do
+      local newset = {}
+      for pname, p in pairs(params) do
         -- Recursively set up parameters exactly like their parent items
-        setup(nameIndexed, p)
-        if p.position then
-          if positionIndexed[p.position] then
-            error("Multiple parameters specified for position "..p.position.." on "..name)
+        setup(newset, pname, p)
           end
-          positionIndexed[p.position] = p
+      param.params = newset
         end
       end
-      param._paramsByPosition = positionIndexed
-      param._paramsByName = nameIndexed
-    end
-  end
 
-  for _, command in ipairs(qsconfig.commands) do
-    setup(commands, command)
+  for name, command in pairs(qsconfig.commands) do
+    setup(commands, name, command)
   end
-  for _, objective in ipairs(qsconfig.objectives) do
-    setup(objectives, objective)
+  for name, objective in pairs(qsconfig.objectives) do
+    setup(objectives, name, objective)
   end
 end
 
@@ -312,22 +299,22 @@ end
 function addon.QuestScriptCompiler:GetCommandInfo(cmdToken, paramToken)
   local command = commands[cmdToken]
   if not paramToken then return command end
-  return command._paramsByName[paramToken]
+  return command.params[paramToken]
 end
 
 function addon.QuestScriptCompiler:GetObjectiveInfo(objToken, paramToken)
   local obj = objectives[objToken]
   if not paramToken then return obj end
-  return obj._paramsByName[paramToken]
+  return obj.params[paramToken]
 end
 
 function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info, options)
   local val = args[token]
-  if not info._paramsByName then
+  if not info.params then
     -- Something didn't initialize properly, this will fail
     addon.Logger:Table(info)
   end
-  local paramInfo = info._paramsByName[token]
+  local paramInfo = info.params[token]
   if not paramInfo then
     if options and options.optional then
       return nil
@@ -388,7 +375,8 @@ end
 function addon.QuestScriptCompiler:ParseConditions(params, args)
   local conditions = {}
 
-  for _, param in ipairs(params) do
+  -- _ will be the alias here, if the param had one
+  for _, param in pairs(params) do
     if param.multiple then
       -- If multiple arg values are allowed, then they will be passed to the
       -- condition handler as a set, such as { value1 = true, value2 = true }

@@ -78,8 +78,7 @@ local templates = {
       [tokens.METHOD_POST_COND] = { required = false },
     },
     params = {
-      {
-        name = tokens.PARAM_TEXT,
+      [tokens.PARAM_TEXT] = {
         type = { "string", "table" },
       }
     }
@@ -105,62 +104,28 @@ local templates = {
       full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
     },
     params = {
-      {
-        name = tokens.PARAM_TEXT,
-        type = { "string", "table" }
-      },
-      {
-        name = tokens.PARAM_TARGET,
-        template = "evaluated",
-        multiple = true,
-      },
-      {
-        name = tokens.PARAM_ZONE,
-        template = "evaluated",
-      },
-      {
-        name = tokens.PARAM_SUBZONE,
-        template = "evaluated",
-      },
-      {
-        name = tokens.PARAM_POSX,
-        template = "evaluated",
-        type = "number",
-      },
-      {
-        name = tokens.PARAM_POSY,
-        template = "evaluated",
-        type = "number",
-      },
-      {
-        name = tokens.PARAM_RADIUS,
-        type = "number",
-      },
+      [tokens.PARAM_TEXT] = { type = { "string", "table" } },
+      [tokens.PARAM_TARGET] = { template = "evaluated", multiple = true },
+      [tokens.PARAM_ZONE] = { template = "evaluated" },
+      [tokens.PARAM_SUBZONE] = { template = "evaluated" },
+      [tokens.PARAM_POSX] = { template = "evaluated", type = "number" },
+      [tokens.PARAM_POSY] = { template = "evaluated", type = "number" },
+      [tokens.PARAM_RADIUS] = { type = "number" },
     }
   },
   ["requirement"] = {
     template = { "parsed", "evaluated" },
     params = {
-      {
-        name = tokens.PARAM_CLASS,
-      },
-      {
-        name = tokens.PARAM_FACTION,
-      },
-      {
-        name = tokens.PARAM_LEVEL,
-        type = "number"
-      },
+      [tokens.PARAM_CLASS] = {},
+      [tokens.PARAM_FACTION] = {},
+      [tokens.PARAM_LEVEL] = { type = "number" },
       -- todo: test nested params to make sure this is possible
-      -- {
-      --   name = tokens.PARAM_REPUTATION,
+      -- [tokens.PARAM_REPUTATION] = {
       --   params = {
-      --     {
-      --       name = tokens.PARAM_REPUTATION_NAME,
+      --     [tokens.PARAM_REPUTATION_NAME] = {
       --       required = true,
       --     },
-      --     {
-      --       name = tokens.PARAM_REPUTATION_LEVEL,
+      --     [tokens.PARAM_REPUTATION_LEVEL] = {
       --       required = true,
       --     }
       --   }
@@ -170,12 +135,8 @@ local templates = {
 }
 
 local objectives = {
-  {
-    name = tokens.OBJ_COMPLETE,
-    template = "startcomplete",
-  },
-  {
-    name = tokens.OBJ_EMOTE,
+  [tokens.OBJ_COMPLETE] = { template = "startcomplete" },
+  [tokens.OBJ_EMOTE] = {
     template = "objective",
     shorthand = {
       tokens.PARAM_EMOTE,
@@ -193,25 +154,19 @@ local objectives = {
       full = "Use emote /%em[%t: on [%g2]%t|[%g2: %g2 times]]"
     },
     params = {
-      {
-        name = tokens.PARAM_GOAL,
-        type = "number",
-      },
-      {
-        name = tokens.PARAM_EMOTE,
+      [tokens.PARAM_GOAL] = { type = "number" },
+      [tokens.PARAM_EMOTE] = {
         template = "evaluated",
         required = true,
         multiple = true,
       },
-      {
-        name = tokens.PARAM_TARGET,
+      [tokens.PARAM_TARGET] = {
         template = "evaluated",
         multiple = true,
       },
     }
   },
-  {
-    name = tokens.OBJ_EXPLORE,
+  [tokens.OBJ_EXPLORE] = {
     template = "objective",
     shorthand = {
       tokens.PARAM_ZONE,
@@ -234,32 +189,14 @@ local objectives = {
       full = "Go [%r:within %r units of|to] [%x:(%x, %y) in ][%sz:%sz in ]%z"
     },
     params = {
-      {
-        name = tokens.PARAM_ZONE,
-        template = "evaluated",
-      },
-      {
-        name = tokens.PARAM_SUBZONE,
-        template = "evaluated",
-      },
-      {
-        name = tokens.PARAM_POSX,
-        template = "evaluated",
-        type = "number",
-      },
-      {
-        name = tokens.PARAM_POSY,
-        template = "evaluated",
-        type = "number",
-      },
-      {
-        name = tokens.PARAM_RADIUS,
-        type = "number",
-      },
+      [tokens.PARAM_ZONE] = { template = "evaluated" },
+      [tokens.PARAM_SUBZONE] = { template = "evaluated" },
+      [tokens.PARAM_POSX] = { template = "evaluated", type = "number" },
+      [tokens.PARAM_POSY] = { template = "evaluated", type = "number" },
+      [tokens.PARAM_RADIUS] = { type = "number" },
     }
   },
-  {
-    name = tokens.OBJ_KILL,
+  [tokens.OBJ_KILL] = {
     template = "objective",
     shorthand = {
       tokens.PARAM_GOAL,
@@ -275,12 +212,8 @@ local objectives = {
       full = "Kill [%g2]%t"
     },
     params = {
-      {
-        name = tokens.PARAM_GOAL,
-        type = "number",
-      },
-      {
-        name = tokens.PARAM_KILLTARGET,
+      [tokens.PARAM_GOAL] = { type = "number" },
+      [tokens.PARAM_KILLTARGET] = {
         alias = tokens.PARAM_TARGET,
         template = "evaluated",
         required = true,
@@ -288,12 +221,8 @@ local objectives = {
       },
     }
   },
-  {
-    name = tokens.OBJ_START,
-    template = "startcomplete",
-  },
-  {
-    name = tokens.OBJ_TALKTO,
+  [tokens.OBJ_START] = { template = "startcomplete" },
+  [tokens.OBJ_TALKTO] = {
     template = "objective",
     shorthand = {
       tokens.PARAM_GOAL,
@@ -309,12 +238,8 @@ local objectives = {
       full = "Talk to [%g2]%t"
     },
     params = {
-      {
-        name = tokens.PARAM_GOAL,
-        type = "number",
-      },
-      {
-        name = tokens.PARAM_TARGET,
+      [tokens.PARAM_GOAL] = { type = "number" },
+      [tokens.PARAM_TARGET] = {
         template = "evaluated",
         required = true,
         multiple = true,
@@ -324,47 +249,24 @@ local objectives = {
 }
 
 local commands = {
-  {
-    name = tokens.CMD_COMPLETE,
-    template = "startcomplete",
-  },
-  {
-    name = tokens.CMD_QUEST,
+  [tokens.CMD_COMPLETE] = { template = "startcomplete" },
+  [tokens.CMD_QUEST] = {
     template = "parsed",
     params = {
-      {
-        name = tokens.PARAM_NAME,
-      },
-      {
-        name = tokens.PARAM_DESCRIPTION,
-      },
-      {
-        name = tokens.PARAM_COMPLETION,
-      },
+      [tokens.PARAM_NAME] = {},
+      [tokens.PARAM_DESCRIPTION] = {},
+      [tokens.PARAM_COMPLETION] = {},
     }
   },
-  {
-    name = tokens.CMD_OBJ,
+  [tokens.CMD_OBJ] = {
     template = "parsed",
     params = {
-      {
-        name = tokens.PARAM_NAME,
-        required = true,
-      },
+      [tokens.PARAM_NAME] = { required = true },
     }
   },
-  {
-    name = tokens.CMD_REC,
-    template = "requirement",
-  },
-  {
-    name = tokens.CMD_REQ,
-    template = "requirement",
-  },
-  {
-    name = tokens.CMD_START,
-    template = "startcomplete",
-  }
+  [tokens.CMD_REC] = { template = "requirement" },
+  [tokens.CMD_REQ] = { template = "requirement" },
+  [tokens.CMD_START] = { template = "startcomplete" },
 }
 
 addon.QuestScript = {
