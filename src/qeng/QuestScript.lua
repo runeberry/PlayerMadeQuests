@@ -1,11 +1,9 @@
 local _, addon = ...
 
 local tokens = {
-  OBJ_COMPLETE = "complete",
   OBJ_EMOTE = "emote",
   OBJ_EXPLORE = "explore",
   OBJ_KILL = "kill",
-  OBJ_START = "start",
   OBJ_TALKTO = "talkto",
 
   CMD_COMPLETE = "complete",
@@ -135,7 +133,6 @@ local templates = {
 }
 
 local objectives = {
-  [tokens.OBJ_COMPLETE] = { template = "startcomplete" },
   [tokens.OBJ_EMOTE] = {
     template = "objective",
     shorthand = {
@@ -221,7 +218,6 @@ local objectives = {
       },
     }
   },
-  [tokens.OBJ_START] = { template = "startcomplete" },
   [tokens.OBJ_TALKTO] = {
     template = "objective",
     shorthand = {

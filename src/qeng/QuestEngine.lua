@@ -218,11 +218,11 @@ function addon.QuestEngine:Validate(quest)
 end
 
 function addon.QuestEngine:EvaluateStart(quest)
-  return evaluateStartComplete(quest.start, tokens.OBJ_START)
+  return evaluateStartComplete(quest.start, tokens.CMD_START)
 end
 
 function addon.QuestEngine:EvaluateComplete(quest)
-  return evaluateStartComplete(quest.complete, tokens.OBJ_COMPLETE)
+  return evaluateStartComplete(quest.complete, tokens.CMD_COMPLETE)
 end
 
 -------------------------

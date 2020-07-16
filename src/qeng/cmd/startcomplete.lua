@@ -10,12 +10,12 @@ local function parseStartComplete(objToken, args)
 end
 
 compiler:AddScript(tokens.CMD_START, tokens.METHOD_PARSE, function(quest, args)
-  quest.start = parseStartComplete(tokens.OBJ_START, args)
+  quest.start = parseStartComplete(tokens.CMD_START, args)
   quest.start.questId = quest.questId
 end)
 
 compiler:AddScript(tokens.CMD_COMPLETE, tokens.METHOD_PARSE, function(quest, args)
-  quest.complete = parseStartComplete(tokens.OBJ_COMPLETE, args)
+  quest.complete = parseStartComplete(tokens.CMD_COMPLETE, args)
   quest.complete.questId = quest.questId
 end)
 

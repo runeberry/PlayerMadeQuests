@@ -434,7 +434,7 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
   end
 
   objName = objName:lower()
-  local objInfo = objectives[objName]
+  local objInfo = objectives[objName] or commands[objName]
   if not objInfo then
     error("Unknown objective name: "..objName)
   end
