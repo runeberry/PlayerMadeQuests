@@ -48,10 +48,10 @@ local function checkRecs(recs)
   return true
 end
 
-compiler:AddScript(tokens.CMD_REC, tokens.METHOD_CHECK_COND, function(quest)
+compiler:AddScript(tokens.CMD_REC, tokens.METHOD_EVAL, function(quest)
   return checkRecs(quest.recommended)
 end)
 
-compiler:AddScript(tokens.CMD_REQ, tokens.METHOD_CHECK_COND, function(quest)
+compiler:AddScript(tokens.CMD_REQ, tokens.METHOD_EVAL, function(quest)
   return checkRecs(quest.required)
 end)

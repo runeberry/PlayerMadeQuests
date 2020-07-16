@@ -14,9 +14,9 @@ local tokens = {
   CMD_START = "start",
 
   METHOD_PARSE = "Parse",
-  METHOD_PRE_COND = "BeforeCheckConditions",
-  METHOD_CHECK_COND = "CheckCondition",
-  METHOD_POST_COND = "AfterCheckConditions",
+  METHOD_PRE_EVAL = "BeforeEvaluate",
+  METHOD_EVAL = "Evaluate",
+  METHOD_POST_EVAL = "AfterEvaluate",
 
   PARAM_CLASS = "class",
   PARAM_COMPLETION = "completion",
@@ -70,10 +70,10 @@ local templates = {
     }
   },
   ["objective"] = {
-    objective = true, -- Explicitly mark objectives so they can be evaluated during quest progression
+    questEvent = true, -- Listen for QuestEvents by this name when the QuestEngine starts up
     scripts = {
-      [tokens.METHOD_PRE_COND] = { required = false },
-      [tokens.METHOD_POST_COND] = { required = false },
+      [tokens.METHOD_PRE_EVAL] = { required = false },
+      [tokens.METHOD_POST_EVAL] = { required = false },
     },
     params = {
       [tokens.PARAM_TEXT] = {
@@ -83,7 +83,7 @@ local templates = {
   },
   ["evaluated"] = {
     scripts = {
-      [tokens.METHOD_CHECK_COND] = { required = true },
+      [tokens.METHOD_EVAL] = { required = true },
     }
   },
   ["startcomplete"] = {

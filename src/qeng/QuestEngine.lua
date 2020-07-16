@@ -22,27 +22,27 @@ local function evaluateObjective(objective, obj, ...)
   local ok, beforeResult, checkResult, afterResult
   logger:Trace("Evaluating objective", addon:Enquote(obj.name), addon:Enquote(obj.id, "()"))
 
-  if objective.scripts and objective.scripts.BeforeCheckConditions then
+  if objective.scripts and objective.scripts[tokens.PRE_EVAL] then
     -- Determine if the objective as a whole should be evaluated
-    ok, beforeResult = pcall(objective.scripts.BeforeCheckConditions, obj, ...)
+    ok, beforeResult = pcall(objective.scripts[tokens.PRE_EVAL], obj, ...)
     if not ok then
-      logger:Error("Error during BeforeCheckConditions for", addon:Enquote(obj.id), ":", beforeResult)
+      logger:Error("Error during pre-evaluation for", addon:Enquote(obj.id), ":", beforeResult)
       return
     elseif beforeResult == false then
       -- If the objective's pre-condition returns boolean false, then do not continue evaluating the objective
-      logger:Trace("BeforeCheckConditions evaluated false for", obj.id..". Terminating early.")
+      logger:Trace("Pre-evaluation returned false for", obj.id..". Terminating early.")
       return
     end
   end
 
-  -- CheckCondition is expected to return a boolean value only:
+  -- Evaluation is expected to return a boolean value only:
   -- true if the condition was met, false otherwise
   local anyFailed
   for name, val in pairs(obj.conditions) do
     local condition = objective.params[name]
-    if condition.scripts and condition.scripts.CheckCondition then
-      -- CheckCondition receives 2 args: The obj being evaluated, and the value(s) for this condition
-      ok, checkResult = pcall(condition.scripts.CheckCondition, obj, val)
+    if condition.scripts and condition.scripts[tokens.METHOD_EVAL] then
+      -- Evaluation receives 2 args: The obj being evaluated, and the value(s) for this condition
+      ok, checkResult = pcall(condition.scripts[tokens.METHOD_EVAL], obj, val)
       logger:Trace("    Condition", addon:Enquote(name), "evaluated:", checkResult)
       if not ok then
         logger:Error("Error evaluating condition", addon:Enquote(name), "for", addon:Enquote(obj.id), ":", checkResult)
@@ -58,17 +58,17 @@ local function evaluateObjective(objective, obj, ...)
     checkResult = false
   end
 
-  -- AfterCheckConditions may take the result from CheckCondition and make a final ruling by
+  -- Post-evaluation may take the result from evaluation and make a final ruling by
   -- returning either a boolean or a number to represent objective progress
-  if objective.scripts and objective.scripts.AfterCheckConditions then
-    ok, afterResult = addon:catch(objective.scripts.AfterCheckConditions, obj, checkResult, ...)
+  if objective.scripts and objective.scripts[tokens.POST_EVAL] then
+    ok, afterResult = addon:catch(objective.scripts[tokens.POST_EVAL], obj, checkResult, ...)
     if not(ok) then
-      logger:Error("Error during AfterCheckConditions for", addon:Enquote(obj.id), ":", afterResult)
+      logger:Error("Error during post-evaluation for", addon:Enquote(obj.id), ":", afterResult)
       return
     elseif afterResult ~= nil then
-      -- If the After function returns a value, then that value will override the result of CheckCondition
+      -- If the post-evaluation returns a value, then that value will override the result of evaluation
       checkResult = afterResult
-      logger:Trace("    AfterCheckConditions overriding result with:", checkResult)
+      logger:Trace("    Post-evaluation overriding result with:", checkResult)
     end
   end
 

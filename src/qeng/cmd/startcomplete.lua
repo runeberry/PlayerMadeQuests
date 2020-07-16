@@ -20,5 +20,5 @@ compiler:AddScript(tokens.CMD_COMPLETE, tokens.METHOD_PARSE, function(quest, arg
 end)
 
 -- todo: Populate these methods
-compiler:AddScript(tokens.CMD_START, tokens.METHOD_CHECK_COND, function() end)
-compiler:AddScript(tokens.CMD_COMPLETE, tokens.METHOD_CHECK_COND, function() end)
+compiler:AddScript(tokens.CMD_START, tokens.METHOD_EVAL, function() end)
+compiler:AddScript(tokens.CMD_COMPLETE, tokens.METHOD_EVAL, function() end)

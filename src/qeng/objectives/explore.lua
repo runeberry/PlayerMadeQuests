@@ -2,7 +2,7 @@ local _, addon = ...
 addon:traceFile("objectives/explore.lua")
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
 
-compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_COND, function(obj, result, locData)
+compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_EVAL, function(obj, result, locData)
   if obj.conditions[tokens.PARAM_POSX] or obj.conditions[tokens.PARAM_POSY] then
     -- If the objective specifies an X or Y position, then begin polling for X/Y changes
     -- on an interval whenever a player enters the correct zone(s)

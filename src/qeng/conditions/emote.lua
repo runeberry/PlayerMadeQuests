@@ -6,7 +6,7 @@ local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
 -- Expected chat messages indexed by the objective they're expected for
 local expectedEmoteMessages = {}
 
-compiler:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_CHECK_COND, function(obj, emoteNames)
+compiler:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_EVAL, function(obj, emoteNames)
   local eem = expectedEmoteMessages[obj.id]
   local expectTargetedEmote = obj.conditions[tokens.PARAM_TARGET]
 
