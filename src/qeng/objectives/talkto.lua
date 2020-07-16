@@ -1,6 +1,5 @@
 local _, addon = ...
-addon:traceFile("objectives/talkto.lua")
-local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
+local tokens = addon.QuestScriptTokens
 local UnitExists = addon.G.UnitExists
 
 -- Publish the TalkTo event anytime the player targets a friendly unit

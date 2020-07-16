@@ -1,6 +1,5 @@
 local _, addon = ...
-addon:traceFile("objectives/kill.lua")
-local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
+local tokens = addon.QuestScriptTokens
 
 addon:onload(function()
   addon.CombatLogEvents:Subscribe("PARTY_KILL", function(cl)

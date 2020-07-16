@@ -1,8 +1,9 @@
 local _, addon = ...
-addon:traceFile("cmd/objective.lua")
-local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
+local loader = addon.QuestScriptLoader
+local compiler = addon.QuestScriptCompiler
+local tokens = addon.QuestScriptTokens
 
-compiler:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
+loader:AddScript(tokens.CMD_OBJ, tokens.METHOD_PARSE, function(quest, args)
   local num = 0
   for i, obj in ipairs(args) do
     num = i

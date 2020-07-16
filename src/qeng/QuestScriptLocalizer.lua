@@ -90,14 +90,10 @@ rules = {
         if not template then return str end
 
         str = str:sub(2) -- Remove the leading %
-        -- Look for global handlers for this var first, like %p and %g
-        local handler = addon.QuestScript.globalDisplayTextVars[str]
-        if not handler then
-          -- Otherwise, look for objective-specific handlers
-          local dt = objectives[obj.name].displaytext
-          if dt and dt.vars then
-            handler = dt.vars[str]
-          end
+        local handler
+        local dt = objectives[obj.name].displaytext
+        if dt and dt.vars then
+          handler = dt.vars[str]
         end
         if type(handler) == "string" then
           -- Token values represent the name of the condition value to return
@@ -177,7 +173,7 @@ end
 -- Event Subscribers --
 -----------------------
 
-addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
-  objectives = addon:CopyTable(qsObjectives)
+addon.AppEvents:Subscribe("CompilerLoaded", function()
+  objectives = addon:CopyTable(addon.QuestScript[addon.QuestScriptTokens.CMD_OBJ].params)
   addon.AppEvents:Publish("LocalizerLoaded")
 end)

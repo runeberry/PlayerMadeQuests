@@ -4,12 +4,7 @@ local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
 local GetUnitName = addon.G.GetUnitName
 
 addon.QuestScriptCompiler = {}
-local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
-
-local commands = {}
-local objectives = {}
-local scripts = {}
-local cleanNamePattern = "^[%l%d]+$"
+local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScriptTokens
 
 local function tryConvert(val, toType)
   local ok, converted = pcall(addon.ConvertValue, addon, val, toType)
@@ -84,7 +79,7 @@ local function getCommand(commandName)
   if not commandName then
     error("No command name specified")
   end
-  local command = commands[commandName]
+  local command = addon.QuestScript[commandName]
   if not command then
     error("No command exists with name: "..commandName)
   end
@@ -155,157 +150,16 @@ local function assignShorthandArgs(args, objInfo)
   end
 end
 
-local function initQuestScript(qsconfig)
-  local function validateAndRegister(set, name, param)
-    if not name or name == "" then
-      error("Name cannot be nil or empty")
-    end
-    if type(name) ~= "string" or not name:match(cleanNamePattern) then
-      error("Name must only contain lowercase alphanumeric characters")
-    end
-    if set[name] and set[name] ~= param then
-      error("An item is already registered with name: "..name)
-    end
-    set[name] = param
-  end
 
-  local function applyTemplate(param, templateName)
-    local templateNameType = type(templateName)
-    assert(templateNameType == "string" or templateNameType == "table", "templateName must be a string or table")
-
-    if templateNameType == "table" then
-      for _, t in ipairs(templateName) do
-        param = applyTemplate(param, t)
-      end
-      return param
-    end
-
-    local template = qsconfig.templates[templateName]
-    assert(template, templateName.." is not a recognized template")
-
-    if template.template then
-      -- apply nested templates first
-      param = applyTemplate(param, template.template)
-    end
-
-    -- Merge the template table onto the param table, which will set and overwrite properties
-    return addon:MergeTable(param, template)
-  end
-
-  local function getMethodScript(paramName, methodName, methodOptions)
-    assert(type(methodName) == "string", "Non-string registered as methodName for "..paramName)
-    assert(type(methodOptions) == "table", "Non-table registered as methodOptions for "..paramName)
-
-    local method = scripts[paramName]
-    if not method then
-      if not methodOptions.required then return nil end
-      error("No scripts registered for: "..paramName.." (looking for "..methodName..")")
-    end
-
-    method = method[methodName]
-    if not method then
-      if not methodOptions.required then return nil end
-      error("No script registered for "..paramName.." with name: "..methodName)
-    end
-
-    assert(type(method) == "function", "Non-function registered as script for "..paramName..": "..methodName)
-    return method
-  end
-
-  local function setup(set, name, param)
-    assert(name, "name is required")
-    assert(type(name) == "string", type(name).." is not a valid type for name")
-    assert(param and type(param) == "table", "param is required")
-    assert(type(param) == "table", type(param).." is not a valid type for param")
-    param.name = name
-
-    -- Since merging tables changes the table reference, need to apply templates
-    -- before the param table is registered
-    local template = param.template
-    if template then
-      param = applyTemplate(param, template)
-      param.template = nil
-    end
-
-    validateAndRegister(set, name, param)
-    if param.alias then
-      validateAndRegister(set, param.alias, param)
-    end
-
-    local itemScripts = param.scripts
-    if itemScripts then
-      -- Replace the array of script names with a table like: { name = function }
-      local newScripts = {}
-      for methodName, methodOptions in pairs(itemScripts) do
-        newScripts[methodName] = getMethodScript(name, methodName, methodOptions)
-      end
-      param.scripts = newScripts
-    end
-
-    local params = param.params
-    if params then
-      local newset = {}
-      for pname, p in pairs(params) do
-        -- Recursively set up parameters exactly like their parent items
-        setup(newset, pname, p)
-          end
-      param.params = newset
-        end
-      end
-
-  for name, command in pairs(qsconfig.commands) do
-    setup(commands, name, command)
-  end
-  for name, objective in pairs(qsconfig.objectives) do
-    setup(objectives, name, objective)
-  end
-end
 
 --------------------
 -- Public Methods --
 --------------------
 
---[[
-  Registers an arbitrary script by the specified unique name.
-  Reference this script name in QuestScript.lua and it will be attached
-  to the associated item and executed at the appropriate point in the quest lifecycle.
---]]
-function addon.QuestScriptCompiler:AddScript(itemName, methodName, fn)
-  if not itemName or itemName == "" then
-    logger:Error("AddScript: itemName is required")
-    logger:Debug("methodName:", methodName)
-    return
-  end
-  if not methodName or methodName == "" then
-    logger:Error("AddScript: methodName is required")
-    logger:Debug("itemName:", itemName)
-    return
-  end
-
-  local existing = scripts[itemName]
-  if not existing then
-    existing = {}
-    scripts[itemName] = existing
-  end
-
-  if existing[methodName] then
-    addon.Logger:Error("AddScript: script is already registered for", itemName, "with name", methodName)
-    return
-  end
-
-  existing[methodName] = fn
-end
-
 function addon.QuestScriptCompiler:GetCommandInfo(cmdToken, paramToken)
-  local command = commands[cmdToken]
+  local command = addon.QuestScript[cmdToken]
   if not paramToken then return command end
   return command.params[paramToken]
-end
-
-function addon.QuestScriptCompiler:GetObjectiveInfo(objToken, paramToken)
-  local obj = objectives[objToken]
-  if not paramToken then return obj end
-  return obj.params[paramToken]
 end
 
 function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info, options)
@@ -384,7 +238,7 @@ function addon.QuestScriptCompiler:ParseConditions(params, args)
       --       condition name in the compiled quest
       local val = args[param.name] or args[param.alias]
       if val then
-        if type(param.name) ~= "table" then
+        if type(param.name) ~= "table" then -- todo: what is going on here? why did i do this?
           val = { val }
         end
         conditions[param.name] = addon:DistinctSet(val)
@@ -434,7 +288,7 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
   end
 
   objName = objName:lower()
-  local objInfo = objectives[objName] or commands[objName]
+  local objInfo = addon.QuestScript[objName] or addon.QuestScript[tokens.CMD_OBJ].params[objName]
   if not objInfo then
     error("Unknown objective name: "..objName)
   end
@@ -506,9 +360,3 @@ end
 function addon.QuestScriptCompiler:TryCompile(script, params)
   return pcall(compiler.Compile, compiler, script, params)
 end
-
-addon:onload(function()
-  initQuestScript(addon.QuestScript)
-  logger:Debug("QuestScript loaded OK!")
-  addon.AppEvents:Publish("CompilerLoaded", objectives, commands)
-end)

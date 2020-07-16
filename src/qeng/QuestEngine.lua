@@ -1,6 +1,6 @@
 local _, addon = ...
 addon:traceFile("QuestEngine.lua")
-local tokens = addon.QuestScript.tokens
+local tokens = addon.QuestScriptTokens
 local QuestLog, QuestStatus
 addon:onload(function()
   QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
@@ -310,9 +310,9 @@ addon.AppEvents:Subscribe("QuestLogReset", function()
   logger:Trace("Stopped tracking all quests")
 end)
 
-addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
+addon.AppEvents:Subscribe("CompilerLoaded", function()
   -- Ensure everything can be setup, then wire up objectives into the engine
-  objectivesByName = addon:CopyTable(qsObjectives)
+  objectivesByName = addon:CopyTable(addon.QuestScript[addon.QuestScriptTokens.CMD_OBJ].params)
   for _, objective in pairs(objectivesByName) do
     objective._active = {} -- Every active instance of this objective will be tracked
     addon.QuestEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))

@@ -1,5 +1,6 @@
 local _, addon = ...
-local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
+local loader = addon.QuestScriptLoader
+local tokens = addon.QuestScriptTokens
 
 local UnitClass = addon.G.UnitClass
 local UnitFactionGroup = addon.G.UnitFactionGroup
@@ -15,11 +16,11 @@ local function parseRecs(args)
   return recs
 end
 
-compiler:AddScript(tokens.CMD_REC, tokens.METHOD_PARSE, function(quest, args)
+loader:AddScript(tokens.CMD_REC, tokens.METHOD_PARSE, function(quest, args)
   quest.recommended = parseRecs(args)
 end)
 
-compiler:AddScript(tokens.CMD_REQ, tokens.METHOD_PARSE, function(quest, args)
+loader:AddScript(tokens.CMD_REQ, tokens.METHOD_PARSE, function(quest, args)
   quest.required = parseRecs(args)
 end)
 
@@ -48,10 +49,10 @@ local function checkRecs(recs)
   return true
 end
 
-compiler:AddScript(tokens.CMD_REC, tokens.METHOD_EVAL, function(quest)
+loader:AddScript(tokens.CMD_REC, tokens.METHOD_EVAL, function(quest)
   return checkRecs(quest.recommended)
 end)
 
-compiler:AddScript(tokens.CMD_REQ, tokens.METHOD_EVAL, function(quest)
+loader:AddScript(tokens.CMD_REQ, tokens.METHOD_EVAL, function(quest)
   return checkRecs(quest.required)
 end)
