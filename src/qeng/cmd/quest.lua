@@ -4,7 +4,7 @@ local compiler = addon.QuestScriptCompiler
 local tokens = addon.QuestScriptTokens
 
 loader:AddScript(tokens.CMD_QUEST, tokens.METHOD_PARSE, function(quest, args)
-  local cmdInfo = compiler:GetCommandInfo(tokens.CMD_QUEST)
+  local cmdInfo = addon.QuestScript[tokens.CMD_QUEST]
 
   local name = compiler:GetValidatedParameterValue(tokens.PARAM_NAME, args, cmdInfo)
   if name then

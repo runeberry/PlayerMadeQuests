@@ -310,9 +310,10 @@ addon.AppEvents:Subscribe("QuestLogReset", function()
   logger:Trace("Stopped tracking all quests")
 end)
 
-addon.AppEvents:Subscribe("CompilerLoaded", function()
+addon.AppEvents:Subscribe("QuestScriptLoaded", function()
   -- Ensure everything can be setup, then wire up objectives into the engine
-  objectivesByName = addon:CopyTable(addon.QuestScript[addon.QuestScriptTokens.CMD_OBJ].params)
+  local queryQuestEvents = function(cmd) return cmd.questEvent end
+  objectivesByName = addon.QuestScriptCompiler:Find(queryQuestEvents)
   for _, objective in pairs(objectivesByName) do
     objective._active = {} -- Every active instance of this objective will be tracked
     addon.QuestEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))

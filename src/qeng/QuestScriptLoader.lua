@@ -145,6 +145,6 @@ end
 addon:onload(function()
   initQuestScript()
   logger:Debug("QuestScript loaded OK!")
-  addon.AppEvents:Publish("CompilerLoaded")
+  addon.AppEvents:Publish("QuestScriptLoaded")
   addon.QuestScriptLoader = nil -- No longer needed after load
 end)

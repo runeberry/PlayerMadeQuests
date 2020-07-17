@@ -6,6 +6,8 @@ local GetUnitName = addon.G.GetUnitName
 addon.QuestScriptCompiler = {}
 local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScriptTokens
 
+local parsable
+
 local function tryConvert(val, toType)
   local ok, converted = pcall(addon.ConvertValue, addon, val, toType)
   if ok then return converted end
@@ -150,16 +152,30 @@ local function assignShorthandArgs(args, objInfo)
   end
 end
 
-
-
 --------------------
 -- Public Methods --
 --------------------
 
-function addon.QuestScriptCompiler:GetCommandInfo(cmdToken, paramToken)
-  local command = addon.QuestScript[cmdToken]
-  if not paramToken then return command end
-  return command.params[paramToken]
+local function find(query, searchSet, resultSet)
+  for k, v in pairs(searchSet) do
+    if query(v) then
+      if resultSet[k] then
+        -- This doesn't cause problems yet, but it might someday. Keep an eye on it.
+        logger:Warn("QuestScript search: duplicate value for", k,"in result set")
+      else
+        resultSet[k] = v
+      end
+    elseif v.params then
+      find(query, v.params, resultSet)
+    end
+  end
+end
+
+function addon.QuestScriptCompiler:Find(query)
+  local resultSet = {}
+  find(query, addon.QuestScript, resultSet)
+  logger:Trace("QuestScript search:", addon:tlen(resultSet), "results")
+  return addon:CopyTable(resultSet)
 end
 
 function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info, options)
@@ -283,12 +299,11 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
 
   local objName, args = parseMode[mode](obj)
   if not objName then
-    logger:Table(obj)
     error("Cannot determine name of objective")
   end
 
   objName = objName:lower()
-  local objInfo = addon.QuestScript[objName] or addon.QuestScript[tokens.CMD_OBJ].params[objName]
+  local objInfo = parsable[objName]
   if not objInfo then
     error("Unknown objective name: "..objName)
   end
@@ -360,3 +375,10 @@ end
 function addon.QuestScriptCompiler:TryCompile(script, params)
   return pcall(compiler.Compile, compiler, script, params)
 end
+
+addon:onload(function()
+  addon.AppEvents:Subscribe("QuestScriptLoaded", function()
+    local queryParsable = function(cmd) return cmd.contentParseable end
+    parsable = compiler:Find(queryParsable)
+  end)
+end)

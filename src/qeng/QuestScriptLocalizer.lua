@@ -2,7 +2,7 @@ local _, addon = ...
 
 addon.QuestScriptLocalizer = {}
 
-local objectives = {}
+local localizables = {}
 local rules -- defined below
 
 local function parseConditionValueText(obj, condName)
@@ -86,12 +86,12 @@ rules = {
       pattern = "%%%w+",
       fn = function(str, obj)
         -- print("     match: %var", str)
-        local template = objectives[obj.name]
+        local template = localizables[obj.name]
         if not template then return str end
 
         str = str:sub(2) -- Remove the leading %
         local handler
-        local dt = objectives[obj.name].displaytext
+        local dt = localizables[obj.name].displaytext
         if dt and dt.vars then
           handler = dt.vars[str]
         end
@@ -159,9 +159,8 @@ function addon.QuestScriptLocalizer:GetDisplayText(obj, scope)
   end
   if not displayText then
     -- Otherwise, use default displayText for this objective
-    local dirTemplate = objectives[obj.name]
+    local dirTemplate = localizables[obj.name]
     assert(dirTemplate, "Invalid directive: "..obj.name)
-    assert(dirTemplate.displaytext, "No default displaytext is defined for directive: "..obj.name)
     displayText = dirTemplate.displaytext[scope]
   end
 
@@ -173,7 +172,8 @@ end
 -- Event Subscribers --
 -----------------------
 
-addon.AppEvents:Subscribe("CompilerLoaded", function()
-  objectives = addon:CopyTable(addon.QuestScript[addon.QuestScriptTokens.CMD_OBJ].params)
+addon.AppEvents:Subscribe("QuestScriptLoaded", function()
+  local queryHasDisplayText = function(cmd) return cmd.displaytext end
+  localizables = addon.QuestScriptCompiler:Find(queryHasDisplayText)
   addon.AppEvents:Publish("LocalizerLoaded")
 end)

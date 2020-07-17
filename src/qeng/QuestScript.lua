@@ -66,6 +66,7 @@ addon.QuestScriptTemplates = {
   -- Template for all quest objectives that will be tracked by the QuestEngine
   ["objective"] = {
     questEvent = true, -- Listen for QuestEvents by this name when the QuestEngine starts up
+    contentParseable = true, -- Can be interpreted by ParseObjective
     multiple = true,
     displaytext = {
       vars = {
@@ -95,6 +96,7 @@ addon.QuestScriptTemplates = {
   -- Template for start/complete objectives
   ["startcomplete"] = {
     template = { "toplevel" },
+    contentParseable = true, -- Can be interpreted by ParseObjective
     scripts = {
       [t.METHOD_EVAL] = { required = true },
     },
