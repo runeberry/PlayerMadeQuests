@@ -28,17 +28,12 @@ end
 
 local function processQueue(broker)
   broker._pubFlag = false
-  local queueRem = {}
-  for event, payloadArray in pairs(broker.queue) do
-    table.insert(queueRem, event)
-    if checkHasSubscribers(broker, event) then
-      for _, payload in pairs(payloadArray) do
-        handleEvent(broker, event, unpack(payload))
-      end
+  local queue = addon:CopyTable(broker.queue)
+  broker.queue = {}
+  for _, item in ipairs(queue) do
+    if checkHasSubscribers(broker, item.event) then
+      handleEvent(broker, item.event, unpack(item.args))
     end
-  end
-  for _, event in ipairs(queueRem) do
-    broker.queue[event] = nil -- Cleanup queue after events are processed
   end
 end
 
@@ -51,12 +46,10 @@ local function broker_Publish(self, event, ...)
   elseif self._async then
     -- Async event handling - set a timer and execute events on the next frame
     -- Insert the payload for this event into the queue
-    local existing = self.queue[event]
-    if existing == nil then
-      existing = {}
-      self.queue[event] = existing
-    end
-    table.insert(existing, { ... })
+    self.queue[#self.queue+1] = {
+      event = event,
+      args = { ... }
+    }
 
     if not self._pubFlag then
       -- If this is the first event published to this broker (this frame)
