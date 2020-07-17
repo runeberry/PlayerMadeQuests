@@ -43,7 +43,7 @@ local function processQueue(broker)
 end
 
 local function broker_Publish(self, event, ...)
-  self.logger:Trace("Publishing "..self.name..":", event)
+  self.logger:Debug("Publishing "..self.name..":", event)
   local handlers = self.handlersMap[event]
   if addon:tlen(handlers) == 0 then
     -- There are no handlers registered for this event
