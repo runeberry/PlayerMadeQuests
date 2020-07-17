@@ -177,14 +177,14 @@ local function wrapObjectiveHandler(objective)
   end
 end
 
-local function evaluateStartComplete(section, objToken)
+local function evaluateStartComplete(section, token)
   if not section or not section.conditions then
     -- Nothing to evaluate, the quest can be started/completed
     return true
   end
 
-  logger:Debug("Evaluating", objToken, "condition...")
-  local objective = objectivesByName[objToken]
+  logger:Debug("Evaluating", token, "condition...")
+  local objective = addon.QuestScript[token] -- "start" or "complete"
   local result = evaluateObjective(objective, section)
   logger:Debug("    Result:", result)
   return result > 0
