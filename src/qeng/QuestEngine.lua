@@ -22,9 +22,9 @@ local function evaluateObjective(objective, obj, ...)
   local ok, beforeResult, checkResult, afterResult
   logger:Trace("Evaluating objective", addon:Enquote(obj.name), addon:Enquote(obj.id, "()"))
 
-  if objective.scripts and objective.scripts[tokens.PRE_EVAL] then
+  if objective.scripts and objective.scripts[tokens.METHOD_PRE_EVAL] then
     -- Determine if the objective as a whole should be evaluated
-    ok, beforeResult = pcall(objective.scripts[tokens.PRE_EVAL], obj, ...)
+    ok, beforeResult = pcall(objective.scripts[tokens.METHOD_PRE_EVAL], obj, ...)
     if not ok then
       logger:Error("Error during pre-evaluation for", addon:Enquote(obj.id), ":", beforeResult)
       return
@@ -60,8 +60,8 @@ local function evaluateObjective(objective, obj, ...)
 
   -- Post-evaluation may take the result from evaluation and make a final ruling by
   -- returning either a boolean or a number to represent objective progress
-  if objective.scripts and objective.scripts[tokens.POST_EVAL] then
-    ok, afterResult = addon:catch(objective.scripts[tokens.POST_EVAL], obj, checkResult, ...)
+  if objective.scripts and objective.scripts[tokens.METHOD_POST_EVAL] then
+    ok, afterResult = addon:catch(objective.scripts[tokens.METHOD_POST_EVAL], obj, checkResult, ...)
     if not(ok) then
       logger:Error("Error during post-evaluation for", addon:Enquote(obj.id), ":", afterResult)
       return
