@@ -30,6 +30,8 @@ local function checkRecs(recs)
     details = {},
   }
 
+  if not recs then return result end
+
   if recs.class then
     local class = UnitClass("player")
     if class:lower() == recs.class:lower() then
