@@ -58,3 +58,8 @@ make test-coverage  # runs unit tests and prints code coverage to console
 make test-report    # runs unit tests and prints code coverage as a detailed HTML report
 make clean          # Cleans up any leftover files from testing
 ```
+
+### Notes about the Docker container
+
+* If you ever close the terminal interacting with the container without `exit`ing it properly, you will get an error message stating that 'The container name "/pmq" is already in use' when you next try to run it. Simply run `docker kill pmq` to kill the running container.
+* Sometimes the terminal for the container will appear to stop responding to keyboard input. Simply spam Ctrl+C a few times to kill whatever process is locking up the terminal and continue as normal. If that doesn't work, open another command prompt and kill the container.
