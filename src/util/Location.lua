@@ -40,13 +40,16 @@ function addon:GetPlayerLocation(refresh)
     if playerLocation.x ~= loc.x or playerLocation.y ~= loc.y then
       doPublish = true
     end
+  else
+    -- Always publish if this is the first location of the session
+    doPublish = true
   end
 
   playerLocation = loc
 
   if doPublish then
     addon.AppEvents:Publish("PlayerLocationChanged", playerLocation)
-    logger:Trace("Player location changed")
+    logger:Trace("Player location changed", "("..string.format("%.2f", loc.x)..", "..string.format("%.2f", loc.y)..")")
   end
 
   return playerLocation
@@ -67,7 +70,7 @@ function addon:StartPollingLocation(id)
   -- If polling has already started, don't try to start it again
   if pollingTimerId then return end
   pollingTimerId = addon.Ace:ScheduleRepeatingTimer(pollingFn, pollingTimerInterval)
-  logger:Trace("Start polling for player location")
+  logger:Debug("Start polling for player location")
 end
 
 -- Give an id to indicate what you no longer need to poll the player's location for
@@ -80,7 +83,7 @@ function addon:StopPollingLocation(id)
   if not pollingTimerId then return end
   addon.Ace:CancelTimer(pollingTimerId)
   pollingTimerId = nil
-  logger:Trace("Stop polling for player location")
+  logger:Debug("Stop polling for player location")
 end
 
 -- Emergency brake
@@ -89,5 +92,5 @@ function addon:StopAllLocationPolling()
   addon.Ace:CancelTimer(pollingTimerId)
   pollingTimerId = nil
   pollingIds = {}
-  logger:Trace("Stop polling for player location")
+  logger:Debug("Stop polling for player location")
 end
