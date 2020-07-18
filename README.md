@@ -4,6 +4,8 @@ Create and share your own custom quests in World of Warcraft: Classic!
 
 Download it today: https://www.curseforge.com/wow/addons/pmq
 
+Want to contribute? Check out the [contributing guidelines](docs/contributing.md) for everything you need to know about getting PMQ setup for development.
+
 ![](docs/img/demo1.png)
 
 Several demo quests are included to help you learn how to write quests for PMQ.
@@ -23,21 +25,3 @@ Quest objectives are tracked and updated in real-time as you complete them. Feel
 ## Planned Features
 
 Check out the [Issues](/../../issues) page for features in the works for PMQ.
-
-## Developer Notes
-
-### Running unit tests w/ Docker in Windows
-
-From the repo directory, run:
-
-```ps
-.\scripts\docker.cmd
-```
-
-This will launch a bash shell in in the Docker container. From there, run any of the Makefile commands:
-
-```bash
-make test # runs unit tests
-make test-coverage # runs unit tests and prints code coverage to console
-make test-report # runs unit tests and prints code coverage as a detailed HTML report
-```
