@@ -88,7 +88,9 @@ local buttons = {
     text = "Abandon Quest",
     width = 122, -- todo: lookup actual width
     action = function(quest)
-      StaticPopups:Show("AbandonQuest", quest):OnYes(refreshQuestFrame)
+      StaticPopups:Show("AbandonQuest", quest):OnYes(function()
+        addon:ShowQuestInfoFrame(false)
+      end)
     end
   },
   ["Share"] = {
@@ -102,7 +104,9 @@ local buttons = {
     text = "Replay Quest",
     width = 122,
     action = function(quest)
-      StaticPopups:Show("RetryQuest", quest):OnYes(refreshQuestFrame)
+      StaticPopups:Show("RetryQuest", quest):OnYes(function()
+        addon:ShowQuestInfoFrame(false)
+      end)
     end
   },
   ["Empty"] = {
