@@ -14,7 +14,6 @@ local internalPublish
 local playerName
 
 addon.MessageEvents = addon.Events:CreateBroker("MessageEvent")
-addon.MessageEvents:SetLogLevel(addon.LogLevel.debug)
 addon.MessageEvents:EnableAsync()
 
 --[[
