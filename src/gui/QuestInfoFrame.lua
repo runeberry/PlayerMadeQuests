@@ -154,23 +154,40 @@ local frameModes = {
       fs[1]:SetText(quest.name)
       fs[2]:SetText(quest.description or " ")
 
+      -- Requirements & recommendations
+      if quest.required or quest.recommended then
+        fs[3]:SetText("Requirements")
+        local recString = ""
+        if quest.required then
+          for k, v in pairs(quest.required) do
+            recString = string.format("%s* %s: %s\n", recString, k, v)
+          end
+        end
+        if quest.recommended then
+          for k, v in pairs(quest.recommended) do
+            recString = string.format("%s* %s: %s (Recommended)\n", recString, k, v)
+          end
+        end
+        fs[4]:SetText(recString)
+      end
+
       -- Starting condition
       if quest.start and quest.start.conditions then
-        fs[3]:SetText("Getting Started")
-        fs[4]:SetText(localizer:GetDisplayText(quest.start, "quest").."\n")
+        fs[5]:SetText("Getting Started")
+        fs[6]:SetText(localizer:GetDisplayText(quest.start, "quest").."\n")
       end
 
       -- Quest objectives
-      fs[5]:SetText("Quest Objectives")
+      fs[7]:SetText("Quest Objectives")
       if quest.objectives then
         local objString = ""
         for _, obj in ipairs(quest.objectives) do
-          objString = objString.."* "..localizer:GetDisplayText(obj, "quest").."\n"
+          objString = string.format("%s* %s\n", objString, localizer:GetDisplayText(obj, "quest"))
         end
         objString = objString.."\n\n" -- Spacer for bottom margin
-        fs[6]:SetText(objString)
+        fs[8]:SetText(objString)
       else
-        fs[6]:SetText("\n")
+        fs[8]:SetText("\n")
       end
 
       addon:PlaySound("BookWrite")
