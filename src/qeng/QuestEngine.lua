@@ -114,7 +114,7 @@ local function updateQuestObjectiveProgress(obj)
   -- objective is considered completed if progress is >= goal
   if obj.progress >= obj.goal then
     -- quest is only considered completed if all objectives would be considered completed
-    isQuestCompleted = true
+    isObjectiveCompleted = true
     for _, qo in pairs(quest.objectives) do
       if qo.progress < qo.goal then
         isQuestCompleted = false
