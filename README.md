@@ -2,6 +2,8 @@
 
 Create and share your own custom quests in World of Warcraft: Classic!
 
+Download it today: https://www.curseforge.com/wow/addons/pmq
+
 ![](docs/img/demo1.png)
 
 Several demo quests are included to help you learn how to write quests for PMQ.
