@@ -1,12 +1,14 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
   <Script file="qeng/QuestStatus.lua"/>
   <Script file="qeng/QuestScript.lua"/>
+  <Script file="qeng/QuestScriptLoader.lua"/>
   <Script file="qeng/QuestScriptCompiler.lua"/>
   <Script file="qeng/QuestScriptLocalizer.lua"/>
   <Script file="qeng/QuestEngine.lua"/>
 
   <Script file="qeng/cmd/objective.lua"/>
   <Script file="qeng/cmd/quest.lua"/>
+  <Script file="qeng/cmd/req.lua"/>
   <Script file="qeng/cmd/startcomplete.lua"/>
 
   <Script file="qeng/objectives/emote.lua"/>

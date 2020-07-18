@@ -1,6 +1,6 @@
 local _, addon = ...
 addon:traceFile("QuestEngine.lua")
-local tokens = addon.QuestScript.tokens
+local tokens = addon.QuestScriptTokens
 local QuestLog, QuestStatus
 addon:onload(function()
   QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
@@ -22,27 +22,27 @@ local function evaluateObjective(objective, obj, ...)
   local ok, beforeResult, checkResult, afterResult
   logger:Trace("Evaluating objective", addon:Enquote(obj.name), addon:Enquote(obj.id, "()"))
 
-  if objective.scripts and objective.scripts.BeforeCheckConditions then
+  if objective.scripts and objective.scripts[tokens.METHOD_PRE_EVAL] then
     -- Determine if the objective as a whole should be evaluated
-    ok, beforeResult = pcall(objective.scripts.BeforeCheckConditions, obj, ...)
+    ok, beforeResult = pcall(objective.scripts[tokens.METHOD_PRE_EVAL], obj, ...)
     if not ok then
-      logger:Error("Error during BeforeCheckConditions for", addon:Enquote(obj.id), ":", beforeResult)
+      logger:Error("Error during pre-evaluation for", addon:Enquote(obj.id), ":", beforeResult)
       return
     elseif beforeResult == false then
       -- If the objective's pre-condition returns boolean false, then do not continue evaluating the objective
-      logger:Trace("BeforeCheckConditions evaluated false for", obj.id..". Terminating early.")
+      logger:Trace("Pre-evaluation returned false for", obj.id..". Terminating early.")
       return
     end
   end
 
-  -- CheckCondition is expected to return a boolean value only:
+  -- Evaluation is expected to return a boolean value only:
   -- true if the condition was met, false otherwise
   local anyFailed
   for name, val in pairs(obj.conditions) do
-    local condition = objective._paramsByName[name]
-    if condition.scripts and condition.scripts.CheckCondition then
-      -- CheckCondition receives 2 args: The obj being evaluated, and the value(s) for this condition
-      ok, checkResult = pcall(condition.scripts.CheckCondition, obj, val)
+    local condition = objective.params[name]
+    if condition.scripts and condition.scripts[tokens.METHOD_EVAL] then
+      -- Evaluation receives 2 args: The obj being evaluated, and the value(s) for this condition
+      ok, checkResult = pcall(condition.scripts[tokens.METHOD_EVAL], obj, val)
       logger:Trace("    Condition", addon:Enquote(name), "evaluated:", checkResult)
       if not ok then
         logger:Error("Error evaluating condition", addon:Enquote(name), "for", addon:Enquote(obj.id), ":", checkResult)
@@ -58,17 +58,17 @@ local function evaluateObjective(objective, obj, ...)
     checkResult = false
   end
 
-  -- AfterCheckConditions may take the result from CheckCondition and make a final ruling by
+  -- Post-evaluation may take the result from evaluation and make a final ruling by
   -- returning either a boolean or a number to represent objective progress
-  if objective.scripts and objective.scripts.AfterCheckConditions then
-    ok, afterResult = addon:catch(objective.scripts.AfterCheckConditions, obj, checkResult, ...)
+  if objective.scripts and objective.scripts[tokens.METHOD_POST_EVAL] then
+    ok, afterResult = addon:catch(objective.scripts[tokens.METHOD_POST_EVAL], obj, checkResult, ...)
     if not(ok) then
-      logger:Error("Error during AfterCheckConditions for", addon:Enquote(obj.id), ":", afterResult)
+      logger:Error("Error during post-evaluation for", addon:Enquote(obj.id), ":", afterResult)
       return
     elseif afterResult ~= nil then
-      -- If the After function returns a value, then that value will override the result of CheckCondition
+      -- If the post-evaluation returns a value, then that value will override the result of evaluation
       checkResult = afterResult
-      logger:Trace("    AfterCheckConditions overriding result with:", checkResult)
+      logger:Trace("    Post-evaluation overriding result with:", checkResult)
     end
   end
 
@@ -114,6 +114,7 @@ local function updateQuestObjectiveProgress(obj)
   -- objective is considered completed if progress is >= goal
   if obj.progress >= obj.goal then
     -- quest is only considered completed if all objectives would be considered completed
+    isObjectiveCompleted = true
     isQuestCompleted = true
     for _, qo in pairs(quest.objectives) do
       if qo.progress < qo.goal then
@@ -128,10 +129,9 @@ local function updateQuestObjectiveProgress(obj)
   end
   QuestLog:Save(quest)
 
+  addon.AppEvents:Publish("ObjectiveUpdated", obj)
   if isObjectiveCompleted then
     addon.AppEvents:Publish("ObjectiveCompleted", obj)
-  else
-    addon.AppEvents:Publish("ObjectiveUpdated", obj)
   end
 
   return isObjectiveCompleted, isQuestCompleted
@@ -177,14 +177,14 @@ local function wrapObjectiveHandler(objective)
   end
 end
 
-local function evaluateStartComplete(section, objToken)
+local function evaluateStartComplete(section, token)
   if not section or not section.conditions then
     -- Nothing to evaluate, the quest can be started/completed
     return true
   end
 
-  logger:Debug("Evaluating", objToken, "condition...")
-  local objective = objectivesByName[objToken]
+  logger:Debug("Evaluating", token, "condition...")
+  local objective = addon.QuestScript[token] -- "start" or "complete"
   local result = evaluateObjective(objective, section)
   logger:Debug("    Result:", result)
   return result > 0
@@ -211,18 +211,26 @@ function addon.QuestEngine:Validate(quest)
 
     assert(type(obj.conditions) == "table", addon:Enquote(obj.name).." must have conditions defined")
     for condName, _ in pairs(obj.conditions) do
-      local condition = objTemplate._paramsByName[condName]
+      local condition = objTemplate.params[condName]
       assert(condition, addon:Enquote(condName).." is not a valid condition for objective "..addon:Enquote(objTemplate.name))
     end
   end
 end
 
 function addon.QuestEngine:EvaluateStart(quest)
-  return evaluateStartComplete(quest.start, tokens.OBJ_START)
+  return evaluateStartComplete(quest.start, tokens.CMD_START)
 end
 
 function addon.QuestEngine:EvaluateComplete(quest)
-  return evaluateStartComplete(quest.complete, tokens.OBJ_COMPLETE)
+  return evaluateStartComplete(quest.complete, tokens.CMD_COMPLETE)
+end
+
+function addon.QuestEngine:EvaluateRecommendations(quest)
+  return addon.QuestScript[tokens.CMD_REC].scripts[tokens.METHOD_EVAL](quest)
+end
+
+function addon.QuestEngine:EvaluateRequirements(quest)
+  return addon.QuestScript[tokens.CMD_REQ].scripts[tokens.METHOD_EVAL](quest)
 end
 
 -------------------------
@@ -310,9 +318,10 @@ addon.AppEvents:Subscribe("QuestLogReset", function()
   logger:Trace("Stopped tracking all quests")
 end)
 
-addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
+addon.AppEvents:Subscribe("QuestScriptLoaded", function()
   -- Ensure everything can be setup, then wire up objectives into the engine
-  objectivesByName = addon:CopyTable(qsObjectives)
+  local queryQuestEvents = function(cmd) return cmd.questEvent end
+  objectivesByName = addon.QuestScriptCompiler:Find(queryQuestEvents)
   for _, objective in pairs(objectivesByName) do
     objective._active = {} -- Every active instance of this objective will be tracked
     addon.QuestEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))

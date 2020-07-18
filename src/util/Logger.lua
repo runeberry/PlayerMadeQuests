@@ -193,7 +193,7 @@ local methods = {
       local val = select(n, ...)
       vals[#vals+1] = tostring(val)
     end
-    self:Log(level, "Variadic args: [" .. table.concat(vals, ", ") .. "]")
+    self:Log(level, "Variadic args:", addon:Enquote(table.concat(vals, ", "), "[]"))
   end,
   ["Table"] = function(self, t, key, indent, circ)
     -- These logs are only intended for debugging, so just print them at the lowest visible log level
@@ -206,9 +206,9 @@ local methods = {
     circ = circ or {}
     circ[t] = true
     if key then
-      self:Log(level, indent, key, "=", t, "(", addon:tlen(t), "elements )")
+      self:Log(level, indent, key, "=", t, addon:Enquote(addon:tlen(t), "( elements)"))
     else
-      self:Log(level, t, "(", addon:tlen(t), "elements )")
+      self:Log(level, t, addon:Enquote(addon:tlen(t), "( elements)"))
     end
     indent = indent.."  "
     for k, v in pairs(t) do

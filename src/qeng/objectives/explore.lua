@@ -1,8 +1,8 @@
 local _, addon = ...
-addon:traceFile("objectives/explore.lua")
-local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
+local loader = addon.QuestScriptLoader
+local tokens = addon.QuestScriptTokens
 
-compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_COND, function(obj, result, locData)
+loader:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_EVAL, function(obj, result, locData)
   if obj.conditions[tokens.PARAM_POSX] or obj.conditions[tokens.PARAM_POSY] then
     -- If the objective specifies an X or Y position, then begin polling for X/Y changes
     -- on an interval whenever a player enters the correct zone(s)
@@ -18,12 +18,14 @@ compiler:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_COND, function(obj, re
   end
 end)
 
+addon.AppEvents:Subscribe("PlayerLocationChanged", function(loc)
+  addon.QuestEvents:Publish(tokens.OBJ_EXPLORE, loc)
+end)
+
 local function publish()
-  -- Calling GPL(true) here will ensure the data is refreshed for all conditions
   addon.QuestEvents:Publish(tokens.OBJ_EXPLORE, addon:GetPlayerLocation(true))
 end
 
-addon.AppEvents:Subscribe("PlayerLocationChanged", publish)
 addon.AppEvents:Subscribe("QuestAdded", publish)
 addon.AppEvents:Subscribe("QuestLogBuilt", publish)
 addon.AppEvents:Subscribe("QuestTrackingStarted", publish)

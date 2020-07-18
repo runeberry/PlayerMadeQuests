@@ -4,12 +4,9 @@ local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
 local GetUnitName = addon.G.GetUnitName
 
 addon.QuestScriptCompiler = {}
-local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
+local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScriptTokens
 
-local commands = {}
-local objectives = {}
-local scripts = {}
-local cleanNamePattern = "^[%l%d]+$"
+local parsable
 
 local function tryConvert(val, toType)
   local ok, converted = pcall(addon.ConvertValue, addon, val, toType)
@@ -84,7 +81,7 @@ local function getCommand(commandName)
   if not commandName then
     error("No command name specified")
   end
-  local command = commands[commandName]
+  local command = addon.QuestScript[commandName]
   if not command then
     error("No command exists with name: "..commandName)
   end
@@ -97,6 +94,7 @@ end
 local function yamlToQuest(quest, yaml)
   for cmd, args in pairs(yaml) do
     local command = getCommand(cmd)
+    logger:Trace("Parsing command:", cmd)
     command.scripts.Parse(quest, args)
   end
 end
@@ -136,7 +134,7 @@ local function assignShorthandArgs(args, objInfo)
   local skipped = 0
   -- print("----------------")
   for i, paramName in pairs(shorthand) do
-    local paramInfo = objInfo._paramsByName[paramName]
+    local paramInfo = objInfo.params[paramName]
     if not paramInfo then
       -- If this happens, then a bad token was assigned in QuestScript configuration
       error("Unrecognized shorthand parameter: "..paramName)
@@ -154,142 +152,44 @@ local function assignShorthandArgs(args, objInfo)
   end
 end
 
-local function initQuestScript(qsconfig)
-  local function validateAndRegister(set, name, param)
-    if not name or name == "" then
-      error("Name cannot be nil or empty")
-    end
-    if type(name) ~= "string" or not name:match(cleanNamePattern) then
-      error("Name must only contain lowercase alphanumeric characters")
-    end
-    if set[name] and set[name] ~= param then
-      error("An item is already registered with name: "..name)
-    end
-    set[name] = param
-  end
-
-  local function setup(set, param)
-    local name = param.name
-    validateAndRegister(set, name, param)
-    if param.alias then
-      validateAndRegister(set, param.alias, param)
-    end
-
-    local itemScripts = param.scripts
-    if itemScripts then
-      -- Replace the array of script names with a table like: { name = function }
-      local newScripts = {}
-      for _, methodName in pairs(itemScripts) do
-        local method = scripts[name]
-        if not method then
-          error("No scripts registered for: "..name)
-        end
-        if type(methodName) ~= "string" then
-          error("Non-string registered as methodName for "..name)
-        end
-        method = method[methodName]
-        if not method then
-          error("No script registered for "..name.." with name: "..methodName)
-        end
-        if type(method) ~= "function" then
-          error("Non-function registered as script for "..name..": "..methodName)
-        end
-        newScripts[methodName] = method
-      end
-      param.scripts = newScripts
-    end
-
-    local params = param.params
-    if params then
-      local nameIndexed, positionIndexed = {}, {}
-
-      for _, p in ipairs(params) do
-        -- Recursively set up parameters exactly like their parent items
-        setup(nameIndexed, p)
-        if p.position then
-          if positionIndexed[p.position] then
-            error("Multiple parameters specified for position "..p.position.." on "..name)
-          end
-          positionIndexed[p.position] = p
-        end
-      end
-      param._paramsByPosition = positionIndexed
-      param._paramsByName = nameIndexed
-    end
-  end
-
-  for _, command in ipairs(qsconfig.commands) do
-    setup(commands, command)
-  end
-  for _, objective in ipairs(qsconfig.objectives) do
-    setup(objectives, objective)
-  end
-end
-
 --------------------
 -- Public Methods --
 --------------------
 
---[[
-  Registers an arbitrary script by the specified unique name.
-  Reference this script name in QuestScript.lua and it will be attached
-  to the associated item and executed at the appropriate point in the quest lifecycle.
---]]
-function addon.QuestScriptCompiler:AddScript(itemName, methodName, fn)
-  if not itemName or itemName == "" then
-    logger:Error("AddScript: itemName is required")
-    logger:Debug("methodName:", methodName)
-    return
+local function find(query, searchSet, resultSet)
+  for k, v in pairs(searchSet) do
+    if query(v) then
+      if resultSet[k] then
+        -- This doesn't cause problems yet, but it might someday. Keep an eye on it.
+        logger:Warn("QuestScript search: duplicate value for", k,"in result set")
+      else
+        resultSet[k] = v
+      end
+    elseif v.params then
+      find(query, v.params, resultSet)
+    end
   end
-  if not methodName or methodName == "" then
-    logger:Error("AddScript: methodName is required")
-    logger:Debug("itemName:", itemName)
-    return
-  end
-
-  local existing = scripts[itemName]
-  if not existing then
-    existing = {}
-    scripts[itemName] = existing
-  end
-
-  if existing[methodName] then
-    addon.Logger:Error("AddScript: script is already registered for", itemName, "with name", methodName)
-    return
-  end
-
-  existing[methodName] = fn
 end
 
-function addon.QuestScriptCompiler:GetCommandInfo(cmdToken, paramToken)
-  local command = commands[cmdToken]
-  if not paramToken then return command end
-  return command._paramsByName[paramToken]
-end
-
-function addon.QuestScriptCompiler:GetObjectiveInfo(objToken, paramToken)
-  local obj = objectives[objToken]
-  if not paramToken then return obj end
-  return obj._paramsByName[paramToken]
+function addon.QuestScriptCompiler:Find(query)
+  local resultSet = {}
+  find(query, addon.QuestScript, resultSet)
+  logger:Trace("QuestScript search:", addon:tlen(resultSet), "results")
+  return addon:CopyTable(resultSet)
 end
 
 function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info, options)
   local val = args[token]
-  if not info._paramsByName then
+  if not info.params then
     -- Something didn't initialize properly, this will fail
     addon.Logger:Table(info)
   end
-  local paramInfo = info._paramsByName[token]
+  local paramInfo = info.params[token]
   if not paramInfo then
-    error(token.." is not a recognized parameter for "..info.name)
-  end
-
-  if options and options.default then
-    if val == nil and not paramInfo.required then
-      -- Non-required parameters can have a default value
-      -- If no default value is specified, then nil will be returned
-      return paramInfo.default
+    if options and options.optional then
+      return nil
     end
+    error(token.." is not a recognized parameter for "..info.name)
   end
 
   local expectedType = paramInfo.type or "string"
@@ -345,7 +245,8 @@ end
 function addon.QuestScriptCompiler:ParseConditions(params, args)
   local conditions = {}
 
-  for _, param in ipairs(params) do
+  -- _ will be the alias here, if the param had one
+  for _, param in pairs(params) do
     if param.multiple then
       -- If multiple arg values are allowed, then they will be passed to the
       -- condition handler as a set, such as { value1 = true, value2 = true }
@@ -353,7 +254,7 @@ function addon.QuestScriptCompiler:ParseConditions(params, args)
       --       condition name in the compiled quest
       local val = args[param.name] or args[param.alias]
       if val then
-        if type(param.name) ~= "table" then
+        if type(param.name) ~= "table" then -- todo: what is going on here? why did i do this?
           val = { val }
         end
         conditions[param.name] = addon:DistinctSet(val)
@@ -369,7 +270,7 @@ end
 
 -- Use this method at compile-time
 function addon.QuestScriptCompiler:ParseDisplayText(args, info)
-  local displaytext = compiler:GetValidatedParameterValue(tokens.PARAM_TEXT, args, info, { convert = true, default = true })
+  local displaytext = compiler:GetValidatedParameterValue(tokens.PARAM_TEXT, args, info, { convert = true })
   if type(displaytext) == "string" then
     -- If a single text value is defined, it's used for all display texts
     displaytext = {
@@ -398,12 +299,11 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
 
   local objName, args = parseMode[mode](obj)
   if not objName then
-    logger:Table(obj)
     error("Cannot determine name of objective")
   end
 
   objName = objName:lower()
-  local objInfo = objectives[objName]
+  local objInfo = parsable[objName]
   if not objInfo then
     error("Unknown objective name: "..objName)
   end
@@ -419,14 +319,20 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
     conditions = nil, -- The conditions under which this objective must be completed
   }
 
-  -- Special case: command-level objectives like "start" and "complete" do not have a goal
-  if not objInfo.command then
-    objective.goal = compiler:GetValidatedParameterValue(tokens.PARAM_GOAL, args, objInfo, { convert = true, default = true })
-    args[tokens.PARAM_GOAL] = nil
-  end
-
+  -- All objectives should support a display text parameter
   objective.displaytext = compiler:ParseDisplayText(args, objInfo)
   args[tokens.PARAM_TEXT] = nil
+
+  -- If an objective supports a goal parameter, extract that and use it
+  objective.goal = compiler:GetValidatedParameterValue(tokens.PARAM_GOAL, args, objInfo, { convert = true, optional = true })
+  args[tokens.PARAM_GOAL] = nil
+
+  -- If the objective does not support a goal parameter,
+  -- or if the objective supports a goal parameter but none was specified,
+  -- then default the goal to 1
+  if not objective.goal then
+    objective.goal = 1
+  end
 
   objective.conditions = compiler:ParseConditions(objInfo.params, args)
 
@@ -471,7 +377,8 @@ function addon.QuestScriptCompiler:TryCompile(script, params)
 end
 
 addon:onload(function()
-  initQuestScript(addon.QuestScript)
-  logger:Debug("QuestScript loaded OK!")
-  addon.AppEvents:Publish("CompilerLoaded", objectives, commands)
+  addon.AppEvents:Subscribe("QuestScriptLoaded", function()
+    local queryParsable = function(cmd) return cmd.contentParsable end
+    parsable = compiler:Find(queryParsable)
+  end)
 end)

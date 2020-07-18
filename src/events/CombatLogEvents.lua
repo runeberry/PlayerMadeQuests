@@ -4,7 +4,6 @@ addon:traceFile("CombatLogEvents.lua")
 local CombatLogGetCurrentEventInfo = addon.G.CombatLogGetCurrentEventInfo
 
 addon.CombatLogEvents = addon.Events:CreateBroker("CombatLogEvent")
-addon.CombatLogEvents:SetLogLevel(addon.LogLevel.error)
 
 -- Returns only the event type of the current combat log event
 -- function addon:GetClogEventType()

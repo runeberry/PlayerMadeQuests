@@ -23,25 +23,41 @@ local textStyles = {
   }
 }
 
+local function acceptQuest(quest, sender)
+  QuestLog:SaveWithStatus(quest, QuestStatus.Active)
+  if QuestCatalog:FindByID(quest.questId) then
+    QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
+  end
+  if sender then
+    addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = sender }, quest.questId)
+  end
+  addon:PlaySound("QuestAccepted")
+  addon:ShowQuestInfoFrame(false)
+  addon:ShowQuestLog(true)
+end
+
 local buttons = {
   ["Accept"] = {
     text = "Accept",
     width = 77,
     action = function(quest, sender)
+      local reqs = addon.QuestEngine:EvaluateRequirements(quest)
+      if not reqs.pass then
+        addon.Logger:Warn("You do not meet the requirements to start this quest.")
+        return
+      end
       if not addon.QuestEngine:EvaluateStart(quest) then
         addon.Logger:Warn("Unable to accept quest: start conditions are not met")
         return
       end
-      QuestLog:SaveWithStatus(quest, QuestStatus.Active)
-      if QuestCatalog:FindByID(quest.questId) then
-        QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
+      local recs = addon.QuestEngine:EvaluateRecommendations(quest)
+      if recs.pass then
+        acceptQuest(quest, sender)
+      else
+        addon.StaticPopups:Show("StartQuestBelowRequirements", quest, recs):OnYes(function()
+          acceptQuest(quest, sender)
+        end)
       end
-      if sender then
-        addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = sender }, quest.questId)
-      end
-      addon:PlaySound("QuestAccepted")
-      addon:ShowQuestInfoFrame(false)
-      addon:ShowQuestLog(true)
     end
   },
   ["Decline"] = {
@@ -138,23 +154,44 @@ local frameModes = {
       fs[1]:SetText(quest.name)
       fs[2]:SetText(quest.description or " ")
 
+      local index = 3
+
+      -- Requirements & recommendations
+      if quest.required or quest.recommended then
+        fs[index]:SetText("Requirements")
+        local recString = ""
+        if quest.required then
+          for k, v in pairs(quest.required) do
+            recString = string.format("%s* %s: %s\n", recString, k, v)
+          end
+        end
+        if quest.recommended then
+          for k, v in pairs(quest.recommended) do
+            recString = string.format("%s* %s: %s (Recommended)\n", recString, k, v)
+          end
+        end
+        fs[index+1]:SetText(recString)
+        index = index + 2
+      end
+
       -- Starting condition
       if quest.start and quest.start.conditions then
-        fs[3]:SetText("Getting Started")
-        fs[4]:SetText(localizer:GetDisplayText(quest.start, "quest").."\n")
+        fs[index]:SetText("Getting Started")
+        fs[index+1]:SetText(localizer:GetDisplayText(quest.start, "quest").."\n")
+        index = index + 2
       end
 
       -- Quest objectives
-      fs[5]:SetText("Quest Objectives")
+      fs[index]:SetText("Quest Objectives")
       if quest.objectives then
         local objString = ""
         for _, obj in ipairs(quest.objectives) do
-          objString = objString.."* "..localizer:GetDisplayText(obj, "quest").."\n"
+          objString = string.format("%s* %s\n", objString, localizer:GetDisplayText(obj, "quest"))
         end
         objString = objString.."\n\n" -- Spacer for bottom margin
-        fs[6]:SetText(objString)
+        fs[index+1]:SetText(objString)
       else
-        fs[6]:SetText("\n")
+        fs[index+1]:SetText("\n")
       end
 
       addon:PlaySound("BookWrite")

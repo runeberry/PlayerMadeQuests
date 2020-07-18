@@ -1,6 +1,5 @@
 local _, addon = ...
-addon:traceFile("objectives/emote.lua")
-local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
+local tokens = addon.QuestScriptTokens
 local GetUnitName = addon.G.GetUnitName
 
 addon:onload(function()

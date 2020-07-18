@@ -1,6 +1,6 @@
 local _, addon = ...
-addon:traceFile("conditions/target.lua")
-local compiler, tokens = addon.QuestScriptCompiler, addon.QuestScript.tokens
+local loader = addon.QuestScriptLoader
+local tokens = addon.QuestScriptTokens
 local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
 
 local targetGuidHistory
@@ -27,7 +27,7 @@ local function isUniqueTargetGuid(obj, targetUnitGuid)
   return true
 end
 
-compiler:AddScript(tokens.PARAM_TARGET, tokens.METHOD_CHECK_COND, function(obj, unitNames)
+loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_EVAL, function(obj, unitNames)
   local targetUnitName = GetUnitName("target")
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name
@@ -40,7 +40,7 @@ compiler:AddScript(tokens.PARAM_TARGET, tokens.METHOD_CHECK_COND, function(obj, 
   return isUniqueTargetGuid(obj, UnitGUID("target"))
 end)
 
-compiler:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_CHECK_COND, function(obj, unitNames)
+loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_EVAL, function(obj, unitNames)
   if not addon.LastPartyKill then return end
 
   local targetUnitName = addon.LastPartyKill.destName

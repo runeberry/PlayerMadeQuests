@@ -2,7 +2,7 @@ local _, addon = ...
 
 addon.QuestScriptLocalizer = {}
 
-local objectives = {}
+local localizables = {}
 local rules -- defined below
 
 local function parseConditionValueText(obj, condName)
@@ -86,18 +86,14 @@ rules = {
       pattern = "%%%w+",
       fn = function(str, obj)
         -- print("     match: %var", str)
-        local template = objectives[obj.name]
+        local template = localizables[obj.name]
         if not template then return str end
 
         str = str:sub(2) -- Remove the leading %
-        -- Look for global handlers for this var first, like %p and %g
-        local handler = addon.QuestScript.globalDisplayTextVars[str]
-        if not handler then
-          -- Otherwise, look for objective-specific handlers
-          local dt = objectives[obj.name].displaytext
-          if dt and dt.vars then
-            handler = dt.vars[str]
-          end
+        local handler
+        local dt = localizables[obj.name].displaytext
+        if dt and dt.vars then
+          handler = dt.vars[str]
         end
         if type(handler) == "string" then
           -- Token values represent the name of the condition value to return
@@ -163,9 +159,8 @@ function addon.QuestScriptLocalizer:GetDisplayText(obj, scope)
   end
   if not displayText then
     -- Otherwise, use default displayText for this objective
-    local dirTemplate = objectives[obj.name]
+    local dirTemplate = localizables[obj.name]
     assert(dirTemplate, "Invalid directive: "..obj.name)
-    assert(dirTemplate.displaytext, "No default displaytext is defined for directive: "..obj.name)
     displayText = dirTemplate.displaytext[scope]
   end
 
@@ -177,7 +172,8 @@ end
 -- Event Subscribers --
 -----------------------
 
-addon.AppEvents:Subscribe("CompilerLoaded", function(qsObjectives)
-  objectives = addon:CopyTable(qsObjectives)
+addon.AppEvents:Subscribe("QuestScriptLoaded", function()
+  local queryHasDisplayText = function(cmd) return cmd.displaytext end
+  localizables = addon.QuestScriptCompiler:Find(queryHasDisplayText)
   addon.AppEvents:Publish("LocalizerLoaded")
 end)
