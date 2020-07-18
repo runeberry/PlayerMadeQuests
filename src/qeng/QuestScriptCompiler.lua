@@ -378,7 +378,7 @@ end
 
 addon:onload(function()
   addon.AppEvents:Subscribe("QuestScriptLoaded", function()
-    local queryParsable = function(cmd) return cmd.contentParseable end
+    local queryParsable = function(cmd) return cmd.contentParsable end
     parsable = compiler:Find(queryParsable)
   end)
 end)
