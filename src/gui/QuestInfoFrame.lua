@@ -23,25 +23,41 @@ local textStyles = {
   }
 }
 
+local function acceptQuest(quest, sender)
+  QuestLog:SaveWithStatus(quest, QuestStatus.Active)
+  if QuestCatalog:FindByID(quest.questId) then
+    QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
+  end
+  if sender then
+    addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = sender }, quest.questId)
+  end
+  addon:PlaySound("QuestAccepted")
+  addon:ShowQuestInfoFrame(false)
+  addon:ShowQuestLog(true)
+end
+
 local buttons = {
   ["Accept"] = {
     text = "Accept",
     width = 77,
     action = function(quest, sender)
+      local reqs = addon.QuestEngine:EvaluateRequirements(quest)
+      if not reqs.pass then
+        addon.Logger:Warn("You do not meet the requirements to start this quest.")
+        return
+      end
       if not addon.QuestEngine:EvaluateStart(quest) then
         addon.Logger:Warn("Unable to accept quest: start conditions are not met")
         return
       end
-      QuestLog:SaveWithStatus(quest, QuestStatus.Active)
-      if QuestCatalog:FindByID(quest.questId) then
-        QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
+      local recs = addon.QuestEngine:EvaluateRecommendations(quest)
+      if recs.pass then
+        acceptQuest(quest, sender)
+      else
+        addon.StaticPopups:Show("StartQuestBelowRequirements", quest, recs):OnYes(function()
+          acceptQuest(quest, sender)
+        end)
       end
-      if sender then
-        addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = sender }, quest.questId)
-      end
-      addon:PlaySound("QuestAccepted")
-      addon:ShowQuestInfoFrame(false)
-      addon:ShowQuestLog(true)
     end
   },
   ["Decline"] = {

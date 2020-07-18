@@ -25,28 +25,42 @@ loader:AddScript(tokens.CMD_REQ, tokens.METHOD_PARSE, function(quest, args)
 end)
 
 local function checkRecs(recs)
+  local result = {
+    pass = true,
+    details = {},
+  }
+
   if recs.class then
     local class = UnitClass("player")
-    if class:lower() ~= recs.class:lower() then
-      return false
+    if class:lower() == recs.class:lower() then
+      result.details.class = true
+    else
+      result.details.class = false
+      result.pass = false
     end
   end
 
   if recs.faction then
     local faction = UnitFactionGroup("player")
-    if faction:lower() ~= recs.faction:lower() then
-      return false
+    if faction:lower() == recs.faction:lower() then
+      result.details.class = true
+    else
+      result.details.class = false
+      result.pass = false
     end
   end
 
   if recs.level then
     local level = UnitLevel("player")
-    if level < recs.level then
-      return false
+    if level >= recs.level then
+      result.details.level = true
+    else
+      result.details.level = false
+      result.pass = false
     end
   end
 
-  return true
+  return result
 end
 
 loader:AddScript(tokens.CMD_REC, tokens.METHOD_EVAL, function(quest)

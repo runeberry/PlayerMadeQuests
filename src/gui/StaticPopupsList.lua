@@ -63,6 +63,14 @@ addon.StaticPopupsList = {
       QuestLog:SaveWithStatus(quest, QuestStatus.Active)
     end,
   },
+  ["StartQuestBelowRequirements"] = {
+    message = function(quest, recsResult)
+      return "You do not meet the recommended criteria to start this quest.\nAccept anyway?"
+    end,
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function() end, -- Need an empty function to trigger the OnYes handler
+  },
   ["DeleteCatalogItem"] = {
     message = function(catalogItem)
       return "Are you sure you want to delete\n"..addon.Enquote(catalogItem.quest.name, '""?')

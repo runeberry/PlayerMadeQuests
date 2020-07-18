@@ -225,6 +225,14 @@ function addon.QuestEngine:EvaluateComplete(quest)
   return evaluateStartComplete(quest.complete, tokens.CMD_COMPLETE)
 end
 
+function addon.QuestEngine:EvaluateRecommendations(quest)
+  return addon.QuestScript[tokens.CMD_REC].scripts[tokens.METHOD_EVAL](quest)
+end
+
+function addon.QuestEngine:EvaluateRequirements(quest)
+  return addon.QuestScript[tokens.CMD_REQ].scripts[tokens.METHOD_EVAL](quest)
+end
+
 -------------------------
 -- Event Subscriptions --
 -------------------------
