@@ -215,7 +215,7 @@ describe("QuestScriptCompiler", function()
         }
       },
       {
-        objective = "explore: { zone: Elwynn Forest, posx: 32, posy: 20, radius: 5 }",
+        objective = "explore: { zone: Elwynn Forest, x: 32, y: 20, radius: 5 }",
         expected = {
           log = "Go to Point #1 in Elwynn Forest",
           progress = "Point #1 in Elwynn Forest explored: 0/1",
@@ -224,7 +224,7 @@ describe("QuestScriptCompiler", function()
         }
       },
       {
-        objective = "explore: { zone: Elwynn Forest, subzone: Goldshire, posx: 32, posy: 20, radius: 5 }",
+        objective = "explore: { zone: Elwynn Forest, subzone: Goldshire, x: 32, y: 20, radius: 5 }",
         expected = {
           log = "Go to Point #1 in Goldshire",
           progress = "Point #1 in Goldshire explored: 0/1",
