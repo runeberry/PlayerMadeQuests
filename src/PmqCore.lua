@@ -1,7 +1,7 @@
 local _, addon = ...
 local print = addon.G.print
 
-addon.VERSION = 3
+addon.VERSION = 4
 addon.BRANCH = "alpha"
 addon.IsAddonLoaded = false
 

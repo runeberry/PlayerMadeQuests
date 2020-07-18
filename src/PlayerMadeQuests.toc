@@ -2,7 +2,7 @@
 ## Title: PlayerMadeQuests
 ## Author: dolphinspired
 ## Notes: Create your own quests and share them with other players!
-## Version: 0.0.3-alpha
+## Version: 0.0.4-alpha
 ## RequiredDeps:
 ## OptionalDeps:
 ## SavedVariables: PMQGlobalCache
