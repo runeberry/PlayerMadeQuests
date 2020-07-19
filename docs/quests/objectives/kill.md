@@ -18,7 +18,7 @@ The **kill** objective is triggered whenever you or someone in your party kills 
 |-|-
 |**[goal](../parameters/goal.md)**|The number of enemies to kill
 |**[target](../parameters/target.md)**|The name of the monster or NPC to kill
-|**[text](../text.md)**|Custom display text for this objective
+|**[text](../parameters/text.md)**|Custom display text for this objective
 
 ### Custom text variables
 

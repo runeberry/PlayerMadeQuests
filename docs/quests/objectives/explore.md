@@ -20,7 +20,7 @@ When you enter a zone or subzone in which you have an objective to explore certa
 |-|-
 |**[radius](../parameters/coords.md)**|The number of enemies to kill
 |**[subzone](../parameters/zone.md)**|The name of the subzone to explore
-|**[text](../text.md)**|Custom display text for this objective
+|**[text](../parameters/text.md)**|Custom display text for this objective
 |**[x](../parameters/coords.md)**|The x-coordinate of the location
 |**[y](../parameters/coords.md)**|The y-coordinate of the location
 |**[zone](../parameters/zone.md)**|The name of the zone to explore

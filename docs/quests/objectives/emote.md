@@ -14,12 +14,12 @@ The **emote** objective is triggered whenever you use an emote, such as `/dance`
 
 ### Parameters
 
-|Parameter|Description
+|Parameter|How it's used
 |-|-
 |**[emote](../parameters/emote.md)**|The name of the emote to use, without the slash
 |**[goal](../parameters/goal.md)**|The number of times you must use this emote
 |**[target](../parameters/target.md)**|The name of the NPC that must be targeted when the emote is used
-|**[text](../text.md)**|Custom display text for this objective.
+|**[text](../parameters/text.md)**|Custom display text for this objective.
 
 ### Custom text variables
 

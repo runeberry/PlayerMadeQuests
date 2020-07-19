@@ -18,11 +18,11 @@ This objective can also be written as `talk`.
 
 ### Parameters
 
-|Parameter|Description
+|Parameter|How it's used
 |-|-
 |**[goal](../parameters/goal.md)**|The number of times you must talk to this NPC
 |**[target](../parameters/target.md)**|The name of the NPC to talk to
-|**[text](../text.md)**|Custom display text for this objective
+|**[text](../parameters/text.md)**|Custom display text for this objective
 
 ### Custom text variables
 
