@@ -184,7 +184,6 @@ local objectives = {
     template = "objective",
     shorthand = {
       t.PARAM_ZONE,
-      t.PARAM_SUBZONE,
       t.PARAM_POSX,
       t.PARAM_POSY,
       t.PARAM_RADIUS,
