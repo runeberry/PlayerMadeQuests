@@ -18,12 +18,9 @@ When you enter a zone or subzone in which you have an objective to explore certa
 
 |Parameter|How it's used
 |-|-
-|**[radius](../parameters/coords.md)**|The number of enemies to kill
-|**[subzone](../parameters/zone.md)**|The name of the subzone to explore
 |**[text](../parameters/text.md)**|Custom display text for this objective
-|**[x](../parameters/coords.md)**|The x-coordinate of the location
-|**[y](../parameters/coords.md)**|The y-coordinate of the location
-|**[zone](../parameters/zone.md)**|The name of the zone to explore
+|**[x<br/>y<br/>radius](../parameters/coords.md)**|The coordinates to explore, and how close you must get to explore them
+|**[zone<br/>subzone](../parameters/zone.md)**|The name of the zone and/or subzone to explore
 
 ### Custom text variables
 
