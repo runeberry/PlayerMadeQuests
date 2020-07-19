@@ -14,7 +14,7 @@ When you enter a zone or subzone in which you have an objective to explore certa
 
 *optional
 
-### Parameters
+### Supported parameters
 
 |Parameter|How it's used
 |-|-

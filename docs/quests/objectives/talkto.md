@@ -16,7 +16,7 @@ This objective can also be written as `talk`.
 
 *optional
 
-### Parameters
+### Supported parameters
 
 |Parameter|How it's used
 |-|-

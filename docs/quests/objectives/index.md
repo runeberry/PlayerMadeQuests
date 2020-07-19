@@ -58,7 +58,7 @@ objectives:
       target: Mangy Wolf
 ```
 
-## Supported Objectives
+## List of objectives
 
 PMQ currently supports the following quest objectives. Each link will take you to more information detailing the parameters supported by that objective.
 

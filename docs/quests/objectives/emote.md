@@ -12,7 +12,7 @@ The **emote** objective is triggered whenever you use an emote, such as `/dance`
 
 *optional
 
-### Parameters
+### Supported parameters
 
 |Parameter|How it's used
 |-|-

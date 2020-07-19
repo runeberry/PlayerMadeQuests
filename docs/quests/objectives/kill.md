@@ -12,7 +12,7 @@ The **kill** objective is triggered whenever you or someone in your party kills 
 
 *optional
 
-### Parameters
+### Supported parameters
 
 |Parameter|How it's used
 |-|-
