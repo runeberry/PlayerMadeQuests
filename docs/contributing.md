@@ -1,6 +1,8 @@
+[← Back to PMQ Home](index.md)
+
 # Guidelines for Contributing
 
-Thank you for contributing to PMQ! The following instructions will help you get your environment set up to modify and test PMQ's code. These instructions assume the following:
+Thank you for contributing to PlayerMadeQuests! The following instructions will help you get your environment set up to modify and test PMQ's code. These instructions assume the following:
 
 * You're developing on Windows 10 and have Administrator access
 * You have World of Warcraft: Classic installed (with an active game subscription)
@@ -12,7 +14,7 @@ You'll need to create a fork of the PlayerMadeQuests repository, commit your cha
 
 ## Backing up saved data
 
-If you're worried about losing any saved data for PMQ, such as Drafts, Settings, or quest progress, you may want to first follow these steps to back up your data before proceeding:
+If you're worried about losing any saved data for PMQ, such as Drafts, Settings, or quest progress, you may want to first follow these steps to back up your data before doing any development:
 
 1. Navigate to your Wow: Classic installation folder. For example: `C:\Program Files (x86)\World of Warcraft\_classic_`
 2. Navigate to `WTF/Account/{your_account_id}/SavedVariables`, where `{your_account_id}` is something like: `12345678#1`
