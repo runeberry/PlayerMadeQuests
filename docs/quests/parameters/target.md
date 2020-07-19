@@ -2,7 +2,7 @@
 
 # target
 
-The **target** condition is used in a variety of ways, but in general it is used to specify the monster or NPC that must be targeted in order to progress an objective.
+The **target** parameter is used in a variety of ways, but in general it is used to specify the monster or NPC that must be targeted in order to progress an objective.
 
 ### Value type
 

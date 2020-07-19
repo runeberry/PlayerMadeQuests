@@ -60,7 +60,7 @@ objectives:
 
 ## Supported Objectives
 
-PMQ currently supports the following quest objectives. Each link will take you to more information detailing the conditions and other parameters supported by that objective.
+PMQ currently supports the following quest objectives. Each link will take you to more information detailing the parameters supported by that objective.
 
 |Objective|Description
 |-|-
