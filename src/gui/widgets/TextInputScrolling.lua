@@ -5,7 +5,6 @@ local widget = addon.CustomWidgets:NewWidget("TextInputScrolling")
 
 local labelSpacer = "  "
 local textInset = 8
-local scrollDelay = 0.033 -- approximately 1 frame @ 30 FPS
 
 local editBoxScripts = {
   -- todo: (#53) scrolling is a little buggy when you insert a new line
@@ -77,11 +76,6 @@ local widgetMethods = {
   end,
   ["SetText"] = function(self, text)
     self.editBox:SetText(text or "")
-    addon.Ace:ScheduleTimer(function()
-      -- Force the scrollFrame to start at the top whenever the text is changed
-      -- Seems the WoW client can't correctly set scroll until the next frame
-      self.scrollFrame:SetVerticalScroll(0)
-    end, scrollDelay)
   end,
 }
 
