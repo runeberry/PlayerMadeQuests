@@ -16,6 +16,8 @@ The **target** parameter is used in a variety of ways, but in general it is used
 |**[kill](../objectives/kill.md)**|The target that must be killed
 |**[talkto](../objectives/talkto.md)**|The target that must be talked to
 
+This parameter can also be used as a [start or complete condition](../startcomplete.md).
+
 ### Usage notes
 
 * The target's name must be spelled and capitalized exactly as it is in-game in order for the objective to progress.

@@ -17,6 +17,8 @@ The **text** parameter allows you to precisely define how your quest information
 |**[kill](../objectives/kill.md)**|Custom display text
 |**[talkto](../objectives/talkto.md)**|Custom display text
 
+Custom display text can also be used with a [start and complete conditions](../startcomplete.md) as well as [quest requirements](../requirements.md).
+
 ### Usage notes
 
 The text

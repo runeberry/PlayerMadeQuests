@@ -27,6 +27,8 @@ The player must enter the box bounded by the top-left coordinate (37.2, 46.5) an
 |-|-
 |**[explore](../objectives/explore.md)**|The coordinates that must be explored
 
+This parameter can also be used as a [start or complete condition](../startcomplete.md).
+
 ### Usage notes
 
 * A distance of one "coordinate value" is vastly different between zones, since all map coordinates are normalized to 100 x 100 units. This means that a radius of 0.5 units is much larger in the Barrens compared to Deadwind Pass, since the Barrens is a much larger map.

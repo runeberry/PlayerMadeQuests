@@ -14,6 +14,8 @@ The **zone** and **subzone** parameters are used to specify the names of in-game
 |-|-
 |**[explore](../objectives/explore.md)**|The name of the zone or subzone that must be explored
 
+This parameter can also be used as a [start or complete condition](../startcomplete.md).
+
 ### Usage notes
 
 * Zone and subzone are completely interchangeable - both parameters will look at both your current zone and subzone for a match when evaluating objectives.
