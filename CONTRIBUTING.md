@@ -1,5 +1,3 @@
-[← Back to PMQ Home](index.md)
-
 # Guidelines for Contributing
 
 Thank you for contributing to PlayerMadeQuests! The following instructions will help you get your environment set up to modify and test PMQ's code. These instructions assume the following:
