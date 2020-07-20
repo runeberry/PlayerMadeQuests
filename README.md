@@ -4,7 +4,7 @@ Create and share your own custom quests in World of Warcraft: Classic!
 
 Download it today: https://www.curseforge.com/wow/addons/pmq
 
-Want to contribute? Check out the [contributing guidelines](docs/contributing.md) for everything you need to know about getting PMQ setup for development.
+Want to contribute? Check out the [contributing guidelines](CONTRIBUTING.md) for everything you need to know about getting PMQ setup for development.
 
 ![](docs/img/demo1.png)
 
