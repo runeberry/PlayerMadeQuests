@@ -103,6 +103,12 @@ function menu:OnShowMenu(frame, draftId)
   frame.nameField:SetText(currentDraft.parameters.name)
   frame.descField:SetText(currentDraft.parameters.description)
   frame.scriptEditor:SetText(currentDraft.script)
+  addon.Ace:ScheduleTimer(function()
+    -- Force the scrollFrame to start at the top whenever the text is changed
+    -- Seems the WoW client can't correctly set scroll until the next frame
+    frame.descField.scrollFrame:SetVerticalScroll(0)
+    frame.scriptEditor.scrollFrame:SetVerticalScroll(0)
+  end, 0.033)
   cleanForm()
 
   frame.scriptEditor:RefreshStyle()

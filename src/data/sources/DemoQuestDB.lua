@@ -119,8 +119,8 @@ objectives:
   - explore:
       zone: "Elwynn Forest"
       subzone: "Goldshire"
-      posx: 39.5
-      posy: 64.5]]
+      x: 39.5
+      y: 64.5]]
   },
   {
     demoId = "tutorial-explore-horde",
@@ -139,8 +139,8 @@ objectives:
   - explore:
       zone: Durotar
       subzone: "Jaggedswine Farm"
-      posx: 48.7
-      posy: 17.2]]
+      x: 48.7
+      y: 17.2]]
   },
   {
     demoId = "tutorial-startcomplete-ally",
