@@ -259,6 +259,14 @@ describe("Repository", function()
       local result = repo:FindByID(testData[1].id)
       assert.is_nil(result)
     end)
+    it("maintains index after delete", function()
+      repo:DeleteAll()
+      local entityToAdd = testData[2]
+      repo:Save(entityToAdd)
+
+      local result = repo:FindByID(entityToAdd.id)
+      assert.same(entityToAdd, result)
+    end)
     it("fires an EntityDataReset event", function()
       repo:DeleteAll()
 

@@ -463,7 +463,9 @@ local methods = {
     end
 
     self.data = {}
-    self.index = {}
+    for _, idx in pairs(self.index) do
+      idx.data = {}
+    end
 
     self.logger:Trace("All data deleted")
     writeSaveData(self)
