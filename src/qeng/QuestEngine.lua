@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("QuestEngine.lua")
 local tokens = addon.QuestScriptTokens
 local QuestLog, QuestStatus
 addon:onload(function()

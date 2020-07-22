@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("DataTable.lua")
 local CreateFrame, LibScrollingTable = addon.G.CreateFrame, addon.LibScrollingTable
 
 local widget = addon.CustomWidgets:NewWidget("DataTable")

@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("CustomWidgets.lua")
 
 addon.CustomWidgets = {}
 local widgets = {}

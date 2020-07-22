@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("MessageEvents.lua")
 local Ace, unpack = addon.Ace, addon.G.unpack
 local GetUnitName = addon.G.GetUnitName
 local encoder = addon.LibCompress:GetAddonEncodeTable()

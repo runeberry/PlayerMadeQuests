@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("Repository.lua")
 local time = addon.G.time
 
 addon.Data = {}

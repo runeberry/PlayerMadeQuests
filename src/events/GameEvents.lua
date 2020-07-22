@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("GameEvents.lua")
 
 -- Note that this event should NOT be executed async, because some global functions only return
 -- correct data on the same frame that the event is fired

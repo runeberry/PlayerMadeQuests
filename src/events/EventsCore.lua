@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("EventsCore.lua")
 
 local unpack = addon.G.unpack
 

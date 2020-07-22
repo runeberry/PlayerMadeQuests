@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("MainMenu.lua")
 local UISpecialFrames = addon.G.UISpecialFrames
 
 local firstShow = true

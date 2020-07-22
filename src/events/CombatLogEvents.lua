@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("CombatLogEvents.lua")
 
 local CombatLogGetCurrentEventInfo = addon.G.CombatLogGetCurrentEventInfo
 

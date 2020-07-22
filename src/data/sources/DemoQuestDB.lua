@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("DemoQuestDB.lua")
 
 local descriptions = {
   ["kill"] = [[This demonstrates how to write a quest to kill enemies. The target's name must be spelled and capitalized exactly right, otherwise you won't gain quest progress for killing them!

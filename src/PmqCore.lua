@@ -69,18 +69,6 @@ function addon:OnSaveDataLoaded(fn)
   end
 end
 
--- Place at the top of a file to help debugging in trace mode
-local tracedFiles = {}
-function addon:traceFile(filename)
-  tracedFiles[filename] = true
-end
-
-function addon:assertFile(filename)
-  if tracedFiles[filename] == nil then
-    addon.Logger:Fatal("Expected file not loaded:", filename)
-  end
-end
-
 -- Long text to use for display testing
 addon.LOREM_IPSUM = [[Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Elementum curabitur vitae nunc sed. Purus ut faucibus pulvinar elementum integer enim neque volutpat. Venenatis tellus in metus vulputate. Porta non pulvinar neque laoreet suspendisse interdum. Nulla aliquet porttitor lacus luctus accumsan tortor posuere. Consequat nisl vel pretium lectus quam id leo. Egestas purus viverra accumsan in nisl nisi scelerisque eu ultrices. Odio aenean sed adipiscing diam. Viverra orci sagittis eu volutpat odio facilisis mauris.
 

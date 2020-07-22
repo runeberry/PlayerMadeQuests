@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("EmoteDB.lua")
 
 addon.EmoteDB = {
   {

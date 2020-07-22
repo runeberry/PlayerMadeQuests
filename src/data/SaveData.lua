@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("SaveData.lua")
 
 local SavedVariables = {
   PMQCache = false,

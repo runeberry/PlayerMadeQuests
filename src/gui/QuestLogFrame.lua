@@ -1,5 +1,4 @@
 local _, addon = ...
-addon:traceFile("QuestLogFrame.lua")
 
 local AceGUI = addon.AceGUI
 local strjoin, strsplit = addon.G.strjoin, addon.G.strsplit
