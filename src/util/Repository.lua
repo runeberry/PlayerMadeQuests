@@ -456,6 +456,19 @@ local methods = {
     writeSaveData(self)
     addon.AppEvents:Publish(self.events.EntityDeleted, existing)
   end,
+  ["DeleteAll"] = function(self)
+    if not self._writeEnabled then
+      self.logger:Error("Failed to DeleteAll: Repository is read-only")
+      return
+    end
+
+    self.data = {}
+    self.index = {}
+
+    self.logger:Trace("All data deleted")
+    writeSaveData(self)
+    addon.AppEvents:Publish(self.events.EntityDataReset)
+  end,
   --------------------
   -- Config Methods --
   --------------------
@@ -574,7 +587,8 @@ function addon:NewRepository(name, pkey)
       EntityAdded = name.."Added",
       EntityUpdated = name.."Updated",
       EntityDeleted = name.."Deleted",
-      EntityDataLoaded = name.."DataLoaded"
+      EntityDataLoaded = name.."DataLoaded",
+      EntityDataReset = name.."DataReset",
     }
   }
 
