@@ -126,7 +126,7 @@ function menu:Create(frame)
   tablePane:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getQuests)
-  dataTable:SubscribeToEvents("QuestDataLoaded", "QuestAdded", "QuestDeleted", "QuestStatusChanged", "QuestLogReset")
+  dataTable:SubscribeToEvents("QuestDataLoaded", "QuestAdded", "QuestDeleted", "QuestStatusChanged", "QuestDataReset")
   dataTable:OnRowSelected(setButtonState)
   dataTable:OnGetSelectedItem(function(row)
     return QuestLog:FindByID(row[3])

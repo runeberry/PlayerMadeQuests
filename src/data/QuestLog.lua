@@ -52,16 +52,6 @@ function addon.QuestLog:SaveWithStatus(questOrId, status)
   self:Save(quest)
 end
 
--- todo: (#48) add a DeleteAll/BulkDelete method to Repository
--- https://github.com/dolphinspired/PlayerMadeQuests/issues/48
-function addon.QuestLog:Clear()
-  local quests = self:FindAll()
-  for _, quest in ipairs(quests) do
-    self:Delete(quest)
-  end
-  addon.AppEvents:Publish("QuestLogReset")
-end
-
 function addon.QuestLog:Validate(quest)
   addon:ValidateQuestStatusChange(quest)
 end

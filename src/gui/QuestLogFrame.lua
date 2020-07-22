@@ -42,7 +42,7 @@ local textRedrawEvents = {
   "QuestAdded",
   "QuestUpdated",
   "QuestDeleted",
-  "QuestLogReset",
+  "QuestDataReset",
 }
 
 -- For some reason GetPoint() returns the wrong position unless you move the window

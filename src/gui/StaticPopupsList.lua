@@ -43,7 +43,7 @@ addon.StaticPopupsList = {
     yesText = "OK",
     noText = "Cancel",
     yesHandler = function()
-      QuestLog:Clear()
+      QuestLog:DeleteAll()
       addon:PlaySound("QuestAbandoned")
       addon.Logger:Warn("Quest Log reset")
     end,
