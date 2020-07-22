@@ -9,7 +9,6 @@ local qs = {
   Abandoned = "Abandoned",
   Completed = "Completed",
   Finished = "Finished",
-  Archived = "Archived",
 }
 addon.QuestStatus = qs
 
@@ -25,7 +24,6 @@ local validStatusTable = {
     [qs.Abandoned] = valid(),
     [qs.Completed] = valid(),
     [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
-    [qs.Archived] = valid(),
   },
   [qs.Failed] = {
     [qs.Active] = valid(),
@@ -33,7 +31,6 @@ local validStatusTable = {
     [qs.Abandoned] = valid(),
     [qs.Completed] = invalid("A quest can only be completed from the Active status."),
     [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
-    [qs.Archived] = valid(),
   },
   [qs.Abandoned] = {
     [qs.Active] = valid(),
@@ -41,7 +38,6 @@ local validStatusTable = {
     [qs.Abandoned] = valid(),
     [qs.Completed] = invalid("A quest can only be completed from the Active status."),
     [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
-    [qs.Archived] = valid(),
   },
   [qs.Completed] = {
     [qs.Active] = valid(),
@@ -49,7 +45,6 @@ local validStatusTable = {
     [qs.Abandoned] = valid(),
     [qs.Completed] = valid(),
     [qs.Finished] = valid(),
-    [qs.Archived] = valid(),
   },
   [qs.Finished] = {
     [qs.Active] = valid(),
@@ -57,15 +52,6 @@ local validStatusTable = {
     [qs.Abandoned] = invalid("A finished quest cannot be returned to the Abandoned status."),
     [qs.Completed] = invalid("A finished quest cannot be returned to the Completed status."),
     [qs.Finished] = valid(),
-    [qs.Archived] = valid(),
-  },
-  [qs.Archived] = {
-    [qs.Active] = valid(),
-    [qs.Failed] = invalid("A quest can only be failed from the Active status."),
-    [qs.Abandoned] = invalid("A quest cannot be abandoned once it's already been archived."),
-    [qs.Completed] = valid(),
-    [qs.Finished] = valid(),
-    [qs.Archived] = valid(),
   },
 }
 

@@ -312,7 +312,6 @@ local statusModeMap = {
   [QuestStatus.Abandoned] = "TerminatedQuest",
   [QuestStatus.Completed] = "CompletedQuest",
   [QuestStatus.Finished] = "TerminatedQuest",
-  [QuestStatus.Archived] = "TerminatedQuest",
 }
 
 local function buildQuestInfoFrame()

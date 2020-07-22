@@ -22,7 +22,8 @@ addon.StaticPopupsList = {
     yesText = "OK",
     noText = "Cancel",
     yesHandler = function(quest)
-      QuestLog:SaveWithStatus(quest, QuestStatus.Archived)
+      QuestArchive:Save(quest)
+      QuestLog:Delete(quest)
     end,
   },
   ["DeleteQuest"] = {
@@ -39,7 +40,7 @@ addon.StaticPopupsList = {
   },
   ["ResetQuestLog"] = {
     message = "Are you sure you want to reset your quest log?\n"..
-              "This will delete ALL quest log history, including archived quests!",
+              "This will delete ALL quests in your log!",
     yesText = "OK",
     noText = "Cancel",
     yesHandler = function()
