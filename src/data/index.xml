@@ -1,12 +1,10 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-  <Script file="data/Repository.lua"/>
-
   <Script file="data/sources/DemoQuestDB.lua"/>
   <Script file="data/sources/EmoteDB.lua"/>
 
-  <Script file="data/repos/Emotes.lua"/>
-  <Script file="data/repos/QuestCatalog.lua"/>
-  <Script file="data/repos/QuestDemos.lua"/>
-  <Script file="data/repos/QuestDrafts.lua"/>
-  <Script file="data/repos/QuestLog.lua"/>
+  <Script file="data/Emotes.lua"/>
+  <Script file="data/QuestCatalog.lua"/>
+  <Script file="data/QuestDemos.lua"/>
+  <Script file="data/QuestDrafts.lua"/>
+  <Script file="data/QuestLog.lua"/>
 </Ui>

@@ -8,6 +8,8 @@
 
   <!-- Possible Logger dependency -->
   <Script file="util/Location.lua"/>
+  <Script file="util/Repository.lua"/>
+  <Script file="util/SaveData.lua"/>
   <Script file="util/Sounds.lua"/>
   <Script file="util/Types.lua"/>
 </Ui>

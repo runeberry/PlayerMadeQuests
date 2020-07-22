@@ -12,7 +12,7 @@ local GetUnitName = addon.G.GetUnitName
   }
 --]]
 
-addon.QuestDrafts = addon.Data:NewRepository("Draft", "draftId")
+addon.QuestDrafts = addon:NewRepository("Draft", "draftId")
 addon.QuestDrafts:SetSaveDataSource("Drafts")
 addon.QuestDrafts:EnableWrite(true)
 addon.QuestDrafts:EnableCompression(true)

@@ -1,6 +1,6 @@
 local _, addon = ...
 
-addon.Emotes = addon.Data:NewRepository("Emote", "command")
+addon.Emotes = addon:NewRepository("Emote", "command")
 addon.Emotes:AddIndex("targeted")
 addon.Emotes:AddIndex("untargeted")
 addon.Emotes:SetTableSource(addon.EmoteDB)

@@ -5,7 +5,7 @@ local _, addon = ...
     See DemoQuestDB.lua
 --]]
 
-addon.QuestDemos = addon.Data:NewRepository("DemoQuest", "demoId")
+addon.QuestDemos = addon:NewRepository("DemoQuest", "demoId")
 addon.QuestDemos:SetTableSource(addon.DemoQuestDB)
 addon.QuestDemos:EnableDirectRead(true)
 

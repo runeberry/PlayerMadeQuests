@@ -1,7 +1,6 @@
 local _, addon = ...
 local time = addon.G.time
 
-addon.Data = {}
 local logger = addon.Logger:NewLogger("Data", addon.LogLevel.info)
 local repos = {}
 local defaultPkey = "id"
@@ -564,7 +563,7 @@ local methods = {
 -- Constructors --
 ------------------
 
-function addon.Data:NewRepository(name, pkey)
+function addon:NewRepository(name, pkey)
   local repo = {
     name = name,
     pkey = pkey or defaultPkey,

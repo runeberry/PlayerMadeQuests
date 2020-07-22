@@ -22,7 +22,7 @@ local GetUnitName = addon.G.GetUnitName
   }
 --]]
 
-addon.QuestCatalog = addon.Data:NewRepository("CatalogItem", "questId")
+addon.QuestCatalog = addon:NewRepository("CatalogItem", "questId")
 addon.QuestCatalog:SetSaveDataSource("QuestCatalog")
 addon.QuestCatalog:EnableWrite(true)
 addon.QuestCatalog:EnableCompression(true)

@@ -29,7 +29,7 @@ local GetUnitName = addon.G.GetUnitName
   }
 --]]
 
-addon.QuestLog = addon.Data:NewRepository("Quest", "questId")
+addon.QuestLog = addon:NewRepository("Quest", "questId")
 addon.QuestLog:SetSaveDataSource("QuestLog")
 addon.QuestLog:EnableWrite(true)
 addon.QuestLog:EnableCompression(true)
