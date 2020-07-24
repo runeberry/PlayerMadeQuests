@@ -41,7 +41,7 @@ local textLines = {
   },
   {
     style = "default",
-    text = "Resets your PMQ quest log. Abandons all quests without confirmation!",
+    text = "Resets your PMQ quest log and archive. Deletes all quests without confirmation!",
   },
 }
 

@@ -37,6 +37,7 @@ end
 handlers = {
   ["reset"] = function()
     addon.QuestLog:DeleteAll()
+    addon.QuestArchive:DeleteAll()
     addon:PlaySound("QuestAbandoned")
   end,
   ["add"] = function(demoId)
