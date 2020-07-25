@@ -3,7 +3,7 @@ local loader = addon.QuestScriptLoader
 local tokens = addon.QuestScriptTokens
 
 loader:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_EVAL, function(obj, result, locData)
-  if obj.conditions[tokens.PARAM_POSX] or obj.conditions[tokens.PARAM_POSY] then
+  if obj.conditions[tokens.PARAM_COORDS] then
     -- If the objective specifies an X or Y position, then begin polling for X/Y changes
     -- on an interval whenever a player enters the correct zone(s)
     local z, sz = obj.conditions[tokens.PARAM_ZONE], obj.conditions[tokens.PARAM_SUBZONE]

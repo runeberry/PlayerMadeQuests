@@ -26,18 +26,21 @@ Both properties support all the same parameters and are evaluated in the same wa
 
 |Parameter|How it's used
 |-|-
+|**[coords](parameters/coords.md)**|The coordinates you must be at in order to start or complete the quest
 |**[target](parameters/target.md)**|The NPC that must be targeted in order to start or complete the quest
 |**[text](parameters/text.md)**|Custom display text for the start or complete condition
-|**[x<br/>y<br/>radius](parameters/coords.md)**|The coordinates you must be at, and how close you must get, to start or complete the quest
 |**[zone<br/>subzone](parameters/zone.md)**|The name of the zone and/or subzone where the quest starts or ends
 
 ### Custom text variables
 
 |Variable|Parameter
 |-|-
-|**%r**|radius
-|**%sz**|subzone
 |**%t**|target
-|**%x**|x
-|**%y**|y
 |**%z**|zone
+|**%sz**|subzone
+|**%co**|coords
+|**%x**|x-coordinate of coords
+|**%y**|y-coordinate of coords
+|**%r**|radius of coords
+|**%xy**|coords formatted as: `(x, y)`
+|**%xyr**|coords formatted as: `(x, y) +/- radius`
