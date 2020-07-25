@@ -109,8 +109,14 @@ local methods = {
     self:Show()
 
     if menuId then
-      local screen = getOrCreateScreen(self, menuId)
-      if not screen then return end -- No screen registered for this ID
+      local ok, screen = pcall(getOrCreateScreen, self, menuId)
+      if not ok then
+        addon.UILogger:Error("Failed to create menu screen"..menuId..":", screen)
+        return
+      elseif not screen then
+        addon.UILogger:Warn("No screen registered with id:", menuId)
+        return
+      end
 
       if self._selectedScreen then
         self._selectedScreen:OnLeaveMenu()

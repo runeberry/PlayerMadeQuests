@@ -65,7 +65,7 @@ addon:OnSaveDataLoaded(function()
       addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
     end
   end)
-  addon.AppEvents:Subscribe("QuestLogReset", function()
+  addon.AppEvents:Subscribe("QuestDataReset", function()
     targetGuidHistory = {}
     addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
   end)

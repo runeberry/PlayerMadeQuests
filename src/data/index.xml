@@ -3,6 +3,7 @@
   <Script file="data/sources/EmoteDB.lua"/>
 
   <Script file="data/Emotes.lua"/>
+  <Script file="data/QuestArchive.lua"/>
   <Script file="data/QuestCatalog.lua"/>
   <Script file="data/QuestDemos.lua"/>
   <Script file="data/QuestDrafts.lua"/>

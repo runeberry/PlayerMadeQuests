@@ -1,9 +1,9 @@
 local _, addon = ...
-local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
+local QuestArchive = addon.QuestArchive
 local StaticPopups = addon.StaticPopups
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen("questlog")
+local menu = addon.MainMenu:NewMenuScreen("archive")
 
 local colinfo = {
   {
@@ -12,19 +12,13 @@ local colinfo = {
     align = "LEFT"
   },
   {
-    name = "Status",
+    name = "Last Status",
     align = "RIGHT"
   }
 }
 
-local questLogRows = {}
+local questArchiveRows = {}
 local buttons = {
-  {
-    id = "toggle",
-    text = "Toggle Window",
-    anchor = "TOP",
-    enabled = "Always",
-  },
   {
     id = "info",
     text = "View Quest Info",
@@ -38,19 +32,8 @@ local buttons = {
     enabled = "Row",
   },
   {
-    id = "abandon",
-    text = "Abandon Quest",
-    anchor = "TOP",
-    enabled = "Row",
-    status = {
-      [QuestStatus.Active] = true,
-      [QuestStatus.Failed] = true,
-      [QuestStatus.Completed] = true,
-    }
-  },
-  {
     id = "reset",
-    text = "Reset Quest Log",
+    text = "Reset Archive",
     anchor = "BOTTOM",
     enabled = "Always",
   },
@@ -59,19 +42,6 @@ local buttons = {
     text = "Delete Quest",
     anchor = "BOTTOM",
     enabled = "Row",
-  },
-  {
-    id = "archive",
-    text = "Archive Quest",
-    anchor = "BOTTOM",
-    enabled = "Row",
-    status = {
-      [QuestStatus.Active] = true,
-      [QuestStatus.Failed] = true,
-      [QuestStatus.Abandoned] = true,
-      [QuestStatus.Completed] = true,
-      [QuestStatus.Finished] = true,
-    }
   },
 }
 
@@ -106,14 +76,14 @@ local function setButtonState(row)
 end
 
 local function getQuests()
-  questLogRows = {}
-  local quests = QuestLog:FindAll()
+  questArchiveRows = {}
+  local quests = QuestArchive:FindAll()
   table.sort(quests, function(a, b) return a.questId < b.questId end)
   for _, quest in pairs(quests) do
     local row = { quest.name, quest.status, quest.questId }
-    table.insert(questLogRows, row)
+    table.insert(questArchiveRows, row)
   end
-  return questLogRows
+  return questArchiveRows
 end
 
 function menu:Create(frame)
@@ -126,10 +96,10 @@ function menu:Create(frame)
   tablePane:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getQuests)
-  dataTable:SubscribeToEvents("QuestDataLoaded", "QuestAdded", "QuestDeleted", "QuestStatusChanged", "QuestDataReset")
+  dataTable:SubscribeToEvents("ArchiveDataLoaded", "ArchiveAdded", "ArchiveDeleted", "ArchiveDataReset")
   dataTable:OnRowSelected(setButtonState)
   dataTable:OnGetSelectedItem(function(row)
-    return QuestLog:FindByID(row[3])
+    return QuestArchive:FindByID(row[3])
   end)
   frame.dataTable = dataTable
 
@@ -138,39 +108,30 @@ function menu:Create(frame)
     if not row or not row[3] then
       return
     end
-    local quest = QuestLog:FindByID(row[3])
+    local quest = QuestArchive:FindByID(row[3])
     if not quest then
-      addon.Logger:Error("No quest found with id", row[3])
+      addon.Logger:Error("No archived quest found with id", row[3])
       return
     end
     return quest
   end
 
   local handlers = {
-    ["toggle"] = function()
-      addon:ShowQuestLog(not(addon.PlayerSettings.IsQuestLogShown))
-    end,
     ["info"] = function()
       local quest = getRowQuest()
       if not quest then return end
-      addon:ShowQuestInfoFrame(true, quest)
+      addon:ShowQuestInfoFrame(true, quest, nil, "TerminatedQuest")
       dataTable:ClearSelection()
     end,
     ["share"] = function()
       local row = dataTable:GetSelectedRow()
-      QuestLog:ShareQuest(row[3])
-    end,
-    ["abandon"] = function()
-      StaticPopups:Show("AbandonQuest", dataTable:GetSelectedItem())
-    end,
-    ["archive"] = function()
-      StaticPopups:Show("ArchiveQuest", dataTable:GetSelectedItem())
+      QuestArchive:ShareQuest(row[3])
     end,
     ["delete"] = function()
-      StaticPopups:Show("DeleteQuest", dataTable:GetSelectedItem())
+      StaticPopups:Show("DeleteArchive", dataTable:GetSelectedItem())
     end,
     ["reset"] = function()
-      StaticPopups:Show("ResetQuestLog", dataTable:GetSelectedItem())
+      StaticPopups:Show("ResetArchive", dataTable:GetSelectedItem())
     end,
   }
 

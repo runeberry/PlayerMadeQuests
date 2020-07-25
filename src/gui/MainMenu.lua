@@ -14,13 +14,14 @@ addon.MainMenu:SetMenuTree({ -- value == menuId
       { value = "demo", text = "Demo Quests" },
       { value = "drafts", text = "My Drafts" },
       { value = "questlog", text = "My Quest Log" },
+      { value = "archive", text = "Quest Archive" },
     }
   },
   { value = "settings", text = "Settings" },
   { value = "help", text = "Help",
     children = {
       { value = "commands", text = "Commands" },
-      { value = "faq", text = "FAQs" }
+      { value = "faq", text = "FAQs" },
     }
   },
 })

@@ -310,7 +310,7 @@ addon.AppEvents:Subscribe("QuestDataLoaded", function()
   isQuestDataLoaded = true
 end)
 
-addon.AppEvents:Subscribe("QuestLogReset", function()
+addon.AppEvents:Subscribe("QuestDataReset", function()
   for _, objective in pairs(objectivesByName) do
     objective._active = {}
   end
