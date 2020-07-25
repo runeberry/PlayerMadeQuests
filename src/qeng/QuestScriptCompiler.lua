@@ -94,7 +94,7 @@ end
 local function yamlToQuest(quest, yaml)
   for cmd, args in pairs(yaml) do
     local command = getCommand(cmd)
-    logger:Trace("Parsing command:", cmd)
+    logger:Trace("Parsing command: %s", cmd)
     command.scripts.Parse(quest, args)
   end
 end
@@ -161,7 +161,7 @@ local function find(query, searchSet, resultSet)
     if query(v) then
       if resultSet[k] then
         -- This doesn't cause problems yet, but it might someday. Keep an eye on it.
-        logger:Warn("QuestScript search: duplicate value for", k,"in result set")
+        logger:Warn("QuestScript search: duplicate value for \"%s\" in result set", k)
       else
         resultSet[k] = v
       end
@@ -174,7 +174,7 @@ end
 function addon.QuestScriptCompiler:Find(query)
   local resultSet = {}
   find(query, addon.QuestScript, resultSet)
-  logger:Trace("QuestScript search:", addon:tlen(resultSet), "results")
+  logger:Trace("QuestScript search: %i results", addon:tlen(resultSet))
   return addon:CopyTable(resultSet)
 end
 
@@ -367,7 +367,7 @@ function addon.QuestScriptCompiler:Compile(script, params)
 
   addon.QuestEngine:Validate(quest)
 
-  logger:Trace("Quest compiled:", quest.questId)
+  logger:Trace("Quest compiled: %s", quest.questId)
   -- addon.Logger:Table(quest)
   return quest
 end

@@ -143,14 +143,14 @@ function addon:DecompressTable(str)
 
   local serialized, msg = LibCompress:Decompress(str)
   if serialized == nil then
-    addon.Logger:Error("Failed to decompress table:", msg)
+    addon.Logger:Error("Failed to decompress table: %s", msg)
     return {}
   end
 
   local ok, t = Ace:Deserialize(serialized)
   if not ok then
     -- 2nd param is an error message if it failed
-    addon.Logger:Error("Failed to deserialize table:", t)
+    addon.Logger:Error("Failed to deserialize table: %s", t)
     return {}
   end
 

@@ -32,7 +32,7 @@ function addon.CustomWidgets:NewWidget(name)
     return {}
   end
   if widgets[name] then
-    addon.UILogger:Warn("Unable to create CustomWidget: widget already exists with name '"..name.."'")
+    addon.UILogger:Warn("Unable to create CustomWidget: widget already exists with name \"%s\"", name)
     return {}
   end
 

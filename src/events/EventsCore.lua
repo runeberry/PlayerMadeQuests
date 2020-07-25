@@ -20,7 +20,7 @@ local function handleEvent(broker, event, ...)
       -- If the handler has a log level, then override the broker's default log level
       logLevel = handler.logLevel
     end
-    broker.logger:Log(logLevel, "Handling "..broker.name..":", event)
+    broker.logger:Log(logLevel, "Handling %s: %s", broker.name, event)
     addon:catch(handler.fn, ...)
   end
 end
@@ -37,7 +37,7 @@ local function processQueue(broker)
 end
 
 local function broker_Publish(self, event, ...)
-  self.logger:Debug("Publishing "..self.name..":", event)
+  self.logger:Debug("Publishing %s: %s", self.name, event)
   local handlers = self.handlersMap[event]
   if addon:tlen(handlers) == 0 then
     -- There are no handlers registered for this event
@@ -89,7 +89,7 @@ local function broker_Subscribe(self, event, handlerFunc, options)
 
   local key = addon:CreateID("subscription-%i")
   handlers[key] = handler
-  self.logger:Trace("Subscribed to "..self.name..":", event)
+  self.logger:Trace("Subscribed to %s: %s", self.name, event)
   return key -- Key can be used to unsubscribe later
 end
 
@@ -118,7 +118,7 @@ local function broker_Unsubscribe(self, event, key)
     self.handlersMap[event] = nil
   end
 
-  self.logger:Trace("Unsubscribed from event:", event)
+  self.logger:Trace("Unsubscribed from event: %s", event)
   return true
 end
 

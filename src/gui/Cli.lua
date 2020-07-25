@@ -16,7 +16,7 @@ SlashCmdList.PMQ = function(msg)
     local cmd = (args[1]):lower()
     local handler = handlers[cmd]
     if not handler then
-      addon.Logger:Warn("Unrecognized command:", cmd)
+      addon.Logger:Warn("Unrecognized command: %s", cmd)
       return
     end
 
@@ -28,9 +28,9 @@ end
 local function dumpToConsole(name, val)
   if type(val) == "table" then
     addon.Logger:Table(val)
-    addon.Logger:Debug("^ Dumped table value for:", name)
+    addon.Logger:Debug("^ Dumped table value for: %s", name)
   else
-    addon.Logger:Debug(name..":", val)
+    addon.Logger:Debug("%s: %s", name, val)
   end
 end
 
@@ -43,7 +43,7 @@ handlers = {
   ["add"] = function(demoId)
     local ok, quest = addon.QuestDemos:CompileDemo(demoId)
     if not ok then
-      addon.Logger:Error("Failed to add demo quest:", quest)
+      addon.Logger:Error("Failed to add demo quest: %s", quest)
       return
     end
     addon.QuestLog:SaveWithStatus(quest, addon.QuestStatus.Active)
@@ -57,7 +57,7 @@ handlers = {
     table.sort(stats, function(a, b) return a.name < b.name end)
     addon.Logger:Info("Logger stats:")
     for _, stat in pairs(stats) do
-      addon.Logger:Info("    ", stat.name, "("..stat.stats.printed, "printed,", stat.stats.received, "received @", stat.levelname..")")
+      addon.Logger:Info("    %s (%i printed, %i received @ %s)", stat.name, stat.stats.printed, stat.stats.received, stat.levelname)
     end
   end,
   ["show"] = function()
@@ -82,7 +82,7 @@ handlers = {
       quest = addon.QuestLog:FindByQuery(function(q) return q.name == nameOrId end)
     end
     if not quest then
-      addon.Logger:Warn("Quest not found:", nameOrId)
+      addon.Logger:Warn("Quest not found: %s", nameOrId)
     else
       dumpToConsole(nameOrId, quest)
     end
@@ -93,7 +93,7 @@ handlers = {
       return
     end
 
-    addon.Logger:Info(name..":", addon.PlayerSettings[name] or "not configured")
+    addon.Logger:Info("%s: %s", name, addon.PlayerSettings[name] or "not configured")
   end,
   ["set"] = function(name, value)
     if not name or not value then
@@ -121,7 +121,7 @@ handlers = {
     if addon.PlayerSettings[name] then
       addon.PlayerSettings[name] = nil
       addon.SaveData:Save("Settings", addon.PlayerSettings)
-      addon.Logger:Info("Cleared setting:", name)
+      addon.Logger:Info("Cleared setting: %s", name)
     end
   end
 }

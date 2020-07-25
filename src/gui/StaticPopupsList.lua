@@ -12,7 +12,7 @@ addon.StaticPopupsList = {
     yesHandler = function(quest)
       QuestLog:SaveWithStatus(quest, QuestStatus.Abandoned)
       addon:PlaySound("QuestAbandoned")
-      addon.Logger:Warn("Quest abandoned:", quest.name)
+      addon.Logger:Warn("Quest abandoned: %s", quest.name)
     end,
   },
   ["ArchiveQuest"] = {
@@ -36,7 +36,7 @@ addon.StaticPopupsList = {
     noText = "Cancel",
     yesHandler = function(quest)
       QuestLog:Delete(quest.questId)
-      addon.Logger:Warn("Quest deleted:", quest.name)
+      addon.Logger:Warn("Quest deleted: %s", quest.name)
     end,
   },
   ["ResetQuestLog"] = {
@@ -85,7 +85,7 @@ addon.StaticPopupsList = {
     noText = "Cancel",
     yesHandler = function(catalogItem)
       addon.QuestCatalog:Delete(catalogItem.quest.questId)
-      addon.Logger:Warn("Catalog item deleted:", catalogItem.quest.name)
+      addon.Logger:Warn("Catalog item deleted: %s", catalogItem.quest.name)
     end,
   },
   ["ExitDraft"] = {
@@ -109,7 +109,7 @@ addon.StaticPopupsList = {
     noText = "Cancel",
     yesHandler = function(draftId, draftName)
       addon.QuestDrafts:Delete(draftId)
-      addon.Logger:Warn("Draft deleted:", draftName)
+      addon.Logger:Warn("Draft deleted: %s", draftName)
     end,
   },
   ["DeleteArchive"] = {
@@ -121,7 +121,7 @@ addon.StaticPopupsList = {
     noText = "Cancel",
     yesHandler = function(quest)
       QuestArchive:Delete(quest.questId)
-      addon.Logger:Warn("Quest removed from archive:", quest.name)
+      addon.Logger:Warn("Quest removed from archive: %s", quest.name)
     end,
   },
   ["ResetArchive"] = {

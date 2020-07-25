@@ -146,9 +146,9 @@ local frameModes = {
     rightButton = buttons.Decline,
     busy = function(frame, quest, sender)
       if sender then
-        addon.Logger:Warn(sender, "invited you to a quest. View it in your Quest Catalog.")
+        addon.Logger:Warn("%s invited you to a quest. View it in your Quest Catalog.", sender)
       else
-        addon.Logger:Warn("Accept or decline this quest before trying to view another one.")
+        addon.Logger:Warn("Close this window before trying to view another quest.")
       end
     end,
     content = function(frame, quest, sender)
@@ -453,7 +453,7 @@ function addon:ShowQuestInfoFrame(flag, quest, sender, modeName)
     end
     local mode = frameModes[modeName]
     if not mode then
-      addon.UILogger:Warn("Unable to show QuestInfoFrame:", modeName, "is not a valid view mode")
+      addon.UILogger:Warn("Unable to show QuestInfoFrame: %s is not a valid view mode", modeName)
       return
     end
     questInfoFrame:ShowQuest(quest, sender, mode)

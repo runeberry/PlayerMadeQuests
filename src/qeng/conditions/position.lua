@@ -21,7 +21,7 @@ loader:AddScript(tokens.PARAM_COORDS, tokens.METHOD_EVAL, function(obj, strTarge
   local pos = addon:GetPlayerLocation()
   local diffX = math.abs(pos.x - targetCoords.x)
   local diffY = math.abs(pos.y - targetCoords.y)
-  -- addon.Logger:Trace("Distance from target coords:", addon:PrettyCoords(diffX, diffY, targetCoords.rad))
+  addon.Logger:Trace("Distance from target coords: (%.2f, %.2f) targeting radius %.2f", diffX, diffY, targetCoords.rad)
   return diffX < targetCoords.rad and diffY < targetCoords.rad
 end)
 

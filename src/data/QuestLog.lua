@@ -72,5 +72,5 @@ function addon.QuestLog:ShareQuest(questId)
 
   catalogItem.metadata.sender = GetUnitName("player", true)
   addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
-  addon.Logger:Info("Sharing quest -", catalogItem.quest.name)
+  addon.Logger:Info("Sharing quest - %s", catalogItem.quest.name)
 end

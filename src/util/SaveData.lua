@@ -41,7 +41,7 @@ function addon.SaveData:Load(field, global)
   else
     value = SavedVariables.PMQCache[field]
   end
-  -- addon.Logger:Debug("SaveData loaded. ("..field..")")
+  -- addon.Logger:Debug("SaveData loaded. (%s)", field)
   return value
 end
 
@@ -77,5 +77,5 @@ function addon.SaveData:Save(field, value, global)
   else
     SavedVariables.PMQCache[field] = value
   end
-  -- addon.Logger:Debug("SaveData saved. ("..field..")")
+  -- addon.Logger:Debug("SaveData saved. (%s)", field)
 end

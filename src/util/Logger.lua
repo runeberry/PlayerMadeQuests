@@ -132,6 +132,26 @@ local function bumpStats(statsTable, isPrinted, level)
   end
 end
 
+local argFormatters = {
+  ["string"] = function(v) return v end,
+  ["number"] = function(v) return v end,
+  ["boolean"] = function(v) return v end,
+  ["table"] = function(v) return tostring(v) end, -- Print table as memory address
+  ["function"] = function(v) return tostring(v) end, -- Print function as memory address
+}
+
+local function toLogMessage(formatString, ...)
+  local args, formatted = { ... }, {}
+  for i, arg in ipairs(args) do
+    formatted[i] = argFormatters[type(arg)](arg)
+  end
+  local ok, msg = pcall(string.format, formatString, unpack(formatted))
+  if not ok then
+    msg = formatString.."[Log format error: "..(msg or "unknown error").."]"
+  end
+  return msg
+end
+
 local logMethods = {
   [lm.Pretty] = function(self, loglevel, str, ...)
     if useLogBuffer then
@@ -140,7 +160,7 @@ local logMethods = {
     end
     -- Log must be "higher priority" than both the instance and global log levels
     if loglevel <= getMinLogLevel(self.name) then
-      print(addon:GetEscapeColor(logcolors[loglevel])..self.prefix, str, ...)
+      print(addon:GetEscapeColor(logcolors[loglevel])..self.prefix, toLogMessage(str, ...))
       bumpStats(self.stats, true, loglevel)
     else
       bumpStats(self.stats, false, loglevel)
@@ -153,7 +173,7 @@ local logMethods = {
     end
     -- Log must be "higher priority" than both the instance and global log levels
     if loglevel <= getMinLogLevel(self.name) then
-      print(self.prefix, str, ...)
+      print(self.prefix, toLogMessage(str, ...))
       bumpStats(self.stats, true, loglevel)
     else
       bumpStats(self.stats, false, loglevel)
@@ -161,7 +181,7 @@ local logMethods = {
   end,
   [lm.SimpleUnbuffered] = function(self, loglevel, str, ...)
     if loglevel <= getMinLogLevel(self.name) then
-      print(self.prefix, str, ...)
+      print(self.prefix, toLogMessage(str, ...))
       bumpStats(self.stats, true, loglevel)
     else
       bumpStats(self.stats, false, loglevel)
@@ -193,7 +213,7 @@ local methods = {
       local val = select(n, ...)
       vals[#vals+1] = tostring(val)
     end
-    self:Log(level, "Variadic args:", addon:Enquote(table.concat(vals, ", "), "[]"))
+    self:Log(level, "Variadic args: [%s]", table.concat(vals, ", "))
   end,
   ["Table"] = function(self, t, key, indent, circ)
     -- These logs are only intended for debugging, so just print them at the lowest visible log level
@@ -206,20 +226,21 @@ local methods = {
     circ = circ or {}
     circ[t] = true
     if key then
-      self:Log(level, indent, key, "=", t, addon:Enquote(addon:tlen(t), "( elements)"))
+      self:Log(level, "%s%s = %s (%i elements)", indent, key, t, addon:tlen(t))
     else
-      self:Log(level, t, addon:Enquote(addon:tlen(t), "( elements)"))
+      -- Root level table is logged differently from nested tables
+      self:Log(level, "%s (%i elements)", t, addon:tlen(t))
     end
     indent = indent.."  "
     for k, v in pairs(t) do
       if type(v) == "table" then
         if circ[v] then
-          self:Log(level, indent, k, "=", v, "(Dupe)")
+          self:Log(level, "%s%s = %s (Dupe)", indent, k, v)
         else
           self:Table(v, k, indent, circ)
         end
       else
-        self:Log(level, indent, k, "=", v)
+        self:Log(level, "%s%s = %s", indent, k, tostring(v))
       end
     end
   end,
@@ -265,13 +286,13 @@ end
 -- Sets a user-defined minimum log level for a given logger
 function addon:SetUserLogLevel(name, level)
   if not loggers[name] then
-    addon.Logger:Warn(name, "is not a known logger.")
+    addon.Logger:Warn("%s is not a known logger.", name)
     return
   end
 
   local value = getLogLevel(level)
   if not value then
-    addon.Logger:Warn(level, "is not a valid log level.");
+    addon.Logger:Warn("%s is not a valid log level.", level);
     return
   end
 
@@ -282,7 +303,7 @@ function addon:SetUserLogLevel(name, level)
   end
   addon.PlayerSettings.Logging[name] = value
   addon.SaveData:Save("Settings", addon.PlayerSettings)
-  addon.Logger:Info("Set log level for", name, "to", level..".")
+  addon.Logger:Info("Set log level for %s to %s.", name, level)
 end
 
 function addon:GetLogStats()
