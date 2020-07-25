@@ -1,21 +1,5 @@
 local _, addon = ...
 
--- incrementing counter unique to a given objective
-local incTable = {}
-local function inc(obj)
-  local qinc = incTable[obj.questId]
-  if not qinc then
-    qinc = {}
-    incTable[obj.questId] = qinc
-  end
-  local incVal = qinc[obj.id]
-  if not incVal then
-    incVal = addon:tlen(qinc) + 1
-    qinc[obj.id] = incVal
-  end
-  return incVal
-end
-
 addon.QuestScriptTokens = {
   OBJ_EMOTE = "emote",
   OBJ_EXPLORE = "explore",
@@ -36,6 +20,7 @@ addon.QuestScriptTokens = {
 
   PARAM_CLASS = "class",
   PARAM_COMPLETION = "completion",
+  PARAM_COORDS = "coords",
   PARAM_DESCRIPTION = "description",
   PARAM_EMOTE = "emote",
   PARAM_FACTION = "faction",
@@ -43,9 +28,6 @@ addon.QuestScriptTokens = {
   PARAM_KILLTARGET = "killtarget",
   PARAM_LEVEL = "level",
   PARAM_NAME = "name",
-  PARAM_POSX = "x",
-  PARAM_POSY = "y",
-  PARAM_RADIUS = "radius",
   -- PARAM_REPUTATION = "reputation",
   -- PARAM_REPUTATION_NAME = "name",
   -- PARAM_REPUTATION_LEVEL = "level",
@@ -55,6 +37,40 @@ addon.QuestScriptTokens = {
   PARAM_ZONE = "zone",
 }
 local t = addon.QuestScriptTokens
+
+-- Common displaytext functions
+local getGoal = function(obj) return obj.goal end
+local getGoal2 = function(obj) if obj.goal > 1 then return obj.goal end end
+local getProgress = function(obj) return obj.progress end
+local getProgress2 = function(obj) if obj.progress < obj.goal then return obj.progress end end
+
+local getX = function(str) local x, y, r = addon:ParseCoords(str); return x end
+local getY = function(str) local x, y, r = addon:ParseCoords(str); return y end
+local getRad = function(str) local x, y, r = addon:ParseCoords(str); return r end
+
+local getXY = function(str)
+  local x, y = addon:ParseCoords(str)
+  return addon:PrettyCoords(x, y)
+end
+local getXYR = function(str)
+  return addon:PrettyCoords(addon:ParseCoords(str))
+end
+
+-- incrementing counter unique to a given objective
+local incTable = {}
+local function getInc(obj)
+  local qinc = incTable[obj.questId]
+  if not qinc then
+    qinc = {}
+    incTable[obj.questId] = qinc
+  end
+  local incVal = qinc[obj.id]
+  if not incVal then
+    incVal = addon:tlen(qinc) + 1
+    qinc[obj.id] = incVal
+  end
+  return incVal
+end
 
 addon.QuestScriptTemplates = {
   -- Template for all top-level QuestScript fields
@@ -70,11 +86,11 @@ addon.QuestScriptTemplates = {
     multiple = true,
     displaytext = {
       vars = {
-        ["g"] = function(obj) return obj.goal end,
-        ["g2"] = function(obj) if obj.goal > 1 then return obj.goal end end,
-        ["p"] = function(obj) return obj.progress end,
-        ["p2"] = function(obj) if obj.progress < obj.goal then return obj.progress end end,
-        ["inc"] = inc,
+        ["g"] = getGoal,
+        ["g2"] = getGoal2,
+        ["p"] = getProgress,
+        ["p2"] = getProgress2,
+        ["inc"] = getInc,
       }
     },
     scripts = {
@@ -87,6 +103,18 @@ addon.QuestScriptTemplates = {
       }
     }
   },
+  ["coordtext"] = {
+    displaytext = {
+      vars = {
+        ["co"] = t.PARAM_COORDS,
+        ["x"] = { arg = t.PARAM_COORDS, fn = getX },
+        ["y"] = { arg = t.PARAM_COORDS, fn = getY },
+        ["r"] = { arg = t.PARAM_COORDS, fn = getRad },
+        ["xy"] = { arg = t.PARAM_COORDS, fn = getXY },
+        ["xyr"] = { arg = t.PARAM_COORDS, fn = getXYR },
+      }
+    }
+  },
   -- Template for all conditions that can be evaluated against in-game data
   ["condition"] = {
     scripts = {
@@ -95,7 +123,7 @@ addon.QuestScriptTemplates = {
   },
   -- Template for start/complete objectives
   ["startcomplete"] = {
-    template = { "toplevel" },
+    template = { "toplevel", "coordtext" },
     contentParsable = true, -- Can be interpreted by ParseObjective
     scripts = {
       [t.METHOD_EVAL] = { required = true },
@@ -104,23 +132,18 @@ addon.QuestScriptTemplates = {
       vars = {
         ["t"] = t.PARAM_TARGET,
         ["z"] = t.PARAM_ZONE,
-        ["x"] = t.PARAM_POSX,
-        ["y"] = t.PARAM_POSY,
         ["sz"] = t.PARAM_SUBZONE,
-        ["r"] = t.PARAM_RADIUS,
       },
-      log = "Go to [%t|[%x:Point #%inc]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
-      quest = "Go to [%t|[%x:(%x, %y)]][[%t|%x]:[[%sz|%z]: in ]][%sz|%z]",
-      full = "Go [%r:within %r units of|to] [%t:%t in :[%x:(%x, %y) in ]][%sz:%sz in ]%z"
+      log = "Go to [%t|[%xy:Point #%inc]][[%t|%xy]:[[%sz|%z]: in ]][%sz|%z]",
+      quest = "Go to [%t|[%xy:(%x, %y)]][[%t|%xy]:[[%sz|%z]: in ]][%sz|%z]",
+      full = "Go [%r:within %r units of|to] [%t:%t in :[%xy:(%x, %y) in ]][%sz:%sz in ]%z"
     },
     params = {
       [t.PARAM_TEXT] = { type = { "string", "table" } },
       [t.PARAM_TARGET] = { template = "condition", multiple = true },
       [t.PARAM_ZONE] = { template = "condition" },
       [t.PARAM_SUBZONE] = { template = "condition" },
-      [t.PARAM_POSX] = { template = "condition", type = "number" },
-      [t.PARAM_POSY] = { template = "condition", type = "number" },
-      [t.PARAM_RADIUS] = { type = "number" },
+      [t.PARAM_COORDS] = { template = "condition" },
     }
   },
   -- Template for quest recommendations and requirements
@@ -181,32 +204,25 @@ local objectives = {
     }
   },
   [t.OBJ_EXPLORE] = {
-    template = "objective",
+    template = { "objective", "coordtext" },
     shorthand = {
       t.PARAM_ZONE,
-      t.PARAM_POSX,
-      t.PARAM_POSY,
-      t.PARAM_RADIUS,
+      t.PARAM_COORDS,
     },
     displaytext = {
       vars = {
         ["z"] = t.PARAM_ZONE,
-        ["x"] = t.PARAM_POSX,
-        ["y"] = t.PARAM_POSY,
         ["sz"] = t.PARAM_SUBZONE,
-        ["r"] = t.PARAM_RADIUS,
       },
-      log = "Go to [%x:Point #%inc in ][%sz|%z]",
-      progress = "[%x:Point #%inc in ][%sz|%z] explored: %p/%g",
-      quest = "Explore [%x:Point #%inc in ][%sz:%sz in ]%z",
-      full = "Go [%r:within %r units of|to] [%x:(%x, %y) in ][%sz:%sz in ]%z"
+      log = "Go to [%co:Point #%inc in ][%sz|%z]",
+      progress = "[%co:Point #%inc in ][%sz|%z] explored: %p/%g",
+      quest = "Explore [%co:Point #%inc in ][%sz:%sz in ]%z",
+      full = "Go to [%co:%xyr in ][%sz:%sz in ]%z"
     },
     params = {
       [t.PARAM_ZONE] = { template = "condition" },
       [t.PARAM_SUBZONE] = { template = "condition" },
-      [t.PARAM_POSX] = { template = "condition", type = "number" },
-      [t.PARAM_POSY] = { template = "condition", type = "number" },
-      [t.PARAM_RADIUS] = { type = "number" },
+      [t.PARAM_COORDS] = { template = "condition" },
     }
   },
   [t.OBJ_KILL] = {

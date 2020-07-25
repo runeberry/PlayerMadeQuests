@@ -5,32 +5,57 @@ addon.QuestScriptLocalizer = {}
 local localizables = {}
 local rules -- defined below
 
-local function parseConditionValueText(obj, condName)
-  local condVal = obj.conditions and obj.conditions[condName]
-    if condVal == nil then return end
+-- If the condition value is a table of values, then returns each value in that table
+-- in a reader-friendly comma-separated string, with the last two items separated by "or"
+local function defaultConditionTextHandler(condVal)
+  if condVal == nil then return end
 
-  if type(condVal) ~= "table" then
-    return condVal
-  end
-
-  local len = addon:tlen(condVal)
-  if len == 0 then return end
-  if len == 1 then
-    for v in pairs(condVal) do
-      return v
-    end
-  elseif len > 1 then
-    local ret = ""
-    local i = 1
-    for v in pairs(condVal) do
-      if i == len then
-        return ret.." or "..v
-      else
-        ret = ret..", "..v
+  if type(condVal) == "table" then
+    local len, result = addon:tlen(condVal), ""
+    if len == 1 then
+      for v in pairs(condVal) do
+        result = v
       end
-      i = i + 1
+    elseif len > 1 then
+      local i = 1
+      for v in pairs(condVal) do
+        if i == len then
+          return result.." or "..v
+        else
+          result = result..", "..v
+        end
+        i = i + 1
+      end
     end
+    condVal = result
   end
+
+  return condVal
+end
+
+local function parseConditionValueText(obj, handlerArg, handlerFn)
+  local arg
+  if handlerArg then
+    arg = obj.conditions[handlerArg]
+    if not arg then
+      addon.UILogger:Warn("Failed to parse display text: objective has no var for", handlerArg)
+      return
+    end
+  else
+    arg = obj
+  end
+
+  local result
+  if handlerFn then
+    result = handlerFn(arg)
+  else
+    if not handlerArg then
+      addon.UILogger:Warn("Failed to parse display text: a param name must be provided to use the default text handler")
+      return
+    end
+    result = defaultConditionTextHandler(arg)
+  end
+  return result
 end
 
 local function populateDisplayText(text, obj)
@@ -84,30 +109,43 @@ rules = {
     },
     { -- Any %var gets the value for the mapped condition returned
       pattern = "%%%w+",
-      fn = function(str, obj)
+      fn = function(pctstr, obj)
         -- print("     match: %var", str)
         local template = localizables[obj.name]
-        if not template then return str end
+        if not template then return pctstr end -- objective does not have any localizable content
 
-        str = str:sub(2) -- Remove the leading %
+        local str = pctstr:sub(2) -- Remove the leading %
         local handler
         local dt = localizables[obj.name].displaytext
         if dt and dt.vars then
           handler = dt.vars[str]
         end
-        if type(handler) == "string" then
-          -- Token values represent the name of the condition value to return
-          -- print("     ^ handler:", handler)
-          return parseConditionValueText(obj, handler) or ""
+        if not handler then return pctstr end -- objective has no displaytext handler for this var name
+
+        -- Handlers under displaytext.vars[varname] can be registered in multiple ways, but two values are required:
+        --   * fn: given some context, returns the value to be displayed (will be converted to string)
+        --   * arg: a token name to define which param value should be passed to the fn
+        -- This can be registed as a displaytext var in the following ways:
+        --   * table: consisting of one or both of the above properties
+        --   * string: the param name - a default handler fn will be used
+        --   * function: a handler - the whole objective will be passed as a parameter
+        local result
+        if type(handler) == "table" then
+          -- print("     ^ handler: table", addon:Enquote(handler.arg, "()"))
+          result = parseConditionValueText(obj, handler.arg, handler.fn)
+        elseif type(handler) == "string" then
+          -- print("     ^ handler: string", addon:Enquote(handler, "()"))
+          result = parseConditionValueText(obj, handler, nil)
         elseif type(handler) == "function" then
-          -- Var handlers can be configured inline within QuestScript
           -- print("     ^ handler: function")
-          return tostring(handler(obj) or "")
+          result = parseConditionValueText(obj, nil, handler)
         else
-          -- No valid handler found, return it raw
-          -- print("     ^ handler: none")
-          return "%"..str
+          -- print("     ^ handler: not found", addon:Enquote(pctstr, "()"))
+          result = pctstr
         end
+
+        if result == nil then return "" end
+        return tostring(result)
       end
     }
   },

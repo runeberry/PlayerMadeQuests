@@ -111,15 +111,14 @@ objectives:
     script = [[
 objectives:
   - explore "Elwynn Forest"
-  - explore "Elwynn Forest" 40.2 74.6
+  - explore "Elwynn Forest" 40.2,74.6
   - explore:
       zone: "Elwynn Forest"
       subzone: "Lion's Pride Inn"
   - explore:
       zone: "Elwynn Forest"
       subzone: "Goldshire"
-      x: 39.5
-      y: 64.5]]
+      coords: 39.5, 64.5]]
   },
   {
     demoId = "tutorial-explore-horde",
@@ -131,15 +130,14 @@ objectives:
     script = [[
 objectives:
   - explore Durotar
-  - explore Durotar 48 12.2
+  - explore Durotar 48,12.2
   - explore:
       zone: Durotar
       subzone: "Skull Rock"
   - explore:
       zone: Durotar
       subzone: "Jaggedswine Farm"
-      x: 48.7
-      y: 17.2]]
+      coords: 48.7, 17.2]]
   },
   {
     demoId = "tutorial-startcomplete-ally",

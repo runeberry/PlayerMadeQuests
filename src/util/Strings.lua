@@ -149,3 +149,14 @@ function addon:ParseCoords(str)
   if radius then radius = tonumber(radius) end
   return x, y, radius
 end
+
+-- Returns two coordinate values as: "(x, y)"
+-- If a radius is included, returns as: "(x, y) +/- r"
+local function trimDec(num) return string.format("%.2f", num):gsub("%.?0+$", "") end
+function addon:PrettyCoords(x, y, radius)
+  local coords = string.format("(%s, %s)", trimDec(x), trimDec(y))
+  if radius then
+    coords = coords.." +/- "..trimDec(radius)
+  end
+  return coords
+end

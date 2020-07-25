@@ -197,7 +197,7 @@ describe("QuestScriptCompiler", function()
         }
       },
       {
-        objective = "explore Westfall 25.2 38.4",
+        objective = "explore Westfall 25.2,38.4",
         expected = {
           log = "Go to Point #1 in Westfall",
           progress = "Point #1 in Westfall explored: 0/1",
@@ -215,21 +215,21 @@ describe("QuestScriptCompiler", function()
         }
       },
       {
-        objective = "explore: { zone: Elwynn Forest, x: 32, y: 20, radius: 5 }",
+        objective = "explore: { zone: Elwynn Forest, coords: '32, 20, 5' }",
         expected = {
           log = "Go to Point #1 in Elwynn Forest",
           progress = "Point #1 in Elwynn Forest explored: 0/1",
           quest = "Explore Point #1 in Elwynn Forest",
-          full = "Go within 5 units of (32, 20) in Elwynn Forest"
+          full = "Go to (32, 20) +/- 5 in Elwynn Forest"
         }
       },
       {
-        objective = "explore: { zone: Elwynn Forest, subzone: Goldshire, x: 32, y: 20, radius: 5 }",
+        objective = "explore: { zone: Elwynn Forest, subzone: Goldshire, coords: \"32,20,5\" }",
         expected = {
           log = "Go to Point #1 in Goldshire",
           progress = "Point #1 in Goldshire explored: 0/1",
           quest = "Explore Point #1 in Goldshire in Elwynn Forest",
-          full = "Go within 5 units of (32, 20) in Goldshire in Elwynn Forest"
+          full = "Go to (32, 20) +/- 5 in Goldshire in Elwynn Forest"
         }
       },
       {
