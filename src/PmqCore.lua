@@ -7,11 +7,10 @@ addon.IsAddonLoaded = false
 
 function addon.Ace:OnInitialize()
   addon:catch(function()
-    -- addon.Logger:NewLogger("test")
     addon.IsAddonLoaded = true
     addon:load()
     addon.SaveData:Init()
-    addon.Logger:Info("PlayerMadeQuests loaded. Type "..addon:Colorize("orange", "/pmq").." to open the main menu.")
+    addon.Logger:Info("PlayerMadeQuests loaded. Type %s to open the main menu", addon:Colorize("orange", "/pmq"))
   end)
 end
 
@@ -30,7 +29,7 @@ function addon:catch(fn, ...)
   if not(ok) then
     -- Uncomment this as an escape hatch to print errors if logging breaks
     -- print("Lua script error") if result then print(result) end
-    addon.Logger:Error("Lua script error:", result)
+    addon.Logger:Error("Lua script error: %s", result)
   end
   return ok, result, r2, r3, r4
 end

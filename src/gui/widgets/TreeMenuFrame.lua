@@ -85,7 +85,7 @@ local methods = {
   ["NewMenuScreen"] = function(self, menuId, headingText)
     local st = { headingText = headingText }
     if self._menus[menuId] then
-      addon.UILogger:Error("Failed to register NewMenuScreen: screen already exists with id", menuId)
+      addon.UILogger:Error("Failed to register NewMenuScreen: screen already exists with id %s", menuId)
       return st
     end
     self._menus[menuId] = st
@@ -111,10 +111,10 @@ local methods = {
     if menuId then
       local ok, screen = pcall(getOrCreateScreen, self, menuId)
       if not ok then
-        addon.UILogger:Error("Failed to create menu screen"..menuId..":", screen)
+        addon.UILogger:Error("Failed to create menu screen %s: %s", menuId, screen)
         return
       elseif not screen then
-        addon.UILogger:Warn("No screen registered with id:", menuId)
+        addon.UILogger:Warn("No screen registered with id: %s", menuId)
         return
       end
 
@@ -124,7 +124,7 @@ local methods = {
       end
       self._selectedScreen = screen
 
-      addon.UILogger:Trace("Showing menu with id:", menuId)
+      addon.UILogger:Trace("Showing menu with id: %s", menuId)
       screen:OnShowMenu(...)
       screen:Show()
     end

@@ -115,13 +115,13 @@ local function getGlobalPopup(name)
 
   local template = addon.StaticPopupsList[name]
   if not template then
-    addon.UILogger:Error("No popup template exists with name:", name)
+    addon.UILogger:Error("No popup template exists with name: %s", name)
     return
   end
 
   local popup = buildPopup(template, globalId)
   StaticPopupDialogs[globalId] = popup
-  addon.UILogger:Trace("Registered static popup:", name)
+  addon.UILogger:Trace("Registered static popup: %s", name)
 
   return popup
 end

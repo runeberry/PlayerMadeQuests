@@ -28,7 +28,7 @@ addon.MessageEvents:EnableAsync()
 --]]
 
 local function onCommReceived(prefix, message, distribution, sender)
-  addon.Logger:Trace("Message received for", distribution, "from", sender)
+  addon.Logger:Trace("Message received for %s from %s", distribution, sender)
   if sender == playerName then return end -- Don't handle messages that you also sent out
   local decoded = encoder:Decode(message)
   local payload = addon:DecompressTable(decoded)

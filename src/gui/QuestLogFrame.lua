@@ -63,7 +63,6 @@ local function SavePosition()
   end
   local w, h = widget.frame:GetSize()
   addon.PlayerSettings.QuestLogPosition = strjoin(",", p1, p2, x, y, w, h)
-  -- addon.UILogger:Debug("Saving position:", p1, p2, x, y, w, h)
 end
 
 local function LoadPosition()

@@ -118,13 +118,11 @@ end
 --]]
 function addon.QuestScriptLoader:AddScript(itemName, methodName, fn)
   if not itemName or itemName == "" then
-    logger:Error("AddScript: itemName is required")
-    logger:Debug("methodName:", methodName)
+    logger:Error("AddScript: itemName is required (methodName: %s)", methodName)
     return
   end
   if not methodName or methodName == "" then
-    logger:Error("AddScript: methodName is required")
-    logger:Debug("itemName:", itemName)
+    logger:Error("AddScript: methodName is required (itemName: %s)", itemName)
     return
   end
 
@@ -135,7 +133,7 @@ function addon.QuestScriptLoader:AddScript(itemName, methodName, fn)
   end
 
   if existing[methodName] then
-    logger:Error("AddScript: script is already registered for", itemName, "with name", methodName)
+    logger:Error("AddScript: script is already registered for %s with name %s", itemName, methodName)
     return
   end
 

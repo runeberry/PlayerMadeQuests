@@ -14,7 +14,7 @@ local function button_Start()
   if not currentDemoId then return end
   local ok, quest = addon.QuestDemos:CompileDemo(currentDemoId)
   if not ok then
-    addon.Logger:Error("Failed to accept demo quest:", quest)
+    addon.Logger:Error("Failed to accept demo quest: %s", quest)
     return
   end
   addon.QuestDemos:StartDemo(currentDemoId)
@@ -60,7 +60,7 @@ function menu:OnShowMenu(frame, demoId)
   currentDemoId = demoId
   local demo = QuestDemos:FindByID(demoId)
   if not demo then
-    addon.Logger:Error("No demo available with id:", demoId)
+    addon.Logger:Error("No demo available with id: %s", demoId)
     error("No demo available with id:", demoId)
     return
   end

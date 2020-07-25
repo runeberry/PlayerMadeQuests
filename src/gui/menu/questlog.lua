@@ -140,7 +140,7 @@ function menu:Create(frame)
     end
     local quest = QuestLog:FindByID(row[3])
     if not quest then
-      addon.Logger:Error("No quest found with id", row[3])
+      addon.Logger:Error("No quest found with id: %s", row[3])
       return
     end
     return quest

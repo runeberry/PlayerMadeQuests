@@ -96,7 +96,7 @@ local function indexAllData(repo)
       addItemToIndex(indexTable, item, indexProp)
     end
   end
-  -- repo.logger:Trace("Reindexed repository:", addon:tlen(repo.index), "index(es)")
+  repo.logger:Trace("Reindexed repository")
 end
 
 local function deindexAllData(repo)
@@ -189,8 +189,7 @@ local function ta_Run(self)
         self:Log("Undoing transaction step:", i)
         undoOk, undoErr = pcall(t.undo)
         if not undoOk then
-          logger:Fatal("Transaction undo failed. Repository may be in a bad state!")
-          logger:Fatal(undoErr)
+          logger:Fatal("Transaction undo failed. Repository may be in a bad state!\n%s", undoErr)
           break
         end
       else
@@ -231,7 +230,7 @@ local methods = {
         table.insert(results, addon:CopyTable(item))
       end
     end
-    self.logger:Trace("FindAll:", #results, "result(s)")
+    self.logger:Trace("FindAll: %i result(s)", #results)
     return results
   end,
   ["FindByID"] = function(self, id)
@@ -241,17 +240,17 @@ local methods = {
       result = addon:CopyTable(result)
     end
 
-    self.logger:Trace("FindByID =", id, ":", count, "result(s)")
+    self.logger:Trace("FindByID = %s: %i", tostring(id), count)
     return result
   end,
   ["FindByIndex"] = function(self, indexProp, indexValue)
     if type(indexProp) ~= "string" then
-      self.logger:Error("Failed to FindByIndex:", type(indexProp), "is not a valid property name")
+      self.logger:Error("Failed to FindByIndex: %s is not a valid property name", type(indexProp))
       return nil
     end
     local indexTable = self.index[indexProp]
     if not indexTable then
-      self.logger:Error("Failed to FindByIndex: no index exists for property", indexProp)
+      self.logger:Error("Failed to FindByIndex: no index exists for property %s", indexProp)
       return nil
     end
 
@@ -272,12 +271,12 @@ local methods = {
       result = {}
     end
 
-    self.logger:Trace("FindByIndex", indexProp, "=", indexValue, ":", count, "result(s)")
+    self.logger:Trace("FindByIndex %s = %s: %i result(s)", indexProp, tostring(indexValue), count)
     return result
   end,
   ["FindByQuery"] = function(self, queryFunction)
     if type(queryFunction) ~= "function" then
-      self.logger:Error("Failed to FindByQuery:", type(queryFunction) "is not a valid query function")
+      self.logger:Error("Failed to FindByQuery: %s is not a valid query function", type(queryFunction))
       return {}
     end
     local results = {}
@@ -289,7 +288,7 @@ local methods = {
         table.insert(results, item)
       end
     end
-    self.logger:Trace("FindByQuery:", #results, "results")
+    self.logger:Trace("FindByQuery: %i result(s)", #results)
     return results
   end,
   -------------------
@@ -409,11 +408,11 @@ local methods = {
     end
     local ok, err = transaction:Run()
     if not ok then
-      self.logger:Error("Failed to Save:", err)
+      self.logger:Error("Failed to Save: %s", err)
       return
     end
     if event then
-      self.logger:Trace(msg, ":", entity[self.pkey])
+      self.logger:Trace("%s: %s", msg, entity[self.pkey])
       addon.AppEvents:Publish(event, entity)
       writeSaveData(self)
     end
@@ -428,12 +427,12 @@ local methods = {
       id = id[self.pkey]
     end
     if not id then
-      self.logger:Error("Failed to Delete:", self.pkey, "is required")
+      self.logger:Error("Failed to Delete: %s is required", self.pkey)
       return
     end
     local existing = findEntitiesByIndex(self, self.pkey, id)
     if not existing then
-      self.logger:Trace("Nothing to delete for id:", id)
+      self.logger:Trace("Nothing to delete for id: %s", id)
       return
     end
 
@@ -448,11 +447,11 @@ local methods = {
 
     local ok, err = transaction:Run()
     if not ok then
-      self.logger:Error("Failed to Delete:", err)
+      self.logger:Error("Failed to Delete: %s", err)
       return
     end
 
-    self.logger:Trace("Entity deleted:", id)
+    self.logger:Trace("Entity deleted: %s", id)
     writeSaveData(self)
     addon.AppEvents:Publish(self.events.EntityDeleted, existing)
   end,
@@ -476,15 +475,15 @@ local methods = {
   --------------------
   ["AddIndex"] = function(self, indexProp, options)
     if self.index[indexProp] then
-      self.logger:Warn("Index already exists for property:", indexProp)
+      self.logger:Warn("Index already exists for property: %s", indexProp)
       return
     end
     local result, indexTable = pcall(createIndexTable, self.data, indexProp, options)
     if not result then
-      self.logger:Error("Failed to AddIndex:", indexTable)
+      self.logger:Error("Failed to AddIndex: %s", indexTable)
       return
     end
-    self.logger:Trace("Added index on property", indexProp)
+    self.logger:Trace("Added index on property: %s", indexProp)
     self.index[indexProp] = indexTable
   end,
   ["SetSaveDataSource"] = function(self, saveDataField)
@@ -507,11 +506,11 @@ local methods = {
       end)
       local ok, err = transaction:Run()
       if not ok then
-        self.logger:Error("Failed to SetSaveDataSource:", err)
+        self.logger:Error("Failed to SetSaveDataSource: %s", err)
         return
       end
       self._hasDataSource = true
-      -- self.logger:Trace("SetSaveDataSource to", saveDataField, ":", addon:tlen(self.data), "item(s)")
+      self.logger:Trace("SetSaveDataSource to %s: %i item(s)", saveDataField, addon:tlen(self.data))
       addon.AppEvents:Publish(self.events.EntityDataLoaded, self)
     end)
   end,
@@ -521,7 +520,7 @@ local methods = {
       return
     end
     if type(dataSource) ~= "table" then
-      self.logger:Error("Failed to SetTableSource: expected table, got", type(dataSource))
+      self.logger:Error("Failed to SetTableSource: expected table, got %s", type(dataSource))
       return
     end
     local transaction = newTransaction(self)
@@ -539,7 +538,7 @@ local methods = {
     end)
     local ok, err = transaction:Run()
     if not ok then
-      self.logger:Error("Failed to SetTableSource:", err)
+      self.logger:Error("Failed to SetTableSource: %s", err)
       return
     end
     self._hasDataSource = true
@@ -608,6 +607,6 @@ function addon:NewRepository(name, pkey)
   })
 
   repos[name] = repo
-  logger:Trace("NewRepository:", name)
+  logger:Trace("NewRepository: %s", name)
   return repo
 end

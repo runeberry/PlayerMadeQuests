@@ -36,7 +36,7 @@ end
 function addon.QuestDemos:StartDemo(demoId)
   local ok, quest = self:CompileDemo(demoId)
   if not ok then
-    addon.Logger:Error("Unable to start demo quest:", quest)
+    addon.Logger:Error("Unable to start demo quest: %s", quest)
     return
   end
   addon:ShowQuestInfoFrame(true, quest)

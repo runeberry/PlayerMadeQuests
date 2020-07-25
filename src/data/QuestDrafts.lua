@@ -65,7 +65,7 @@ end
 function addon.QuestDrafts:CatalogDraft(draftId)
   local ok, quest = self:CompileDraft(draftId)
   if not ok then
-    addon.Logger:Error("Failed to catalog draft:", quest)
+    addon.Logger:Error("Failed to catalog draft: %s", quest)
     return
   end
 
@@ -96,13 +96,13 @@ function addon.QuestDrafts:ShareDraft(draftId)
 
   catalogItem.metadata.sender = GetUnitName("player", true)
   addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
-  addon.Logger:Info("Sharing quest -", catalogItem.quest.name)
+  addon.Logger:Info("Sharing quest - %s", catalogItem.quest.name)
 end
 
 function addon.QuestDrafts:StartDraft(draftId)
   local ok, quest = self:CompileDraft(draftId)
   if not ok then
-    addon.Logger:Error("Failed to start draft:", quest)
+    addon.Logger:Error("Failed to start draft: %s", quest)
     return
   end
   addon:ShowQuestInfoFrame(true, quest)

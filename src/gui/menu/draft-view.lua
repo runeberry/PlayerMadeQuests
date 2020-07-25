@@ -39,7 +39,7 @@ local function button_Save()
   writeFields(currentDraft)
   QuestDrafts:Save(currentDraft)
   cleanForm()
-  addon.Logger:Info("Draft Saved -", currentDraft.parameters.name)
+  addon.Logger:Info("Draft Saved - %s", currentDraft.parameters.name)
 end
 
 local function button_Back()
@@ -54,8 +54,7 @@ local function button_Validate()
   if not currentDraft then return end
   local ok, quest = compile()
   if not ok then
-    addon.Logger:Warn("Your quest contains an error:")
-    addon.Logger:Warn(quest)
+    addon.Logger:Warn("Your quest contains an error:\n%s", quest)
     return
   end
   addon.Logger:Info("Your quest looks good! No errors detected.")
@@ -91,7 +90,7 @@ function menu:OnShowMenu(frame, draftId)
   if draftId then
     currentDraft = QuestDrafts:FindByID(draftId)
     if not currentDraft then
-      addon.Logger:Error("No draft available with id:", draftId)
+      addon.Logger:Error("No draft available with id: %s", draftId)
       return
     end
   else

@@ -70,19 +70,19 @@ end
 function addon.QuestCatalog:ShareFromCatalog(questId)
   local catalogItem = self:FindByID(questId)
   if not catalogItem then
-    addon.Logger:Error("Failed to ShareFromCatalog: no item with id", questId)
+    addon.Logger:Error("Failed to ShareFromCatalog: no item with id %s", questId)
     return
   end
 
   catalogItem.metadata.sender = GetUnitName("player", true)
   addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
-  addon.Logger:Info("Sharing quest -", catalogItem.quest.name)
+  addon.Logger:Info("Sharing quest - %s", catalogItem.quest.name)
 end
 
 function addon.QuestCatalog:StartFromCatalog(questId)
   local catalogItem = self:FindByID(questId)
   if not catalogItem then
-    addon.Logger:Error("Failed to StartFromCatalog: no item with id", questId)
+    addon.Logger:Error("Failed to StartFromCatalog: no item with id %s", questId)
     return
   end
   addon:ShowQuestInfoFrame(true, catalogItem.quest)
@@ -111,20 +111,20 @@ addon:onload(function()
     end
 
     addon.QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Invited)
-    addon.Logger:Warn(sender, "has invited you to a quest:", catalogItem.quest.name)
+    addon.Logger:Warn("%s has invited you to a quest: %s", sender, catalogItem.quest.name)
     addon:ShowQuestInfoFrame(true, catalogItem.quest, sender)
   end)
 
   addon.MessageEvents:Subscribe("QuestInviteAccepted", function(distribution, sender, questId)
-    addon.Logger:Warn(sender, "accepted your quest.")
+    addon.Logger:Warn("%s accepted your quest.", sender)
   end)
   addon.MessageEvents:Subscribe("QuestInviteDeclined", function(distribution, sender, questId)
-    addon.Logger:Warn(sender, "declined your quest.")
+    addon.Logger:Warn("%s declined your quest.", sender)
   end)
   addon.MessageEvents:Subscribe("QuestInviteDuplicate", function(distribution, sender, questId, status)
-    addon.Logger:Warn(sender, "already has that quest.")
+    addon.Logger:Warn("%s already has that quest.", sender)
   end)
   addon.MessageEvents:Subscribe("QuestInviteRequirements", function(distribution, sender, questId)
-    addon.Logger:Warn(sender, "does not meet the requirements for that quest.")
+    addon.Logger:Warn("%s does not meet the requirements for that quest.", sender)
   end)
 end)

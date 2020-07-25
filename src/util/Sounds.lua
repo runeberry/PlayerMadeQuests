@@ -31,7 +31,7 @@ local sounds = {
 function addon:PlaySound(name)
   local sound = sounds[name]
   if not sound then
-    addon.Logger:Warn("No sound registered with name:", name)
+    addon.Logger:Warn("No sound registered with name: %s", name)
     return
   end
 

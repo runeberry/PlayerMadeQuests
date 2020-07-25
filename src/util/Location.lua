@@ -49,7 +49,7 @@ function addon:GetPlayerLocation(refresh)
 
   if doPublish then
     addon.AppEvents:Publish("PlayerLocationChanged", playerLocation)
-    logger:Trace("Player location changed", "("..string.format("%.2f", loc.x)..", "..string.format("%.2f", loc.y)..")")
+    logger:Trace("Player location changed: (%.2f, %.2f)", loc.x, loc.y)
   end
 
   return playerLocation
