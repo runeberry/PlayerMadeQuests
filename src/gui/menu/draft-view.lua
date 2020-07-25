@@ -28,6 +28,12 @@ local function writeFields(draft)
   draft.script = currentFrame.scriptEditor:GetText()
 end
 
+local function compile()
+  local draftCopy = addon:CopyTable(currentDraft)
+  writeFields(draftCopy)
+  return addon.QuestScriptCompiler:TryCompile(draftCopy.script, draftCopy.parameters)
+end
+
 local function button_Save()
   if not currentDraft then return end
   writeFields(currentDraft)
@@ -42,12 +48,6 @@ local function button_Back()
   else
     navBack()
   end
-end
-
-local function compile()
-  local draftCopy = addon:CopyTable(currentDraft)
-  writeFields(draftCopy)
-  return addon.QuestScriptCompiler:TryCompile(currentDraft.script, currentDraft.parameters)
 end
 
 local function button_Validate()
