@@ -9,7 +9,7 @@ When you enter a zone or subzone in which you have an objective to explore certa
 ### Shorthand
 
 ```yaml
-  - explore {zone} {x*} {y*} {radius*}
+  - explore {zone} {coords*}
 ```
 
 *optional
@@ -18,16 +18,19 @@ When you enter a zone or subzone in which you have an objective to explore certa
 
 |Parameter|How it's used
 |-|-
+|**[coords](../parameters/coords.md)**|The precise coordinates to explore in the specified zone
 |**[text](../parameters/text.md)**|Custom display text for this objective
-|**[x<br/>y<br/>radius](../parameters/coords.md)**|The coordinates to explore, and how close you must get to explore them
 |**[zone<br/>subzone](../parameters/zone.md)**|The name of the zone and/or subzone to explore
 
 ### Custom text variables
 
 |Variable|Parameter
 |-|-
-|**%r**|radius
-|**%sz**|subzone
-|**%x**|x
-|**%y**|y
 |**%z**|zone
+|**%sz**|subzone
+|**%co**|coords
+|**%x**|x-coordinate of coords
+|**%y**|y-coordinate of coords
+|**%r**|radius of coords
+|**%xy**|coords formatted as: `(x, y)`
+|**%xyr**|coords formatted as: `(x, y) +/- radius`
