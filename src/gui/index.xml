@@ -23,6 +23,7 @@
   <Script file="gui/YamlFormatting.lua"/>
 
   <!-- MainMenu screens -->
+  <Script file="gui/menu/archive.lua"/>
   <Script file="gui/menu/catalog.lua"/>
   <Script file="gui/menu/commands.lua"/>
   <Script file="gui/menu/demo.lua"/>

@@ -1,5 +1,6 @@
 local _, addon = ...
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
+local QuestArchive = addon.QuestArchive
 
 addon.StaticPopupsList = {
   ["AbandonQuest"] = {
@@ -62,6 +63,10 @@ addon.StaticPopupsList = {
     noText = "Cancel",
     yesHandler = function(quest)
       QuestLog:SaveWithStatus(quest, QuestStatus.Active)
+      if QuestArchive:FindByID(quest.questId) then
+        -- If the quest was in the archive, remove it from there
+        QuestArchive:Delete(quest.questId)
+      end
     end,
   },
   ["StartQuestBelowRequirements"] = {
@@ -105,6 +110,29 @@ addon.StaticPopupsList = {
     yesHandler = function(draftId, draftName)
       addon.QuestDrafts:Delete(draftId)
       addon.Logger:Warn("Draft deleted:", draftName)
+    end,
+  },
+  ["DeleteArchive"] = {
+    message = function(quest)
+      return "Are you sure you want to delete "..addon:Enquote(quest.name, '""?\n')..
+             "This will delete the quest entirely from your archive, and PMQ will forget you ever had it!"
+    end,
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function(quest)
+      QuestArchive:Delete(quest.questId)
+      addon.Logger:Warn("Quest removed from archive:", quest.name)
+    end,
+  },
+  ["ResetArchive"] = {
+    message = "Are you sure you want to reset your quest archive?\n"..
+              "This will remove all quests from your archive, and PMQ will forget you ever had them!",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function()
+      QuestArchive:DeleteAll()
+      addon:PlaySound("QuestAbandoned")
+      addon.Logger:Warn("Quest Archive reset")
     end,
   },
 }
