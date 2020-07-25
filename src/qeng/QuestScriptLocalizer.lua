@@ -37,10 +37,8 @@ local function parseConditionValueText(obj, handlerArg, handlerFn)
   local arg
   if handlerArg then
     arg = obj.conditions[handlerArg]
-    if not arg then
-      addon.UILogger:Warn("Failed to parse display text: objective has no var for", handlerArg)
-      return
-    end
+    -- If objective doesn't have a value for this condition, simply return nothing
+    if not arg then return end
   else
     arg = obj
   end
