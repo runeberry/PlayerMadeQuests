@@ -135,4 +135,16 @@ addon.StaticPopupsList = {
       addon.Logger:Warn("Quest Archive reset")
     end,
   },
+  ["ResetSaveData"] = {
+    message = "Are you sure you want to clear all save data?\n"..
+              "This will remove all drafts, quests, quest progress, and settings from PMQ.\n"..
+              "Once you click, there is no going back! This cannot be undone!",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function()
+      addon.SaveData:ClearAll()
+      addon.SaveData:ClearAll(true)
+      addon.G.ReloadUI()
+    end,
+  },
 }

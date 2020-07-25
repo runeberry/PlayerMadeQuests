@@ -1,4 +1,5 @@
 local _, addon = ...
+local logger = addon.Logger:NewLogger("SaveData")
 
 local SavedVariables = {
   PMQCache = false,
@@ -9,6 +10,14 @@ addon.SaveData = {}
 addon.PlayerSettings = nil
 addon.GlobalSettings = nil
 addon.SaveDataLoaded = false
+
+local function getSaveTable(global)
+  if global then
+    return SavedVariables.PMQGlobalCache
+  else
+    return SavedVariables.PMQCache
+  end
+end
 
 function addon.SaveData:Init()
   if addon.SaveDataLoaded then return end
@@ -21,6 +30,7 @@ function addon.SaveData:Init()
     SavedVariables[varname] = saved
   end
   addon.SaveDataLoaded = true
+  logger:Debug("SaveData loaded")
 
   -- These are such frequently used tables, just make them easily accessible
   addon.PlayerSettings = self:LoadTable("Settings")
@@ -32,16 +42,9 @@ end
 -- Returns the value of the specified field from SavedVariables
 -- If the value is a table, then a copy of the saved table is returned
 function addon.SaveData:Load(field, global)
-  if not addon.SaveDataLoaded then
-    error("Cannot Load: SaveData not ready")
-  end
-  local value
-  if global then
-    value = SavedVariables.PMQGlobalCache[field]
-  else
-    value = SavedVariables.PMQCache[field]
-  end
-  -- addon.Logger:Debug("SaveData loaded. (%s)", field)
+  assert(addon.SaveDataLoaded, "Failed to Load field"..field..": SaveData not loaded")
+  local value = getSaveTable(global)[field]
+  logger:Trace("SaveData field loaded: %s", field)
   return value
 end
 
@@ -69,13 +72,24 @@ end
 
 -- Saves the value to the specified field in SavedVariables
 function addon.SaveData:Save(field, value, global)
-  if not addon.SaveDataLoaded then
-    error("Cannot Save: SaveData not ready")
+  assert(addon.SaveDataLoaded, "Failed to Save field"..field..": SaveData not loaded")
+  getSaveTable(global)[field] = value
+  logger:Trace("SaveData field saved: %s", field)
+end
+
+-- Saves nil to the specified field in SavedVariables
+function addon.SaveData:Clear(field, global)
+  assert(addon.SaveDataLoaded, "Failed to Clear field "..field..": SaveData not loaded")
+  getSaveTable(global)[field] = nil
+  logger:Debug("SaveData field cleared: %s", field)
+end
+
+-- Resets all SavedVariables
+function addon.SaveData:ClearAll(global)
+  assert(addon.SaveDataLoaded, "Failed to ClearAll: SaveData not loaded")
+  local t = getSaveTable(global)
+  for k, _ in pairs(t) do
+    t[k] = nil
   end
-  if global then
-    SavedVariables.PMQGlobalCache[field] = value
-  else
-    SavedVariables.PMQCache[field] = value
-  end
-  -- addon.Logger:Debug("SaveData saved. (%s)", field)
+  logger:Debug("SaveData cleared")
 end

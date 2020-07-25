@@ -33,6 +33,7 @@ addon.G = {
   GetMinimapZoneText = GetMinimapZoneText,
   GetZoneText = GetZoneText,
   PlaySoundFile = PlaySoundFile,
+  ReloadUI = ReloadUI,
   SlashCmdList = SlashCmdList,
   StaticPopupDialogs = StaticPopupDialogs,
   StaticPopup_Show = StaticPopup_Show,
