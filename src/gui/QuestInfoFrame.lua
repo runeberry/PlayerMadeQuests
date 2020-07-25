@@ -41,6 +41,7 @@ local buttons = {
     text = "Accept",
     width = 77,
     action = function(quest, sender)
+      addon:GetPlayerLocation(true) -- Refresh location before evaluating condition
       local reqs = addon.QuestEngine:EvaluateRequirements(quest)
       if not reqs.pass then
         addon.Logger:Warn("You do not meet the requirements to start this quest.")
@@ -75,6 +76,7 @@ local buttons = {
     text = "Complete Quest",
     width = 122, -- todo: lookup actual width
     action = function(quest)
+      addon:GetPlayerLocation(true) -- Refresh location before evaluating condition
       if not addon.QuestEngine:EvaluateComplete(quest) then
         addon.Logger:Warn("Unable to complete quest: completion conditions are not met")
         return
