@@ -111,4 +111,30 @@ Line C]],
       end)
     end
   end)
+  describe("ParseCoords", function()
+    local testCases = {
+      { str = "38,22", expected = { 38, 22 } },
+      { str = "    38.14  ,    22.78     ", expected = { 38.14, 22.78 } },
+      { str = "38.1, 22.7, 0.8", expected = { 38.1, 22.7, 0.8 } },
+      { str = "one,two", err = true },
+      { str = "38", err = true },
+      { str = "38,22.7,0.84,11", err = true },
+      { str = 38.7, err = true },
+      { str = nil, err = true },
+      { str = "", err = true },
+      { str = "one,two", err = true },
+      { str = "38 . 14 , 22. 78", err = true },
+    }
+    for i, tc in ipairs(testCases) do
+      if tc.expected then
+        it("can parse coordinates "..addon:Enquote(i, "()"), function()
+          assert.same(tc.expected, { addon:ParseCoords(tc.str) })
+        end)
+      elseif tc.err then
+        it("can reject bad input "..addon:Enquote(i, "()"), function()
+          assert.has_error(function() addon:ParseCoords(tc.str) end)
+        end)
+      end
+    end
+  end)
 end)
