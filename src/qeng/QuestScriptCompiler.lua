@@ -365,6 +365,8 @@ function addon.QuestScriptCompiler:Compile(script, params)
     yamlToQuest(quest, yaml)
   end
 
+  quest.addonVersion = addon.VERSION
+
   addon.QuestEngine:Validate(quest)
 
   logger:Trace("Quest compiled: %s", quest.questId)

@@ -5,6 +5,7 @@ local GetUnitName = addon.G.GetUnitName
   Quest model:
   {
     questId: "string",        -- Required, globally unique between all users (can be safely shared)
+    addonVersion: 0,          -- Required, version of PMQ that the quest was compiled with
     name: "string",           -- Required
     source: "string",         -- Indicates where the quest was before the QuestLog (catalog, demo, draft)
     description: "string",    -- Flavor text shown on quest start
