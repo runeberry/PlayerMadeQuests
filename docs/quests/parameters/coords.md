@@ -19,7 +19,7 @@ objectives:
       coords: 38,72               # Coordinates can be whole numbers
   - explore:
       zone: Elwynn Forest
-      coords: 38.5124,72.6483     # Or you can get precise with decimals
+      coords: 38.51,72.64         # Or you can get precise with decimals
   - explore:
       zone: Elwynn Forest
       coords: 38.51,72.64,0.8     # You can add a custom radius, too
