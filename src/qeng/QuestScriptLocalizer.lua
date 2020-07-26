@@ -173,14 +173,6 @@ rules = {
         return a, b, nil
       end
     },
-    { -- If A, then show A, else show nothing
-      -- A courtesy space is added after the var to make this more useful
-      pattern = "^(.-)$",
-      fn = function(a)
-        logger:Trace("     ^ match: [a]")
-        return a, a.." ", nil
-      end
-    }
   }
 }
 
