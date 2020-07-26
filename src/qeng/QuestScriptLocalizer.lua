@@ -1,4 +1,5 @@
 local _, addon = ...
+local logger = addon.Logger:NewLogger("Localizer")
 
 addon.QuestScriptLocalizer = {}
 
@@ -48,7 +49,7 @@ local function parseConditionValueText(obj, handlerArg, handlerFn)
     result = handlerFn(arg)
   else
     if not handlerArg then
-      addon.UILogger:Warn("Failed to parse display text: a param name must be provided to use the default text handler")
+      logger:Warn("Failed to parse display text: a param name must be provided to use the default text handler")
       return
     end
     result = defaultConditionTextHandler(arg)
@@ -57,22 +58,27 @@ local function parseConditionValueText(obj, handlerArg, handlerFn)
 end
 
 local function populateDisplayText(text, obj)
-  -- print("=> received:", text)
+  logger:Trace("=> received: %s", text)
   for _, mod in ipairs(rules.standard) do
     text = addon:strmod(text, mod.pattern, mod.fn, obj)
   end
-  -- Once all substitutions are made, clean up extra spaces
-  -- print("<= resolved:", text)
+  logger:Trace("<= resolved: %s", text)
   return text
 end
+
+-- Keep a ref to the bracketRule where other rules can grab it (assigned below)
+local bracketRule
 
 rules = {
   standard = {
     { -- Contents of bracketed sets are analyzed recursively, innermost first
       pattern = "%b[]",
       fn = function(str, obj)
-        -- print("     match: []", str)
-        str = str:match("^%[(.+)%]$") -- extract contents from brackets
+        logger:Trace("     match: brackets %s", str)
+        -- Extract contents from brackets
+        str = str:match("^%[(.+)%]$")
+        -- Recursively apply this function
+        str = addon:strmod(str, bracketRule.pattern, bracketRule.fn, obj)
 
         local condition, valIfTrue, valIfFalse
         for _, br in ipairs(rules.bracketed) do
@@ -81,14 +87,14 @@ rules = {
           if condition then
             -- If matched, an associated function will map to the appropriate values
             condition, valIfTrue, valIfFalse = br.fn(condition, valIfTrue, valIfFalse)
-            -- print("     ^ ctf:", condition, valIfTrue, valIfFalse)
+            logger:Trace("     ^ condition: %s, if-true: %s, if-false: %s", condition, valIfTrue, valIfFalse)
             break
           end
         end
 
         if not condition then
           -- Unable to parse bracket formula, try to parse the string as a whole
-          -- print("     ^ unmatched bracket formula")
+          logger:Trace("     ^ unmatched bracket formula")
           return populateDisplayText(str, obj)
         end
 
@@ -108,7 +114,7 @@ rules = {
     { -- Any %var gets the value for the mapped condition returned
       pattern = "%%%w+",
       fn = function(pctstr, obj)
-        -- print("     match: %var", str)
+        logger:Trace("     match: var %s", pctstr)
         local template = localizables[obj.name]
         if not template then return pctstr end -- objective does not have any localizable content
 
@@ -129,16 +135,16 @@ rules = {
         --   * function: a handler - the whole objective will be passed as a parameter
         local result
         if type(handler) == "table" then
-          -- print("     ^ handler: table", addon:Enquote(handler.arg, "()"))
+          logger:Trace("     ^ handler: table (%s = %s)", pctstr, handler.arg)
           result = parseConditionValueText(obj, handler.arg, handler.fn)
         elseif type(handler) == "string" then
-          -- print("     ^ handler: string", addon:Enquote(handler, "()"))
+          logger:Trace("     ^ handler: string (%s = %s)", pctstr, handler)
           result = parseConditionValueText(obj, handler, nil)
         elseif type(handler) == "function" then
-          -- print("     ^ handler: function")
+          logger:Trace("     ^ handler: function (%s)", pctstr)
           result = parseConditionValueText(obj, nil, handler)
         else
-          -- print("     ^ handler: not found", addon:Enquote(pctstr, "()"))
+          logger:Trace("     ^ handler: not found (%s)", pctstr)
           result = pctstr
         end
 
@@ -151,34 +157,47 @@ rules = {
     { -- If A, then show B, else show C
       pattern = "^(.-):(.-)|(.-)$",
       fn = function(a, b, c)
-        -- print("     ^ match: [a:b|c]")
+        logger:Trace("     ^ match: [a:b|c]")
         return a, b, c
       end
     },
     { -- If A, then show A, else show B
       pattern = "^(.-)|(.-)$",
       fn = function(a, b)
-        -- print("     ^ match: [a|b]")
+        logger:Trace("     ^ match: [a|b]")
         return a, a, b
       end
     },
     { -- If A, then show B, else show nothing
       pattern = "^(.-):(.-)$",
       fn = function(a, b)
-        -- print("     ^ match: [a:b]")
+        logger:Trace("     ^ match: [a:b]")
         return a, b, nil
       end
     },
-    { -- If A, then show A, else show nothing
-      -- A courtesy space is added after the var to make this more useful
-      pattern = "^(.-)$",
-      fn = function(a)
-        -- print("     ^ match: [a]")
-        return a, a.." ", nil
+    -- { -- If A and B, then show C, else show D
+    --   pattern = "^(.-)&(.-):(.-)|(.-)",
+    --   fn = function(a, b, c, d)
+    --     return a and b, c, d
+    --   end
+    -- },
+    -- { -- If A and B, then show C, else show nothing
+    --   pattern = "^(.-)&(.-):(.-)$",
+    --   fn = function(a, b, c)
+    --     logger:Trace("     ^ match: [a&b:c]")
+    --     return a and b, c, nil
+    --   end
+    -- },
+    { -- If B, then show B with spacing A and C added, else show nothing
+      pattern = "^([ ]-)([^ ]-)([ ]-)$",
+      fn = function(a, b, c)
+        return b, a..b..c, nil
       end
     }
   }
 }
+
+bracketRule = rules.standard[1]
 
 --------------------
 -- Public methods --
@@ -201,7 +220,10 @@ function addon.QuestScriptLocalizer:GetDisplayText(obj, scope)
   end
 
   assert(displayText, "Cannot determine how to display text for directive: "..obj.name.." in scope "..scope)
-  return populateDisplayText(displayText, obj)
+  local text = populateDisplayText(displayText, obj)
+
+  -- Clean up any leading, trailing, or duplicate spaces before returning
+  return text:gsub("^%s+", ""):gsub("%s+$", ""):gsub(" +", " ")
 end
 
 -----------------------
