@@ -186,6 +186,12 @@ rules = {
     --     return a and b, c, nil
     --   end
     -- },
+    { -- If B, then show B with spacing A and C added, else show nothing
+      pattern = "^([ ]-)([^ ]-)([ ]-)$",
+      fn = function(a, b, c)
+        return b, a..b..c, nil
+      end
+    }
   }
 }
 
