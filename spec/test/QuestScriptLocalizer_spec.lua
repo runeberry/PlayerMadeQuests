@@ -129,7 +129,7 @@ describe("QuestScriptLocalizer", function()
     for num, tc in ipairs(testCases) do
       local script = [[
         quest:
-          name: Display text parser test
+          name: Objective displaytext parser test
         objectives:
           - ]]..tc.objective
       local quest = compiler:Compile(script)
@@ -220,6 +220,10 @@ describe("QuestScriptLocalizer", function()
       ]]
       local quest = compiler:Compile(script)
       local objs = quest.objectives
+      assert.equals("Complete task #1", localizer:GetDisplayText(objs[2]))
+      assert.equals("Complete task #2", localizer:GetDisplayText(objs[4]))
+      assert.equals("Complete task #3", localizer:GetDisplayText(objs[5]))
+      -- Run tests again to ensure that the values persist on each GetDisplayText call
       assert.equals("Complete task #1", localizer:GetDisplayText(objs[2]))
       assert.equals("Complete task #2", localizer:GetDisplayText(objs[4]))
       assert.equals("Complete task #3", localizer:GetDisplayText(objs[5]))
