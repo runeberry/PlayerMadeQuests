@@ -141,6 +141,7 @@ local argFormatters = {
 }
 
 local function toLogMessage(formatString, ...)
+  formatString = tostring(formatString) -- ensure this is a string
   local args, formatted = { ... }, {}
   for i, arg in ipairs(args) do
     formatted[i] = argFormatters[type(arg)](arg)
