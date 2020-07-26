@@ -62,10 +62,12 @@ local function populateDisplayText(text, obj)
   for _, mod in ipairs(rules.standard) do
     text = addon:strmod(text, mod.pattern, mod.fn, obj)
   end
-  -- Once all substitutions are made, clean up extra spaces
   logger:Trace("<= resolved: %s", text)
   return text
 end
+
+-- Keep a ref to the bracketRule where other rules can grab it (assigned below)
+local bracketRule
 
 rules = {
   standard = {
@@ -76,7 +78,7 @@ rules = {
         -- Extract contents from brackets
         str = str:match("^%[(.+)%]$")
         -- Recursively apply this function
-        str = addon:strmod(str, rules.standard[1].pattern, rules.standard[1].fn, obj)
+        str = addon:strmod(str, bracketRule.pattern, bracketRule.fn, obj)
 
         local condition, valIfTrue, valIfFalse
         for _, br in ipairs(rules.bracketed) do
@@ -195,6 +197,8 @@ rules = {
   }
 }
 
+bracketRule = rules.standard[1]
+
 --------------------
 -- Public methods --
 --------------------
@@ -216,7 +220,10 @@ function addon.QuestScriptLocalizer:GetDisplayText(obj, scope)
   end
 
   assert(displayText, "Cannot determine how to display text for directive: "..obj.name.." in scope "..scope)
-  return populateDisplayText(displayText, obj)
+  local text = populateDisplayText(displayText, obj)
+
+  -- Clean up any leading, trailing, or duplicate spaces before returning
+  return text:gsub("^%s+", ""):gsub("%s+$", ""):gsub(" +", " ")
 end
 
 -----------------------

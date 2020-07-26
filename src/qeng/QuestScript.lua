@@ -44,16 +44,65 @@ local getGoal2 = function(obj) if obj.goal > 1 then return obj.goal end end
 local getProgress = function(obj) return obj.progress end
 local getProgress2 = function(obj) if obj.progress < obj.goal then return obj.progress end end
 
-local getX = function(str) local x, y, r = addon:ParseCoords(str); return x end
-local getY = function(str) local x, y, r = addon:ParseCoords(str); return y end
-local getRad = function(str) local x, y, r = addon:ParseCoords(str); return r end
-
+local getX = function(str)
+  if not str then return end
+  local x, y, r = addon:ParseCoords(str)
+  return x
+end
+local getY = function(str)
+  if not str then return end
+  local x, y, r = addon:ParseCoords(str)
+  return y
+end
+local getRad = function(str)
+  if not str then return end
+  local x, y, r = addon:ParseCoords(str)
+  return r
+end
 local getXY = function(str)
+  if not str then return end
   local x, y = addon:ParseCoords(str)
   return addon:PrettyCoords(x, y)
 end
 local getXYR = function(str)
+  if not str then return end
   return addon:PrettyCoords(addon:ParseCoords(str))
+end
+
+local getZone2 = function(obj)
+  local zone = obj.conditions[t.PARAM_ZONE]
+  local subzone = obj.conditions[t.PARAM_SUBZONE]
+  if zone and subzone then
+    return subzone.." in "..zone
+  elseif zone then
+    return zone
+  else
+    return subzone
+  end
+end
+local getXYZ = function(obj)
+  local zone = getZone2(obj) or ""
+  local coords = getXY(obj.conditions[t.PARAM_COORDS])
+  if not coords then return zone end
+  return coords.." in "..zone
+end
+local getXYRZ = function(obj)
+  local zone = getZone2(obj) or ""
+  local coords = getXYR(obj.conditions[t.PARAM_COORDS])
+  if not coords then return zone end
+  return coords.." in "..zone
+end
+local getAtin = function(obj)
+  local target = obj.conditions[t.PARAM_TARGET]
+  if not target then return end
+  local zone = obj.conditions[t.PARAM_ZONE]
+  local subzone = obj.conditions[t.PARAM_SUBZONE]
+  local coords = obj.conditions[t.PARAM_COORDS]
+  if coords or subzone then
+    return "at"
+  elseif zone then
+    return "in"
+  end
 end
 
 -- incrementing counter unique to a given objective
@@ -107,11 +156,17 @@ addon.QuestScriptTemplates = {
     displaytext = {
       vars = {
         ["co"] = t.PARAM_COORDS,
+        ["z"] = t.PARAM_ZONE,
+        ["sz"] = t.PARAM_SUBZONE,
         ["x"] = { arg = t.PARAM_COORDS, fn = getX },
         ["y"] = { arg = t.PARAM_COORDS, fn = getY },
         ["r"] = { arg = t.PARAM_COORDS, fn = getRad },
         ["xy"] = { arg = t.PARAM_COORDS, fn = getXY },
+        ["xyz"] = getXYZ,
         ["xyr"] = { arg = t.PARAM_COORDS, fn = getXYR },
+        ["xyrz"] = getXYRZ,
+        ["z2"] = getZone2,
+        ["atin"] = getAtin,
       }
     }
   },
@@ -131,12 +186,10 @@ addon.QuestScriptTemplates = {
     displaytext = {
       vars = {
         ["t"] = t.PARAM_TARGET,
-        ["z"] = t.PARAM_ZONE,
-        ["sz"] = t.PARAM_SUBZONE,
       },
-      log = "Go to [%t|[%xy:Point #%inc]][[%t|%xy]:[[%sz|%z]: in ]][%sz|%z]",
-      quest = "Go to [%t|[%xy:(%x, %y)]][[%t|%xy]:[[%sz|%z]: in ]][%sz|%z]",
-      full = "Go [%r:within %r units of|to] [%t:%t in :[%xy:(%x, %y) in ]][%sz:%sz in ]%z"
+      log = "Go to %t[%sz:[%t: at] %sz|[%z:[%t: in] %z]]",
+      quest = "Go to [%t ][%atin ]%xyz",
+      full = "Go to [%t ][%atin ]%xyrz"
     },
     params = {
       [t.PARAM_TEXT] = { type = { "string", "table" } },
@@ -187,8 +240,8 @@ local objectives = {
       },
       log = "/%em[%t: with %t][%g2: %p/%g]",
       progress = "/%em[%t: with %t]: %p/%g",
-      quest = "/%em[%t: with [%g2]%t|[%g2: %g2 times]]",
-      full = "Use emote /%em[%t: on [%g2]%t|[%g2: %g2 times]]"
+      quest = "/%em[%t: with [%g2 ]%t|[%g2: %g2 times]]",
+      full = "Use emote /%em[%t: on [%g2 ]%t|[%g2: %g2 times]]"
     },
     params = {
       [t.PARAM_GOAL] = { type = "number" },
@@ -210,14 +263,10 @@ local objectives = {
       t.PARAM_COORDS,
     },
     displaytext = {
-      vars = {
-        ["z"] = t.PARAM_ZONE,
-        ["sz"] = t.PARAM_SUBZONE,
-      },
       log = "Go to [%co:Point #%inc in ][%sz|%z]",
       progress = "[%co:Point #%inc in ][%sz|%z] explored: %p/%g",
-      quest = "Explore [%co:Point #%inc in ][%sz:%sz in ]%z",
-      full = "Go to [%co:%xyr in ][%sz:%sz in ]%z"
+      quest = "Explore [%co:Point #%inc in ]%z2",
+      full = "Go to %xyrz"
     },
     params = {
       [t.PARAM_ZONE] = { template = "condition" },
@@ -237,8 +286,8 @@ local objectives = {
       },
       log = "%t %p/%g",
       progress = "%t slain: %p/%g",
-      quest = "Kill [%g2]%t",
-      full = "Kill [%g2]%t"
+      quest = "Kill [%g2 ]%t",
+      full = "Kill [%g2 ]%t"
     },
     params = {
       [t.PARAM_GOAL] = { type = "number" },
@@ -262,8 +311,8 @@ local objectives = {
       },
       log = "Talk to %t[%g2: %p/%g]",
       progress = "Talk to %t: %p/%g",
-      quest = "Talk to [%g2]%t",
-      full = "Talk to [%g2]%t"
+      quest = "Talk to [%g2 ]%t",
+      full = "Talk to [%g2 ]%t"
     },
     params = {
       [t.PARAM_GOAL] = { type = "number" },
