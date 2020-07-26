@@ -1,5 +1,6 @@
 local _, addon = ...
 local logger = addon.Logger:NewLogger("Location")
+local time = addon.G.time
 
 local GetBestMapForUnit = addon.G.GetBestMapForUnit
 local GetPlayerMapPosition = addon.G.GetPlayerMapPosition
@@ -8,14 +9,17 @@ local GetSubZoneText = addon.G.GetSubZoneText
 local GetMinimapZoneText = addon.G.GetMinimapZoneText
 local GetZoneText = addon.G.GetZoneText
 
-local playerLocation
+local playerLocation = {}
+local playerLocationExpires = 0 -- updated when the player location is refreshed
+local playerLocationTTL = 0.5 -- time to cache player location in seconds
 
 local pollingIds = {}
 local pollingTimerId
 local pollingTimerInterval = 1 -- time between polling events in seconds
 
-function addon:GetPlayerLocation(refresh)
-  if playerLocation and not refresh then
+function addon:GetPlayerLocation()
+  local ts = time()
+  if playerLocation.timestamp and ts < playerLocationExpires then
     return playerLocation
   end
 
@@ -26,42 +30,35 @@ function addon:GetPlayerLocation(refresh)
     x, y = position:GetXY()
   end
 
-  local loc = {
-    zone = GetZoneText(),
-    realZone = GetRealZoneText(),
-    subZone = GetSubZoneText(),
-    minimapZone = GetMinimapZoneText(),
-    x = x * 100,
-    y = y * 100
-  }
+  -- Reuse the same table for tracking player info, since this is called frequently
+  playerLocation.timestamp = ts
+  playerLocation.zone = GetZoneText()
+  playerLocation.realZone = GetRealZoneText()
+  playerLocation.subZone = GetSubZoneText()
+  playerLocation.minimapZone = GetMinimapZoneText()
+  playerLocation.x = x * 100
+  playerLocation.y = y * 100
 
-  local doPublish = false
-  if playerLocation then
-    if playerLocation.x ~= loc.x or playerLocation.y ~= loc.y then
-      doPublish = true
-    end
-  else
-    -- Always publish if this is the first location of the session
-    doPublish = true
-  end
-
-  playerLocation = loc
-
-  if doPublish then
-    addon.AppEvents:Publish("PlayerLocationChanged", playerLocation)
-    logger:Trace("Player location changed: (%.2f, %.2f)", loc.x, loc.y)
-  end
+  playerLocationExpires = ts + playerLocationTTL
 
   return playerLocation
 end
 
-function addon:CheckPlayerInZone(zone, refresh)
-  local ld = addon:GetPlayerLocation(refresh)
+function addon:CheckPlayerInZone(zone)
+  local ld = addon:GetPlayerLocation()
   return ld.zone == zone or ld.realZone == zone or ld.subZone == zone or ld.minimapZone == zone
 end
 
 local function pollingFn()
-  addon:GetPlayerLocation(true)
+  local oldX, oldY = playerLocation.x, playerLocation.y
+  addon:GetPlayerLocation()
+
+  if playerLocation.x ~= oldX or playerLocation.y ~= oldY then
+    addon.AppEvents:Publish("PlayerLocationChanged", playerLocation)
+    logger:Trace("Player location changed: (%.2f, %.2f)", playerLocation.x, playerLocation.y)
+  -- else
+  --   logger:Trace("[%i] Player location did not change: (%.2f, %.2f)", time() % 100, playerLocation.x, playerLocation.y)
+  end
 end
 
 -- Give an id to indicate the thing you're polling the player's location for
@@ -94,3 +91,14 @@ function addon:StopAllLocationPolling()
   pollingIds = {}
   logger:Debug("Stop polling for player location")
 end
+
+local function stopQuestLocationPolling(quest)
+  if not quest or not quest.objectives then return end
+  for _, obj in ipairs(quest.objectives) do
+    addon:StopPollingLocation(obj.id)
+  end
+end
+
+addon:onload(function()
+  addon.AppEvents:Subscribe("QuestTrackingStopped", stopQuestLocationPolling)
+end)

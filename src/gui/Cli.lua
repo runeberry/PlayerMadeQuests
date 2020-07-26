@@ -93,7 +93,7 @@ handlers = {
       return
     end
 
-    addon.Logger:Info("%s: %s", name, addon.PlayerSettings[name] or "not configured")
+    addon.Logger:Info("Config value: %s = %s", name, tostring(addon.PlayerSettings[name]))
   end,
   ["set"] = function(name, value)
     if not name or not value then
@@ -103,7 +103,7 @@ handlers = {
 
     addon.PlayerSettings[name] = addon:TryConvertString(value)
     addon.SaveData:Save("Settings", addon.PlayerSettings)
-    addon.Logger:Info(name..":", addon.PlayerSettings[name])
+    addon.Logger:Info("Config value set: %s = %s", name, tostring(addon.PlayerSettings[name]))
   end,
   ["unset"] = function(name)
     if not name then

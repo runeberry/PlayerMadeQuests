@@ -44,30 +44,11 @@ local getGoal2 = function(obj) if obj.goal > 1 then return obj.goal end end
 local getProgress = function(obj) return obj.progress end
 local getProgress2 = function(obj) if obj.progress < obj.goal then return obj.progress end end
 
-local getX = function(str)
-  if not str then return end
-  local x, y, r = addon:ParseCoords(str)
-  return x
-end
-local getY = function(str)
-  if not str then return end
-  local x, y, r = addon:ParseCoords(str)
-  return y
-end
-local getRad = function(str)
-  if not str then return end
-  local x, y, r = addon:ParseCoords(str)
-  return r
-end
-local getXY = function(str)
-  if not str then return end
-  local x, y = addon:ParseCoords(str)
-  return addon:PrettyCoords(x, y)
-end
-local getXYR = function(str)
-  if not str then return end
-  return addon:PrettyCoords(addon:ParseCoords(str))
-end
+local getX = function(coords) if coords then return coords.x end end
+local getY = function(coords) if coords then return coords.y end end
+local getRad = function(coords) if coords then return coords.radius end end
+local getXY = function(coords) if coords then return addon:PrettyCoords(coords.x, coords.y) end end
+local getXYR = function(coords) if coords then return addon:PrettyCoords(coords.x, coords.y, coords.radius) end end
 
 local getZone2 = function(obj)
   local zone = obj.conditions[t.PARAM_ZONE]
@@ -193,10 +174,21 @@ addon.QuestScriptTemplates = {
     },
     params = {
       [t.PARAM_TEXT] = { type = { "string", "table" } },
-      [t.PARAM_TARGET] = { template = "condition", multiple = true },
+      [t.PARAM_TARGET] = {
+        template = "condition",
+        scripts = {
+          [t.METHOD_PARSE] = { required = true },
+        },
+        multiple = true,
+      },
       [t.PARAM_ZONE] = { template = "condition" },
       [t.PARAM_SUBZONE] = { template = "condition" },
-      [t.PARAM_COORDS] = { template = "condition" },
+      [t.PARAM_COORDS] = {
+        template = "condition",
+        scripts = {
+          [t.METHOD_PARSE] = { required = true },
+        },
+      },
     }
   },
   -- Template for quest recommendations and requirements
@@ -247,11 +239,17 @@ local objectives = {
       [t.PARAM_GOAL] = { type = "number" },
       [t.PARAM_EMOTE] = {
         template = "condition",
+        scripts = {
+          [t.METHOD_PARSE] = { required = true },
+        },
         required = true,
         multiple = true,
       },
       [t.PARAM_TARGET] = {
         template = "condition",
+        scripts = {
+          [t.METHOD_PARSE] = { required = true },
+        },
         multiple = true,
       },
     }
@@ -271,7 +269,12 @@ local objectives = {
     params = {
       [t.PARAM_ZONE] = { template = "condition" },
       [t.PARAM_SUBZONE] = { template = "condition" },
-      [t.PARAM_COORDS] = { template = "condition" },
+      [t.PARAM_COORDS] = {
+        template = "condition",
+        scripts = {
+          [t.METHOD_PARSE] = { required = true },
+        },
+      },
     }
   },
   [t.OBJ_KILL] = {
@@ -294,6 +297,9 @@ local objectives = {
       [t.PARAM_KILLTARGET] = {
         alias = t.PARAM_TARGET,
         template = "condition",
+        scripts = {
+          [t.METHOD_PARSE] = { required = true },
+        },
         required = true,
         multiple = true,
       },
@@ -318,6 +324,9 @@ local objectives = {
       [t.PARAM_GOAL] = { type = "number" },
       [t.PARAM_TARGET] = {
         template = "condition",
+        scripts = {
+          [t.METHOD_PARSE] = { required = true },
+        },
         required = true,
         multiple = true,
       }

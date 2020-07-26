@@ -43,8 +43,8 @@ local function applyTemplate(param, templateName)
 end
 
 local function getMethodScript(paramName, methodName, methodOptions)
-  assert(type(methodName) == "string", "Non-string registered as methodName for "..paramName)
-  assert(type(methodOptions) == "table", "Non-table registered as methodOptions for "..paramName)
+  assert(type(methodName) == "string", type(methodName).." registered as methodName for "..paramName)
+  assert(type(methodOptions) == "table", type(methodOptions).." registered as methodOptions for "..paramName)
 
   local method = scripts[paramName]
   if not method then

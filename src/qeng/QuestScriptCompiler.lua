@@ -242,27 +242,32 @@ function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info,
   -- print("    type validation failure", paramInfo.name, val, actualType, expectedType)
 end
 
+local function parseFromArgs(param, args)
+  local val = args[param.name] or args[param.alias]
+  if not val then
+    if param.required then
+      error(param.name.." is required")
+    end
+    return
+  end
+
+  if param.scripts and param.scripts[tokens.METHOD_PARSE] then
+    val = param.scripts[tokens.METHOD_PARSE](val)
+  end
+
+  return val
+end
+
 function addon.QuestScriptCompiler:ParseConditions(params, args)
   local conditions = {}
 
   -- _ will be the alias here, if the param had one
   for _, param in pairs(params) do
-    if param.multiple then
-      -- If multiple arg values are allowed, then they will be passed to the
-      -- condition handler as a set, such as { value1 = true, value2 = true }
-      -- Note: values assigned to an alias in script will be assigned to the primary
-      --       condition name in the compiled quest
-      local val = args[param.name] or args[param.alias]
-      if val then
-        if type(param.name) ~= "table" then -- todo: what is going on here? why did i do this?
-          val = { val }
-        end
-        conditions[param.name] = addon:DistinctSet(val)
-      end
-    else
-      -- Otherwise, simply pass a single value to the condition handler
-      conditions[param.name] = args[param.name]
-    end
+    -- Note: values assigned to an alias in script will be assigned to the primary
+    --       condition name in the compiled quest
+    -- For example, values assigned to the "target" alias for "killtarget" will be
+    -- assigned to obj.conditions["killtarget"]
+    conditions[param.name] = parseFromArgs(param, args)
   end
 
   return conditions
