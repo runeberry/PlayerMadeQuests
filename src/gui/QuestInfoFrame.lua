@@ -5,7 +5,7 @@ local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogS
 local StaticPopups = addon.StaticPopups
 local localizer = addon.QuestScriptLocalizer
 
-local refreshQuestFrame = function() end -- replaced with real function on build
+local pollingTimerInterval = 0.5 -- interval to poll for start/complete condition satisfaction, in seconds
 
 local pageStyle = {
   margins = { 8, 8, 10, 0 }, -- bottom spacing doesn't work on a scroll frame
@@ -40,8 +40,10 @@ local buttons = {
   ["Accept"] = {
     text = "Accept",
     width = 77,
+    -- If the player meets requirements and the quest contains a start step, run start evaluation on an interval
+    pollIf = function(quest) return addon.QuestEngine:EvaluateRequirements(quest) and quest.start end,
+    enableIf = function(quest) return addon.QuestEngine:EvaluateRequirements(quest) and addon.QuestEngine:EvaluateStart(quest) end,
     action = function(quest, sender)
-      addon:GetPlayerLocation(true) -- Refresh location before evaluating condition
       local reqs = addon.QuestEngine:EvaluateRequirements(quest)
       if not reqs.pass then
         addon.Logger:Warn("You do not meet the requirements to start this quest.")
@@ -75,8 +77,10 @@ local buttons = {
   ["Complete"] = {
     text = "Complete Quest",
     width = 122, -- todo: lookup actual width
+    -- If the quest contains a complete step, run completion evaluation on an interval
+    pollIf = function(quest) return quest.complete end,
+    enableIf = function(quest) return addon.QuestEngine:EvaluateComplete(quest) end,
     action = function(quest)
-      addon:GetPlayerLocation(true) -- Refresh location before evaluating condition
       if not addon.QuestEngine:EvaluateComplete(quest) then
         addon.Logger:Warn("Unable to complete quest: completion conditions are not met")
         return
@@ -118,11 +122,15 @@ local buttons = {
   }
 }
 
-local function setButtonBehavior(btn, behavior)
+local function setButtonBehavior(btn, behavior, quest)
   -- Start by clearing the current button behavior
   btn._action = nil
   btn:SetText("")
   btn:Hide()
+  if btn._pollTimerId then
+    addon.Ace:CancelTimer(btn._pollTimerId)
+    btn._pollTimerId = nil
+  end
 
   -- If no behavior is supplied, do not show the button
   if not behavior then return end
@@ -131,6 +139,20 @@ local function setButtonBehavior(btn, behavior)
   btn._action = behavior.action
   btn:SetText(behavior.text)
   btn:SetWidth(behavior.width)
+
+  if quest then
+    -- If the button is conditionally enabled, check that condition now
+    if behavior.enableIf then
+      btn:SetEnabled(behavior.enableIf(quest))
+    end
+    -- If a polling condition is met, then check the enable condition on an interval
+    if behavior.pollIf and behavior.pollIf(quest) then
+      btn._pollTimerId = addon.Ace:ScheduleRepeatingTimer(function()
+        btn:SetEnabled(behavior.enableIf(quest))
+      end, pollingTimerInterval)
+    end
+  end
+
   btn:Show()
 end
 
@@ -265,8 +287,8 @@ local frameMethods = {
     self:ClearContent()
 
     mode.content(self, quest, sender)
-    setButtonBehavior(self.leftButton, mode.leftButton)
-    setButtonBehavior(self.rightButton, mode.rightButton)
+    setButtonBehavior(self.leftButton, mode.leftButton, quest)
+    setButtonBehavior(self.rightButton, mode.rightButton, quest)
 
     self:Show()
   end,
@@ -275,8 +297,8 @@ local frameMethods = {
     self._sender = nil
     self._shown = nil
 
-    setButtonBehavior(self.leftButton, nil)
-    setButtonBehavior(self.rightButton, nil)
+    setButtonBehavior(self.leftButton)
+    setButtonBehavior(self.rightButton)
 
     self:Hide()
   end,
@@ -407,10 +429,6 @@ local function buildQuestInfoFrame()
   article:AddText("HEADER_4", "header")
   article:AddText("BODY_4")
   article:Assemble()
-
-  refreshQuestFrame = function()
-    questFrame:RefreshMode()
-  end
 
   questFrame.scrollFrame = questDetailScrollFrame
   questFrame.titleFontString = questFrameNpcNameText
