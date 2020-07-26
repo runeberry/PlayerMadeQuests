@@ -135,7 +135,7 @@ end
 local argFormatters = {
   ["string"] = function(v) return v end,
   ["number"] = function(v) return v end,
-  ["boolean"] = function(v) return v end,
+  ["boolean"] = function(v) return tostring(v) end, -- Refer to booleans as %s in format string
   ["table"] = function(v) return tostring(v) end, -- Print table as memory address
   ["function"] = function(v) return tostring(v) end, -- Print function as memory address
 }
