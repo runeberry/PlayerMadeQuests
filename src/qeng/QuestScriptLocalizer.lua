@@ -173,6 +173,19 @@ rules = {
         return a, b, nil
       end
     },
+    -- { -- If A and B, then show C, else show D
+    --   pattern = "^(.-)&(.-):(.-)|(.-)",
+    --   fn = function(a, b, c, d)
+    --     return a and b, c, d
+    --   end
+    -- },
+    -- { -- If A and B, then show C, else show nothing
+    --   pattern = "^(.-)&(.-):(.-)$",
+    --   fn = function(a, b, c)
+    --     logger:Trace("     ^ match: [a&b:c]")
+    --     return a and b, c, nil
+    --   end
+    -- },
   }
 }
 
