@@ -73,7 +73,10 @@ rules = {
       pattern = "%b[]",
       fn = function(str, obj)
         logger:Trace("     match: brackets %s", str)
-        str = str:match("^%[(.+)%]$") -- extract contents from brackets
+        -- Extract contents from brackets
+        str = str:match("^%[(.+)%]$")
+        -- Recursively apply this function
+        str = addon:strmod(str, rules.standard[1].pattern, rules.standard[1].fn, obj)
 
         local condition, valIfTrue, valIfFalse
         for _, br in ipairs(rules.bracketed) do
