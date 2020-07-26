@@ -27,6 +27,17 @@ local function isUniqueTargetGuid(obj, targetUnitGuid)
   return true
 end
 
+loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_PARSE, function(unitNames)
+  local t = type(unitNames)
+  assert(t == "string" or t == "table", t.." is not a valid type for "..tokens.PARAM_TARGET)
+
+  if t == "string" then
+    unitNames = { unitNames }
+  end
+
+  return addon:DistinctSet(unitNames)
+end)
+
 loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_EVAL, function(obj, unitNames)
   local targetUnitName = GetUnitName("target")
   if unitNames[targetUnitName] == nil then
@@ -38,6 +49,17 @@ loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_EVAL, function(obj, unitName
     return true
   end
   return isUniqueTargetGuid(obj, UnitGUID("target"))
+end)
+
+loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_PARSE, function(unitNames)
+  local t = type(unitNames)
+  assert(t == "string" or t == "table", t.." is not a valid type for "..tokens.PARAM_KILLTARGET)
+
+  if t == "string" then
+    unitNames = { unitNames }
+  end
+
+  return addon:DistinctSet(unitNames)
 end)
 
 loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_EVAL, function(obj, unitNames)

@@ -6,6 +6,17 @@ local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
 -- Expected chat messages indexed by the objective they're expected for
 local expectedEmoteMessages = {}
 
+loader:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_PARSE, function(emoteNames)
+  local t = type(emoteNames)
+  assert(t == "string" or t == "table", t.." is not a valid type for "..tokens.PARAM_EMOTE)
+
+  if t == "string" then
+    emoteNames = { emoteNames }
+  end
+
+  return addon:DistinctSet(emoteNames)
+end)
+
 loader:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_EVAL, function(obj, emoteNames)
   local eem = expectedEmoteMessages[obj.id]
   local expectTargetedEmote = obj.conditions[tokens.PARAM_TARGET]
