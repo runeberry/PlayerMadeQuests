@@ -39,7 +39,7 @@ addon.StaticPopups = {}
 local popupMethods = {
   ["Show"] = function(self, ...)
     if self._messageFunction then
-      self.text = self._messageFunction(...)
+      self.text = string.format(self._messageFunction(...))
     end
     self._varargs = { ... }
     StaticPopup_Show(self._globalId)

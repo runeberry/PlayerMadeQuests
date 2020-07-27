@@ -94,7 +94,7 @@ local function widget_OnShow(self)
   end
 end
 
-function widget:Create(parent, defaultTextStyle, pageStyle)
+function widget:Create(parent, textinfo)
   local frame = CreateFrame("Frame", nil, parent)
   frame:SetAllPoints(true)
   -- frame:Hide()
@@ -108,11 +108,29 @@ function widget:Create(parent, defaultTextStyle, pageStyle)
     frame[name] = method
   end
 
-  frame:SetTextStyle("default", defaultTextStyle)
-  frame:SetPageStyle(pageStyle)
+  frame:SetTextStyle("default")
+  frame:SetPageStyle()
   -- frame:SetScript("OnShow", widget_OnShow)
   -- bug: Added as a manual method because I couldn't get OnShow to work properly
   frame.Assemble = widget_OnShow
+
+  -- Can supply all text info at the start and have it prepopulated
+  if textinfo then
+    if textinfo.styles then
+      for name, style in pairs(textinfo.styles) do
+        frame:SetTextStyle(name, style)
+      end
+    end
+    if textinfo.text then
+      for _, item in ipairs(textinfo.text) do
+        frame:AddText(item.text, item.style)
+      end
+    end
+    if textinfo.static then
+      -- Set static = true if you don't intend to add anymore text to this article
+      frame:Assemble()
+    end
+  end
 
   return frame
 end

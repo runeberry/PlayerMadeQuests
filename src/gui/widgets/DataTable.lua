@@ -80,7 +80,7 @@ local methods = {
   end,
 }
 
-function widget:Create(parent, colinfo, datasource, ...)
+function widget:Create(parent, colinfo, datasource)
   local frame = CreateFrame("Frame", nil, parent)
   frame:SetAllPoints(true)
 

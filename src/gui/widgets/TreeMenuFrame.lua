@@ -114,7 +114,7 @@ local methods = {
         addon.UILogger:Error("Failed to create menu screen %s: %s", menuId, screen)
         return
       elseif not screen then
-        addon.UILogger:Warn("No screen registered with id: %s", menuId)
+        -- addon.UILogger:Warn("No screen registered with id: %s", menuId)
         return
       end
 
