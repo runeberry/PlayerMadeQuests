@@ -209,7 +209,9 @@ function addon:ShowQuestLog(show)
       BuildQuestLogFrame()
     end
   elseif mainframe ~= nil then
-    OnClose(mainframe)
+    -- todo: this might throw an error from AceGUI
+    -- just going to suppress it until I can refactor this window
+    pcall(OnClose, mainframe)
   end
 end
 
