@@ -5,7 +5,8 @@ local QuestArchive = addon.QuestArchive
 addon.StaticPopupsList = {
   ["AbandonQuest"] = {
     message = function(quest)
-      return "Are you sure you want to abandon\n"..addon:Enquote(quest.name, '""?')
+      return "Are you sure you want to abandon\n"..
+             "\"%s\"?", quest.name
     end,
     yesText = "OK",
     noText = "Cancel",
@@ -17,8 +18,8 @@ addon.StaticPopupsList = {
   },
   ["ArchiveQuest"] = {
     message = function(quest)
-      return "Archive "..addon:Enquote(quest.name, '""?\n')..
-             "This will hide the quest from your Quest Log, but PMQ will remember that you completed it."
+      return "Archive \"%s\"?\n"..
+             "This will hide the quest from your Quest Log, but PMQ will remember that you completed it.", quest.name
     end,
     yesText = "OK",
     noText = "Cancel",
@@ -29,8 +30,8 @@ addon.StaticPopupsList = {
   },
   ["DeleteQuest"] = {
     message = function(quest)
-      return "Are you sure you want to delete "..addon:Enquote(quest.name, '""?\n')..
-             "This will delete the quest entirely from your log, and PMQ will forget you ever had it!"
+      return "Are you sure you want to delete \"%s\"?\n"..
+             "This will delete the quest entirely from your log, and PMQ will forget you ever had it!", quest.name
     end,
     yesText = "OK",
     noText = "Cancel",
@@ -54,9 +55,10 @@ addon.StaticPopupsList = {
     message = function(quest)
       if quest.status == QuestStatus.Finished then
         -- Provide an additional warning only if the quest has already been successfully finished
-        return "Replay "..addon:Enquote(quest.name, '""?').."\nThis will erase your previous completion of this quest."
+        return "Replay \"%s\"?\n"..
+               "This will erase your previous completion of this quest.", quest.name
       else
-        return "Replay "..addon:Enquote(quest.name, '""?')
+        return "Replay \"%s\"?", quest.name
       end
     end,
     yesText = "OK",
@@ -71,7 +73,8 @@ addon.StaticPopupsList = {
   },
   ["StartQuestBelowRequirements"] = {
     message = function(quest, recsResult)
-      return "You do not meet the recommended criteria to start this quest.\nAccept anyway?"
+      return "You do not meet the recommended criteria to start this quest.\n"..
+             "Accept anyway?"
     end,
     yesText = "OK",
     noText = "Cancel",
@@ -79,7 +82,8 @@ addon.StaticPopupsList = {
   },
   ["DeleteCatalogItem"] = {
     message = function(catalogItem)
-      return "Are you sure you want to delete\n"..addon.Enquote(catalogItem.quest.name, '""?')
+      return "Are you sure you want to delete\n"..
+             "\"%s\"?", catalogItem.quest.name
     end,
     yesText = "OK",
     noText = "Cancel",
@@ -89,7 +93,8 @@ addon.StaticPopupsList = {
     end,
   },
   ["ExitDraft"] = {
-    message = "You have unsaved changes.\nWould you like to save?",
+    message = "You have unsaved changes.\n"..
+              "Would you like to save?",
     yesText = "Discard",
     noText = "Cancel",
     otherText = "Save",
@@ -103,7 +108,8 @@ addon.StaticPopupsList = {
   },
   ["DeleteDraft"] = {
     message = function(draftId, draftName)
-      return "Are you sure you want to delete\n"..addon:Enquote(draftName, '""?')
+      return "Are you sure you want to delete\n"..
+             "\"%s\"?", draftName
     end,
     yesText = "OK",
     noText = "Cancel",
@@ -114,8 +120,8 @@ addon.StaticPopupsList = {
   },
   ["DeleteArchive"] = {
     message = function(quest)
-      return "Are you sure you want to delete "..addon:Enquote(quest.name, '""?\n')..
-             "This will delete the quest entirely from your archive, and PMQ will forget you ever had it!"
+      return "Are you sure you want to delete \"%s\"?\n"..
+             "This will delete the quest entirely from your archive, and PMQ will forget you ever had it!", quest.name
     end,
     yesText = "OK",
     noText = "Cancel",
