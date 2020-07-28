@@ -123,5 +123,8 @@ handlers = {
       addon.SaveData:Save("Settings", addon.PlayerSettings)
       addon.Logger:Info("Cleared setting: %s", name)
     end
-  end
+  end,
+  ["scan-events"] = function()
+    addon.GameEvents:ToggleWatchAll()
+  end,
 }
