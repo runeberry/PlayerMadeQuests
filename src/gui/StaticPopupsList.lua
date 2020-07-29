@@ -153,4 +153,17 @@ addon.StaticPopupsList = {
       addon.G.ReloadUI()
     end,
   },
+  ["RenameDemoCopy"] = {
+    message = "Enter a name for your quest draft.",
+    editBox = function(demo)
+      return "Copy of "..demo.parameters.name, true
+    end,
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function(demo, text)
+      addon.QuestDemos:CopyToDrafts(demo.demoId, text)
+      addon.Logger:Info("Demo quest copied to drafts.")
+      addon.MainMenu:NavToMenuScreen("drafts")
+    end,
+  },
 }

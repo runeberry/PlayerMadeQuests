@@ -74,8 +74,8 @@ function menu:Create(frame)
     if not row or not row[2] then
       return
     end
-    addon.QuestDemos:CopyToDrafts(row[2])
-    addon.Logger:Info("Demo quest copied to drafts.")
+    local demo = addon.QuestDemos:FindByID(row[2])
+    addon.StaticPopups:Show("RenameDemoCopy", demo)
   end
 
   buttons[1] = buttonPane:AddButton("Start Quest", acceptQuest)

@@ -22,8 +22,8 @@ end
 
 local function button_CopyToDrafts()
   if not currentDemoId then return end
-  addon.QuestDemos:CopyToDrafts(currentDemoId)
-  addon.Logger:Info("Demo quest copied to drafts.")
+  local demo = addon.QuestDemos:FindByID(currentDemoId)
+  addon.StaticPopups:Show("RenameDemoCopy", demo)
 end
 
 function menu:Create(frame)
