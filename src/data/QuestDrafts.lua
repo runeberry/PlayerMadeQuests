@@ -96,7 +96,7 @@ function addon.QuestDrafts:ShareDraft(draftId)
 
   catalogItem.metadata.sender = GetUnitName("player", true)
   addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
-  addon.Logger:Info("Sharing quest - %s", catalogItem.quest.name)
+  addon.Logger:Info("Sharing quest %s...", catalogItem.quest.name)
 end
 
 function addon.QuestDrafts:StartDraft(draftId)
