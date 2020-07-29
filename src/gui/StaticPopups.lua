@@ -14,6 +14,7 @@ addon.StaticPopups = {}
     button3 = "string",   -- Maybe
     OnAccept = function,  -- I don't know
     OnAlt = function,     -- Can you repeat the question?
+    OnShow = function,
   }
 
   Properties added to the global popup by PMQ:
@@ -28,6 +29,7 @@ addon.StaticPopups = {}
   Popup template properties:
   {
     message: "string" or function,
+    editBox: "string" or function, -- show an editbox, defaulting to this message
     yesText: "string",
     noText: "string",
     otherText: "string",
@@ -73,12 +75,40 @@ local function buildPopup(template, globalId)
   popup.button2 = template.noText
   popup.button3 = template.otherText
 
+  if template.editBox then
+    popup.hasEditBox = true
+    popup.OnShow = function(self)
+      addon:catch(function()
+        if type(template.editBox) == "string" then
+          self.editBox:SetText(template.editBox)
+        elseif type(template.editBox) == "function" then
+          local v = popup._varargs or {}
+          local text, doHighlight = template.editBox(unpack(v))
+          self.editBox:SetText(text)
+          if doHighlight then
+            self.editBox:HighlightText()
+            self.editBox:SetCursorPosition(0)
+          end
+        end
+      end)
+    end
+    popup.OnHide = function(self)
+      addon:catch(function()
+        self.editBox:SetText("")
+      end)
+    end
+  end
+
   if template.yesHandler then
     popup._yesHandler = template.yesHandler
-    popup.OnAccept = function()
+    popup.OnAccept = function(self)
       addon:catch(function()
         local v = popup._varargs or {}
-        popup._yesHandler(unpack(v))
+        local text
+        if self.editBox then
+          text = self.editBox:GetText()
+        end
+        popup._yesHandler(unpack(v), text)
         if popup._onYes then
           popup._onYes()
         end
@@ -88,10 +118,14 @@ local function buildPopup(template, globalId)
   end
   if template.otherHandler then
     popup._otherHandler = template.otherHandler
-    popup.OnAlt = function()
+    popup.OnAlt = function(self)
       addon:catch(function()
         local v = popup._varargs or {}
-        popup._otherHandler(unpack(v))
+        local text
+        if self.editBox then
+          text = self.editBox:GetText()
+        end
+        popup._otherHandler(unpack(v), text)
         if popup._onOther then
           popup._onOther()
         end

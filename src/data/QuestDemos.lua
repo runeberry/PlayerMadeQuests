@@ -21,11 +21,11 @@ function addon.QuestDemos:CompileDemo(demoId)
   return addon.QuestScriptCompiler:TryCompile(demo.script, demo.parameters)
 end
 
-function addon.QuestDemos:CopyToDrafts(demoId)
+function addon.QuestDemos:CopyToDrafts(demoId, name)
   local demo = self:FindByID(demoId)
   local draft = addon.QuestDrafts:NewDraft()
   draft.parameters = addon:CopyTable(demo.parameters)
-  draft.parameters.name = demo.name
+  draft.parameters.name = name or demo.parameters.name
   draft.parameters.questId = nil -- Each copy of the demo is considered a new quest
   draft.parameters.demoId = demo.demoId -- ..but it will still keep a reference to the demo it was created from
   draft.script = demo.script
