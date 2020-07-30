@@ -75,16 +75,3 @@ function addon.QuestLog:ShareQuest(questId)
   addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
   addon.Logger:Warn("Sharing quest %s...", catalogItem.quest.name)
 end
-
-
--- addon:onload(function(questId)
---   local catalogItem = addon.QuestCatalog:FindByID(questId)
---   QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
---   addon.AppEvents:Subscribe("QuestStatusChanged", function(q)3
---     if q.status == QuestStatus.Active then
---       -- addon.Logger:Warn("Quest Accepted :)")
---       addon.Logger:Warn("Quest Accepted :) %s...", catalogItem.quest.name)
---     end
---   end)
-
--- end)
