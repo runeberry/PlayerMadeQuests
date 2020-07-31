@@ -414,6 +414,7 @@ local function buildQuestInfoFrame()
   questDetailInfoFrame:SetAllPoints(true)
 
   local article = addon.CustomWidgets:CreateWidget("ArticleText", questDetailInfoFrame)
+  article:SetAllPoints(true)
   article:SetPageStyle(pageStyle)
   for name, style in pairs(textStyles) do
     article:SetTextStyle(name, style)
