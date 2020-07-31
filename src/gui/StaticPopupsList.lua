@@ -156,7 +156,7 @@ addon.StaticPopupsList = {
   ["RenameDemoCopy"] = {
     message = "Enter a name for your quest draft.",
     editBox = function(demo)
-      return "Copy of "..demo.parameters.name, true
+      return "Copy of "..demo.demoName, true
     end,
     yesText = "OK",
     noText = "Cancel",

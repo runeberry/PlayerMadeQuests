@@ -27,7 +27,7 @@ local function button_CopyToDrafts()
 end
 
 function menu:Create(frame)
-  local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Quest Name")
+  local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Demo Name")
   nameField:SetEnabled(false)
   nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
   nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
@@ -44,7 +44,7 @@ function menu:Create(frame)
   buttonPane:AddButton("Start Quest", button_Start, { anchor = "RIGHT" })
   buttonPane:AddButton("Copy to Drafts", button_CopyToDrafts, { anchor = "RIGHT" })
 
-  local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Script")
+  local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Quest Script")
   scriptEditor:SetEnabled(false)
   scriptEditor:SetPoint("TOPLEFT", descField, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
@@ -60,12 +60,11 @@ function menu:OnShowMenu(frame, demoId)
   currentDemoId = demoId
   local demo = QuestDemos:FindByID(demoId)
   if not demo then
-    addon.Logger:Error("No demo available with id: %s", demoId)
-    error("No demo available with id:", demoId)
+    error("No demo available with id: "..demoId)
     return
   end
-  frame.nameField:SetText(demo.parameters.name)
-  frame.descField:SetText(demo.parameters.description)
+  frame.nameField:SetText(demo.demoName)
+  frame.descField:SetText(demo.helpText)
   frame.scriptEditor:SetText(demo.script)
 
   frame.scriptEditor:RefreshStyle()

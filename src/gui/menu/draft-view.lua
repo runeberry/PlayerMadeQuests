@@ -8,13 +8,11 @@ local currentDraft
 
 local function checkDirty()
   return currentFrame.nameField:IsDirty() or
-    currentFrame.descField:IsDirty() or
     currentFrame.scriptEditor:IsDirty()
 end
 
 local function cleanForm()
   currentFrame.nameField:SetDirty(false)
-  currentFrame.descField:SetDirty(false)
   currentFrame.scriptEditor:SetDirty(false)
 end
 
@@ -23,8 +21,7 @@ local function navBack()
 end
 
 local function writeFields(draft)
-  draft.parameters.name = currentFrame.nameField:GetText()
-  draft.parameters.description = currentFrame.descField:GetText()
+  draft.draftName = currentFrame.nameField:GetText()
   draft.script = currentFrame.scriptEditor:GetText()
 end
 
@@ -39,7 +36,7 @@ local function button_Save()
   writeFields(currentDraft)
   QuestDrafts:Save(currentDraft)
   cleanForm()
-  addon.Logger:Info("Draft Saved - %s", currentDraft.parameters.name)
+  addon.Logger:Info("Draft Saved - %s", currentDraft.draftName)
 end
 
 local function button_Back()
@@ -61,14 +58,9 @@ local function button_Validate()
 end
 
 function menu:Create(frame)
-  local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Quest Name")
+  local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Draft Name")
   nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
   nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
-
-  local descField = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "Description")
-  descField:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
-  descField:SetPoint("TOPRIGHT", nameField, "BOTTOMRIGHT")
-  descField:SetHeight(100)
 
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "BOTTOM")
   -- bug: This should default to LEFT anchor, but it's defaulting to TOP for some reason? Investigate...
@@ -76,12 +68,11 @@ function menu:Create(frame)
   buttonPane:AddButton("Save", button_Save, { anchor = "RIGHT" })
   buttonPane:AddButton("Validate", button_Validate, { anchor = "RIGHT" })
 
-  local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Script")
-  scriptEditor:SetPoint("TOPLEFT", descField, "BOTTOMLEFT")
+  local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Quest Script")
+  scriptEditor:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
 
   frame.nameField = nameField
-  frame.descField = descField
   frame.scriptEditor = scriptEditor
 end
 
@@ -95,17 +86,21 @@ function menu:OnShowMenu(frame, draftId)
     end
   else
     currentDraft = QuestDrafts:NewDraft()
-    currentDraft.parameters.name = "New Quest"
-    currentDraft.script = "objectives:\n  - "
+    currentDraft.draftName = "New Quest Draft"
+    currentDraft.script = [[
+quest:
+  name: My Quest Name
+  description: Dialogue for the start of the quest.
+  completion: Dialogue for the end of the quest.
+objectives:
+  - ]]
   end
 
-  frame.nameField:SetText(currentDraft.parameters.name)
-  frame.descField:SetText(currentDraft.parameters.description)
+  frame.nameField:SetText(currentDraft.draftName)
   frame.scriptEditor:SetText(currentDraft.script)
   addon.Ace:ScheduleTimer(function()
     -- Force the scrollFrame to start at the top whenever the text is changed
     -- Seems the WoW client can't correctly set scroll until the next frame
-    frame.descField.scrollFrame:SetVerticalScroll(0)
     frame.scriptEditor.scrollFrame:SetVerticalScroll(0)
   end, 0.033)
   cleanForm()
@@ -117,6 +112,5 @@ function menu:OnLeaveMenu(frame)
   currentFrame = nil
   currentDraft = nil
   frame.nameField:SetText()
-  frame.descField:SetText()
   frame.scriptEditor:SetText()
 end
