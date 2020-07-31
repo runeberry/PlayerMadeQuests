@@ -7,12 +7,12 @@ local menu = addon.MainMenu:NewMenuScreen("demo")
 local colinfo = {
   {
     name = "Quest",
-    pwidth = 0.5,
+    pwidth = 0.7,
     align = "LEFT"
   },
   {
-    name = "Demo ID",
-    pwidth = 0.5,
+    name = "Faction",
+    pwidth = 0.3,
     align = "RIGHT"
   }
 }
@@ -38,7 +38,7 @@ end
 
 function menu:Create(frame)
   for _, dq in pairs(QuestDemos:FindAll()) do
-    table.insert(dqRows, { dq.parameters.name, dq.demoId, dq.order })
+    table.insert(dqRows, { dq.demoName, dq.faction, dq.order, dq.demoId })
   end
   table.sort(dqRows, function(a, b) return a[3] < b[3] end)
 
@@ -58,24 +58,24 @@ function menu:Create(frame)
   local acceptQuest = function()
     local row = dataTable:GetSelectedRow()
     if not row then return end
-    addon.QuestDemos:StartDemo(row[2])
+    addon.QuestDemos:StartDemo(row[4])
     dataTable:ClearSelection()
   end
 
   local viewCode = function()
     local selectedRow = dataTable:GetSelectedRow()
     if not selectedRow then return end
-    local demoId = selectedRow[2]
+    local demoId = selectedRow[4]
     addon.MainMenu:ShowMenuScreen("demo-view", demoId)
   end
 
   local copyToDrafts = function()
     local row = dataTable:GetSelectedRow()
-    if not row or not row[2] then
+    if not row or not row[4] then
       return
     end
-    addon.QuestDemos:CopyToDrafts(row[2])
-    addon.Logger:Info("Demo quest copied to drafts.")
+    local demo = addon.QuestDemos:FindByID(row[4])
+    addon.StaticPopups:Show("RenameDemoCopy", demo)
   end
 
   buttons[1] = buttonPane:AddButton("Start Quest", acceptQuest)

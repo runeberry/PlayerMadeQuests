@@ -96,8 +96,6 @@ end
 
 function widget:Create(parent, textinfo)
   local frame = CreateFrame("Frame", nil, parent)
-  frame:SetAllPoints(true)
-  -- frame:Hide()
 
   frame.fontStrings = nil
   frame.pageStyle = nil

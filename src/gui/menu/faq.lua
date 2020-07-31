@@ -4,17 +4,7 @@ local menu = addon.MainMenu:NewMenuScreen("faq")
 
 local textinfo = {
   static = true,
-  styles = {
-    ["header"] = {
-      inheritsFrom = "GameFontNormalLarge",
-      justifyH = "LEFT"
-    },
-    ["default"] = {
-      inheritsFrom = "GameFontHighlightSmall",
-      justifyH = "LEFT",
-      spacing = 2
-    }
-  },
+  styles = addon.DefaultArticleTextStyle,
   text = {
     {
       style = "header",
@@ -40,5 +30,6 @@ local textinfo = {
 }
 
 function menu:Create(frame)
-  addon.CustomWidgets:CreateWidget("ArticleText", frame, textinfo)
+  local article = addon.CustomWidgets:CreateWidget("ArticleText", frame, textinfo)
+  article:SetAllPoints(true)
 end

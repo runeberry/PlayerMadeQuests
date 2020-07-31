@@ -51,9 +51,6 @@ function addon.QuestDrafts:CompileDraft(draftId)
   if not ok then
     return ok, quest
   end
-  if not draft.parameters then
-    draft.parameters = {}
-  end
   if not draft.parameters.questId then
     -- This will ensure that the quest gets the same id on every recompilation of the draft
     draft.parameters.questId = quest.questId

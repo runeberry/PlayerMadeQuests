@@ -43,7 +43,7 @@ describe("QuestScriptCompiler", function()
     -- https://github.com/dolphinspired/PlayerMadeQuests/issues/49
     local demos = addon.QuestDemos:FindAll()
     for _, demo in ipairs(demos) do
-      compiler:Compile(demo.script, demo.parameters)
+      compiler:Compile(demo.script)
     end
   end)
   describe("objective parse modes", function()

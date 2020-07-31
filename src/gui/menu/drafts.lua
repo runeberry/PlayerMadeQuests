@@ -42,7 +42,7 @@ local function getDrafts()
   local drafts = QuestDrafts:FindAll()
   table.sort(drafts, function(a, b) return a.draftId < b.draftId end)
   for _, draft in pairs(drafts) do
-    local draftName = draft.parameters.name or "(untitled draft)"
+    local draftName = draft.draftName or "(untitled draft)"
     local row = { draftName, draft.version, draft.status, draft.draftId }
     table.insert(draftRows, row)
   end

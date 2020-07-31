@@ -4,24 +4,14 @@ local menu = addon.MainMenu:NewMenuScreen("commands")
 
 local textinfo = {
   static = true,
-  styles = {
-    ["header"] = {
-      inheritsFrom = "GameFontNormalSmall",
-      justifyH = "LEFT"
-    },
-    ["default"] = {
-      inheritsFrom = "GameFontHighlightSmall",
-      justifyH = "LEFT",
-      spacing = 2
-    }
-  },
+  styles = addon.DefaultArticleTextStyle,
   text = {
     {
       style = "default",
       text = "You can open the main menu by using the command "..addon:Colorize("orange", "/pmq").." anytime. Here are some other commands you can use:"
     },
     {
-      style = "header",
+      style = "highlight",
       text = "/pmq show",
     },
     {
@@ -29,7 +19,7 @@ local textinfo = {
       text = "Shows your PMQ quest log.",
     },
     {
-      style = "header",
+      style = "highlight",
       text = "/pmq hide",
     },
     {
@@ -37,7 +27,7 @@ local textinfo = {
       text = "Hides your PMQ quest log.",
     },
     {
-      style = "header",
+      style = "highlight",
       text = "/pmq reset"
     },
     {
@@ -48,5 +38,6 @@ local textinfo = {
 }
 
 function menu:Create(frame)
-  addon.CustomWidgets:CreateWidget("ArticleText", frame, textinfo)
+  local article = addon.CustomWidgets:CreateWidget("ArticleText", frame, textinfo)
+  article:SetAllPoints(true)
 end

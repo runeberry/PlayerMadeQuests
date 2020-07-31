@@ -17,18 +17,21 @@ function addon.QuestDemos:CompileDemo(demoId)
   if not demo then
     return false, "No demo exists with demoId: "..demoId
   end
-  demo.parameters.questId = demoId
-  return addon.QuestScriptCompiler:TryCompile(demo.script, demo.parameters)
+  return addon.QuestScriptCompiler:TryCompile(demo.script, { questId = demoId })
 end
 
-function addon.QuestDemos:CopyToDrafts(demoId)
+function addon.QuestDemos:CopyToDrafts(demoId, name)
+  assert(type(demoId) == "string", "Failed to CopyToDrafts: demoId is required")
+
   local demo = self:FindByID(demoId)
   local draft = addon.QuestDrafts:NewDraft()
-  draft.parameters = addon:CopyTable(demo.parameters)
-  draft.parameters.name = demo.name
-  draft.parameters.questId = nil -- Each copy of the demo is considered a new quest
-  draft.parameters.demoId = demo.demoId -- ..but it will still keep a reference to the demo it was created from
+
+  draft.draftName = name or demo.demoName
   draft.script = demo.script
+  draft.parameters = {
+    demoId = demo.demoId, -- Each draft created from a demo copy will remember which demo it came from
+  }
+
   addon.QuestDrafts:Save(draft)
   return draft
 end

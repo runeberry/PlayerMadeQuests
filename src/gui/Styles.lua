@@ -12,6 +12,29 @@ local scrollBarBackdrop = {
   insets = { left = -1, right = 0, top = 4, bottom = 4 }
 }
 
+addon.DefaultArticleTextStyle = {
+  ["header"] = {
+    inheritsFrom = "GameFontNormalLarge",
+    justifyH = "LEFT",
+    spacing = 2,
+  },
+  ["page-header"] = {
+    inheritsFrom = "GameFontNormalLarge",
+    justifyH = "CENTER",
+    spacing = 4,
+  },
+  ["default"] = {
+    inheritsFrom = "GameFontHighlightSmall",
+    justifyH = "LEFT",
+    spacing = 2,
+  },
+  ["highlight"] = {
+    inheritsFrom = "GameFontNormalSmall",
+    justifyH = "LEFT",
+    spacing = 2,
+  }
+}
+
 function addon:ApplyBackgroundStyle(frame)
   frame:SetBackdrop(backdrop)
   frame:SetBackdropColor(0, 0, 0)
