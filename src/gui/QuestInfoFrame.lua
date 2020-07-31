@@ -85,7 +85,7 @@ local buttons = {
         addon.Logger:Warn("Unable to complete quest: completion conditions are not met")
         return
       end
-      QuestLog:SaveWithStatus(quest, QuestStatus.Finished)
+      QuestLog:SaveWithStatus(quest, QuestStatus.Completed)
       addon:PlaySound("QuestComplete")
       addon:ShowQuestInfoFrame(false)
     end
@@ -225,7 +225,7 @@ local frameModes = {
       addon:PlaySound("BookWrite")
     end,
   },
-  ["CompletedQuest"] = {
+  ["FinishedQuest"] = {
     leftButton = buttons.Empty,
     rightButton = buttons.Complete, -- todo: incorporate "Abandon" into this mode
     busy = function(frame, quest, sender)
@@ -334,8 +334,8 @@ local statusModeMap = {
   [QuestStatus.Active] = "ActiveQuest",
   [QuestStatus.Failed] = "TerminatedQuest",
   [QuestStatus.Abandoned] = "TerminatedQuest",
-  [QuestStatus.Completed] = "CompletedQuest",
-  [QuestStatus.Finished] = "TerminatedQuest",
+  [QuestStatus.Finished] = "FinishedQuest",
+  [QuestStatus.Completed] = "TerminatedQuest",
 }
 
 local function buildQuestInfoFrame()

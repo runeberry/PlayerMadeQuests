@@ -109,22 +109,22 @@ local function updateQuestObjectiveProgress(obj)
   qobj.progress = obj.progress
   QuestLog:Save(quest)
 
-  local isObjectiveCompleted, isQuestCompleted
+  local isObjectiveCompleted, isQuestFinished
   -- objective is considered completed if progress is >= goal
   if obj.progress >= obj.goal then
     -- quest is only considered completed if all objectives would be considered completed
     isObjectiveCompleted = true
-    isQuestCompleted = true
+    isQuestFinished = true
     for _, qo in pairs(quest.objectives) do
       if qo.progress < qo.goal then
-        isQuestCompleted = false
+        isQuestFinished = false
         break
       end
     end
   end
 
-  if isQuestCompleted then
-    quest.status = QuestStatus.Completed
+  if isQuestFinished then
+    quest.status = QuestStatus.Finished
   end
   QuestLog:Save(quest)
 
@@ -133,7 +133,7 @@ local function updateQuestObjectiveProgress(obj)
     addon.AppEvents:Publish("ObjectiveCompleted", obj)
   end
 
-  return isObjectiveCompleted, isQuestCompleted
+  return isObjectiveCompleted, isQuestFinished
 end
 
 local function wrapObjectiveHandler(objective)

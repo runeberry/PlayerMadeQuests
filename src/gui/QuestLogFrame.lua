@@ -21,11 +21,11 @@ local visConfig = {
   showQuest = {
     [QuestStatus.Active] = true,
     [QuestStatus.Failed] = true,
-    [QuestStatus.Completed] = true,
+    [QuestStatus.Finished] = true,
   },
   showStatus = {
-    [QuestStatus.Failed] = true,
-    [QuestStatus.Completed] = true,
+    [QuestStatus.Failed] = "(Failed)",
+    [QuestStatus.Finished] = "(Complete)",
   },
   showObjectives = {
     [QuestStatus.Active] = true
@@ -33,7 +33,7 @@ local visConfig = {
   questColor = {
     [QuestStatus.Active] = "yellow",
     [QuestStatus.Failed] = "red",
-    [QuestStatus.Completed] = "green",
+    [QuestStatus.Finished] = "green",
   }
 }
 
@@ -85,8 +85,9 @@ end
 
 local function SetQuestText(label, quest)
   local text = quest.name
-  if visConfig.showStatus[quest.status] then
-    text = text.." ("..quest.status..")"
+  local statusText = visConfig.showStatus[quest.status]
+  if statusText then
+    text = text.." "..statusText
   end
   local color = visConfig.questColor[quest.status]
   if color then

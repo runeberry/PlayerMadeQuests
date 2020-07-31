@@ -53,7 +53,7 @@ addon.StaticPopupsList = {
   },
   ["RetryQuest"] = {
     message = function(quest)
-      if quest.status == QuestStatus.Finished then
+      if quest.status == QuestStatus.Completed then
         -- Provide an additional warning only if the quest has already been successfully finished
         return "Replay \"%s\"?\n"..
                "This will erase your previous completion of this quest.", quest.name

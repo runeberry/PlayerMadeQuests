@@ -45,7 +45,7 @@ local buttons = {
     status = {
       [QuestStatus.Active] = true,
       [QuestStatus.Failed] = true,
-      [QuestStatus.Completed] = true,
+      [QuestStatus.Finished] = true,
     }
   },
   {
@@ -69,8 +69,8 @@ local buttons = {
       [QuestStatus.Active] = true,
       [QuestStatus.Failed] = true,
       [QuestStatus.Abandoned] = true,
-      [QuestStatus.Completed] = true,
       [QuestStatus.Finished] = true,
+      [QuestStatus.Completed] = true,
     }
   },
 }

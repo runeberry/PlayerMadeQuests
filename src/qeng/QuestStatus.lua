@@ -7,8 +7,8 @@ local qs = {
   Active = "Active",
   Failed = "Failed",
   Abandoned = "Abandoned",
-  Completed = "Completed",
   Finished = "Finished",
+  Completed = "Completed",
 }
 addon.QuestStatus = qs
 
@@ -22,36 +22,36 @@ local validStatusTable = {
     [qs.Active] = valid(),
     [qs.Failed] = valid(),
     [qs.Abandoned] = valid(),
-    [qs.Completed] = valid(),
-    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
+    [qs.Finished] = valid(),
+    [qs.Completed] = invalid("A quest can only be completed from the Finished status."),
   },
   [qs.Failed] = {
     [qs.Active] = valid(),
     [qs.Failed] = valid(),
     [qs.Abandoned] = valid(),
-    [qs.Completed] = invalid("A quest can only be completed from the Active status."),
-    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
+    [qs.Finished] = invalid("A quest can only be finished from the Active status."),
+    [qs.Completed] = invalid("A quest can only be completed from the Finished status."),
   },
   [qs.Abandoned] = {
     [qs.Active] = valid(),
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
     [qs.Abandoned] = valid(),
-    [qs.Completed] = invalid("A quest can only be completed from the Active status."),
-    [qs.Finished] = invalid("A quest can only be finished from the Completed status."),
-  },
-  [qs.Completed] = {
-    [qs.Active] = valid(),
-    [qs.Failed] = invalid("A quest can only be failed from the Active status."),
-    [qs.Abandoned] = valid(),
-    [qs.Completed] = valid(),
-    [qs.Finished] = valid(),
+    [qs.Finished] = invalid("A quest can only be finished from the Active status."),
+    [qs.Completed] = invalid("A quest can only be completed from the Finished status."),
   },
   [qs.Finished] = {
     [qs.Active] = valid(),
     [qs.Failed] = invalid("A quest can only be failed from the Active status."),
-    [qs.Abandoned] = invalid("A finished quest cannot be returned to the Abandoned status."),
-    [qs.Completed] = invalid("A finished quest cannot be returned to the Completed status."),
+    [qs.Abandoned] = valid(),
     [qs.Finished] = valid(),
+    [qs.Completed] = valid(),
+  },
+  [qs.Completed] = {
+    [qs.Active] = valid(),
+    [qs.Failed] = invalid("A quest can only be failed from the Active status."),
+    [qs.Abandoned] = invalid("A completed quest cannot be returned to the Abandoned status."),
+    [qs.Finished] = invalid("A completed quest cannot be returned to the Finished status."),
+    [qs.Completed] = valid(),
   },
 }
 
