@@ -18,6 +18,11 @@ addon.DefaultArticleTextStyle = {
     justifyH = "LEFT",
     spacing = 2,
   },
+  ["page-header"] = {
+    inheritsFrom = "GameFontNormalLarge",
+    justifyH = "CENTER",
+    spacing = 4,
+  },
   ["default"] = {
     inheritsFrom = "GameFontHighlightSmall",
     justifyH = "LEFT",

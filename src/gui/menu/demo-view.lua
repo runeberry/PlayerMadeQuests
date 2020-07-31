@@ -6,6 +6,15 @@ local menu = addon.MainMenu:NewMenuScreen("demo-view")
 -- Temporarily store an id here to use it with the onclick functions
 local currentDemoId = nil
 
+local textinfo = {
+  static = true,
+  styles = addon.DefaultArticleTextStyle,
+  text = {
+    { style = "page-header", text = "DEMO_NAME" },
+    { style = "default", text = "DEMO_INFO" },
+  }
+}
+
 local function button_Back()
   addon.MainMenu:NavToMenuScreen("demo")
 end
@@ -27,16 +36,11 @@ local function button_CopyToDrafts()
 end
 
 function menu:Create(frame)
-  local nameField = addon.CustomWidgets:CreateWidget("TextInput", frame, "Demo Name")
-  nameField:SetEnabled(false)
-  nameField:SetPoint("TOPLEFT", frame, "TOPLEFT")
-  nameField:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
-
-  local descField = addon.CustomWidgets:CreateWidget("TextInputScrolling", frame, "Description")
-  descField:SetEnabled(false)
-  descField:SetPoint("TOPLEFT", nameField, "BOTTOMLEFT")
-  descField:SetPoint("TOPRIGHT", nameField, "BOTTOMRIGHT")
-  descField:SetHeight(100)
+  local articleText = addon.CustomWidgets:CreateWidget("ArticleText", frame, textinfo)
+  articleText:ClearAllPoints()
+  articleText:SetPoint("TOPLEFT", frame, "TOPLEFT")
+  articleText:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
+  articleText:SetHeight(120)
 
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "BOTTOM")
   -- bug: This should default to LEFT anchor, but it's defaulting to TOP for some reason? Investigate...
@@ -46,11 +50,11 @@ function menu:Create(frame)
 
   local scriptEditor = addon.CustomWidgets:CreateWidget("ScriptEditor", frame, "Quest Script")
   scriptEditor:SetEnabled(false)
-  scriptEditor:SetPoint("TOPLEFT", descField, "BOTTOMLEFT")
+  scriptEditor:SetPoint("TOPLEFT", articleText, "BOTTOMLEFT")
   scriptEditor:SetPoint("BOTTOMRIGHT", buttonPane, "TOPRIGHT")
 
-  frame.nameField = nameField
-  frame.descField = descField
+  frame.nameField = articleText:GetFontString(1)
+  frame.descField = articleText:GetFontString(2)
   frame.scriptEditor = scriptEditor
 
   return frame
@@ -72,7 +76,7 @@ end
 
 function menu:OnLeaveMenu(frame)
   currentDemoId = nil
-  frame.nameField:SetText()
-  frame.descField:SetText()
+  frame.nameField:SetText("DEMO_NAME")
+  frame.descField:SetText("DEMO_INFO")
   frame.scriptEditor:SetText()
 end
