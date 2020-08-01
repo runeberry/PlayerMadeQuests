@@ -171,7 +171,8 @@ end
 --   content - what to draw when the frame is shown in this mode
 --   busy - what to draw when a request is recieved to show the frame, but it's already shown
 --   clean - how to clean up the frame and leave an empty canvas for the next draw
-local frameModes = {
+local frameModes
+frameModes = {
   ["NewQuest"] = {
     leftButton = buttons.Accept,
     rightButton = buttons.Decline,
@@ -263,8 +264,25 @@ local frameModes = {
 
     end,
     content = function(frame, quest, sender)
-      -- todo: real stuff here
-      frame.article:GetFontString(2):SetText("You are currently on "..addon:Enquote(quest.name, '""'))
+      frame.titleFontString:SetText("[PMQ] Quest Info")
+
+      local fs = frame.article:GetFontStrings()
+
+      -- Quest name & objectives
+      fs[1]:SetText(quest.name)
+      if quest.objectives then
+        local objString = ""
+        for _, obj in ipairs(quest.objectives) do
+          objString = string.format("%s* %s\n", objString, localizer:GetDisplayText(obj, "quest"))
+        end
+        fs[2]:SetText(objString)
+      else
+        fs[2]:SetText("\n")
+      end
+
+      -- Quest Description
+      fs[3]:SetText("Description")
+      fs[4]:SetText((quest.description or " ").."\n\n") -- Space for bottom margin
     end,
   },
   ["TerminatedQuest"] = {
@@ -274,8 +292,8 @@ local frameModes = {
 
     end,
     content = function(frame, quest, sender)
-      -- todo: real stuff here
-      frame.article:GetFontString(2):SetText("Try again?")
+      -- Using the same frame as NewQuest for now, may update this later
+      frameModes["NewQuest"].content(frame, quest, sender)
     end,
   }
 }
