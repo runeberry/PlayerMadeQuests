@@ -98,6 +98,7 @@ local buttons = {
       QuestLog:SaveWithStatus(quest, QuestStatus.Completed)
       addon:PlaySound("QuestComplete")
       addon:ShowQuestInfoFrame(false)
+      addon.Logger:Warn("%s completed.", quest.name)
     end
   },
   ["Abandon"] = {
