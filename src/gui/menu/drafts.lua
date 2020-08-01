@@ -1,21 +1,18 @@
 local _, addon = ...
 local QuestDrafts = addon.QuestDrafts
 local CreateFrame = addon.G.CreateFrame
+local date = addon.G.date
 
 local menu = addon.MainMenu:NewMenuScreen("drafts")
 
 local colinfo = {
   {
-    name = "Quest",
-    pwidth = 0.5,
+    name = "Draft",
+    pwidth = 0.6,
     align = "LEFT"
   },
   {
-    name = "Version",
-    align = "RIGHT"
-  },
-  {
-    name = "Status",
+    name = "Last Modified",
     align = "RIGHT"
   }
 }
@@ -43,7 +40,7 @@ local function getDrafts()
   table.sort(drafts, function(a, b) return a.draftId < b.draftId end)
   for _, draft in pairs(drafts) do
     local draftName = draft.draftName or "(untitled draft)"
-    local row = { draftName, draft.version, draft.status, draft.draftId }
+    local row = { draftName, date("%x %X", draft.ud), draft.draftId }
     table.insert(draftRows, row)
   end
   return draftRows
@@ -70,27 +67,27 @@ function menu:Create(frame)
   local editDraft = function()
     local selectedRow = dataTable:GetSelectedRow()
     if not selectedRow then return end
-    local draftId = selectedRow[4]
+    local draftId = selectedRow[3]
     addon.MainMenu:ShowMenuScreen("draft-view", draftId)
   end
 
   local deleteDraft = function()
     local row = dataTable:GetSelectedRow()
     if not row then return end
-    addon.StaticPopups:Show("DeleteDraft", row[4], row[1])
+    addon.StaticPopups:Show("DeleteDraft", row[3], row[1])
   end
 
   local startQuest = function()
     local row = dataTable:GetSelectedRow()
     if not row then return end
-    addon.QuestDrafts:StartDraft(row[4])
+    addon.QuestDrafts:StartDraft(row[3])
     dataTable:ClearSelection()
   end
 
   local shareQuest = function()
     local row = dataTable:GetSelectedRow()
     if not row then return end
-    addon.QuestDrafts:ShareDraft(row[4])
+    addon.QuestDrafts:ShareDraft(row[3])
   end
 
   buttons[1] = buttonPane:AddButton("New", newDraft)

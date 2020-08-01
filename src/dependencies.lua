@@ -16,6 +16,7 @@ addon.ParseYaml = LibStub("TinyYaml").parse
 
 -- WoW Global Functions
 addon.G = {
+  date = date,
   print = print,
   strjoin = strjoin,
   strsplit = strsplit,
