@@ -261,9 +261,9 @@ local objectives = {
       t.PARAM_COORDS,
     },
     displaytext = {
-      log = "Go to [%co:Point #%inc in ][%sz|%z]",
-      progress = "[%co:Point #%inc in ][%sz|%z] explored: %p/%g",
-      quest = "Explore [%co:Point #%inc in ]%z2",
+      log = "Go to %xyz",
+      progress = "%xyz explored: %p/%g",
+      quest = "Explore %xyz",
       full = "Go to %xyrz"
     },
     params = {
