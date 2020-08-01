@@ -23,6 +23,15 @@ local textStyles = {
   }
 }
 
+local frameDefaultPos = {
+  p1 = "TOPLEFT",
+  p2 = "TOPLEFT",
+  x = 0,
+  y = -104,
+  w = 384,
+  h = 512,
+}
+
 local function acceptQuest(quest, sender)
   QuestLog:SaveWithStatus(quest, QuestStatus.Active)
   if QuestCatalog:FindByID(quest.questId) then
@@ -325,6 +334,13 @@ local frameScripts = {
     self._shown = nil
     addon:PlaySound("BookClose")
   end,
+  ["OnDragStart"] = function(self)
+    self:StartMoving()
+  end,
+  ["OnDragStop"] = function(self)
+    self:StopMovingOrSizing()
+    addon:SaveWindowPosition(self, "QuestInfoFramePosition", frameDefaultPos)
+  end,
   -- ["OnLoad"] = function() end,
   -- ["OnEvent"] = function() end,
 }
@@ -343,9 +359,9 @@ local function buildQuestInfoFrame()
   --questFrame:SetTopLevel(true)
   questFrame:SetMovable(true)
   questFrame:EnableMouse(true)
+  questFrame:RegisterForDrag("LeftButton")
   questFrame:Hide()
-  questFrame:SetSize(384, 512)
-  questFrame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -104)
+  addon:LoadWindowPosition(questFrame, "QuestInfoFramePosition", frameDefaultPos)
   questFrame:SetHitRectInsets(0, 30, 0, 70)
   for event, handler in pairs(frameScripts) do
     questFrame:SetScript(event, handler)
@@ -403,7 +419,7 @@ local function buildQuestInfoFrame()
   end)
 
   local questDetailScrollFrame = CreateFrame("ScrollFrame", nil, questFrameDetailPanel, "QuestScrollFrameTemplate")
-  -- questDetailScrollFrame:SetAllPoints(true)
+  questDetailScrollFrame:SetPoint("TOPLEFT", questFrameDetailPanel, "TOPLEFT", 22, -82)
   local questDetailScrollChildFrame = CreateFrame("Frame", nil, questDetailScrollFrame)
   questDetailScrollChildFrame:SetSize(300, 334)
   questDetailScrollChildFrame:SetPoint("TOPLEFT", questFrameDetailPanel, "TOPLEFT")
