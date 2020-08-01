@@ -43,6 +43,7 @@ local function acceptQuest(quest, sender)
   addon:PlaySound("QuestAccepted")
   addon:ShowQuestInfoFrame(false)
   addon:ShowQuestLog(true)
+  addon.Logger:Warn("Quest Accepted: %s", quest.name)
 end
 
 local buttons = {
