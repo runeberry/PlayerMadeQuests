@@ -1,8 +1,8 @@
 local _, addon = ...
 local print = addon.G.print
 
-addon.VERSION = 7
-addon.BRANCH = "alpha"
+addon.VERSION = 100
+addon.BRANCH = "beta"
 addon.IsAddonLoaded = false
 
 function addon.Ace:OnInitialize()
