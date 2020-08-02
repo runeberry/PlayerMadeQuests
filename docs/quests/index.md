@@ -51,13 +51,10 @@ objectives:
   - emote roar 4 "Dunemaul Brute"
 complete:
   zone: Steamwheedle Port
-  x: 68.24
-  y: 22.95
+  coords: 68.24,22.95
 ```
 
 Want to see how it works? Feel free to copy-paste this quest into your own draft in-game. Try changing some of the values and see how the quest is changed as a result.
 
 <img src="../img/ogre1.png" width="49%"/>
 <img src="../img/ogre2.png" width="49%"/>
-
-_Don't mind the couple of text bugs you see here. We're still in development, we'll work it out!_
