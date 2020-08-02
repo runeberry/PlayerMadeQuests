@@ -38,6 +38,16 @@ local patterns = {
     result = "%1%2|c%3|r",
     color = colors.yellow
   },
+  { -- Multi-line string markers
+    pattern = ":(%s-)(>)",
+    result = ":%1|c%2|r",
+    color = colors.pinkish
+  },
+  { -- Text variables
+    pattern = "%%(%w-)(%W)",
+    result = "|c%%%1|r%2",
+    color = colors.pinkish
+  },
   { -- Flow style table braces
     pattern = "([{}])",
     result = "|c%1|r",
