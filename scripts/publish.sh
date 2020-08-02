@@ -38,3 +38,7 @@ rm $OUTFILE # Clean up old copy in case it already exists
 rm -rf $ADDON_NAME
 
 echo "Addon published to: $OUTFILE"
+
+git commit . -m "v$VERSION_STRING"
+
+echo "Version bump committed to git."
