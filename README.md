@@ -21,7 +21,7 @@ Create and share your own custom quests in World of Warcraft: Classic!
 * **Quest Development Tools** - tools to track coordinates, NPCs, etc. that you want to put in your quests
 * **Quest Builder UI** - build your quest with a friendlier user interface instead of writing script
 
-Download it today: https://www.curseforge.com/wow/addons/pmq
+Download the addon on [CurseForge](https://www.curseforge.com/wow/addons/pmq), or simply download the latest .zip file from the [Releases](https://github.com/runeberry/PlayerMadeQuests/releases) page.
 
 Want to give us feedback during the Beta test? Join us on [Discord](https://discord.gg/U9cDAQg).
 
