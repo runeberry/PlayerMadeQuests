@@ -2,24 +2,24 @@
 
 Create and share your own custom quests in World of Warcraft: Classic!
 
-Features:
+### Features
 
 * Write out your own custom quest with just a few lines of YAML script
-* **Demo Quests**: short quests provided with the addon to help you learn how to write your own
-* **Real-time Objective Tracking**: plays just like a World of Warcraft quest
-* **Quest Sharing**: share your quest with party members with the click of a button*
-* **Highly Customizable**: any and all quest text to tell the story (or joke) you want to tell
-* **Quest Replay**: you can replay any quests that you've finished previously
+* **Demo Quests** - short quests provided with the addon to help you learn how to write your own
+* **Real-time Objective Tracking** - plays just like a World of Warcraft quest
+* **Quest Sharing** - share your quest with party members with the click of a button*
+* **Highly Customizable** - any and all quest text to tell the story (or joke) you want to tell
+* **Quest Replay** - you can replay any quests that you've finished previously
 
 *Party members must also have PMQ installed in order to receive shared quests
 
-Upcoming plans for PMQ:
+### Upcoming plans for PMQ
 
-* **Quest Chains**: link multiple quests together to form a larger story
-* **More Objectives**: involving items, auras, merchants, and more
-* **Localization**: share quests reliably between different-language game clients
-* **Quest Development Tools**: tools to track coordinates, NPCs, etc. that you want to put in your quests
-* **Quest Builder UI**: build your quest with a friendlier user interface instead of writing script
+* **Quest Chains** - link multiple quests together to form a larger story
+* **More Objectives** - involving items, auras, merchants, and more
+* **Localization** - share quests reliably between different-language game clients
+* **Quest Development Tools** - tools to track coordinates, NPCs, etc. that you want to put in your quests
+* **Quest Builder UI** - build your quest with a friendlier user interface instead of writing script
 
 Download it today: https://www.curseforge.com/wow/addons/pmq
 
