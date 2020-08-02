@@ -8,27 +8,27 @@ local factions = {
 local demoinfos = {
   ["basics"] = {
     name = "Lesson 1: The Basics",
-    help = "<add this>",
+    help = "",
   },
   ["kill"] = {
     name = "Lesson 2: Killing Foes",
-    help = "This demonstrates how to write a quest to kill enemies. The target's name must be spelled and capitalized exactly right, otherwise you won't gain quest progress for killing them!\n\nAlso, if the target's name is more than one word, you must surround it with quotes. Otherwise, quotes are optional.",
+    help = "",
   },
   ["talkto"] = {
     name = "Lesson 3: Talking to NPCs",
-    help = "This demonstrates how to write a quest to talk to certains NPCs. The target's name must be spelled and capitalized exactly right, and quotes must be used if the target's name is more than one word.\n\nIf you specify a goal number, you must talk to that many different NPCs with the same name. Talking to the same NPC twice won't grant additional quest progress!",
+    help = "",
   },
   ["emote"] = {
     name = "Lesson 4: Show your Emotions",
-    help = "This demonstrates how to write a quest to use certain in-game emotes. You can specify a target that the emote must be used with. If you don't specify a target, then performing the emote anywhere will count.\n\nJust like with the 'talkto' objective, if you specify a goal number, you must use that emote on multiple different NPCs with that same name.",
+    help = "",
   },
   ["explore"] = {
     name = "Lesson 5: Going Places",
-    help = "This demonstrates how to write a quest to visit certain locations. You must specify a zone, but you can also specify a subzone or coordinates for a more precise destination.",
+    help = "",
   },
   ["text"] = {
     name = "Lesson 6: Custom Text",
-    help = "<add this>",
+    help = "",
   },
 }
 
@@ -69,7 +69,7 @@ quest:
     He told you to do what?! I was trying to tame those wild beasts!
     *sigh*... It's okay, they grow back quick enough. Thanks for getting rid
     of that pesky cow, at least.
-# 'recommended' or 'required' let you set requirements for your quest
+# 'recommended' or 'required' lets you set requirements for your quest
 recommended:
   level: 5
   faction: Alliance
@@ -217,7 +217,7 @@ quest:
     Ah, I can see that you were successful, as the blood of untamed beasts
     soaks your now-tattered clothes. You didn't actually kill the bunny, right?
     I was kidding about that.
-# 'recommended' or 'required' let you set requirements for your quest
+# 'recommended' or 'required' lets you set requirements for your quest
 recommended:
   level: 5
   faction: Horde

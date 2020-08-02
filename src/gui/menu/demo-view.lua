@@ -40,7 +40,7 @@ function menu:Create(frame)
   articleText:ClearAllPoints()
   articleText:SetPoint("TOPLEFT", frame, "TOPLEFT")
   articleText:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
-  articleText:SetHeight(120)
+  articleText:SetHeight(20)
 
   local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "BOTTOM")
   -- bug: This should default to LEFT anchor, but it's defaulting to TOP for some reason? Investigate...
