@@ -4,37 +4,52 @@ local CreateFrame = addon.G.CreateFrame
 
 local menu = addon.MainMenu:NewMenuScreen("QuestDemoListMenu")
 
-local colinfo = {
-  {
-    name = "Quest",
-    pwidth = 0.7,
-    align = "LEFT"
-  },
-  {
-    name = "Faction",
-    pwidth = 0.3,
-    align = "RIGHT"
-  }
-}
-
 local dqRows = {}
-local buttons = {}
 
-local function getDemoQuests()
-  return dqRows
-end
-
-local function setButtonState(row)
-  if row then
-    buttons[1]:Enable()
-    buttons[2]:Enable()
-    buttons[3]:Enable()
-  else
-    buttons[1]:Disable()
-    buttons[2]:Disable()
-    buttons[3]:Disable()
-  end
-end
+local options = {
+  colInfo = {
+    {
+      name = "Quest",
+      pwidth = 0.7,
+      align = "LEFT"
+    },
+    {
+      name = "Faction",
+      pwidth = 0.3,
+      align = "RIGHT"
+    }
+  },
+  dataSource = function()
+    return dqRows
+  end,
+  buttons = {
+    {
+      text = "Start Quest",
+      anchor = "TOP",
+      enabled = "Row",
+      handler = function(demo, dataTable)
+        addon.QuestDemos:StartDemo(demo.demoId)
+        dataTable:ClearSelection()
+      end,
+    },
+    {
+      text = "View Code",
+      anchor = "TOP",
+      enabled = "Row",
+      handler = function(demo)
+        addon.MainMenu:ShowMenuScreen("QuestDemoViewMenu", demo.demoId)
+      end,
+    },
+    {
+      text = "Copy to Drafts",
+      anchor = "TOP",
+      enabled = "Row",
+      handler = function(demo)
+        addon.StaticPopups:Show("RenameDemoCopy", demo)
+      end,
+    }
+  },
+}
 
 function menu:Create(frame)
   for _, dq in pairs(QuestDemos:FindAll()) do
@@ -42,49 +57,9 @@ function menu:Create(frame)
   end
   table.sort(dqRows, function(a, b) return a[3] < b[3] end)
 
-  local buttonPane = addon.CustomWidgets:CreateWidget("ButtonPane", frame, "LEFT", 120)
-
-  local tablePane = CreateFrame("Frame", nil, frame)
-  tablePane:SetPoint("TOPLEFT", buttonPane, "TOPRIGHT")
-  tablePane:SetPoint("BOTTOMLEFT", buttonPane, "BOTTOMRIGHT")
-  tablePane:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
-  tablePane:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
-
-  local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, colinfo, getDemoQuests)
-  dataTable:RefreshData()
-  dataTable:OnRowSelected(setButtonState)
-  frame.dataTable = dataTable
-
-  local acceptQuest = function()
-    local row = dataTable:GetSelectedRow()
-    if not row then return end
-    addon.QuestDemos:StartDemo(row[4])
-    dataTable:ClearSelection()
-  end
-
-  local viewCode = function()
-    local selectedRow = dataTable:GetSelectedRow()
-    if not selectedRow then return end
-    local demoId = selectedRow[4]
-    addon.MainMenu:ShowMenuScreen("QuestDemoViewMenu", demoId)
-  end
-
-  local copyToDrafts = function()
-    local row = dataTable:GetSelectedRow()
-    if not row or not row[4] then
-      return
-    end
-    local demo = addon.QuestDemos:FindByID(row[4])
-    addon.StaticPopups:Show("RenameDemoCopy", demo)
-  end
-
-  buttons[1] = buttonPane:AddButton("Start Quest", acceptQuest)
-  buttons[2] = buttonPane:AddButton("View Code", viewCode)
-  buttons[3] = buttonPane:AddButton("Copy to Drafts", copyToDrafts)
-
-  setButtonState(nil)
-end
-
-function menu:OnShow(frame)
-  setButtonState(frame.dataTable:GetSelectedRow())
+  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
+  dtwb:OnGetSelectedItem(function(row)
+    return QuestDemos:FindByID(row[4])
+  end)
+  dtwb:GetDataTable():RefreshData()
 end

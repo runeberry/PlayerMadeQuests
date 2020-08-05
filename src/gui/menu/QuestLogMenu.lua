@@ -104,7 +104,7 @@ function menu:Create(frame)
     return QuestLog:FindByID(row[3])
   end)
 
-  frame.dataTable = dtwb._dataTable
+  frame.dataTable = dtwb:GetDataTable()
 end
 
 function menu:OnShowMenu(frame)
