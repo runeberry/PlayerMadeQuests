@@ -61,13 +61,13 @@ handlers = {
     end
   end,
   ["show"] = function()
-    addon:ShowQuestLog(true)
+    addon.QuestLogFrame:ToggleShown(true)
   end,
   ["hide"] = function()
-    addon:ShowQuestLog(false)
+    addon.QuestLogFrame:ToggleShown(false)
   end,
   ["toggle"] = function()
-    addon:ShowQuestLog(not(addon.PlayerSettings.IsQuestLogShown))
+    addon.QuestLogFrame:ToggleShown()
   end,
   ["dump"] = function(varname)
     local func = loadstring("return "..varname)

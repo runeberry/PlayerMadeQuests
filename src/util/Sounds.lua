@@ -25,6 +25,10 @@ local sounds = {
   ["BookWrite"] = {
     fileId = 567396,
     path = "sound/interface/writequestc.ogg",
+  },
+  ["CloseWindow"] = {
+    fileId = 567407,
+    path = "sound/interface/uchatscrollbutton.ogg",
   }
 }
 

@@ -6,13 +6,18 @@
   <Script file="gui/Styles.lua"/>
 
   <!-- Custom Widgets -->
+  <Script file="gui/widgets/PopoutFrame.lua"/>
+
   <Script file="gui/widgets/ArticleText.lua"/>
   <Script file="gui/widgets/ButtonPane.lua"/>
   <Script file="gui/widgets/DataTable.lua"/>
   <Script file="gui/widgets/Heading.lua"/>
   <Script file="gui/widgets/ScriptEditor.lua"/>
+  <Script file="gui/widgets/Sizer.lua"/>
   <Script file="gui/widgets/TextInput.lua"/>
   <Script file="gui/widgets/TextInputScrolling.lua"/>
+  <Script file="gui/widgets/TitleBar.lua"/>
+  <Script file="gui/widgets/ToolWindowPopout.lua"/>
   <Script file="gui/widgets/TreeMenuFrame.lua"/>
 
   <!-- Top-level frames -->

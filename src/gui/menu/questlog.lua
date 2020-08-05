@@ -148,7 +148,7 @@ function menu:Create(frame)
 
   local handlers = {
     ["toggle"] = function()
-      addon:ShowQuestLog(not(addon.PlayerSettings.IsQuestLogShown))
+      addon.QuestLogFrame:ToggleShown()
     end,
     ["info"] = function()
       local quest = getRowQuest()

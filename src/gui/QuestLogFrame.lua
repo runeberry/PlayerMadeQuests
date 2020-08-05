@@ -1,10 +1,23 @@
 local _, addon = ...
-
 local AceGUI = addon.AceGUI
 local QuestLog, QuestStatus, localizer = addon.QuestLog, addon.QuestStatus, addon.QuestScriptLocalizer
 
-local frames = {}
-local subscriptions = {}
+addon.QuestLogFrame = nil -- Built at end of file
+
+local frameOptions = {
+  styleOptions = {
+    text = "PMQ Quest Log"
+  },
+  position = {
+    p1 = "RIGHT",
+    p2 = "RIGHT",
+    x = -100,
+    y = 0,
+    w = 250,
+    h = 300,
+    shown = true
+  },
+}
 
 local visConfig = {
   showQuest = {
@@ -33,27 +46,6 @@ local textRedrawEvents = {
   "QuestDeleted",
   "QuestDataReset",
 }
-
-local defaultWindowPos = {
-  p1 = "RIGHT",
-  p2 = "RIGHT",
-  x = -100,
-  y = 0,
-  w = 250,
-  h = 300
-}
-
-local function SavePosition()
-  local widget = frames["main"]
-  if not widget then return end
-  addon:SaveWindowPosition(widget.frame, "QuestLogPosition", defaultWindowPos)
-end
-
-local function LoadPosition()
-  local widget = frames["main"]
-  if not widget then return end
-  addon:LoadWindowPosition(widget.frame, "QuestLogPosition", defaultWindowPos)
-end
 
 local function SetQuestText(label, quest)
   local text = quest.name
@@ -108,44 +100,28 @@ local function SetQuestLogText(questList, quests)
   end
 end
 
-local function refreshQuestText()
-  local quests = QuestLog:FindAll()
-  table.sort(quests, function(a,b) return a.questId < b.questId end)
-  SetQuestLogText(frames["questList"], quests)
-end
+local methods = {
+  ["Refresh"] = function(self)
+    -- Don't try to draw quest text until we have confirmation that the quest log is built
+    if not self._isQuestLogBuilt then return end
+    local quests = QuestLog:FindAll()
+    table.sort(quests, function(a,b) return a.questId < b.questId end)
+    SetQuestLogText(self._questList, quests)
+  end,
+}
 
-local function OnOpen()
-  addon.PlayerSettings.IsQuestLogShown = true
-  LoadPosition()
-  refreshQuestText()
-end
+local function buildQuestLogFrame()
+  local frame = addon.CustomWidgets:CreateWidget("ToolWindowPopout", "QuestLogFrame", frameOptions)
 
-local function OnClose(widget)
-  addon:catch(SavePosition)
-  addon.PlayerSettings.IsQuestLogShown = false
-  frames = {}
-  for event, key in pairs(subscriptions) do
-
-    addon.AppEvents:Unsubscribe(event, key)
-  end
-  subscriptions = {}
-  AceGUI:Release(widget)
-end
-
-local function BuildQuestLogFrame()
-  local container = AceGUI:Create("Window")
-  container:SetTitle("PMQ Quest Log")
-  container:SetCallback("OnClose", OnClose)
-  container:SetLayout("Flow")
-  container.frame:SetFrameStrata("HIGH") -- default Ace frame strata is too high
-  container.frame:SetScript("OnLeave", SavePosition)
-  frames["main"] = container
+  local content = frame:GetContentFrame()
 
   local scrollGroup = AceGUI:Create("SimpleGroup")
   scrollGroup:SetFullWidth(true)
   scrollGroup:SetFullHeight(true)
   scrollGroup:SetLayout("Fill")
-  container:AddChild(scrollGroup)
+
+  scrollGroup.frame:SetParent(content)
+  scrollGroup.frame:SetAllPoints(true)
 
   local scroller = AceGUI:Create("ScrollFrame")
   scroller:SetLayout("Flow")
@@ -166,30 +142,25 @@ local function BuildQuestLogFrame()
   local questList = AceGUI:Create("SimpleGroup")
   questList:SetFullWidth(true)
   scroller:AddChild(questList)
-  frames["questList"] = questList
+  frame._questList = questList
 
+  for fname, fn in pairs(methods) do
+    frame[fname] = fn
+  end
+
+  frame._subscriptions = {}
+  local refresher = function() frame:Refresh() end
   for _, event in ipairs(textRedrawEvents) do
-    subscriptions[event] = addon.AppEvents:Subscribe(event, refreshQuestText)
+    frame._subscriptions[event] = addon.AppEvents:Subscribe(event, refresher)
   end
 
-  OnOpen()
+  return frame
 end
 
-function addon:ShowQuestLog(show)
-  local mainframe = frames["main"]
-  if show == true then
-    if mainframe == nil then
-      BuildQuestLogFrame()
-    end
-  elseif mainframe ~= nil then
-    -- todo: this might throw an error from AceGUI
-    -- just going to suppress it until I can refactor this window
-    pcall(OnClose, mainframe)
-  end
-end
-
-addon.AppEvents:Subscribe("QuestLogBuilt", function()
-  if addon.PlayerSettings.IsQuestLogShown or addon.PlayerSettings.IsQuestLogShown == nil then
-    addon:ShowQuestLog(true)
-  end
+addon:catch(function()
+  addon.QuestLogFrame = buildQuestLogFrame()
+  addon.AppEvents:Subscribe("QuestLogBuilt", function()
+    addon.QuestLogFrame._isQuestLogBuilt = true
+    addon.QuestLogFrame:Refresh()
+  end)
 end)

@@ -58,52 +58,69 @@ function addon:CreateScrollFrame(parent)
   return scrollFrame, scrollBarFrame
 end
 
--- For some reason GetPoint() returns the wrong position unless you move the window
--- Still trying to figure this one out
-local function isInaccuratePoint(p1, p2, x, y)
-  return p1 == "CENTER" and p2 == "CENTER" and x == 0 and y == 0
-end
+-- Pulled from AceGUI-Window
+function addon:SetBorderBoxTexture(frame)
+  local dialogbg = frame:CreateTexture(nil, "BACKGROUND")
+  dialogbg:SetTexture(137056) -- Interface\\Tooltips\\UI-Tooltip-Background
+  dialogbg:SetPoint("TOPLEFT", 8, -24)
+  dialogbg:SetPoint("BOTTOMRIGHT", -6, 8)
+  dialogbg:SetVertexColor(0, 0, 0, .75)
 
-function addon:SaveWindowPosition(frame, saveDataName, defaultPos)
-  local p1, _, p2, x, y = frame:GetPoint()
-  if isInaccuratePoint(p1, p2, x, y) and defaultPos then
-    p1 = defaultPos.p1
-    p2 = defaultPos.p2
-    x = defaultPos.x
-    y = defaultPos.y
-  end
-  local w, h = frame:GetSize()
+  local topleft = frame:CreateTexture(nil, "BORDER")
+  topleft:SetTexture(251963) -- Interface\\PaperDollInfoFrame\\UI-GearManager-Border
+  topleft:SetWidth(64)
+  topleft:SetHeight(64)
+  topleft:SetPoint("TOPLEFT")
+  topleft:SetTexCoord(0.501953125, 0.625, 0, 1)
 
-  if not addon.PlayerSettings.FrameData then
-    addon.PlayerSettings.FrameData = {}
-  end
+  local topright = frame:CreateTexture(nil, "BORDER")
+  topright:SetTexture(251963) -- Interface\\PaperDollInfoFrame\\UI-GearManager-Border
+  topright:SetWidth(64)
+  topright:SetHeight(64)
+  topright:SetPoint("TOPRIGHT")
+  topright:SetTexCoord(0.625, 0.75, 0, 1)
 
-  addon.PlayerSettings.FrameData[saveDataName] = strjoin(",", p1, p2, x, y, w, h)
-  addon.SaveData:Save("Settings", addon.PlayerSettings)
-  addon.UILogger:Trace("Saved window position: %s %s (%.2f, %.2f) %ix%i", p1, p2, x, y, w, h)
-end
+  local top = frame:CreateTexture(nil, "BORDER")
+  top:SetTexture(251963) -- Interface\\PaperDollInfoFrame\\UI-GearManager-Border
+  top:SetHeight(64)
+  top:SetPoint("TOPLEFT", topleft, "TOPRIGHT")
+  top:SetPoint("TOPRIGHT", topright, "TOPLEFT")
+  top:SetTexCoord(0.25, 0.369140625, 0, 1)
 
-function addon:LoadWindowPosition(frame, saveDataName, defaultPos)
-  local pos
-  local frameData = addon.PlayerSettings.FrameData
-  if frameData and frameData[saveDataName] then
-    local p1, p2, x, y, w, h = strsplit(",", frameData[saveDataName])
-    pos = {
-      p1 = p1,
-      p2 = p2,
-      x = x,
-      y = y,
-      w = w,
-      h = h,
-    }
-  elseif defaultPos then
-    pos = defaultPos
-  else
-    addon.UILogger:Trace("No saved position or default position available for frame.")
-    return
-  end
+  local bottomleft = frame:CreateTexture(nil, "BORDER")
+  bottomleft:SetTexture(251963) -- Interface\\PaperDollInfoFrame\\UI-GearManager-Border
+  bottomleft:SetWidth(64)
+  bottomleft:SetHeight(64)
+  bottomleft:SetPoint("BOTTOMLEFT")
+  bottomleft:SetTexCoord(0.751953125, 0.875, 0, 1)
 
-  frame:SetSize(pos.w, pos.h)
-  frame:SetPoint(pos.p1, UIParent, pos.p2, pos.x, pos.y)
-  addon.UILogger:Trace("Loaded window position: %s %s (%.2f, %.2f) %ix%i", pos.p1, pos.p2, pos.x, pos.y, pos.w, pos.h)
+  local bottomright = frame:CreateTexture(nil, "BORDER")
+  bottomright:SetTexture(251963) -- Interface\\PaperDollInfoFrame\\UI-GearManager-Border
+  bottomright:SetWidth(64)
+  bottomright:SetHeight(64)
+  bottomright:SetPoint("BOTTOMRIGHT")
+  bottomright:SetTexCoord(0.875, 1, 0, 1)
+
+  local bottom = frame:CreateTexture(nil, "BORDER")
+  bottom:SetTexture(251963) -- Interface\\PaperDollInfoFrame\\UI-GearManager-Border
+  bottom:SetHeight(64)
+  bottom:SetPoint("BOTTOMLEFT", bottomleft, "BOTTOMRIGHT")
+  bottom:SetPoint("BOTTOMRIGHT", bottomright, "BOTTOMLEFT")
+  bottom:SetTexCoord(0.376953125, 0.498046875, 0, 1)
+
+  local left = frame:CreateTexture(nil, "BORDER")
+  left:SetTexture(251963) -- Interface\\PaperDollInfoFrame\\UI-GearManager-Border
+  left:SetWidth(64)
+  left:SetPoint("TOPLEFT", topleft, "BOTTOMLEFT")
+  left:SetPoint("BOTTOMLEFT", bottomleft, "TOPLEFT")
+  left:SetTexCoord(0.001953125, 0.125, 0, 1)
+
+  local right = frame:CreateTexture(nil, "BORDER")
+  right:SetTexture(251963) -- Interface\\PaperDollInfoFrame\\UI-GearManager-Border
+  right:SetWidth(64)
+  right:SetPoint("TOPRIGHT", topright, "BOTTOMRIGHT")
+  right:SetPoint("BOTTOMRIGHT", bottomright, "TOPRIGHT")
+  right:SetTexCoord(0.1171875, 0.2421875, 0, 1)
+
+  return frame
 end
