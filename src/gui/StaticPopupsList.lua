@@ -48,7 +48,7 @@ addon.StaticPopupsList = {
     yesHandler = function()
       QuestLog:DeleteAll()
       addon:PlaySound("QuestAbandoned")
-      addon.Logger:Warn("Quest Log reset")
+      addon.Logger:Warn("Quest Log cleared")
     end,
   },
   ["RetryQuest"] = {
@@ -138,7 +138,7 @@ addon.StaticPopupsList = {
     yesHandler = function()
       QuestArchive:DeleteAll()
       addon:PlaySound("QuestAbandoned")
-      addon.Logger:Warn("Quest Archive reset")
+      addon.Logger:Warn("Quest Archive cleared")
     end,
   },
   ["ResetSaveData"] = {
@@ -166,4 +166,24 @@ addon.StaticPopupsList = {
       addon.MainMenu:NavToMenuScreen("QuestDraftListMenu")
     end,
   },
+  ["ResetCatalog"] = {
+    message = "Remove all quests from your catalog?",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function()
+      addon.QuestCatalog:DeleteAll()
+      addon:PlaySound("QuestAbandoned")
+      addon.Logger:Warn("Quest Catalog cleared")
+    end,
+  },
+  ["ResetDrafts"] = {
+    message = "Delete all quest drafts?\nThis will delete all drafts shared between all of your characters!",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function()
+      addon.QuestDrafts:DeleteAll()
+      addon:PlaySound("QuestAbandoned")
+      addon.Logger:Warn("Quest Drafts cleared")
+    end,
+  }
 }

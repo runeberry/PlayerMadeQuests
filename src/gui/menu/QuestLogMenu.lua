@@ -71,7 +71,7 @@ local options = {
       end,
     },
     {
-      text = "Reset Quest Log",
+      text = "Clear All",
       anchor = "BOTTOM",
       enabled = "Always",
       handler = function(quest)
@@ -79,7 +79,7 @@ local options = {
       end,
     },
     {
-      text = "Delete Quest",
+      text = "Delete",
       anchor = "BOTTOM",
       enabled = "Row",
       handler = function(quest)

@@ -47,14 +47,6 @@ local options = {
       end,
     },
     {
-      text = "Delete",
-      anchor = "TOP",
-      enabled = "Row",
-      handler = function(draft)
-        addon.StaticPopups:Show("DeleteDraft", draft.draftId, draft.name)
-      end,
-    },
-    {
       text = "Start Quest",
       anchor = "TOP",
       enabled = "Row",
@@ -71,12 +63,28 @@ local options = {
         addon.QuestDrafts:ShareDraft(draft.draftId)
       end,
     },
+    {
+      text = "Clear All",
+      anchor = "BOTTOM",
+      enabled = "Always",
+      handler = function()
+        addon.StaticPopups:Show("ResetDrafts")
+      end,
+    },
+    {
+      text = "Delete",
+      anchor = "BOTTOM",
+      enabled = "Row",
+      handler = function(draft)
+        addon.StaticPopups:Show("DeleteDraft", draft.draftId, draft.draftName or "(untitled draft)")
+      end,
+    },
   },
 }
 
 function menu:Create(frame)
   local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
-  dtwb:SubscribeToEvents("DraftUpdated", "DraftDeleted", "DraftDataLoaded")
+  dtwb:SubscribeToEvents("DraftUpdated", "DraftDeleted", "DraftDataLoaded", "DraftDataReset")
   dtwb:OnGetSelectedItem(function(row)
     return QuestDrafts:FindByID(row[3])
   end)

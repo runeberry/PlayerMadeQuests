@@ -46,8 +46,16 @@ local options = {
       end,
     },
     {
+      text = "Clear All",
+      anchor = "BOTTOM",
+      enabled = "Always",
+      handler = function()
+        addon.StaticPopups:Show("ResetCatalog")
+      end,
+    },
+    {
       text = "Delete",
-      anchor = "TOP",
+      anchor = "BOTTOM",
       enabled = "Row",
       handler = function(catalogItem)
         addon.StaticPopups:Show("DeleteCatalogItem", catalogItem)
@@ -58,7 +66,7 @@ local options = {
 
 function menu:Create(frame)
   local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
-  dtwb:SubscribeToEvents("CatalogItemUpdated", "CatalogItemDeleted", "CatalogItemDataLoaded")
+  dtwb:SubscribeToEvents("CatalogItemUpdated", "CatalogItemDeleted", "CatalogItemDataLoaded", "CatalogItemDataReset")
   dtwb:OnGetSelectedItem(function(row)
     return QuestCatalog:FindByID(row[3])
   end)

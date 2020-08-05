@@ -47,7 +47,7 @@ local options = {
       end,
     },
     {
-      text = "Reset Archive",
+      text = "Clear All",
       anchor = "BOTTOM",
       enabled = "Always",
       handler = function()
@@ -55,7 +55,7 @@ local options = {
       end,
     },
     {
-      text = "Delete Quest",
+      text = "Delete",
       anchor = "BOTTOM",
       enabled = "Row",
       handler = function(quest)
