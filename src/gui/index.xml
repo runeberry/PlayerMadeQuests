@@ -11,6 +11,7 @@
   <Script file="gui/widgets/ArticleText.lua"/>
   <Script file="gui/widgets/ButtonPane.lua"/>
   <Script file="gui/widgets/DataTable.lua"/>
+  <Script file="gui/widgets/DataTableWithButtons.lua"/>
   <Script file="gui/widgets/Heading.lua"/>
   <Script file="gui/widgets/ScriptEditor.lua"/>
   <Script file="gui/widgets/Sizer.lua"/>
