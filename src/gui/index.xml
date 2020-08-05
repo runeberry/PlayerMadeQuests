@@ -28,14 +28,14 @@
   <Script file="gui/YamlFormatting.lua"/>
 
   <!-- MainMenu screens -->
-  <Script file="gui/menu/archive.lua"/>
-  <Script file="gui/menu/catalog.lua"/>
-  <Script file="gui/menu/commands.lua"/>
-  <Script file="gui/menu/demo.lua"/>
-  <Script file="gui/menu/demo-view.lua"/>
-  <Script file="gui/menu/draft-view.lua"/>
-  <Script file="gui/menu/drafts.lua"/>
-  <Script file="gui/menu/faq.lua"/>
-  <Script file="gui/menu/questlog.lua"/>
-  <Script file="gui/menu/settings.lua"/>
+  <Script file="gui/menu/HelpCommandsMenu.lua"/>
+  <Script file="gui/menu/HelpFaqMenu.lua"/>
+  <Script file="gui/menu/QuestArchiveMenu.lua"/>
+  <Script file="gui/menu/QuestCatalogMenu.lua"/>
+  <Script file="gui/menu/QuestDemoListMenu.lua"/>
+  <Script file="gui/menu/QuestDemoViewMenu.lua"/>
+  <Script file="gui/menu/QuestDraftEditMenu.lua"/>
+  <Script file="gui/menu/QuestDraftListMenu.lua"/>
+  <Script file="gui/menu/QuestLogMenu.lua"/>
+  <Script file="gui/menu/SettingsMenu.lua"/>
 </Ui>

@@ -1,7 +1,7 @@
 local _, addon = ...
 local QuestDrafts = addon.QuestDrafts
 
-local menu = addon.MainMenu:NewMenuScreen("draft-view")
+local menu = addon.MainMenu:NewMenuScreen("QuestDraftEditMenu")
 
 local currentFrame
 local currentDraft
@@ -17,7 +17,7 @@ local function cleanForm()
 end
 
 local function navBack()
-  addon.MainMenu:NavToMenuScreen("drafts")
+  addon.MainMenu:NavToMenuScreen("QuestDraftListMenu")
 end
 
 local function writeFields(draft)

@@ -1,7 +1,7 @@
 local _, addon = ...
 local QuestDemos = addon.QuestDemos
 
-local menu = addon.MainMenu:NewMenuScreen("demo-view")
+local menu = addon.MainMenu:NewMenuScreen("QuestDemoViewMenu")
 
 -- Temporarily store an id here to use it with the onclick functions
 local currentDemoId = nil
@@ -16,7 +16,7 @@ local textinfo = {
 }
 
 local function button_Back()
-  addon.MainMenu:NavToMenuScreen("demo")
+  addon.MainMenu:NavToMenuScreen("QuestDemoListMenu")
 end
 
 local function button_Start()

@@ -135,7 +135,7 @@ local function buildQuestLogFrame()
   moreButton:SetText("View Log")
   moreButton:SetWidth(100)
   moreButton:SetCallback("OnClick", function()
-    addon.MainMenu:NavToMenuScreen("questlog")
+    addon.MainMenu:NavToMenuScreen("QuestLogMenu")
   end)
   buttonGroup:AddChild(moreButton)
 

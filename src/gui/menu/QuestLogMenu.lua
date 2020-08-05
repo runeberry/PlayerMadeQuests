@@ -3,7 +3,7 @@ local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 local StaticPopups = addon.StaticPopups
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen("questlog")
+local menu = addon.MainMenu:NewMenuScreen("QuestLogMenu")
 
 local colinfo = {
   {

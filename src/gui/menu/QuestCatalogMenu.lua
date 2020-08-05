@@ -2,7 +2,7 @@ local _, addon = ...
 local QuestCatalog = addon.QuestCatalog
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen("catalog")
+local menu = addon.MainMenu:NewMenuScreen("QuestCatalogMenu")
 
 local colinfo = {
   {

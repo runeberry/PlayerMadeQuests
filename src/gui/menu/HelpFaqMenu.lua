@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local menu = addon.MainMenu:NewMenuScreen("faq")
+local menu = addon.MainMenu:NewMenuScreen("HelpFaqMenu")
 
 local textinfo = {
   static = true,

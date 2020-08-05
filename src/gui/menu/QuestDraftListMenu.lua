@@ -3,7 +3,7 @@ local QuestDrafts = addon.QuestDrafts
 local CreateFrame = addon.G.CreateFrame
 local date = addon.G.date
 
-local menu = addon.MainMenu:NewMenuScreen("drafts")
+local menu = addon.MainMenu:NewMenuScreen("QuestDraftListMenu")
 
 local colinfo = {
   {
@@ -61,14 +61,14 @@ function menu:Create(frame)
   frame.dataTable = dataTable
 
   local newDraft = function()
-    addon.MainMenu:ShowMenuScreen("draft-view")
+    addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu")
   end
 
   local editDraft = function()
     local selectedRow = dataTable:GetSelectedRow()
     if not selectedRow then return end
     local draftId = selectedRow[3]
-    addon.MainMenu:ShowMenuScreen("draft-view", draftId)
+    addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu", draftId)
   end
 
   local deleteDraft = function()

@@ -3,7 +3,7 @@ local QuestArchive = addon.QuestArchive
 local StaticPopups = addon.StaticPopups
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen("archive")
+local menu = addon.MainMenu:NewMenuScreen("QuestArchiveMenu")
 
 local colinfo = {
   {

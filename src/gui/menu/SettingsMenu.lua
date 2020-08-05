@@ -1,7 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen("settings")
+local menu = addon.MainMenu:NewMenuScreen("SettingsMenu")
 
 function menu:Create(frame)
   local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")

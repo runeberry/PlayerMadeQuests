@@ -99,11 +99,11 @@ addon.StaticPopupsList = {
     noText = "Cancel",
     otherText = "Save",
     yesHandler = function()
-      addon.MainMenu:NavToMenuScreen("drafts")
+      addon.MainMenu:NavToMenuScreen("QuestDraftListMenu")
     end,
     otherHandler = function(saveFunction)
       saveFunction()
-      addon.MainMenu:NavToMenuScreen("drafts")
+      addon.MainMenu:NavToMenuScreen("QuestDraftListMenu")
     end,
   },
   ["DeleteDraft"] = {
@@ -163,7 +163,7 @@ addon.StaticPopupsList = {
     yesHandler = function(demo, text)
       addon.QuestDemos:CopyToDrafts(demo.demoId, text)
       addon.Logger:Info("Demo quest copied to drafts.")
-      addon.MainMenu:NavToMenuScreen("drafts")
+      addon.MainMenu:NavToMenuScreen("QuestDraftListMenu")
     end,
   },
 }
