@@ -127,4 +127,7 @@ handlers = {
   ["scan-events"] = function()
     addon.GameEvents:ToggleWatchAll()
   end,
+  ["position"] = function()
+    addon.PositionFinderFrame:ToggleShown()
+  end
 }

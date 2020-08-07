@@ -25,6 +25,7 @@
   <Script file="gui/MainMenu.lua"/>
   <Script file="gui/QuestInfoFrame.lua"/>
   <Script file="gui/QuestLogFrame.lua"/>
+  <Script file="gui/PositionFinderFrame.lua"/>
   <Script file="gui/UIErrorsFrame.lua"/>
   <Script file="gui/YamlFormatting.lua"/>
 
