@@ -67,11 +67,17 @@ local options = {
 
 function menu:Create(frame)
   local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
-  dtwb:SubscribeToEvents("ArchiveDataLoaded", "ArchiveAdded", "ArchiveDeleted", "ArchiveDataReset")
-  dtwb:OnGetSelectedItem(function(row)
+  local dataTable = dtwb:GetDataTable()
+  dataTable:SubscribeMethodToEvents("RefreshData", "ArchiveDataLoaded", "ArchiveAdded", "ArchiveDeleted", "ArchiveDataReset")
+  dataTable:SubscribeMethodToEvents("ClearSelection", "ArchiveDataLoaded", "ArchiveDeleted", "ArchiveDataReset")
+  dataTable:OnGetSelectedItem(function(row)
     return QuestArchive:FindByID(row[3])
   end)
-  frame.dataTable = dtwb:GetDataTable()
+  addon.AppEvents:Subscribe("ArchiveDataReset", function()
+    dataTable:ClearSelection()
+  end)
+
+  frame.dataTable = dataTable
 end
 
 function menu:OnShowMenu(frame)

@@ -34,12 +34,6 @@ local methods = {
   ["OnRowSelected"] = function(self, fn)
     self._onRowSelected = fn
   end,
-  ["SubscribeToEvents"] = function(self, ...)
-    return self._dataTable:SubscribeToEvents(...)
-  end,
-  ["OnGetSelectedItem"] = function(self, fn)
-    return self._dataTable:OnGetSelectedItem(fn)
-  end,
   ["RefreshButtonState"] = function(self)
     setButtonState(self, self._dataTable:GetSelectedItem())
   end

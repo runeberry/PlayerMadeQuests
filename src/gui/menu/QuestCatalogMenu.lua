@@ -66,12 +66,14 @@ local options = {
 
 function menu:Create(frame)
   local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
-  dtwb:SubscribeToEvents("CatalogItemUpdated", "CatalogItemDeleted", "CatalogItemDataLoaded", "CatalogItemDataReset")
-  dtwb:OnGetSelectedItem(function(row)
+  local dataTable = dtwb:GetDataTable()
+  dataTable:SubscribeMethodToEvents("RefreshData", "CatalogItemUpdated", "CatalogItemDeleted", "CatalogItemDataLoaded", "CatalogItemDataReset")
+  dataTable:SubscribeMethodToEvents("ClearSelection", "CatalogDataLoaded", "CatalogItemDeleted", "CatalogDataReset")
+  dataTable:OnGetSelectedItem(function(row)
     return QuestCatalog:FindByID(row[3])
   end)
 
-  frame.dataTable = dtwb._dataTable
+  frame.dataTable = dataTable
 end
 
 function menu:OnShowMenu(frame)

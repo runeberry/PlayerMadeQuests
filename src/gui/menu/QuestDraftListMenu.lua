@@ -84,11 +84,14 @@ local options = {
 
 function menu:Create(frame)
   local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
-  dtwb:SubscribeToEvents("DraftUpdated", "DraftDeleted", "DraftDataLoaded", "DraftDataReset")
-  dtwb:OnGetSelectedItem(function(row)
+  local dataTable = dtwb:GetDataTable()
+  dataTable:SubscribeMethodToEvents("RefreshData", "DraftUpdated", "DraftDeleted", "DraftDataLoaded", "DraftDataReset")
+  dataTable:SubscribeMethodToEvents("ClearSelection", "DraftDataLoaded", "DraftDeleted", "DraftDataReset")
+  dataTable:OnGetSelectedItem(function(row)
     return QuestDrafts:FindByID(row[3])
   end)
-  frame.dataTable = dtwb:GetDataTable()
+
+  frame.dataTable = dataTable
 end
 
 function menu:OnShowMenu(frame)

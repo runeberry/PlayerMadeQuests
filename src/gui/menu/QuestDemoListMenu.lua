@@ -58,8 +58,9 @@ function menu:Create(frame)
   table.sort(dqRows, function(a, b) return a[3] < b[3] end)
 
   local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
-  dtwb:OnGetSelectedItem(function(row)
+  local dataTable = dtwb:GetDataTable()
+  dataTable:OnGetSelectedItem(function(row)
     return QuestDemos:FindByID(row[4])
   end)
-  dtwb:GetDataTable():RefreshData()
+  dataTable:RefreshData()
 end

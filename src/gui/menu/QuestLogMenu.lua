@@ -99,12 +99,14 @@ local options = {
 
 function menu:Create(frame)
   local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
-  dtwb:SubscribeToEvents("QuestDataLoaded", "QuestAdded", "QuestDeleted", "QuestStatusChanged", "QuestDataReset")
-  dtwb:OnGetSelectedItem(function(row)
+  local dataTable = dtwb:GetDataTable()
+  dataTable:SubscribeMethodToEvents("RefreshData", "QuestDataLoaded", "QuestAdded", "QuestDeleted", "QuestStatusChanged", "QuestDataReset")
+  dataTable:SubscribeMethodToEvents("ClearSelection", "QuestDataLoaded", "QuestDeleted", "QuestDataReset")
+  dataTable:OnGetSelectedItem(function(row)
     return QuestLog:FindByID(row[3])
   end)
 
-  frame.dataTable = dtwb:GetDataTable()
+  frame.dataTable = dataTable
 end
 
 function menu:OnShowMenu(frame)

@@ -6,10 +6,10 @@ local widget = addon.CustomWidgets:NewWidget("DataTable")
 local rowHeight = 15
 local highlightColor = { r = 0.8, g = 0.7, b = 0, a = 0.5 }
 
-local function wrapEventRefresh(dt)
+local function wrapEventSubscription(dt, methodName)
   return function(...)
     if dt._enableUpdates then
-      dt:RefreshData(...)
+      dt[methodName](dt, ...)
     end
   end
 end
@@ -29,27 +29,32 @@ local methods = {
   ["ClearFilters"] = function(self)
     self._filters = {}
   end,
-  ["SubscribeToEvents"] = function(self, ...)
+  -- Run the specified method on this DataTable whenever these events occur
+  -- The subscriptions will only be run if updates are enabled on this DataTable
+  ["SubscribeMethodToEvents"] = function(self, methodName, ...)
+    assert(type(methodName) == "string", "Failed to SubscribeToEvents: methodName is required")
+    assert(type(self[methodName]) == "function", "Failed to SubscribeToEvents: "..methodName.." is not a known method of DataTable")
+
+    local subs = self._subscriptions[methodName]
+    if not subs then
+      subs = {}
+      self._subscriptions[methodName] = subs
+    end
+
+    -- Wrap the method call so that it only runs if updates are enabled
+    local wrappedSubscription = wrapEventSubscription(self, methodName)
+
     for _, appEvent in pairs({ ... }) do
-      if self._subscriptions[appEvent] then
-        error("DataTable is already subscribed to event: "..appEvent)
+      if subs[appEvent] then
+        -- DataTable is already subscribed to perform this method on this AppEvent
+      else
+        subs[appEvent] = addon.AppEvents:Subscribe(appEvent, wrappedSubscription)
       end
-      local subKey = addon.AppEvents:Subscribe(appEvent, wrapEventRefresh(self))
-      self._subscriptions[appEvent] = subKey
     end
   end,
   ["EnableUpdates"] = function(self, flag)
     if flag == nil then flag = true end
     self._enableUpdates = flag
-  end,
-  ["UnsubscribeFromEvents"] = function(self, ...)
-    for _, appEvent in pairs({ ... }) do
-      local subKey = self._subscriptions[appEvent]
-      if subKey then
-        addon.AppEvents:Unsubscribe(appEvent, subKey)
-        self._subscriptions[appEvent] = nil
-      end
-    end
   end,
   ["GetSelectedRow"] = function(self)
     local index = self._scrollingTable:GetSelection()
@@ -71,6 +76,11 @@ local methods = {
   end,
   ["ClearSelection"] = function(self)
     return self._scrollingTable:ClearSelection()
+  end,
+  ["SetClearSelectionEvents"] = function(self, ...)
+    for _, appEvent in pairs({ ... }) do
+
+    end
   end,
   ["OnRowSelected"] = function(self, fn)
     self.onRowSelected = fn
