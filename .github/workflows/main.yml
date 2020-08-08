@@ -1,0 +1,24 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Publish Release
+on:
+  release:
+    types: [published]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - name: AWS SNS - Publish Topic
+      uses: nothingalike/sns-publish-topic@v1.6
+      with:
+        # The message you want to send
+        MESSAGE: PMQRelease
+        # The topic arn you are sending
+        TOPIC_ARN: ${{ secrets.PMQ_SNS_TOPIC_ARN }}
+        # A AWSN SNS Region. Can alternatively be stored in environment
+        AWS_REGION: ${{ secrets.PMQ_SNS_AWS_REGION }}
+        # A AWS SNS Key. Can alternatively be stored in environment
+        AWS_ACCESS_KEY_ID: ${{ secrets.PMQ_SNS_AWS_ACCESS_KEY_ID }}
+        # A AWS SNS Secret. Can alternatively be stored in environment
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.PMQ_SNS_AWS_SECRET_ACCESS_KEY }}
