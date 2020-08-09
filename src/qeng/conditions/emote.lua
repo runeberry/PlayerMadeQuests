@@ -1,4 +1,5 @@
 local _, addon = ...
+local logger = addon.QuestEngine.ObjectiveLogger
 local loader = addon.QuestScriptLoader
 local tokens = addon.QuestScriptTokens
 local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
@@ -21,6 +22,11 @@ loader:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_EVAL, function(obj, emoteName
   local eem = expectedEmoteMessages[obj.id]
   local expectTargetedEmote = obj.conditions[tokens.PARAM_TARGET]
 
+  if expectTargetedEmote then
+    logger:Trace("        Expecting emote to be targeted")
+  end
+
+  -- Determine the expected emote messages, then cache the result
   if not eem then
     eem = {}
 
@@ -46,13 +52,18 @@ loader:AddScript(tokens.PARAM_EMOTE, tokens.METHOD_EVAL, function(obj, emoteName
     -- so we can compare to the generic emote message.
     local targetName = GetUnitName("target")
     pem = pem:gsub(targetName, "%%t")
+    logger:Trace("        Last emote message modified to: %s", pem)
   end
 
   -- If the emote matches matches the message of any of the
   -- expected emotes, then the condition is true.
   for _, em in pairs(eem) do
     if pem == em then
+      logger:Debug(logger.pass.."Emote match found: %s", em)
       return true
     end
   end
+
+  logger:Debug(logger.fail.."No emote match found")
+  return false
 end)

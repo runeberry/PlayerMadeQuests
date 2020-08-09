@@ -1,4 +1,5 @@
 local _, addon = ...
+local logger = addon.QuestEngine.ObjectiveLogger
 local loader = addon.QuestScriptLoader
 local tokens = addon.QuestScriptTokens
 local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
@@ -18,12 +19,14 @@ local function isUniqueTargetGuid(obj, targetUnitGuid)
 
   if objTargetGuidHistory[targetUnitGuid] then
     -- Already targeted this NPC for this objective, don't count it
+    logger:Debug(logger.fail.."Target has already been used for this objective (%s)", targetUnitGuid)
     return false
   end
 
   -- Otherwise, log this guid and progress the objective
   objTargetGuidHistory[targetUnitGuid] = true
   addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
+  logger:Debug(logger.pass.."New target for objective (%s)", targetUnitGuid)
   return true
 end
 
@@ -40,12 +43,19 @@ end)
 
 loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_EVAL, function(obj, unitNames)
   local targetUnitName = GetUnitName("target")
+  if not targetUnitName then
+    -- No unit is targeted
+    logger:Debug(logger.fail.."No unit is targeted")
+    return false
+  end
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name
+    logger:Debug(logger.fail.."Target name does not match (%s)", targetUnitName)
     return false
   end
   if obj.goal == 1 then
     -- Only one unit to target, so the objective is satisfied
+    logger:Debug(logger.pass.."Target name match, and goal is 1 (%s)", targetUnitName)
     return true
   end
   return isUniqueTargetGuid(obj, UnitGUID("target"))
@@ -68,10 +78,12 @@ loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_EVAL, function(obj, unit
   local targetUnitName = addon.LastPartyKill.destName
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name
+    logger:Debug(logger.fail.."Target name does not match (%s)", targetUnitName)
     return false
   end
   if obj.goal == 1 then
     -- Only one unit to target, so the objective is satisfied
+    logger:Debug(logger.pass.."Target name match, and goal is 1 (%s)", targetUnitName)
     return true
   end
   return isUniqueTargetGuid(obj, addon.LastPartyKill.destGuid)

@@ -1,4 +1,5 @@
 local _, addon = ...
+local logger = addon.QuestEngine.ObjectiveLogger
 local tokens = addon.QuestScriptTokens
 local UnitExists = addon.G.UnitExists
 

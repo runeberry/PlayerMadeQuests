@@ -6,8 +6,13 @@ addon:onload(function()
 end)
 
 local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
+local objectiveLogger = addon.Logger:NewLogger("Objectives", addon.LogLevel.info)
+objectiveLogger.pass = addon:Colorize("green", "        [PASS] ")
+objectiveLogger.fail = addon:Colorize("red", "        [FAIL] ")
 
-addon.QuestEngine = {}
+addon.QuestEngine = {
+  ObjectiveLogger = objectiveLogger
+}
 
 local objectivesByName = {}
 local isEngineLoaded = false
@@ -19,17 +24,17 @@ local isQuestDataLoaded = false
 
 local function evaluateObjective(objective, obj, ...)
   local ok, beforeResult, checkResult, afterResult
-  logger:Trace("Evaluating objective \"%s\" (%s)", obj.name, obj.id)
+  objectiveLogger:Debug("=== Evaluating objective \"%s\"", obj.name)
 
   if objective.scripts and objective.scripts[tokens.METHOD_PRE_EVAL] then
     -- Determine if the objective as a whole should be evaluated
     ok, beforeResult = pcall(objective.scripts[tokens.METHOD_PRE_EVAL], obj, ...)
     if not ok then
-      logger:Error("Error during pre-evaluation for \"%s\": %s", obj.id, beforeResult)
+      objectiveLogger:Error("Error during pre-evaluation for \"%s\": %s", obj.id, beforeResult)
       return
     elseif beforeResult == false then
       -- If the objective's pre-condition returns boolean false, then do not continue evaluating the objective
-      logger:Trace("Pre-evaluation returned false for %s. Terminating early.", obj.id)
+        objectiveLogger:Debug("Pre-evaluation returned false for %s. Terminating early.", obj.id)
       return
     end
   end
@@ -42,9 +47,8 @@ local function evaluateObjective(objective, obj, ...)
     if condition.scripts and condition.scripts[tokens.METHOD_EVAL] then
       -- Evaluation receives 2 args: The obj being evaluated, and the value(s) for this condition
       ok, checkResult = pcall(condition.scripts[tokens.METHOD_EVAL], obj, val)
-      logger:Trace("    Condition \"%s\" evaluated: %i", name, checkResult)
       if not ok then
-        logger:Error("Error evaluating condition %s for %s: %s", name, obj.id, checkResult)
+        objectiveLogger:Error("Error evaluating condition %s for %s: %s", name, obj.id, checkResult)
         return
       elseif checkResult ~= true then
         -- If any result was not true, keep evaluating conditions, but set checkResult to false when it's all done
@@ -62,12 +66,12 @@ local function evaluateObjective(objective, obj, ...)
   if objective.scripts and objective.scripts[tokens.METHOD_POST_EVAL] then
     ok, afterResult = addon:catch(objective.scripts[tokens.METHOD_POST_EVAL], obj, checkResult, ...)
     if not(ok) then
-      logger:Error("Error during post-evaluation for \"%s\": %s", obj.id, afterResult)
+      objectiveLogger:Error("Error during post-evaluation for \"%s\": %s", obj.id, afterResult)
       return
     elseif afterResult ~= nil then
       -- If the post-evaluation returns a value, then that value will override the result of evaluation
       checkResult = afterResult
-      logger:Trace("    Post-evaluation overriding result with: %i", checkResult)
+      objectiveLogger:Trace("    Post-evaluation overriding result with: %i", checkResult)
     end
   end
 
@@ -80,7 +84,7 @@ local function evaluateObjective(objective, obj, ...)
     checkResult = 0
   end
 
-  logger:Trace("%s evaluated: %s", obj.name, checkResult)
+  objectiveLogger:Trace("=== Evaluated \"%s\": %s", obj.name, checkResult)
   return checkResult
 end
 
@@ -142,7 +146,7 @@ local function wrapObjectiveHandler(objective)
     local numActive = addon:tlen(objective._active)
     if numActive < 1 then return end
 
-    logger:Debug("Evaluating objective: %s (%i active)", objective.name, addon:tlen(objective._active))
+    objectiveLogger:Debug("***** Evaluating objectives: %s (%i active)", objective.name, addon:tlen(objective._active))
     -- logger:Table(objective._active)
     -- Completed objectives will be tracked and removed from the list
     local completed = {}
@@ -173,6 +177,8 @@ local function wrapObjectiveHandler(objective)
       -- Stop trying to update that objective on subsequent game events
       objective._active[id] = nil
     end
+
+    objectiveLogger:Trace("***** Finished evaluating objectives: %s", objective.name)
   end
 end
 
