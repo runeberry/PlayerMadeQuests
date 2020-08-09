@@ -70,7 +70,7 @@ objectives:
       subzone: Goldshire
   - emote:
       emote: sigh
-      target: Murloc Steamrunner
+      target: Murloc
       zone: Crystal Lake
       coords: 50.57,66.80]],
   [6] = [[
@@ -125,11 +125,11 @@ objectives:
 
 addon.DebugQuestDB = {
   {
-    name = "Objective: aura",
+    name = "Objective: getaura",
     script = scripts[9],
   },
   {
-    name = "Objective: aura (shorthand)",
+    name = "Objective: getaura (shorthand)",
     script = scripts[10],
   },
   {
@@ -167,6 +167,10 @@ addon.DebugQuestDB = {
 }
 
 for i, quest in ipairs(addon.DebugQuestDB) do
-  quest.debugQuestId = "debug-quest-"..quest.name
   quest.order = i
+  quest.questId = "debug-quest-"..quest.name
+  quest.parameters = {
+    questId = quest.questId,
+    name = quest.name,
+  }
 end

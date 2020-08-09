@@ -1,22 +1,22 @@
 local _, addon = ...
 
-addon.DebugQuests = addon:NewRepository("DebugQuest", "debugQuestId")
+addon.DebugQuests = addon:NewRepository("DebugQuest", "questId")
 addon.DebugQuests:SetTableSource(addon.DebugQuestDB)
 addon.DebugQuests:EnableDirectRead(true)
 
-function addon.DebugQuests:CompileDebugQuest(debugQuestId)
-  if not debugQuestId then
-    return false, "debugQuestId is required"
+function addon.DebugQuests:CompileDebugQuest(questId)
+  if not questId then
+    return false, "questId is required"
   end
-  local debugQuest = self:FindByID(debugQuestId)
+  local debugQuest = self:FindByID(questId)
   if not debugQuest then
-    return false, "No demo exists with debugQuestId: "..debugQuestId
+    return false, "No demo exists with questId: "..questId
   end
-  return addon.QuestScriptCompiler:TryCompile(debugQuest.script, { questId = debugQuestId, name = debugQuest.name })
+  return addon.QuestScriptCompiler:TryCompile(debugQuest.script, debugQuest.parameters)
 end
 
-function addon.DebugQuests:StartDebugQuest(demoId)
-  local ok, quest = self:CompileDebugQuest(demoId)
+function addon.DebugQuests:StartDebugQuest(questId)
+  local ok, quest = self:CompileDebugQuest(questId)
   if not ok then
     addon.Logger:Error("Unable to start debug quest: %s", quest)
     return
