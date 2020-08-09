@@ -4,7 +4,7 @@ local logger = addon.Logger:NewLogger("Loader")
 addon.QuestScriptLoader = {}
 
 local scripts = {}
-local cleanNamePattern = "^[%l%d-]+$"
+local cleanNamePattern = "^[%l%d]+$"
 
 local function validateAndRegister(set, name, param)
   if not name or name == "" then
