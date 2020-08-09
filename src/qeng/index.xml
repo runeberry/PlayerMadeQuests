@@ -11,11 +11,13 @@
   <Script file="qeng/cmd/req.lua"/>
   <Script file="qeng/cmd/startcomplete.lua"/>
 
+  <Script file="qeng/objectives/getaura.lua"/>
   <Script file="qeng/objectives/emote.lua"/>
   <Script file="qeng/objectives/explore.lua"/>
   <Script file="qeng/objectives/kill.lua"/>
   <Script file="qeng/objectives/talkto.lua"/>
 
+  <Script file="qeng/conditions/aura.lua"/>
   <Script file="qeng/conditions/emote.lua"/>
   <Script file="qeng/conditions/position.lua"/>
   <Script file="qeng/conditions/target.lua"/>

@@ -1,6 +1,7 @@
 local _, addon = ...
 
 addon.QuestScriptTokens = {
+  OBJ_AURA = "getaura",
   OBJ_EMOTE = "emote",
   OBJ_EXPLORE = "explore",
   OBJ_KILL = "kill",
@@ -18,6 +19,7 @@ addon.QuestScriptTokens = {
   METHOD_EVAL = "Evaluate",
   METHOD_POST_EVAL = "AfterEvaluate",
 
+  PARAM_AURA = "aura",
   PARAM_CLASS = "class",
   PARAM_COMPLETION = "completion",
   PARAM_COORDS = "coords",
@@ -218,6 +220,31 @@ addon.QuestScriptTemplates = {
 }
 
 local objectives = {
+  [t.OBJ_AURA] = {
+    template = "objective",
+    shorthand = {
+      t.PARAM_AURA,
+    },
+    displaytext = {
+      vars = {
+        ["a"] = t.PARAM_AURA,
+      },
+      log = "Gain the %a aura",
+      progress = "Gain the %a aura",
+      quest = "Gain the %a aura",
+      full = "Gain the %a aura"
+    },
+    params = {
+      [t.PARAM_AURA] = {
+        template = "condition",
+        scripts = {
+          [t.METHOD_PARSE] = { required = true },
+        },
+        required = true,
+        multiple = true,
+      }
+    }
+  },
   [t.OBJ_EMOTE] = {
     template = "objective",
     shorthand = {
