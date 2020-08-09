@@ -41,8 +41,8 @@ objectives:
   - talkto Erma
   - talkto 'Marshal Dughan'
   - talkto 2 "Stormwind Guard"
-  - talk "Stonetusk Boar"
-  - talk 2 Chicken]],
+  - talkto "Stonetusk Boar"
+  - talkto 2 Chicken]],
   [5] = [[
 objectives:
   - emote: { emote: dance }
