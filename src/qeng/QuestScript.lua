@@ -299,8 +299,8 @@ local objectives = {
       },
       log = "Gain %a",
       progress = "%a gained",
-      quest = "Gain the %a aura[%co: while in %xyz]",
-      full = "Gain the %a aura[%co: while in %xyrz]"
+      quest = "Gain the %a aura[%xyz: while in %xyz]",
+      full = "Gain the %a aura[%xyz: while in %xyrz]"
     },
     params = {
       [t.PARAM_AURA] = getParameter(t.PARAM_AURA, { required = true }),
