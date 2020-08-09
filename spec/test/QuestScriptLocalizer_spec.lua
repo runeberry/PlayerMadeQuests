@@ -56,9 +56,9 @@ describe("QuestScriptLocalizer", function()
       {
         objective = "explore Westfall 25.2,38.4",
         expected = {
-          log = "Go to Point #1 in Westfall",
-          progress = "Point #1 in Westfall explored: 0/1",
-          quest = "Explore Point #1 in Westfall",
+          log = "Go to (25.2, 38.4) in Westfall",
+          progress = "(25.2, 38.4) in Westfall explored: 0/1",
+          quest = "Explore (25.2, 38.4) in Westfall",
           full = "Go to (25.2, 38.4) in Westfall"
         }
       },
@@ -74,18 +74,18 @@ describe("QuestScriptLocalizer", function()
       {
         objective = "explore: { zone: Elwynn Forest, coords: '32, 20, 5' }",
         expected = {
-          log = "Go to Point #1 in Elwynn Forest",
-          progress = "Point #1 in Elwynn Forest explored: 0/1",
-          quest = "Explore Point #1 in Elwynn Forest",
+          log = "Go to (32, 20) in Elwynn Forest",
+          progress = "(32, 20) in Elwynn Forest explored: 0/1",
+          quest = "Explore (32, 20) in Elwynn Forest",
           full = "Go to (32, 20) +/- 5 in Elwynn Forest"
         }
       },
       {
         objective = "explore: { zone: Elwynn Forest, subzone: Goldshire, coords: \"32,20,5\" }",
         expected = {
-          log = "Go to Point #1 in Goldshire",
-          progress = "Point #1 in Goldshire explored: 0/1",
-          quest = "Explore Point #1 in Goldshire in Elwynn Forest",
+          log = "Go to (32, 20) in Goldshire",
+          progress = "(32, 20) in Goldshire explored: 0/1",
+          quest = "Explore (32, 20) in Goldshire in Elwynn Forest",
           full = "Go to (32, 20) +/- 5 in Goldshire in Elwynn Forest"
         }
       },
