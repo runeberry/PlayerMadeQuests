@@ -4,14 +4,14 @@ local logger = addon.Logger:NewLogger("Loader")
 addon.QuestScriptLoader = {}
 
 local scripts = {}
-local cleanNamePattern = "^[%l%d]+$"
+local cleanNamePattern = "^[%l%d-]+$"
 
 local function validateAndRegister(set, name, param)
   if not name or name == "" then
     error("Name cannot be nil or empty")
   end
   if type(name) ~= "string" or not name:match(cleanNamePattern) then
-    error("Name must only contain lowercase alphanumeric characters")
+    error("Name must only contain lowercase alphanumeric characters or dashes")
   end
   if set[name] and set[name] ~= param then
     error("An item is already registered with name: "..name)
