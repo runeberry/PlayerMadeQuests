@@ -15,7 +15,7 @@ objectives:
       goal: 2
       aura: Blessing of Might
   - kill:
-      target: Murloc Steamrunner
+      target: Murloc
       goal: 2
       zone: Crystal Lake
       coords: 50.57,66.80]],
