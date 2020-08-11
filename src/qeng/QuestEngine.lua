@@ -42,6 +42,7 @@ local function evaluateObjective(objective, obj, ...)
   -- Evaluation is expected to return a boolean value only:
   -- true if the condition was met, false otherwise
   local anyFailed
+  local conditionPostEvals = {}
   for name, val in pairs(obj.conditions) do
     local condition = objective.params[name]
     if condition.scripts and condition.scripts[tokens.METHOD_EVAL] then
@@ -55,6 +56,15 @@ local function evaluateObjective(objective, obj, ...)
         -- We keep evaluating because there might be side-effects from other conditions that are still required (not ideal, but oh well)
         anyFailed = true
       end
+      if condition.scripts[tokens.METHOD_POST_EVAL] then
+        -- If the condition has a post-evaluation method, reference it here so we can run it
+        -- After the objective's post-evaluation method
+        conditionPostEvals[#conditionPostEvals+1] = {
+          script = condition.scripts[tokens.METHOD_POST_EVAL],
+          name = name,
+          val = val,
+        }
+      end
     end
   end
   if anyFailed then
@@ -65,13 +75,23 @@ local function evaluateObjective(objective, obj, ...)
   -- returning either a boolean or a number to represent objective progress
   if objective.scripts and objective.scripts[tokens.METHOD_POST_EVAL] then
     ok, afterResult = addon:catch(objective.scripts[tokens.METHOD_POST_EVAL], obj, checkResult, ...)
-    if not(ok) then
+    if not ok then
       objectiveLogger:Error("Error during post-evaluation for \"%s\": %s", obj.id, afterResult)
       return
     elseif afterResult ~= nil then
       -- If the post-evaluation returns a value, then that value will override the result of evaluation
       checkResult = afterResult
       objectiveLogger:Trace("    Post-evaluation overriding result with: %i", checkResult)
+    end
+  end
+
+  -- If there were any condition-level post-evaluation methods, run them now
+  local err
+  for _, postEval in ipairs(conditionPostEvals) do
+    ok, err = addon:catch(postEval.script, obj, checkResult, postEval.val)
+    if not ok then
+      objectiveLogger:Error("Error during post-evaluation for \"%s\": %s", postEval.name, err)
+      -- Continue running, because the method has no effect on the result
     end
   end
 

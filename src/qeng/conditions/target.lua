@@ -4,32 +4,6 @@ local loader = addon.QuestScriptLoader
 local tokens = addon.QuestScriptTokens
 local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
 
-local targetGuidHistory
-
--- If the objective is to target multiples of the same NPC (i.e. 3 guards),
--- make sure they're different by guid
-local function isUniqueTargetGuid(obj, targetUnitGuid)
-  -- Get the targeting history for this specific objective
-  local objTargetGuidHistory = targetGuidHistory[obj.id]
-  if not objTargetGuidHistory then
-    -- First one, log this result and return true
-    objTargetGuidHistory = {}
-    targetGuidHistory[obj.id] = objTargetGuidHistory
-  end
-
-  if objTargetGuidHistory[targetUnitGuid] then
-    -- Already targeted this NPC for this objective, don't count it
-    logger:Debug(logger.fail.."Target has already been used for this objective (%s)", targetUnitGuid)
-    return false
-  end
-
-  -- Otherwise, log this guid and progress the objective
-  objTargetGuidHistory[targetUnitGuid] = true
-  addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
-  logger:Debug(logger.pass.."New target for objective (%s)", targetUnitGuid)
-  return true
-end
-
 loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_PARSE, function(unitNames)
   local t = type(unitNames)
   assert(t == "string" or t == "table", t.." is not a valid type for "..tokens.PARAM_TARGET)
@@ -58,7 +32,20 @@ loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_EVAL, function(obj, unitName
     logger:Debug(logger.pass.."Target name match, and goal is 1 (%s)", targetUnitName)
     return true
   end
-  return isUniqueTargetGuid(obj, UnitGUID("target"))
+  local isExcluded = addon:IsTargetExcluded(obj.id, UnitGUID("target"))
+  if isExcluded then
+    logger:Debug(logger.fail.."Target has already been used for this objective")
+  else
+    logger:Debug(logger.pass.."Target is new for this objective")
+  end
+  return not isExcluded
+end)
+
+loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_POST_EVAL, function(obj, result, unitNames)
+  if result then
+    -- Objective was successful with this target, so exclude it from further progression
+    addon:AddTargetExclusion(obj.id, UnitGUID("target"))
+  end
 end)
 
 loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_PARSE, function(unitNames)
@@ -86,27 +73,18 @@ loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_EVAL, function(obj, unit
     logger:Debug(logger.pass.."Target name match, and goal is 1 (%s)", targetUnitName)
     return true
   end
-  return isUniqueTargetGuid(obj, addon.LastPartyKill.destGuid)
+  local isExcluded = addon:IsTargetExcluded(obj.id, addon.LastPartyKill.destGuid)
+  if isExcluded then
+    logger:Debug(logger.fail.."Target has already been used for this objective")
+  else
+    logger:Debug(logger.pass.."Target is new for this objective")
+  end
+  return not isExcluded
 end)
 
-addon:OnSaveDataLoaded(function()
-  targetGuidHistory = addon.SaveData:LoadTable("TargetGuidHistory")
-
-  -- Reset targetGuidHistory when appropriate
-  addon.AppEvents:Subscribe("ObjectiveCompleted", function(obj)
-    if obj.id and targetGuidHistory[obj.id] then
-      targetGuidHistory[obj.id] = nil
-      addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
-    end
-  end)
-  addon.AppEvents:Subscribe("QuestDataReset", function()
-    targetGuidHistory = {}
-    addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
-  end)
-  addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
-    for _, obj in ipairs(quest.objectives) do
-      targetGuidHistory[obj.id] = nil
-    end
-    addon.SaveData:Save("TargetGuidHistory", targetGuidHistory)
-  end)
+loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_POST_EVAL, function(obj, result, unitNames)
+  if result then
+    -- Objective was successful with this target, so exclude it from further progression
+    addon:AddTargetExclusion(obj.id, addon.LastPartyKill.destGuid)
+  end
 end)

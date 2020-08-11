@@ -139,6 +139,7 @@ local parameters = {
     template = "condition",
     scripts = {
       [t.METHOD_PARSE] = { required = true },
+      [t.METHOD_POST_EVAL] = { required = true },
     },
     multiple = true,
   },
@@ -149,6 +150,7 @@ local parameters = {
     template = "condition",
     scripts = {
       [t.METHOD_PARSE] = { required = true },
+      [t.METHOD_POST_EVAL] = { required = true },
     },
     multiple = true,
   },

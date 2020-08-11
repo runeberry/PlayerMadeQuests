@@ -2,4 +2,5 @@
   <Script file="game/Auras.lua"/>
   <Script file="game/Location.lua"/>
   <Script file="game/Sounds.lua"/>
+  <Script file="game/Targets.lua"/>
 </Ui>
