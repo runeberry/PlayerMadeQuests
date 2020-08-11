@@ -24,12 +24,12 @@ loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_EVAL, function(obj, unitName
   end
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name
-    logger:Debug(logger.fail.."Target name does not match (%s)", targetUnitName)
+    logger:Debug(logger.fail.."Target name does not match")
     return false
   end
   if obj.goal == 1 then
     -- Only one unit to target, so the objective is satisfied
-    logger:Debug(logger.pass.."Target name match, and goal is 1 (%s)", targetUnitName)
+    logger:Debug(logger.pass.."Target name match, and goal is 1")
     return true
   end
   local isExcluded = addon:IsTargetExcluded(obj.id, UnitGUID("target"))
@@ -65,12 +65,12 @@ loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_EVAL, function(obj, unit
   local targetUnitName = addon.LastPartyKill.destName
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name
-    logger:Debug(logger.fail.."Target name does not match (%s)", targetUnitName)
+    logger:Debug(logger.fail.."Target name does not match")
     return false
   end
   if obj.goal == 1 then
     -- Only one unit to target, so the objective is satisfied
-    logger:Debug(logger.pass.."Target name match, and goal is 1 (%s)", targetUnitName)
+    logger:Debug(logger.pass.."Target name match, and goal is 1")
     return true
   end
   local isExcluded = addon:IsTargetExcluded(obj.id, addon.LastPartyKill.destGuid)
