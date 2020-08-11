@@ -22,7 +22,7 @@ local GetUnitName = addon.G.GetUnitName
         },
         goal = 1,                 -- number of times these conditions must be met to complete this objective (min. 1)
         conditions = {            -- map of conditions <> expected value(s) for that condition (examples shown)
-          emote = { "val1": true },
+          use-emote = { "val1": true },
           target = { "val2": true, "val3": true },
         }
       }

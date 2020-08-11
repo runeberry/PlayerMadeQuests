@@ -1,11 +1,11 @@
 local _, addon = ...
 
 addon.QuestScriptTokens = {
-  OBJ_AURA = "getaura",
-  OBJ_EMOTE = "emote",
+  OBJ_AURA = "gain-aura",
+  OBJ_EMOTE = "use-emote",
   OBJ_EXPLORE = "explore",
   OBJ_KILL = "kill",
-  OBJ_TALKTO = "talkto",
+  OBJ_TALKTO = "talk-to",
 
   CMD_COMPLETE = "complete",
   CMD_OBJ = "objectives",
