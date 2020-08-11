@@ -63,6 +63,7 @@ function builder:Build(opts)
     GLOBAL_LOG_MODE = "simple-unbuffered",
     TRANSACTION_LOGS = false,
     USE_INTERNAL_MESSAGING = true,
+    AVOID_BUILDING_UI = true, -- todo: need better mocking system for UI, but suppress errors for now
     -- Exception: I want to include the TinyYaml lib for parsing quests
     ParseYaml = loadfile([[src/libs/lua-tinyyaml/tinyyaml.lua]])().parse
   }

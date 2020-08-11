@@ -38,14 +38,6 @@ describe("QuestScriptCompiler", function()
     local quest = compiler:Compile(nil, params)
     assert.equals(params.demoId, quest.demoId)
   end)
-  it("can compile all demo quests", function()
-    -- todo: (#49) move this test to QuestDemos tests, if I ever make that
-    -- https://github.com/dolphinspired/PlayerMadeQuests/issues/49
-    local demos = addon.QuestDemos:FindAll()
-    for _, demo in ipairs(demos) do
-      compiler:Compile(demo.script)
-    end
-  end)
   describe("objective parse modes", function()
     local expected = {
       name = "Test Quest Name",

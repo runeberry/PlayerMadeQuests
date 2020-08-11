@@ -2,11 +2,10 @@ local _, addon = ...
 local logger = addon.QuestEngine.ObjectiveLogger
 local loader = addon.QuestScriptLoader
 local tokens = addon.QuestScriptTokens
-local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
 
-loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_PARSE, function(unitNames)
+loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_PARSE, function(unitNames)
   local t = type(unitNames)
-  assert(t == "string" or t == "table", t.." is not a valid type for "..tokens.PARAM_TARGET)
+  assert(t == "string" or t == "table", t.." is not a valid type for "..tokens.PARAM_KILLTARGET)
 
   if t == "string" then
     unitNames = { unitNames }
@@ -15,13 +14,10 @@ loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_PARSE, function(unitNames)
   return addon:DistinctSet(unitNames)
 end)
 
-loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_EVAL, function(obj, unitNames)
-  local targetUnitName = GetUnitName("target")
-  if not targetUnitName then
-    -- No unit is targeted
-    logger:Debug(logger.fail.."No unit is targeted")
-    return false
-  end
+loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_EVAL, function(obj, unitNames)
+  if not addon.LastPartyKill then return end
+
+  local targetUnitName = addon.LastPartyKill.destName
   if unitNames[targetUnitName] == nil then
     -- The targeted unit's name does not match the objective's unit name
     logger:Debug(logger.fail.."Target name does not match")
@@ -32,7 +28,7 @@ loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_EVAL, function(obj, unitName
     logger:Debug(logger.pass.."Target name match, and goal is 1")
     return true
   end
-  local isExcluded = addon:IsTargetExcluded(obj.id, UnitGUID("target"))
+  local isExcluded = addon:IsTargetExcluded(obj.id, addon.LastPartyKill.destGuid)
   if isExcluded then
     logger:Debug(logger.fail.."Target has already been used for this objective")
   else
@@ -41,9 +37,9 @@ loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_EVAL, function(obj, unitName
   return not isExcluded
 end)
 
-loader:AddScript(tokens.PARAM_TARGET, tokens.METHOD_POST_EVAL, function(obj, result, unitNames)
+loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_POST_EVAL, function(obj, result, unitNames)
   if result then
     -- Objective was successful with this target, so exclude it from further progression
-    addon:AddTargetExclusion(obj.id, UnitGUID("target"))
+    addon:AddTargetExclusion(obj.id, addon.LastPartyKill.destGuid)
   end
 end)

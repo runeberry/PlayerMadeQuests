@@ -11,7 +11,7 @@ local function validateAndRegister(set, name, param)
     error("Name cannot be nil or empty")
   end
   if type(name) ~= "string" or not name:match(cleanNamePattern) then
-    error("Name must only contain lowercase alphanumeric characters")
+    error("Name must only contain lowercase alphanumeric characters or dashes")
   end
   if set[name] and set[name] ~= param then
     error("An item is already registered with name: "..name)

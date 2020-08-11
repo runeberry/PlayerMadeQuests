@@ -127,4 +127,8 @@ handlers = {
   ["scan-events"] = function()
     addon.GameEvents:ToggleWatchAll()
   end,
+  ["debug-quests"] = function()
+    addon.MainMenu:Show()
+    addon.MainMenu:ShowMenuScreen("DebugQuestListMenu")
+  end
 }
