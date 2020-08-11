@@ -26,59 +26,59 @@ objectives:
   - kill 3 "Mangy Wolf"]],
   [3] = [[
 objectives:
-  - talkto: { target: Erma }
-  - talkto: { target: Stormwind Guard, goal: 2 }
-  - talkto:
+  - talk-to: { target: Erma }
+  - talk-to: { target: Stormwind Guard, goal: 2 }
+  - talk-to:
       target: Marshal Dughan
       aura: Blessing of Might
-  - talkto:
+  - talk-to:
       target: Chicken
       goal: 2
       zone: Elwynn Forest
       subzone: Goldshire]],
   [4] = [[
 objectives:
-  - talkto Erma
-  - talkto 'Marshal Dughan'
-  - talkto 2 "Stormwind Guard"
-  - talkto "Stonetusk Boar"
-  - talkto 2 Chicken]],
+  - talk-to Erma
+  - talk-to 'Marshal Dughan'
+  - talk-to 2 "Stormwind Guard"
+  - talk-to "Stonetusk Boar"
+  - talk-to 2 Chicken]],
   [5] = [[
 objectives:
-  - emote: { emote: dance }
-  - emote: { emote: laugh, target: Erma }
-  - emote:
+  - use-emote: { emote: dance }
+  - use-emote: { emote: laugh, target: Erma }
+  - use-emote:
       emote: flirt
       target: Marshal Dughan
-  - emote:
+  - use-emote:
       emote: fart
       goal: 2
       target: Stormwind Guard
-  - emote:
+  - use-emote:
       emote: roar
       aura: Blessing of Might
-  - emote:
+  - use-emote:
       emote: dance
       goal: 2
       target: Stormwind Guard
       aura: Blessing of Might
-  - emote:
+  - use-emote:
       emote: chicken
       target: Chicken
       goal: 2
       zone: Elwynn Forest
       subzone: Goldshire
-  - emote:
+  - use-emote:
       emote: sigh
       target: Murloc
       zone: Crystal Lake
       coords: 50.57,66.80]],
   [6] = [[
 objectives:
-  - emote dance
-  - emote laugh Erma
-  - emote flirt 'Marshal Dughan'
-  - emote fart 2 "Stormwind Guard"]],
+  - use-emote dance
+  - use-emote laugh Erma
+  - use-emote flirt 'Marshal Dughan'
+  - use-emote fart 2 "Stormwind Guard"]],
   [7] = [[
 objectives:
   - explore: { zone: Elwynn Forest }
@@ -110,34 +110,34 @@ objectives:
   - explore "Elwynn Forest" "42.41, 64.47, 1"]],
   [9] = [[
 objectives:
-  - getaura:
+  - gain-aura:
       aura: Blessing of Might
-  - getaura:
+  - gain-aura:
       aura: Blessing of Might
       zone: Elwynn Forest
       subzone: Goldshire
       coords: 42.41, 64.47, 0.3
-  - getaura: { aura: Blessing of Might, zone: Lion's Pride Inn }]],
+  - gain-aura: { aura: Blessing of Might, zone: Lion's Pride Inn }]],
   [10] = [[
 objectives:
-  - getaura 'Blessing of Might']],
+  - gain-aura 'Blessing of Might']],
 }
 
 addon.DebugQuestDB = {
   {
-    name = "Objective: getaura",
+    name = "Objective: gain-aura",
     script = scripts[9],
   },
   {
-    name = "Objective: getaura (shorthand)",
+    name = "Objective: gain-aura (shorthand)",
     script = scripts[10],
   },
   {
-    name = "Objective: emote",
+    name = "Objective: use-emote",
     script = scripts[5],
   },
   {
-    name = "Objective: emote (shorthand)",
+    name = "Objective: use-emote (shorthand)",
     script = scripts[6],
   },
   {
@@ -157,11 +157,11 @@ addon.DebugQuestDB = {
     script = scripts[2],
   },
   {
-    name = "Objective: talkto",
+    name = "Objective: talk-to",
     script = scripts[3],
   },
   {
-    name = "Objective: talkto (shorthand)",
+    name = "Objective: talk-to (shorthand)",
     script = scripts[4],
   },
 }

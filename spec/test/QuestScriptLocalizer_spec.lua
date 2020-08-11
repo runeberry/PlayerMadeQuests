@@ -9,7 +9,7 @@ describe("QuestScriptLocalizer", function()
   describe("objective displaytext parser", function()
     local testCases = {
       {
-        objective = "emote dance Chicken",
+        objective = "use-emote dance Chicken",
         expected = {
           log = "/dance with Chicken",
           progress = "/dance with Chicken: 0/1",
@@ -18,7 +18,7 @@ describe("QuestScriptLocalizer", function()
         }
       },
       {
-        objective = "emote fart 5 'Stormwind Guard'",
+        objective = "use-emote fart 5 'Stormwind Guard'",
         expected = {
           log = "/fart with Stormwind Guard 0/5",
           progress = "/fart with Stormwind Guard: 0/5",
@@ -27,7 +27,7 @@ describe("QuestScriptLocalizer", function()
         }
       },
       {
-        objective = "emote cry",
+        objective = "use-emote cry",
         expected = {
           log = "/cry",
           progress = "/cry: 0/1",
@@ -36,7 +36,7 @@ describe("QuestScriptLocalizer", function()
         }
       },
       {
-        objective = "emote flex 3",
+        objective = "use-emote flex 3",
         expected = {
           log = "/flex 0/3",
           progress = "/flex: 0/3",
@@ -108,7 +108,7 @@ describe("QuestScriptLocalizer", function()
         }
       },
       {
-        objective = "talkto Rexxar",
+        objective = "talk-to Rexxar",
         expected = {
           log = "Talk to Rexxar",
           progress = "Talk to Rexxar: 0/1",
@@ -117,7 +117,7 @@ describe("QuestScriptLocalizer", function()
         }
       },
       {
-        objective = "talkto 2 'Stormwind Guard'",
+        objective = "talk-to 2 'Stormwind Guard'",
         expected = {
           log = "Talk to Stormwind Guard 0/2",
           progress = "Talk to Stormwind Guard: 0/2",
@@ -210,7 +210,7 @@ describe("QuestScriptLocalizer", function()
               target: Swine
               goal: 5
               text: "Complete task #%inc"
-          - talkto: Orgrimmar Grunt
+          - talk-to: Orgrimmar Grunt
           - kill:
               target: Bloodtalon Scythemaw
               goal: 3

@@ -14,11 +14,11 @@ local demoinfos = {
     name = "Lesson 2: Killing Foes",
     help = "",
   },
-  ["talkto"] = {
+  ["talk-to"] = {
     name = "Lesson 3: Talking to NPCs",
     help = "",
   },
-  ["emote"] = {
+  ["use-emote"] = {
     name = "Lesson 4: Show your Emotions",
     help = "",
   },
@@ -94,9 +94,9 @@ quest:
 start:
   target: Marshal Dughan
 objectives:
-  - talkto Erma
-  - talkto 'Cylina Darkheart'
-  - talkto 2 "Stormwind Guard" # talk to 2 different targets with this name
+  - talk-to Erma
+  - talk-to 'Cylina Darkheart'
+  - talk-to 2 "Stormwind Guard" # talk to 2 different targets with this name
 complete:
   target: Marshal Dughan]],
   [4] = [[
@@ -114,9 +114,9 @@ quest:
 start:
   target: Kurran Steele
 objectives:
-  - emote flirt 'Marshal Dughan'
-  - emote fart 2 "Stormwind Guard"
-  - emote dance # perform this emote with or without a target
+  - use-emote flirt 'Marshal Dughan'
+  - use-emote fart 2 "Stormwind Guard"
+  - use-emote dance # perform this emote with or without a target
 complete:
   target: Kurran Steele]],
   [5] = [[
@@ -169,10 +169,10 @@ objectives:
       target: Stonetusk Boar
       goal: 3
       text: Sacrifice Stonetusk Boars %p/%g # %p = progress, %g = goal
-  - talkto:
+  - talk-to:
       target: Smith Argus
       text: Deliver news of your conquest to %t
-  - emote:
+  - use-emote:
       emote: cackle
       target: Chicken
       text: /%em maniacally at the nearest %t # %em = emote
@@ -199,7 +199,7 @@ start:
   subzone: Razor Hill
 # 'objectives' are the tasks you must complete for your quest
 objectives:
-  - emote beckon 'Cook Torka'
+  - use-emote beckon 'Cook Torka'
 # 'complete' (optional) indicates who you need to target to turn in the quest
 complete:
   target: Kaplak
@@ -244,9 +244,9 @@ quest:
 start:
   target: Kaplak
 objectives:
-  - talkto Rawrk
-  - talkto 'Innkeeper Grosk'
-  - talkto 2 "Razor Hill Grunt" # talk to 2 different targets with this name
+  - talk-to Rawrk
+  - talk-to 'Innkeeper Grosk'
+  - talk-to 2 "Razor Hill Grunt" # talk to 2 different targets with this name
 complete:
   target: Kaplak]],
   [10] = [[
@@ -265,9 +265,9 @@ quest:
 start:
   target: Kaplak
 objectives:
-  - emote dance # perform this emote with or without a target
-  - emote stare 'Cook Torka'
-  - emote salute 2 'Razor Hill Grunt'
+  - use-emote dance # perform this emote with or without a target
+  - use-emote stare 'Cook Torka'
+  - use-emote salute 2 'Razor Hill Grunt'
 complete:
   target: Kaplak]],
   [11] = [[
@@ -322,7 +322,7 @@ start:
   coords: 51.15,42.51,0.2
   text: Start your rampage at Cook Torka's kitchen at %sz. # %sz = subzone
 objectives:
-  - emote:
+  - use-emote:
       emote: cuddle
       target: "Tai'jin"
       text: Cuddle with %t, Cook Torka's ex-girlfriend # %t = target
@@ -330,7 +330,7 @@ objectives:
       target: Dire Mottled Boar
       goal: 3
       text: Kill Cook Torka's stock of %t %p/%g # %p = progress, %g = goal
-  - emote:
+  - use-emote:
       emote: fart
       target: 'Cook Torka'
       text: /%em in %t's general direction # %em = emote
@@ -357,17 +357,17 @@ addon.DemoQuestDB = {
     script = scripts[2],
   },
   {
-    demoId = "demo-talkto-ally",
-    demoName = demoinfos["talkto"].name,
-    helpText = demoinfos["talkto"].help,
+    demoId = "demo-talk-to-ally",
+    demoName = demoinfos["talk-to"].name,
+    helpText = demoinfos["talk-to"].help,
     faction = factions.Alliance,
     order = 3,
     script = scripts[3],
   },
   {
-    demoId = "demo-emote-ally",
-    demoName = demoinfos["emote"].name,
-    helpText = demoinfos["emote"].help,
+    demoId = "demo-use-emote-ally",
+    demoName = demoinfos["use-emote"].name,
+    helpText = demoinfos["use-emote"].help,
     faction = factions.Alliance,
     order = 4,
     script = scripts[4],
@@ -405,17 +405,17 @@ addon.DemoQuestDB = {
     script = scripts[8],
   },
   {
-    demoId = "demo-talkto-horde",
-    demoName = demoinfos["talkto"].name,
-    helpText = demoinfos["talkto"].help,
+    demoId = "demo-talk-to-horde",
+    demoName = demoinfos["talk-to"].name,
+    helpText = demoinfos["talk-to"].help,
     faction = factions.Horde,
     order = 9,
     script = scripts[9],
   },
   {
-    demoId = "demo-emote-horde",
-    demoName = demoinfos["emote"].name,
-    helpText = demoinfos["emote"].help,
+    demoId = "demo-use-emote-horde",
+    demoName = demoinfos["use-emote"].name,
+    helpText = demoinfos["use-emote"].help,
     faction = factions.Horde,
     order = 10,
     script = scripts[10],

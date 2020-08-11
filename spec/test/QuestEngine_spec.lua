@@ -10,8 +10,8 @@ local goodScript = [[
     description: I sure hope these tests pass!
   objectives:
     - kill 5 Chicken
-    - talkto 3 "Stormwind Guard"
-    - emote dance 2 Cow
+    - talk-to 3 "Stormwind Guard"
+    - use-emote dance 2 Cow
 ]]
 
 describe("QuestEngine", function()
