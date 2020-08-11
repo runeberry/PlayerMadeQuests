@@ -323,8 +323,8 @@ local objectives = {
       },
       log = "/%em[%t: with %t][%g2: %p/%g]",
       progress = "/%em[%t: with %t]: %p/%g",
-      quest = "/%em[%t: with [%g2 ]%t|[%g2: %g2 times]][%co: in %xysz][%a: while having %a]",
-      full = "Use emote /%em[%t: on [%g2 ]%t|[%g2: %g2 times]][%co: in %xyrz][%a: while having %a]"
+      quest = "/%em[%t: with [%g2 ]%t|[%g2: %g2 times]][%xysz: in %xysz][%a: while having %a]",
+      full = "Use emote /%em[%t: on [%g2 ]%t|[%g2: %g2 times]][%xyz: in %xyrz][%a: while having %a]"
     },
     params = {
       [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
@@ -365,8 +365,8 @@ local objectives = {
       },
       log = "%t %p/%g",
       progress = "%t slain: %p/%g",
-      quest = "Kill [%g2 ]%t[%co: in %xyz][%a: while having %a]",
-      full = "Kill [%g2 ]%t[%co: in %xyrz][%a: while having %a]"
+      quest = "Kill [%g2 ]%t[%xyz: in %xyz][%a: while having %a]",
+      full = "Kill [%g2 ]%t[%xyz: in %xyrz][%a: while having %a]"
     },
     params = {
       [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
@@ -387,8 +387,8 @@ local objectives = {
       },
       log = "Talk to %t[%g2: %p/%g]",
       progress = "Talk to %t: %p/%g",
-      quest = "Talk to [%g2 ]%t[%co: in %xyz][%a: while having %a]",
-      full = "Talk to [%g2 ]%t[%co: in %xyrz][%a: while having %a]"
+      quest = "Talk to [%g2 ]%t[%xyz: in %xyz][%a: while having %a]",
+      full = "Talk to [%g2 ]%t[%xyz: in %xyrz][%a: while having %a]"
     },
     params = {
       [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
