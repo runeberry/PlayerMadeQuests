@@ -34,7 +34,7 @@ local function evaluateObjective(objective, obj, ...)
       return
     elseif beforeResult == false then
       -- If the objective's pre-condition returns boolean false, then do not continue evaluating the objective
-        objectiveLogger:Debug("Pre-evaluation returned false for %s. Terminating early.", obj.id)
+      objectiveLogger:Debug("    Pre-evaluation returned false for %s. Terminating early.", obj.id)
       return
     end
   end
