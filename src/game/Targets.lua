@@ -63,10 +63,6 @@ function addon:ClearAllTargetExclusions()
   SaveData:Clear(saveDataField)
 end
 
-function addon:targets()
-  return targetGuidHistory
-end
-
 addon:OnSaveDataLoaded(function()
   targetGuidHistory = SaveData:LoadTable(saveDataField)
 
