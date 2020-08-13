@@ -82,6 +82,7 @@ function deps:Init(addon)
   addon.LibScrollingTable = {}
 
   addon.G = {
+    date = mock:NewMock( mock:Returns("date") ),
     print = mock:NewMock("print", mock:Handler(function(...)
       if addon.SILENT_PRINT then return end
       local args, spaced = table.pack(...), {}
@@ -117,6 +118,7 @@ function deps:Init(addon)
     unpack = table.unpack,
 
     CombatLogGetCurrentEventInfo = mock:NewMock(),
+    CheckInteractDistance = mock:NewMock(),
     CreateFrame = mock:NewMock( mock:Returns({}) ),
     GetBestMapForUnit = mock:NewMock( mock:Returns({}) ),
     GetMapInfo = mock:NewMock( mock:Returns({}) ),
@@ -127,13 +129,18 @@ function deps:Init(addon)
     GetMinimapZoneText = mock:NewMock( mock:Returns("subzone") ),
     GetZoneText = mock:NewMock( mock:Returns("zone") ),
     PlaySoundFile = mock:NewMock(),
+    ReloadUI = mock:NewMock(),
     SlashCmdList = {},
     StaticPopupDialogs = {},
     StaticPopup_Show = mock:NewMock(),
     StaticPopup_Hide = mock:NewMock(),
+    UnitAura = mock:NewMock( mock:Returns("aura") ),
+    UnitClass = mock:NewMock( mock:Returns("class") ),
     UnitExists = mock:NewMock( mock:Returns(false) ),
+    UnitFactionGroup = mock:NewMock( mock:Returns("Alliance") ),
     UnitGUID = mock:NewMock( mock:Returns("guid") ),
     UnitIsFriend = mock:NewMock( mock:Returns(false) ),
+    UnitLevel = mock:NewMock( mock:Returns(1) ),
     UIErrorsFrame = {},
     UIParent = {},
     UISpecialFrames = {},

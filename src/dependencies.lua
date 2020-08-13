@@ -24,6 +24,7 @@ addon.G = {
   unpack = unpack,
 
   CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo,
+  CheckInteractDistance = CheckInteractDistance,
   CreateFrame = CreateFrame,
   GetBestMapForUnit = C_Map.GetBestMapForUnit,
   GetMapInfo = C_Map.GetMapInfo,
