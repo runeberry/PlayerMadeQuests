@@ -2,6 +2,7 @@ local _, addon = ...
 local AceGUI = addon.AceGUI
 local QuestLog, QuestStatus, localizer = addon.QuestLog, addon.QuestStatus, addon.QuestScriptLocalizer
 local CreateFrame = addon.G.CreateFrame
+local QuestDrafts = addon.QuestDrafts
 
 addon.PositionFinderFrame = nil -- Built at end of file
 
@@ -20,18 +21,98 @@ local frameOptions = {
   }
 }
 
+local options = {
+  colInfo = {
+    {
+      name = "Draft",
+      pwidth = 0.6,
+      align = "LEFT"
+    },
+    {
+      name = "Last Modified",
+      align = "RIGHT"
+    }
+  },
+  dataSource = function()
+    -- draftRows = {}
+    -- local drafts = QuestDrafts:FindAll()
+    -- table.sort(drafts, function(a, b) return a.draftId < b.draftId end)
+    -- for _, draft in pairs(drafts) do
+    --   local draftName = draft.draftName or "(untitled draft)"
+    --   local row = { draftName, date("%x %X", draft.ud), draft.draftId }
+    --   table.insert(draftRows, row)
+    -- end
+    -- return draftRows
+    return {}
+  end,
+  buttons = {
+    {
+      text = "New",
+      anchor = "TOP",
+      enabled = "Always",
+      handler = function()
+        addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu")
+      end,
+    },
+    {
+      text = "Update",
+      anchor = "TOP",
+      enabled = "Row",
+      handler = function(draft)
+        addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu", draft.draftId)
+      end,
+    },
+    {
+      text = "Rename",
+      anchor = "TOP",
+      enabled = "Row",
+      handler = function(draft, dataTable)
+        addon.QuestDrafts:StartDraft(draft.draftId)
+        dataTable:ClearSelection()
+      end,
+    },
+    {
+      text = "Delete",
+      anchor = "TOP",
+      enabled = "Row",
+      handler = function(draft)
+        addon.QuestDrafts:ShareDraft(draft.draftId)
+      end,
+    },
+    {
+      text = "Delete All",
+      anchor = "TOP",
+      enabled = "Row",
+      handler = function()
+        addon.StaticPopups:Show("ResetDrafts")
+      end,
+    },
+  },
+}
+
 
 local function buildPositionFinderFrame()
   local frame = addon.CustomWidgets:CreateWidget("ToolWindowPopout", "LocationFinderFrame", frameOptions)
+  local contentFrame = frame:GetContentFrame()
   frame:SetSize(400, 250)
   frame:SetMinResize(400, 250)
   local content = frame:GetContentFrame()
   local text = "PLAYER_POSITION"
-  local playerLocationText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  local playerLocationText = contentFrame:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
   playerLocationText:SetText(text)
   playerLocationText:SetPoint("TOPLEFT", content, "TOPLEFT")
   playerLocationText:SetHeight(30)
 
+  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", contentFrame, options)
+  dtwb:ClearAllPoints()
+  dtwb:SetPoint("TOPLEFT", playerLocationText, "BOTTOMLEFT")
+  dtwb:SetPoint("BOTTOMRIGHT", contentFrame, "BOTTOMRIGHT")
+  local dataTable = dtwb:GetDataTable()
+  dataTable:SubscribeMethodToEvents("RefreshData", "LocationUpdated", "LocationDeleted", "LocationDataLoaded", "LocationDataReset")
+  dataTable:SubscribeMethodToEvents("ClearSelection", "LocationDataLoaded", "LocationDeleted", "LocationDataReset")
+  dataTable:OnGetSelectedItem(function(row)
+    return QuestDrafts:FindByID(row[3])
+  end)
   addon:StartPollingLocation("location-frame")
   addon.AppEvents:Subscribe("PlayerLocationChanged", function(loc)
     local location = addon:GetPlayerLocation()
@@ -47,14 +128,7 @@ local function buildPositionFinderFrame()
   return frame
 end
 
-addon.PositionFinderFrame = buildPositionFinderFrame()
-
-  -- local button = CreateFrame("Button", nil, content, "UIPanelButtonTemplate")
-  -- button:SetPoint("TOPLEFT", content, "TOPLEFT")
-  -- button:SetText("Print Coordinates")
-  -- button:SetWidth(135)
-  -- button:SetScript("OnClick", function()
-  --   addon.Logger:Warn("Yay button!")
-  --   local location = addon:GetPlayerLocation()
-  --   addon.Logger:Warn("Coordinates: %s, %s", string.format("%.2f", location.x), string.format("%.2f", location.y))
-  -- end)
+addon:catch( function ()
+  addon.PositionFinderFrame = buildPositionFinderFrame()
+end
+)
