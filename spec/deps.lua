@@ -57,6 +57,7 @@ function deps:Init(addon)
   }
   addon.LibCompress = {
     _ctable = {},
+    _hashCounter = 0,
     CompressHuffman = function(self, str)
       local compressed = addon:CreateID("compress-mock-%i")
       self._ctable[compressed] = str
@@ -77,7 +78,19 @@ function deps:Init(addon)
           return self._entable[encoded] or error("Encoded value not mocked: "..encoded)
         end,
       }
-    end
+    end,
+    fcs32init = function(self)
+      self._hashCounter = self._hashCounter + 1
+      return self._hashCounter
+    end,
+    fcs32update = function(self)
+      self._hashCounter = self._hashCounter + 1
+      return self._hashCounter
+    end,
+    fcs32final = function(self)
+      self._hashCounter = self._hashCounter + 1
+      return self._hashCounter
+    end,
   }
   addon.LibScrollingTable = {}
 
