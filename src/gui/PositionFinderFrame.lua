@@ -127,7 +127,7 @@ local function buildPositionFinderFrame()
   return frame
 end
 
-addon:onload(function()
+addon:OnSaveDataLoaded(function()
   if addon.AVOID_BUILDING_UI then return end
   addon.PositionFinderFrame = buildPositionFinderFrame()
 end)
