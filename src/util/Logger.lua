@@ -221,11 +221,10 @@ local methods = {
   end,
   ["Table"] = function(self, t, key, indent, circ)
     -- These logs are only intended for debugging, so just print them at the lowest visible log level
-    local level = getMinLogLevel(self.name)
-    if t == nil then
-      self:Log(level, "Table is nil")
-      return
+    if type(t) ~= "table" then
+      self:Log(ll.fatal, "Failed to log table: type is %s", type(t))
     end
+    local level = getMinLogLevel(self.name)
     indent = indent or ""
     circ = circ or {}
     circ[t] = true
