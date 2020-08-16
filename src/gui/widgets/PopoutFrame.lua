@@ -45,8 +45,9 @@ local methods = {
     self:SaveWindowState()
   end,
   ["SetWindowState"] = function(self, pos)
-    self:SetSize(pos.w, pos.h)
+    self:ClearAllPoints()
     self:SetPoint(pos.p1, UIParent, pos.p2, pos.x, pos.y)
+    self:SetSize(pos.w, pos.h)
 
     if pos.shown then
       self:Show()
