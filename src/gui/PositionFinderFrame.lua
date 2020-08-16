@@ -96,11 +96,10 @@ local function buildPositionFinderFrame()
   local contentFrame = frame:GetContentFrame()
   frame:SetSize(400, 250)
   frame:SetMinResize(400, 250)
-  local content = frame:GetContentFrame()
   local text = "PLAYER_POSITION"
   local playerLocationText = contentFrame:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
   playerLocationText:SetText(text)
-  playerLocationText:SetPoint("TOPLEFT", content, "TOPLEFT")
+  playerLocationText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT")
   playerLocationText:SetHeight(30)
 
   local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", contentFrame, options)
