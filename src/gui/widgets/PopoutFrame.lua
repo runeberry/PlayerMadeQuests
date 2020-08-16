@@ -3,7 +3,6 @@ local CreateFrame = addon.G.CreateFrame
 local UIParent, UISpecialFrames = addon.G.UIParent, addon.G.UISpecialFrames
 local strsplit, strjoin = addon.G.strsplit, addon.G.strjoin
 local unpack = addon.G.unpack
-local AceGUI = addon.AceGUI
 
 local widget = addon.CustomWidgets:NewWidget("PopoutFrame")
 
@@ -45,10 +44,23 @@ local methods = {
     end
     self:SaveWindowState()
   end,
+  ["SetWindowState"] = function(self, pos)
+    self:SetSize(pos.w, pos.h)
+    self:SetPoint(pos.p1, UIParent, pos.p2, pos.x, pos.y)
+
+    if pos.shown then
+      self:Show()
+    else
+      self:Hide()
+    end
+
+    addon.UILogger:Trace("Set %s state: %s %s (%.2f, %.2f) %ix%i (%s)", self:GetName(), pos.p1, pos.p2, pos.x, pos.y, pos.w, pos.h, pos.shown)
+  end,
   ["SaveWindowState"] = function(self)
     local p1, _, p2, x, y = self:GetPoint()
     local pos = self._options.position
     if isInaccuratePoint(p1, p2, x, y) and pos then
+      addon.UILogger:Debug("Inaccurate point detected, adjusting frame")
       p1 = pos.p1
       p2 = pos.p2
       x = pos.x
@@ -64,49 +76,34 @@ local methods = {
 
     addon.PlayerSettings.FrameData[self._name] = strjoin(",", p1, p2, x, y, w, h, shown)
     addon.SaveData:Save("Settings", addon.PlayerSettings)
-    addon.UILogger:Trace("Saved window position: %s %s (%.2f, %.2f) %ix%i (%s)", p1, p2, x, y, w, h, shown)
+    addon.UILogger:Trace("Saved %s state: %s %s (%.2f, %.2f) %ix%i (%s)", self:GetName(), p1, p2, x, y, w, h, shown)
   end,
   ["LoadWindowState"] = function(self)
-    local pos
     local frameData = addon.PlayerSettings.FrameData
-    if frameData and frameData[self._name] then
-      local p1, p2, x, y, w, h, shown = strsplit(",", frameData[self._name])
-      pos = {
-        p1 = p1,
-        p2 = p2,
-        x = x,
-        y = y,
-        w = w,
-        h = h,
-      }
-      if self._options.saveOpenState then
-        -- Only used the saved 'shown' state if explicitly declared
-        pos.shown = shown or false
-      elseif self._options.position then
-        -- Otherwise fall back on the frame's default shown state
-        pos.shown = self._options.position.shown
-      else
-        -- If no default shown state is available, then hide the frame
-        pos.shown = false
-      end
+    if not frameData or not frameData[self._name] then return end
+
+    local p1, p2, x, y, w, h, shown = strsplit(",", frameData[self._name])
+    local pos = {
+      p1 = p1,
+      p2 = p2,
+      x = x,
+      y = y,
+      w = w,
+      h = h,
+    }
+
+    if self._options.saveOpenState then
+      -- Only used the saved 'shown' state if explicitly declared
+      pos.shown = addon:ConvertValue(shown, "boolean") or false
     elseif self._options.position then
-      pos = self._options.position
+      -- Otherwise fall back on the frame's default shown state
+      pos.shown = self._options.position.shown
     else
-      addon.UILogger:Trace("No saved position or default position available for PopoutFrame: %s", self._name)
-      return
+      -- If no default shown state is available, then hide the frame
+      pos.shown = false
     end
 
-    self:SetSize(pos.w, pos.h)
-    self:SetPoint(pos.p1, UIParent, pos.p2, pos.x, pos.y)
-
-    pos.shown = pos.shown or "false"
-    if pos.shown == "true" then -- shown is stored as a string, not a boolean
-      self:Show()
-    else
-      self:Hide()
-    end
-
-    addon.UILogger:Trace("Loaded window position: %s %s (%.2f, %.2f) %ix%i (%s)", pos.p1, pos.p2, pos.x, pos.y, pos.w, pos.h, pos.shown)
+    self:SetWindowState(pos)
   end,
 }
 
@@ -157,10 +154,13 @@ function widget:Create(frameName, options)
     table.insert(UISpecialFrames, frameName)
   end
 
+  if options.position then
+    frame:SetWindowState(options.position)
+  end
+
   addon:OnSaveDataLoaded(function()
     frame:LoadWindowState()
   end)
 
-  frame:Hide()
   return frame
 end
