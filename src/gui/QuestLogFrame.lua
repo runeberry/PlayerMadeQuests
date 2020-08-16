@@ -158,6 +158,7 @@ local function buildQuestLogFrame()
 end
 
 addon:catch(function()
+  if addon.AVOID_BUILDING_UI then return end
   addon.QuestLogFrame = buildQuestLogFrame()
   addon.AppEvents:Subscribe("QuestLogBuilt", function()
     addon.QuestLogFrame._isQuestLogBuilt = true

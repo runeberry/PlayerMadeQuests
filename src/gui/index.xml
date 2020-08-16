@@ -30,6 +30,7 @@
   <Script file="gui/YamlFormatting.lua"/>
 
   <!-- MainMenu screens -->
+  <Script file="gui/menu/DebugQuestListMenu.lua"/>
   <Script file="gui/menu/HelpCommandsMenu.lua"/>
   <Script file="gui/menu/HelpFaqMenu.lua"/>
   <Script file="gui/menu/QuestArchiveMenu.lua"/>

@@ -4,6 +4,7 @@
   <Include file="util/index.xml"/>
 
   <Include file="events/index.xml"/>
+  <Include file="game/index.xml"/>
   <Include file="qeng/index.xml"/>
   <Include file="data/index.xml"/>
   <Include file="gui/index.xml"/>

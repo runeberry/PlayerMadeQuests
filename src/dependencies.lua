@@ -24,6 +24,7 @@ addon.G = {
   unpack = unpack,
 
   CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo,
+  CheckInteractDistance = CheckInteractDistance,
   CreateFrame = CreateFrame,
   GetBestMapForUnit = C_Map.GetBestMapForUnit,
   GetMapInfo = C_Map.GetMapInfo,
@@ -39,6 +40,7 @@ addon.G = {
   StaticPopupDialogs = StaticPopupDialogs,
   StaticPopup_Show = StaticPopup_Show,
   StaticPopup_Hide = StaticPopup_Hide,
+  UnitAura = UnitAura,
   UnitClass = UnitClass,
   UnitExists = UnitExists,
   UnitFactionGroup = UnitFactionGroup,

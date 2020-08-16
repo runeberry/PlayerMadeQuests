@@ -23,13 +23,13 @@ local patterns = {
     pattern = "^(.-)$",
     result = bofmarker.."%1"..eofmarker
   },
-  {
-    pattern = capbol.."(%s-)(%w-):",
+  { -- Standard keys
+    pattern = capbol.."(%s-)([%w-]-):",
     result = "%1%2|c%3|r:",
     color = colors.darkBlue
   },
   { -- List item keys
-    pattern = capbol.."(%s-)(-) (%w-)(:?)([%s\n])",
+    pattern = capbol.."(%s-)(-) ([%w-]-)(:?)([%s\n])",
     result = "%1%2%3 |c%4|r%5%6",
     color = colors.orange
   },

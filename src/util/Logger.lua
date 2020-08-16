@@ -207,14 +207,17 @@ local methods = {
   ["Debug"] = function(self, str, ...) self:Log(ll.debug, str, ...) end,
   ["Trace"] = function(self, str, ...) self:Log(ll.trace, str, ...) end,
   ["Varargs"] = function(self, ...)
-    local vals = {}
     -- These logs are only intended for debugging, so just print them at the lowest visible log level
     local level = getMinLogLevel(self.name)
-    for n=1, select('#', ...) do
-      local val = select(n, ...)
-      vals[#vals+1] = tostring(val)
+    local vals, filtered = { ... }, {}
+    for i, val in ipairs(vals) do
+      if val == nil then
+        filtered[i] = "nil"
+      else
+        filtered[i] = val
+      end
     end
-    self:Log(level, "Variadic args: [%s]", table.concat(vals, ", "))
+    self:Log(level, "Variadic args: [%s]", table.concat(filtered, ", "))
   end,
   ["Table"] = function(self, t, key, indent, circ)
     -- These logs are only intended for debugging, so just print them at the lowest visible log level
