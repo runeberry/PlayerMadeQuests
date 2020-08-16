@@ -11,7 +11,10 @@ local frameOptions = {
     text = "ToolWindowPopout",
   },
   movable = true,
-  resizable = true,
+  resizable = {
+    minWidth = 200,
+    minHeight = 100,
+  },
   saveOpenState = true,
   position = {
     p1 = "RIGHT",
@@ -36,7 +39,6 @@ function widget:Create(frameName, options)
   options = addon:MergeTable(frameOptions, options or {})
   local frame = addon.CustomWidgets:CreateWidget("PopoutFrame", frameName, options)
   frame:SetFrameStrata("HIGH")
-  frame:SetMinResize(200,100)
   frame:SetToplevel(true)
   frame:OnClose(function()
     frame:SaveWindowState()

@@ -147,6 +147,11 @@ function widget:Create(frameName, options)
     frame:OnResize(function()
       frame:SaveWindowState()
     end)
+    if type(options.resizable) == "table" then
+      if options.resizable.minWidth and options.resizable.minHeight then
+        frame:SetMinResize(options.resizable.minWidth, options.resizable.minHeight)
+      end
+    end
   end
 
   if options.escapable then

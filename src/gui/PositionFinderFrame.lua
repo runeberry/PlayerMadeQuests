@@ -10,6 +10,10 @@ local frameOptions = {
   styleOptions = {
     text = "Location Finder"
   },
+  resizable = {
+    minWidth = 400,
+    minHeight = 250,
+  },
   position = {
     p1 = "RIGHT",
     p2 = "RIGHT",
@@ -94,7 +98,6 @@ local options = {
 local function buildPositionFinderFrame()
   local frame = addon.CustomWidgets:CreateWidget("ToolWindowPopout", "LocationFinderFrame", frameOptions)
   local contentFrame = frame:GetContentFrame()
-  frame:SetMinResize(400, 250)
   local text = "PLAYER_POSITION"
   local playerLocationText = contentFrame:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
   playerLocationText:SetText(text)
