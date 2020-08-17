@@ -94,11 +94,21 @@ local options = {
   },
 }
 
+local function setLocationText()
+  local location = addon:GetPlayerLocation()
+  local text
+  if location.subZone == "" then
+    text = location.zone .." ("..string.format("%.2f", location.x).. ", ".. string.format("%.2f", location.y)..")"
+  else
+    text = location.subZone.. ", "..location.zone .." ("..string.format("%.2f", location.x).. ", ".. string.format("%.2f", location.y)..")"
+  end
+  return text
+end
 
 local function buildPositionFinderFrame()
   local frame = addon.CustomWidgets:CreateWidget("ToolWindowPopout", "LocationFinderFrame", frameOptions)
   local contentFrame = frame:GetContentFrame()
-  local text = "PLAYER_POSITION"
+  local text = setLocationText()
   local playerLocationText = contentFrame:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
   playerLocationText:SetText(text)
   playerLocationText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT")
@@ -116,13 +126,7 @@ local function buildPositionFinderFrame()
   end)
   addon:StartPollingLocation("location-frame")
   addon.AppEvents:Subscribe("PlayerLocationChanged", function(loc)
-    local location = addon:GetPlayerLocation()
-    if location.subZone == "" then
-      text = location.zone .." ("..string.format("%.2f", location.x).. ", ".. string.format("%.2f", location.y)..")"
-    else
-      text = location.subZone.. ", "..location.zone .." ("..string.format("%.2f", location.x).. ", ".. string.format("%.2f", location.y)..")"
-    end
-
+    text = setLocationText()
     playerLocationText:SetText(text)
   end)
 
