@@ -7,8 +7,8 @@ end)
 
 local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
 local objectiveLogger = addon.Logger:NewLogger("Objectives", addon.LogLevel.info)
-objectiveLogger.pass = addon:Colorize("green", "        [PASS] ")
-objectiveLogger.fail = addon:Colorize("red", "        [FAIL] ")
+objectiveLogger.pass = addon:Colorize("green", "[P] ")
+objectiveLogger.fail = addon:Colorize("red", "[F] ")
 
 addon.QuestEngine = {
   ObjectiveLogger = objectiveLogger

@@ -312,6 +312,14 @@ describe("Tables", function()
       assert.same({}, addon:DecompressTable(""))
     end)
   end)
+
+  describe("GetTableHash", function()
+    it("can generate table hash", function()
+      -- This method's dependencies are all mocked out so this doesn't test much
+      -- other than that it doesn't throw any obvious errors
+      assert.has_no_error(function() addon:GetTableHash({}) end)
+    end)
+  end)
 end)
 
 describe("Unpack", function()

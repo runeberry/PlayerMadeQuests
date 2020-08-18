@@ -18,7 +18,11 @@ objectives:
       target: Murloc
       goal: 2
       zone: Crystal Lake
-      coords: 50.57,66.80]],
+      coords: 50.57,66.80
+  - kill:
+      target: Stonetusk Boar
+      goal: 2
+      item: Light Leather]],
   [2] = [[
 objectives:
   - kill Cow
@@ -35,7 +39,10 @@ objectives:
       target: Chicken
       goal: 2
       zone: Elwynn Forest
-      subzone: Goldshire]],
+      subzone: Goldshire
+  - talk-to:
+      target: Innkeeper Farley
+      item: Light Leather]],
   [4] = [[
 objectives:
   - talk-to Erma
@@ -72,7 +79,12 @@ objectives:
       emote: sigh
       target: Murloc
       zone: Crystal Lake
-      coords: 50.57,66.80]],
+      coords: 50.57,66.80
+  - use-emote:
+      emote: growl
+      target: Stonetusk Boar
+      goal: 2
+      item: Light Leather]],
   [6] = [[
 objectives:
   - use-emote dance
@@ -98,7 +110,11 @@ objectives:
   - explore:
       zone: Goldshire
       coords: 42.41, 64.47
-      aura: Blessing of Might]],
+      aura: Blessing of Might
+  - explore:
+      zone: Goldshire
+      coords: 42.41,64.47,0.3
+      item: Light Leather]],
   [8] = [[
 objectives:
   - explore Goldshire
@@ -117,7 +133,10 @@ objectives:
       zone: Elwynn Forest
       subzone: Goldshire
       coords: 42.41, 64.47, 0.3
-  - gain-aura: { aura: Blessing of Might, zone: Lion's Pride Inn }]],
+  - gain-aura: { aura: Blessing of Might, zone: Lion's Pride Inn }
+  - gain-aura:
+      aura: Blessing of Might
+      item: Light Leather]],
   [10] = [[
 objectives:
   - gain-aura 'Blessing of Might']],
