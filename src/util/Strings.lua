@@ -161,7 +161,7 @@ local three_ptn = "^"..num_ptn..","..num_ptn..","..num_ptn.."$"
 -- Splits a string of format "0.0,0.0,0.0" into coordinates x, y, and (optionally) radius
 function addon:ParseCoords(str)
   assert(str and type(str) == "string", "Failed to ParseCoords: argument type "..type(str).." is not a string")
-  assert(str:match(two_ptn) or str:match(three_ptn), "Failed to ParseCoords: coordinate string must be in format: \"#,#,#\"")
+  assert(str:match(two_ptn) or str:match(three_ptn), "Failed to ParseCoords: coordinate string \""..str.."\" must be in format \"#,#,#\"")
 
   local x, y, radius = strsplit(",", str)
   x = tonumber(x)
