@@ -2,29 +2,35 @@ local mock = require("spec/mock")
 
 local deps = {}
 
+-- Lazy shortcut for writing a function with static returns
+local function ret(...)
+  local args = { ... }
+  return function() return table.unpack(args) end
+end
+
 local function newFrameMock()
   return {
-    SetFrameStrata = mock:NewMock(),
-    Show = mock:NewMock(),
-    Hide = mock:NewMock(),
-    SetScript = mock:NewMock(),
+    SetFrameStrata = ret(),
+    Show = ret(),
+    Hide = ret(),
+    SetScript = ret(),
   }
 end
 
 local function newAceFrameMock()
   local aceFrameMock = {
     frame = newFrameMock(),
-    SetTitle = mock:NewMock(),
-    SetStatusText = mock:NewMock(),
-    SetCallback = mock:NewMock(),
-    SetLayout = mock:NewMock(),
-    EnableButtonTooltips = mock:NewMock(),
-    SetTree = mock:NewMock(),
-    AddChild = mock:NewMock(),
-    SelectByValue = mock:NewMock(),
-    SetFullWidth = mock:NewMock(),
-    SetFullHeight = mock:NewMock(),
-    SetStatusTable = mock:NewMock(),
+    SetTitle = ret(),
+    SetStatusText = ret(),
+    SetCallback = ret(),
+    SetLayout = ret(),
+    EnableButtonTooltips = ret(),
+    SetTree = ret(),
+    AddChild = ret(),
+    SelectByValue = ret(),
+    SetFullWidth = ret(),
+    SetFullHeight = ret(),
+    SetStatusTable = ret(),
   }
 
   aceFrameMock.content = { obj = aceFrameMock }
@@ -34,15 +40,15 @@ end
 
 function deps:Init(addon)
   addon.SILENT_PRINT = false
-  addon.Ace = {
+  addon.Ace = mock:NewMock({
     _stable = {},
-    RegisterEvent = mock:NewMock(),
-    RegisterComm = mock:NewMock(),
+    RegisterEvent = ret(),
+    RegisterComm = ret(),
     ScheduleTimer = function(self, func, delay, ...)
       addon:AddTimerFunction(func, ...)
     end,
-    ScheduleRepeatingTimer = mock:NewMock( mock:Returns(1) ), -- Create a mock implementation of this if needed
-    CancelTimer = mock:NewMock(), -- Create a mock implementation of this if needed
+    ScheduleRepeatingTimer = ret(1), -- Create a mock implementation of this if needed
+    CancelTimer = ret(), -- Create a mock implementation of this if needed
     Serialize = function(self, t)
       local serialized = addon:CreateID("serialize-mock-%i")
       self._stable[serialized] = addon:CopyTable(t)
@@ -51,11 +57,11 @@ function deps:Init(addon)
     Deserialize = function(self, serialized)
       return true, self._stable[serialized] or error("Serialized value not mocked: "..serialized)
     end
-  }
-  addon.AceGUI = {
-    Create = mock:NewMock( mock:Returns(newAceFrameMock()) )
-  }
-  addon.LibCompress = {
+  })
+  addon.AceGUI = mock:NewMock({
+    Create = function() return newAceFrameMock() end,
+  })
+  addon.LibCompress = mock:NewMock({
     _ctable = {},
     _hashCounter = 0,
     CompressHuffman = function(self, str)
@@ -91,12 +97,12 @@ function deps:Init(addon)
       self._hashCounter = self._hashCounter + 1
       return self._hashCounter
     end,
-  }
-  addon.LibScrollingTable = {}
+  })
+  addon.LibScrollingTable = mock:NewMock({})
 
-  addon.G = {
-    date = mock:NewMock( mock:Returns("date") ),
-    print = mock:NewMock("print", mock:Handler(function(...)
+  addon.G = mock:NewMock({
+    date = ret("date"),
+    print = function(...)
       if addon.SILENT_PRINT then return end
       local args, spaced = table.pack(...), {}
       for i = 1, args.n do
@@ -112,7 +118,7 @@ function deps:Init(addon)
       end
       table.insert(spaced, "\n")
       io.write(table.unpack(spaced))
-    end) ),
+    end,
     strjoin = function(delim, ...) return table.concat({ ... }, delim) end,
     -- Adapted from: https://gist.github.com/jaredallard/ddb152179831dd23b230
     strsplit = function(delim, str)
@@ -128,40 +134,40 @@ function deps:Init(addon)
       return table.unpack(result)
     end,
     time = function() return math.floor(os.clock() * 1000) end,
-    unpack = table.unpack,
+    unpack = function(...) return table.unpack(...) end,
 
-    CombatLogGetCurrentEventInfo = mock:NewMock(),
-    CheckInteractDistance = mock:NewMock(),
-    CreateFrame = mock:NewMock( mock:Returns({}) ),
-    GetBestMapForUnit = mock:NewMock( mock:Returns({}) ),
-    GetMapInfo = mock:NewMock( mock:Returns({}) ),
-    GetPlayerMapPosition = mock:NewMock( mock:Returns({}) ),
-    GetUnitName = mock:NewMock( mock:Returns("unitname") ),
-    GetRealZoneText = mock:NewMock( mock:Returns("zone") ),
-    GetSubZoneText = mock:NewMock( mock:Returns("subzone") ),
-    GetMinimapZoneText = mock:NewMock( mock:Returns("subzone") ),
-    GetZoneText = mock:NewMock( mock:Returns("zone") ),
-    GetItemInfo = mock:NewMock( mock:Returns("item") ),
-    GetContainerItemInfo = mock:NewMock(),
-    GetInventorySlotInfo = mock:NewMock( mock:Returns(0) ),
-    GetInventoryItemID = mock:NewMock( mock:Returns(0) ),
-    PlaySoundFile = mock:NewMock(),
-    ReloadUI = mock:NewMock(),
+    CombatLogGetCurrentEventInfo = ret(),
+    CheckInteractDistance = ret(),
+    CreateFrame = function() return {} end,
+    GetBestMapForUnit = function() return {} end,
+    GetMapInfo = function() return {} end,
+    GetPlayerMapPosition = function() return {} end,
+    GetUnitName = ret("unitname"),
+    GetRealZoneText = ret("zone"),
+    GetSubZoneText = ret("subzone"),
+    GetMinimapZoneText = ret("subzone"),
+    GetZoneText = ret("zone"),
+    GetItemInfo = ret("item"),
+    GetContainerItemInfo = ret(),
+    GetInventorySlotInfo = ret(0),
+    GetInventoryItemID = ret(0),
+    PlaySoundFile = ret(),
+    ReloadUI = ret(),
     SlashCmdList = {},
     StaticPopupDialogs = {},
-    StaticPopup_Show = mock:NewMock(),
-    StaticPopup_Hide = mock:NewMock(),
-    UnitAura = mock:NewMock( mock:Returns("aura") ),
-    UnitClass = mock:NewMock( mock:Returns("class") ),
-    UnitExists = mock:NewMock( mock:Returns(false) ),
-    UnitFactionGroup = mock:NewMock( mock:Returns("Alliance") ),
-    UnitGUID = mock:NewMock( mock:Returns("guid") ),
-    UnitIsFriend = mock:NewMock( mock:Returns(false) ),
-    UnitLevel = mock:NewMock( mock:Returns(1) ),
+    StaticPopup_Show = ret(),
+    StaticPopup_Hide = ret(),
+    UnitAura = ret("aura"),
+    UnitClass = ret("class"),
+    UnitExists = ret(false),
+    UnitFactionGroup = ret("Alliance"),
+    UnitGUID = ret("guid"),
+    UnitIsFriend = ret(false),
+    UnitLevel = ret(1),
     UIErrorsFrame = {},
     UIParent = {},
     UISpecialFrames = {},
-  }
+  })
 end
 
 return deps
