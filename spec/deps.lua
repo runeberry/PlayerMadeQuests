@@ -10,6 +10,7 @@ end
 
 local function newFrameMock()
   return {
+    AddMessage = ret(),
     SetFrameStrata = ret(),
     Show = ret(),
     Hide = ret(),
@@ -157,7 +158,7 @@ function deps:Init(addon)
     StaticPopupDialogs = {},
     StaticPopup_Show = ret(),
     StaticPopup_Hide = ret(),
-    UnitAura = ret("aura"),
+    UnitAura = ret(),
     UnitClass = ret("class"),
     UnitExists = ret(false),
     UnitFactionGroup = ret("Alliance"),
