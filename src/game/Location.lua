@@ -2,6 +2,11 @@ local _, addon = ...
 local logger = addon.Logger:NewLogger("Location")
 local time = addon.G.time
 
+--- Time to cache player location in seconds
+addon.PLAYER_LOCATION_TTL = addon.PLAYER_LOCATION_TTL or 0.5
+--- Time between polling events in seconds
+addon.PLAYER_LOCATION_INTERVAL = addon.PLAYER_LOCATION_INTERVAL or 1
+
 local GetBestMapForUnit = addon.G.GetBestMapForUnit
 local GetPlayerMapPosition = addon.G.GetPlayerMapPosition
 local GetRealZoneText = addon.G.GetRealZoneText
@@ -11,11 +16,9 @@ local GetZoneText = addon.G.GetZoneText
 
 local playerLocation = {}
 local playerLocationExpires = 0 -- updated when the player location is refreshed
-local playerLocationTTL = 0.5 -- time to cache player location in seconds
 
 local pollingIds = {}
 local pollingTimerId
-local pollingTimerInterval = 1 -- time between polling events in seconds
 
 function addon:GetPlayerLocation()
   local ts = time()
@@ -39,7 +42,7 @@ function addon:GetPlayerLocation()
   playerLocation.x = x * 100
   playerLocation.y = y * 100
 
-  playerLocationExpires = ts + playerLocationTTL
+  playerLocationExpires = ts + addon.PLAYER_LOCATION_TTL
 
   return playerLocation
 end
@@ -66,7 +69,7 @@ function addon:StartPollingLocation(id)
   pollingIds[id] = true
   -- If polling has already started, don't try to start it again
   if pollingTimerId then return end
-  pollingTimerId = addon.Ace:ScheduleRepeatingTimer(pollingFn, pollingTimerInterval)
+  pollingTimerId = addon.Ace:ScheduleRepeatingTimer(pollingFn, addon.PLAYER_LOCATION_INTERVAL)
   logger:Debug("Start polling for player location")
 end
 
