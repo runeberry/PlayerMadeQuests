@@ -60,9 +60,10 @@ function builder:Build(opts)
   local requires = getIncludedFilesFromXML("index.xml")
 
   local addon = {
-    GLOBAL_LOG_MODE = "simple-unbuffered",
+    GLOBAL_LOG_MODE = "pretty",
     TRANSACTION_LOGS = false,
     USE_INTERNAL_MESSAGING = true,
+    USE_ANSI_COLORS = true,
     AVOID_BUILDING_UI = true, -- todo: need better mocking system for UI, but suppress errors for now
     -- Exception: I want to include the TinyYaml lib for parsing quests
     ParseYaml = loadfile([[src/libs/lua-tinyyaml/tinyyaml.lua]])().parse
