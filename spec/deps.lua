@@ -5,12 +5,15 @@ local deps = {}
 -- Lazy shortcut for writing a function with static returns
 local function ret(...)
   local args = { ... }
-  return function() return table.unpack(args) end
+  if #args == 0 then
+    return function() return end
+  else
+    return function() return table.unpack(args) end
+  end
 end
 
 local function newFrameMock()
   return {
-    AddMessage = ret(),
     SetFrameStrata = ret(),
     Show = ret(),
     Hide = ret(),
@@ -102,7 +105,7 @@ function deps:Init(addon)
   addon.LibScrollingTable = mock:NewMock({})
 
   addon.G = mock:NewMock({
-    date = ret("date"),
+    date = ret("01/01/2000"),
     print = function(...)
       if addon.SILENT_PRINT then return end
       local args, spaced = table.pack(...), {}
@@ -140,18 +143,23 @@ function deps:Init(addon)
     CombatLogGetCurrentEventInfo = ret(),
     CheckInteractDistance = ret(),
     CreateFrame = function() return {} end,
-    GetBestMapForUnit = function() return {} end,
-    GetMapInfo = function() return {} end,
-    GetPlayerMapPosition = function() return {} end,
-    GetUnitName = ret("unitname"),
-    GetRealZoneText = ret("zone"),
-    GetSubZoneText = ret("subzone"),
-    GetMinimapZoneText = ret("subzone"),
-    GetZoneText = ret("zone"),
-    GetItemInfo = ret("item"),
+    GetBestMapForUnit = ret(),
+    GetMapInfo = ret(),
+    GetPlayerMapPosition = ret(),
+    GetUnitName = function(uid)
+      -- Player name should always return even if mock env is reset
+      if uid == "player" then
+        return "PlayerName"
+      end
+    end,
+    GetRealZoneText = ret(),
+    GetSubZoneText = ret(),
+    GetMinimapZoneText = ret(),
+    GetZoneText = ret(),
+    GetItemInfo = ret(),
     GetContainerItemInfo = ret(),
-    GetInventorySlotInfo = ret(0),
-    GetInventoryItemID = ret(0),
+    GetInventorySlotInfo = ret(),
+    GetInventoryItemID = ret(),
     PlaySoundFile = ret(),
     ReloadUI = ret(),
     SlashCmdList = {},
@@ -159,13 +167,15 @@ function deps:Init(addon)
     StaticPopup_Show = ret(),
     StaticPopup_Hide = ret(),
     UnitAura = ret(),
-    UnitClass = ret("class"),
-    UnitExists = ret(false),
-    UnitFactionGroup = ret("Alliance"),
-    UnitGUID = ret("guid"),
-    UnitIsFriend = ret(false),
-    UnitLevel = ret(1),
-    UIErrorsFrame = {},
+    UnitClass = ret(),
+    UnitExists = ret(),
+    UnitFactionGroup = ret(),
+    UnitGUID = ret(),
+    UnitIsFriend = ret(),
+    UnitLevel = ret(),
+    UIErrorsFrame = {
+      AddMessage = ret(),
+    },
     UIParent = {},
     UISpecialFrames = {},
   })
