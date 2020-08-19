@@ -28,7 +28,7 @@ describe("Logger", function()
     local tempAddon = builder:Build({ LOG_LEVEL = 4, LOG_MODE = "simple" })
     tempAddon.SILENT_PRINT = true
     local tempLogSpy = spy.on(tempAddon.Logger, "Log")
-    local printSpy = mock:GetMock(tempAddon.G.print)
+    local printSpy = mock:GetFunctionMock(tempAddon.G.print)
     tempAddon.Logger:Debug("buffered log")
     assert.spy(tempLogSpy).was_called()
     printSpy:AssertNotCalled()
@@ -39,7 +39,7 @@ describe("Logger", function()
 end)
 
 describe("Sounds", function()
-  local playSoundMock = mock:GetMock(addon.G.PlaySoundFile)
+  local playSoundMock = mock:GetFunctionMock(addon.G.PlaySoundFile)
 
   before_each(function()
     addon.Logger.Log:clear()
