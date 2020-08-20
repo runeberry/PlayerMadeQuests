@@ -164,7 +164,10 @@ local function wrapObjectiveHandler(objective)
   -- Given an arbitrary list of game event args, handle them as follows
   return function(...)
     local numActive = addon:tlen(objective._active)
-    if numActive < 1 then return end
+    if numActive < 1 then
+      objectiveLogger:Trace("No active objectives for: %s", objective.name)
+      return
+    end
 
     objectiveLogger:Debug("***** Evaluating objectives: %s (%i active)", objective.name, addon:tlen(objective._active))
     -- logger:Table(objective._active)

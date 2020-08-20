@@ -161,7 +161,7 @@ local logMethods = {
     end
     -- Log must be "higher priority" than both the instance and global log levels
     if loglevel <= getMinLogLevel(self.name) then
-      print(addon:GetEscapeColor(logcolors[loglevel])..self.prefix, toLogMessage(str, ...))
+      print(addon.ESCAPE_START..addon:GetEscapeColor(logcolors[loglevel])..self.prefix, toLogMessage(str, ...)..addon.ESCAPE_END)
       bumpStats(self.stats, true, loglevel)
     else
       bumpStats(self.stats, false, loglevel)
