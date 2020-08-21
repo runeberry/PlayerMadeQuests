@@ -1,10 +1,9 @@
 local _, addon = ...
-local AceGUI = addon.AceGUI
-local QuestLog, QuestStatus, localizer = addon.QuestLog, addon.QuestStatus, addon.QuestScriptLocalizer
-local CreateFrame = addon.G.CreateFrame
-local QuestDrafts = addon.QuestDrafts
+local Locations = addon.Locations
 
 addon.PositionFinderFrame = nil -- Built at end of file
+
+local locationRows
 
 local frameOptions = {
   styleOptions = {
@@ -28,26 +27,36 @@ local frameOptions = {
 local options = {
   colInfo = {
     {
-      name = "Draft",
-      pwidth = 0.6,
+      name = "Name",
+      pwidth = 0.4,
       align = "LEFT"
     },
     {
-      name = "Last Modified",
+      name = "Zone",
+      pwidth = 0.2,
+      align = "RIGHT"
+    },
+    {
+      name = "Subzone",
+      pwidth = 0.2,
+      align = "RIGHT"
+    },
+    {
+      name = "Coords",
+      pwidth = 0.2,
       align = "RIGHT"
     }
   },
   dataSource = function()
-    -- draftRows = {}
-    -- local drafts = QuestDrafts:FindAll()
-    -- table.sort(drafts, function(a, b) return a.draftId < b.draftId end)
-    -- for _, draft in pairs(drafts) do
-    --   local draftName = draft.draftName or "(untitled draft)"
-    --   local row = { draftName, date("%x %X", draft.ud), draft.draftId }
-    --   table.insert(draftRows, row)
-    -- end
-    -- return draftRows
-    return {}
+    locationRows = {}
+    local locations = Locations:FindAll()
+    table.sort(locations, function(a, b) return a.locationId < b.locationId end)
+    for _, location in pairs(locations) do
+      local coords = addon:PrettyCoords(location.x, location.y)
+      local row = { location.name, location.zone, location.subZone, coords, location.locationId }
+      table.insert(locationRows, row)
+    end
+    return locationRows
   end,
   buttons = {
     {
@@ -55,32 +64,32 @@ local options = {
       anchor = "TOP",
       enabled = "Always",
       handler = function()
-        addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu")
+        local location = addon:GetPlayerLocation()
+        addon.StaticPopups:Show("NewLocation", location)
       end,
     },
     {
       text = "Update",
       anchor = "TOP",
       enabled = "Row",
-      handler = function(draft)
-        addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu", draft.draftId)
+      handler = function(location)
+        addon.StaticPopups:Show("UpdateLocation", location)
       end,
     },
     {
       text = "Rename",
       anchor = "TOP",
       enabled = "Row",
-      handler = function(draft, dataTable)
-        addon.QuestDrafts:StartDraft(draft.draftId)
-        dataTable:ClearSelection()
+      handler = function(location)
+        addon.StaticPopups:Show("RenameLocation", location)
       end,
     },
     {
       text = "Delete",
       anchor = "TOP",
       enabled = "Row",
-      handler = function(draft)
-        addon.QuestDrafts:ShareDraft(draft.draftId)
+      handler = function(location)
+        addon.StaticPopups:Show("DeleteLocation", location)
       end,
     },
     {
@@ -88,7 +97,7 @@ local options = {
       anchor = "TOP",
       enabled = "Row",
       handler = function()
-        addon.StaticPopups:Show("ResetDrafts")
+        addon.StaticPopups:Show("ResetLocations")
       end,
     },
   },
@@ -113,16 +122,17 @@ local function buildPositionFinderFrame()
   playerLocationText:SetText(text)
   playerLocationText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT")
   playerLocationText:SetHeight(30)
-
   local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", contentFrame, options)
   dtwb:ClearAllPoints()
   dtwb:SetPoint("TOPLEFT", playerLocationText, "BOTTOMLEFT")
-  dtwb:SetPoint("BOTTOMRIGHT", contentFrame, "BOTTOMRIGHT")
+  dtwb:SetPoint("BOTTOMRIGHT", contentFrame, "BOTTOMRIGHT", 0, 9)
   local dataTable = dtwb:GetDataTable()
-  dataTable:SubscribeMethodToEvents("RefreshData", "LocationUpdated", "LocationDeleted", "LocationDataLoaded", "LocationDataReset")
+  dataTable:SubscribeMethodToEvents("RefreshData", "LocationAdded", "LocationUpdated", "LocationDeleted", "LocationDataLoaded", "LocationDataReset")
   dataTable:SubscribeMethodToEvents("ClearSelection", "LocationDataLoaded", "LocationDeleted", "LocationDataReset")
+  dataTable:RefreshData()
+  dataTable:EnableUpdates(true)
   dataTable:OnGetSelectedItem(function(row)
-    return QuestDrafts:FindByID(row[3])
+     return Locations:FindByID(row[5])
   end)
   addon:StartPollingLocation("location-frame")
   addon.AppEvents:Subscribe("PlayerLocationChanged", function(loc)

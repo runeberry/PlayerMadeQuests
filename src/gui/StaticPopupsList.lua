@@ -1,6 +1,7 @@
 local _, addon = ...
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 local QuestArchive = addon.QuestArchive
+local location = addon.Locations
 
 addon.StaticPopupsList = {
   ["AbandonQuest"] = {
@@ -185,5 +186,60 @@ addon.StaticPopupsList = {
       addon:PlaySound("QuestAbandoned")
       addon.Logger:Warn("Quest Drafts cleared")
     end,
-  }
+  },
+  ["NewLocation"] = {
+    message = "Enter the name of your location.",
+    editBox = function(location)
+      return "New Location", true
+    end,
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function(location, text)
+      location = addon:CopyTable(location)
+      location.name = text
+      addon.Locations:Save(location)
+    end,
+  },
+  ["UpdateLocation"] = {
+    message = "Update the zone, subzone, and coordinates for this location?",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function(location)
+      local playerLocation = addon:GetPlayerLocation()
+      location.zone = playerLocation.zone
+      location.subZone = playerLocation.subZone
+      location.x = playerLocation.x
+      location.y = playerLocation.y
+      addon.Locations:Save(location)
+    end,
+  },
+  ["RenameLocation"] = {
+    message = "Enter the new name of your location.",
+    editBox = function(location)
+      return location.name, true
+    end,
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function(location, text)
+      location.name = text
+      addon.Locations:Save(location)
+    end,
+  },
+  ["DeleteLocation"] = {
+    message = "Delete this location?",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function(location)
+      addon.Logger:Table(location)
+      addon.Locations:Delete(location.locationId)
+    end,
+  },
+  ["ResetLocations"] = {
+    message = "Are you sure you want to delete all locations?",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function(location)
+     addon.Locations:DeleteAll()
+    end,
+  },
 }
