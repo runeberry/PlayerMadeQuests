@@ -5,14 +5,19 @@ local addon = builder:Build()
 local logSpy = spy.on(addon.Logger, "Log")
 
 describe("Identifiers", function()
-  it("can create different sequential ids", function()
-    local id1, id2 = addon:CreateID(), addon:CreateID()
-    assert.not_equals(id1, id2)
+  describe("CreateID", function()
+    it("can create different sequential ids", function()
+      local id1, id2 = addon:CreateID(), addon:CreateID()
+      assert.not_equals(id1, id2)
+    end)
+    it("can create IDs with format strings", function()
+      local format = "test-id-%i"
+      local id = addon:CreateID(format)
+      assert.not_equals(id, format)
+    end)
   end)
-  it("can create IDs with format strings", function()
-    local format = "test-id-%i"
-    local id = addon:CreateID(format)
-    assert.not_equals(id, format)
+  describe("ParseGUID", function()
+
   end)
 end)
 
@@ -54,5 +59,14 @@ describe("Sounds", function()
     addon:PlaySound("literally whatever")
     assert.spy(logSpy).was_called()
     playSoundMock:AssertNotCalled()
+  end)
+end)
+
+describe("Types", function()
+  describe("ConvertValue", function()
+
+  end)
+  describe("TryConvertString", function()
+
   end)
 end)

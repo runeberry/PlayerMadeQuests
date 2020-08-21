@@ -281,6 +281,10 @@ describe("Tables", function()
     end)
   end)
 
+  describe("ConcatArray", function()
+
+  end)
+
   -- Even though compression/serialization are mocked out, it's worth
   -- testing to ensure the addon's logic is sound
   describe("Compression", function()
