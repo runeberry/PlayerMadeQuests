@@ -9,4 +9,5 @@
 ## SavedVariablesPerCharacter: PMQCache
 
 dependencies.xml
+PmqConfig.lua
 index.xml

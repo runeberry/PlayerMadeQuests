@@ -1,5 +1,4 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-  <Script file="PmqConfig.lua"/>
   <Script file="PmqCore.lua"/>
 
   <Include file="util/index.xml"/>
