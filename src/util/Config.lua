@@ -13,8 +13,8 @@ local ConfigSource = {
 addon.ConfigSource = ConfigSource
 
 --- Internal function for setting a config value.
---- @return boolean value - returns the type-converted value if it was set successfully, or nil if there was an error
---- @return string err - an error message if ok was false
+--- @return any value - returns the type-converted value if it was set successfully, or nil if there was an error
+--- @return string source - the resolved source of the updated value, or an error message if it was not set successfully
 local function setValue(key, value, source)
   local item = addon.config[key]
   if not item then
@@ -36,7 +36,7 @@ local function setValue(key, value, source)
     item.source = source
   end
 
-  return item.value
+  return item.value, item.source
 end
 
 --- Gets the current value of a config item
@@ -63,9 +63,9 @@ function addon:SetConfigValue(key, value)
   assert(addon.ConfigLoaded, "Failed to SetConfigValue: Config is not loaded")
   assert(type(key) == "string", "Failed to SetConfigValue: a string key must be provided")
 
-  local v, err = setValue(key, value, ConfigSource.Temporary)
-  if err then
-    logger:Warn("Failed to SetConfigValue: %s", err)
+  local v, src = setValue(key, value, ConfigSource.Temporary)
+  if v == nil then
+    logger:Warn("Failed to SetConfigValue: %s", src)
     return
   end
 
@@ -83,14 +83,20 @@ function addon:SaveConfigValue(key, value, global)
 
   local source
   if global then source = ConfigSource.Global else source = ConfigSource.Character end
-  local v, err = setValue(key, value, source)
-  if err then
-    logger:Warn("Failed to SaveConfigValue: %s", err)
+  local v, src = setValue(key, value, source)
+  if v == nil then
+    logger:Warn("Failed to SaveConfigValue: %s", src)
     return
   end
 
   local savedSettings = addon.SaveData:LoadTable("Settings", global)
-  savedSettings[key] = v
+  if src == ConfigSource.Default then
+    -- If the default value was set, then erase the player's saved value
+    savedSettings[key] = nil
+  elseif src == source then
+    -- Otherwise, save the updated value to the player's SavedVariables
+    savedSettings[key] = v
+  end
   addon.SaveData:Save("Settings", savedSettings, global)
 
   addon.AppEvents:Publish("ConfigUpdated", key, v)
@@ -110,40 +116,42 @@ function addon:ResetAllConfig()
   addon.AppEvents:Publish("ConfigDataReset")
 end
 
-addon:OnSaveDataLoaded(function()
-  local settingsLoadOrder = {
-    {
-      source = ConfigSource.Default,
-      data = addon.defaultSettings
-    },
-    {
-      source = ConfigSource.Global,
-      data = addon.SaveData:LoadTable("Settings", true)
-    },
-    {
-      source = ConfigSource.Character,
-      data = addon.SaveData:LoadTable("Settings")
-    },
-  }
+addon:onload(function()
+  addon.AppEvents:Subscribe("SaveDataLoaded", function()
+    local settingsLoadOrder = {
+      {
+        source = ConfigSource.Default,
+        data = addon.defaultSettings
+      },
+      {
+        source = ConfigSource.Global,
+        data = addon.SaveData:LoadTable("Settings", true)
+      },
+      {
+        source = ConfigSource.Character,
+        data = addon.SaveData:LoadTable("Settings")
+      },
+    }
 
-  for _, s in ipairs(settingsLoadOrder) do
-    for k, v in pairs(s.data) do
-      local tvalue = type(v)
+    for _, s in ipairs(settingsLoadOrder) do
+      for k, v in pairs(s.data) do
+        local tvalue = type(v)
 
-      local existing = addon.config[k]
-      if not existing then
-        existing = {
-          name = k,
-          type = tvalue,
-        }
-        addon.config[k] = existing
+        local existing = addon.config[k]
+        if not existing then
+          existing = {
+            name = k,
+            type = tvalue,
+          }
+          addon.config[k] = existing
+        end
+
+        existing.value = addon:ConvertValue(v, existing.type)
+        existing.source = s.source
       end
-
-      existing.value = addon:ConvertValue(v, existing.type)
-      existing.source = s.source
     end
-  end
 
-  addon.ConfigLoaded = true
-  addon.AppEvents:Publish("ConfigDataLoaded")
+    addon.ConfigLoaded = true
+    addon.AppEvents:Publish("ConfigDataLoaded")
+  end)
 end)

@@ -24,8 +24,8 @@ addon.defaultSettings = {
   --- Not for use in-game. Reserved for unit testing.
   SILENT_PRINT = false,
   --- Show this MainMenu screen immediately when the addon loads.
-  --- Set to false to not show any menu on startup.
-  START_MENU = false,
+  --- Set to an empty string to not show any menu on startup.
+  START_MENU = "",
   --- Enable this for detailed logs on Repository transactions.
   --- Disabled by default because it can be quite verbose.
   TRANSACTION_LOGS = false,
@@ -35,4 +35,7 @@ addon.defaultSettings = {
   --- Enable this to reflect all outbound messages back on the player character.
   --- The sender's name will be listed as "*yourself*"
   USE_INTERNAL_MESSAGING = false,
+
+  Logging = {},
+  FrameData = {},
 }
