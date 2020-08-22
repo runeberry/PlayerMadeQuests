@@ -102,6 +102,6 @@ local function stopQuestLocationPolling(quest)
   end
 end
 
-addon:onload(function()
+addon:OnBackendStart(function()
   addon.AppEvents:Subscribe("QuestTrackingStopped", stopQuestLocationPolling)
 end)

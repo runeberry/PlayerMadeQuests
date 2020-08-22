@@ -34,12 +34,7 @@ local function getClog()
   return obj
 end
 
-function addon.CombatLogEvents:Start()
-  if self.started then
-    -- Only allow Start to run once
-    return
-  end
-
+addon:OnBackendStart(function()
   -- This function can be used to pipe Publish events from the Game Events broker
   -- this this broker's Publish function, whenever a CLEU event is captured
   local function wrapGameEventPublish()
@@ -50,9 +45,4 @@ function addon.CombatLogEvents:Start()
     addon.CombatLogEvents:Publish(cl.event, cl)
   end
   addon.GameEvents:Subscribe("COMBAT_LOG_EVENT_UNFILTERED", wrapGameEventPublish, { logLevel = addon.LogLevel.none, sync = true })
-  self.started = true
-end
-
-addon:onload(function()
-  addon.CombatLogEvents:Start()
 end)

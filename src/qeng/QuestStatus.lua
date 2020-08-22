@@ -90,7 +90,7 @@ function addon:ValidateQuestStatusChange(quest)
   end
 end
 
-addon:onload(function()
+addon:OnBackendStart(function()
   addon.AppEvents:Subscribe("QuestAdded", function(quest)
     statusTracker[quest.questId] = quest.status
   end)
