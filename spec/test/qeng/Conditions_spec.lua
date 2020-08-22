@@ -28,6 +28,7 @@ local function assertObjectiveDoesUpdate(quest, appEventSpy)
   local objective = quest.objectives[1]
   assert.is_not_nil(objective, "Quest has no objectives")
   appEventSpy = appEventSpy or events:SpyOnEvents(addon.AppEvents)
+  assert.equals(0, objective.progress, "Quest objective should start at 0 progress")
   -- addon:ForceLogs(function()
     addon.QuestEvents:Publish(objective.name)
     addon:Advance()
@@ -35,6 +36,7 @@ local function assertObjectiveDoesUpdate(quest, appEventSpy)
   local payload = appEventSpy:GetPublishPayload("ObjectiveUpdated", 1)
   assert.is_not_nil(payload, "ObjectiveUpdated published no payload")
   assert.same(objective.id, payload.id, "Id on payload did not match objective")
+  assert.is_true(payload.progress > 0, "Quest objective should have progressed")
 end
 
 --- Fires the QuestEvent associated with the first objective on the quest
