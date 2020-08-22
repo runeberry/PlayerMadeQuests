@@ -2,15 +2,28 @@ local _, addon = ...
 addon.Lifecycle = addon.Events:CreateBroker("Lifecycle")
 
 local events = {
-  AddonLoaded = "AddonLoaded",
-  SaveDataLoaded = "SaveDataLoaded",
-  ConfigLoaded = "ConfigLoaded",
-  AddonConfigured = "AddonConfigured",
-  AddonReady = "AddonReady",
+  AddonStart = "OnAddonStart",
+  SaveDataLoaded = "OnSaveDataLoaded",
+  ConfigLoaded = "OnConfigLoaded",
+  BackendStart = "OnBackendStart",
+  QuestEngineReady = "OnQuestEngineReady",
+  QuestTrackingReady = "OnQuestTrackingReady",
+  BackendReady = "OnBackendReady",
+  GuiStart = "OnGuiStart",
+  GuiReady = "OnGuiReady",
+  AddonReady = "OnAddonReady",
 }
 addon.LifecycleEvents = events
 
 local lifecycleEventsPublished = {}
+
+-- Create shortcut methods on the addon for each Lifecycle event.
+-- For example - addon:OnSaveDataLoaded == addon.Lifecycle:Subscribe("OnSaveDataLoaded")
+for _, event in pairs(events) do
+  addon[event] = function(self, handlerFunc, options)
+    addon.Lifecycle:Subscribe(event, handlerFunc, options)
+  end
+end
 
 local function publish(event)
   lifecycleEventsPublished[event] = true
@@ -18,12 +31,26 @@ local function publish(event)
 end
 
 function addon.Lifecycle:Start()
-  publish(events.AddonLoaded)
+  publish(events.AddonStart)
+
   addon.SaveData:Init()
   publish(events.SaveDataLoaded)
   addon.Config:Init()
   publish(events.ConfigLoaded)
-  publish(events.AddonConfigured)
+
+  publish(events.BackendStart)
+  addon.QuestScriptLoader:Init()
+  addon.QuestScriptCompiler:Init()
+  addon.QuestScriptLocalizer:Init()
+  addon.QuestEngine:Init()
+  publish(events.QuestEngineReady)
+  addon.QuestEngine:StartTrackingQuestLog()
+  publish(events.QuestTrackingReady)
+  publish(events.BackendReady)
+
+  publish(events.GuiStart)
+  publish(events.GuiReady)
+
   publish(events.AddonReady)
 end
 
@@ -41,13 +68,5 @@ function addon.Lifecycle:OnSubscribe(event, handler)
     self.logger:Log(logLevel, "Handling %s: %s", self.name, event)
     addon:catch(handler.fn)
     return false -- Do not continue with the subscription
-  end
-end
-
--- Create shortcut methods on the addon for each Lifecycle event.
--- For example - addon:OnSaveDataLoaded == addon.Lifecycle:Subscribe("SaveDataLoaded")
-for _, event in pairs(events) do
-  addon["On"..event] = function(self, handlerFunc, options)
-    addon.Lifecycle:Subscribe(event, handlerFunc, options)
   end
 end
