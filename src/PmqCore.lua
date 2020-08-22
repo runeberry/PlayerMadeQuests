@@ -3,11 +3,9 @@ local print = addon.G.print
 
 addon.VERSION = 103
 addon.BRANCH = "beta"
-addon.IsAddonLoaded = false
 
 function addon.Ace:OnInitialize()
   addon:catch(function()
-    addon.IsAddonLoaded = true
     addon:load()
     addon.Lifecycle:Start()
     addon.Logger:Info("PlayerMadeQuests loaded. Type %s to open the main menu", addon:Colorize("orange", "/pmq"))
