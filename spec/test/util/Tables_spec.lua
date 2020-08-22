@@ -282,7 +282,36 @@ describe("Tables", function()
   end)
 
   describe("ConcatArray", function()
+    it("cannot concat nil tables", function()
+      -- ARRANGE
+      local t1 = {}
+      local t2 = nil
 
+      -- ASSERT
+      assert.has_error(function() addon:ConcatArray(t1, t2) end)
+    end)
+    it("can concat two array tables", function()
+      -- ARRANGE
+      local t1 = {
+        "Midna",
+        "Beedle",
+        "Captain",
+      }
+      local t2 = { "Scout", "Tank", }
+
+      -- ACT
+      local actual = addon:ConcatArray(t1, t2)
+
+      -- ASSERT
+      local expected = {
+        "Midna",
+        "Beedle",
+        "Captain",
+        "Scout",
+        "Tank",
+      }
+      assert.same(expected, actual)
+    end)
   end)
 
   -- Even though compression/serialization are mocked out, it's worth
