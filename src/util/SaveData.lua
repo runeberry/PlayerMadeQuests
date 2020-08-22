@@ -19,6 +19,7 @@ local function getSaveTable(global)
   end
 end
 
+--- Called as part of the addon lifecycle.
 function addon.SaveData:Init()
   if addon.SaveDataLoaded then return end
   for varname in pairs(SavedVariables) do

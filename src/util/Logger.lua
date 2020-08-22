@@ -100,23 +100,6 @@ local function getLogLevel(level)
   return value, name
 end
 
-addon:OnSaveDataLoaded(function()
-  if addon.PlayerSettings.Logging then
-    logLevels.user = addon:CopyTable(addon.PlayerSettings.Logging)
-  end
-
-  addon:SetGlobalLogFilter(addon.PlayerSettings["global-log-filter"])
-
-  -- Flush all buffered logs
-  -- print("Flushing log buffer:", #globalLogBuffer)
-  useLogBuffer = false
-  for _, l in pairs(globalLogBuffer) do
-    l.logger:Log(l.loglevel, l.str, unpack(l.args))
-  end
-  globalLogBuffer = nil
-  -- print("End flushing log buffer")
-end)
-
 local function bumpStats(statsTable, isPrinted, level)
   if isPrinted then
     statsTable.printed = statsTable.printed + 1
@@ -338,6 +321,25 @@ function addon:ForceLogs(fn, level)
     error(err)
   end
 end
+
+addon:onload(function()
+  addon:OnSaveDataLoaded(function()
+    if addon.PlayerSettings.Logging then
+      logLevels.user = addon:CopyTable(addon.PlayerSettings.Logging)
+    end
+
+    addon:SetGlobalLogFilter(addon.PlayerSettings["global-log-filter"])
+
+    -- Flush all buffered logs
+    -- print("Flushing log buffer:", #globalLogBuffer)
+    useLogBuffer = false
+    for _, l in pairs(globalLogBuffer) do
+      l.logger:Log(l.loglevel, l.str, unpack(l.args))
+    end
+    globalLogBuffer = nil
+    -- print("End flushing log buffer")
+  end)
+end)
 
 -- Cannot create the global logger until this method is available
 addon.Logger = logger_NewLogger(nil, "PMQ", ll.trace)

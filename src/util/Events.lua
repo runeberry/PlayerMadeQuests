@@ -76,7 +76,9 @@ local function broker_Subscribe(self, event, handlerFunc, options)
   end
 
   if self.OnSubscribe then
-    self:OnSubscribe(event, handler)
+    -- If the OnSubscribe handler returns false, do not subscribe the handler
+    local result = self:OnSubscribe(event, handler)
+    if result == false then return end
   end
 
   local handlers = self.handlersMap[event]

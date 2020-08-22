@@ -9,7 +9,7 @@ function addon.Ace:OnInitialize()
   addon:catch(function()
     addon.IsAddonLoaded = true
     addon:load()
-    addon.SaveData:Init()
+    addon.Lifecycle:Start()
     addon.Logger:Info("PlayerMadeQuests loaded. Type %s to open the main menu", addon:Colorize("orange", "/pmq"))
   end)
 end
@@ -34,7 +34,8 @@ function addon:catch(fn, ...)
   return ok, result, r2, r3, r4
 end
 
--- Defer code execution until the addon is fully loaded
+-- Defer code execution until AFTER all addon files have been loaded,
+-- but BEFORE the addon lifecycle begins
 local _onloadBuffer = {}
 function addon:onload(fn)
   table.insert(_onloadBuffer, fn)
@@ -49,23 +50,6 @@ function addon:load()
     end
   end
   _onloadBuffer = nil
-end
-
-function addon:OnSaveDataLoaded(fn)
-  if addon.SaveDataLoaded then
-    -- If save data is already loaded, run the function now
-    fn()
-  elseif not _onloadBuffer then
-    -- If the onload buffer has already been flushed, but save data is
-    -- not loaded, then subscribe directly to the SaveDataLoaded event
-    addon.AppEvents:Subscribe("SaveDataLoaded", fn)
-  else
-    -- Otherwise, subscribe to SaveDataLoaded only after the addon has
-    -- fully loaded
-    addon:onload(function()
-      addon.AppEvents:Subscribe("SaveDataLoaded", fn)
-    end)
-  end
 end
 
 -- Long text to use for display testing
