@@ -2,7 +2,9 @@ local _, addon = ...
 local logger = addon.Logger:NewLogger("Config")
 
 --- The settings that are ultimately used in game will be stored here
-addon.config = {}
+addon.Config = {
+  items = {}
+}
 
 local ConfigSource = {
   Default = "default",
@@ -16,7 +18,7 @@ addon.ConfigSource = ConfigSource
 --- @return any value - returns the type-converted value if it was set successfully, or nil if there was an error
 --- @return string source - the resolved source of the updated value, or an error message if it was not set successfully
 local function setValue(key, value, source)
-  local item = addon.config[key]
+  local item = addon.Config.items[key]
   if not item then
     return nil, key.." is not a known config item"
   end
@@ -39,15 +41,57 @@ local function setValue(key, value, source)
   return item.value, item.source
 end
 
+--- Called as part of the addon lifecycle.
+function addon.Config:Init()
+  local settingsLoadOrder = {
+    {
+      source = ConfigSource.Default,
+      data = addon.defaultSettings
+    },
+    {
+      source = ConfigSource.Global,
+      data = addon.SaveData:LoadTable("Settings", true)
+    },
+    {
+      source = ConfigSource.Character,
+      data = addon.SaveData:LoadTable("Settings")
+    },
+  }
+
+  for _, s in ipairs(settingsLoadOrder) do
+    for k, v in pairs(s.data) do
+      local tvalue = type(v)
+
+      local existing = addon.Config.items[k]
+      if not existing then
+        existing = {
+          name = k,
+          type = tvalue,
+        }
+        addon.Config.items[k] = existing
+      end
+
+      existing.value = addon:ConvertValue(v, existing.type)
+      existing.source = s.source
+    end
+  end
+
+  addon.ConfigLoaded = true
+end
+
+function addon.Config:GetConfig()
+  return addon.Config.items
+end
+
 --- Gets the current value of a config item
 --- @param key string - the key to lookup
 --- @return any value - the value at this key
 --- @return string source - one of ConfigSource
-function addon:GetConfigValue(key)
+function addon.Config:GetValue(key)
   assert(addon.ConfigLoaded, "Failed to GetConfigValue: Config is not loaded")
   assert(type(key) == "string", "Failed to GetConfigValue: a string key must be provided")
 
-  local item = addon.config[key]
+  local item = addon.Config.items[key]
   if not item then
     logger:Warn("Failed to GetConfigValue: %s is not a known config item", key)
     return
@@ -59,7 +103,7 @@ end
 --- Sets the value of a config item. Does not persist between reloads.
 --- @param key string - the key to assign this value to
 --- @param value any - the value to set
-function addon:SetConfigValue(key, value)
+function addon.Config:SetValue(key, value)
   assert(addon.ConfigLoaded, "Failed to SetConfigValue: Config is not loaded")
   assert(type(key) == "string", "Failed to SetConfigValue: a string key must be provided")
 
@@ -77,7 +121,7 @@ end
 --- @param key string
 --- @param value any
 --- @param global boolean - true to save globally (same for all characters), false or nil to save to character
-function addon:SaveConfigValue(key, value, global)
+function addon.Config:SaveValue(key, value, global)
   assert(addon.ConfigLoaded, "Failed to SaveConfigValue: Config is not loaded")
   assert(type(key) == "string", "Failed to SaveConfigValue: a string key must be provided")
 
@@ -103,10 +147,10 @@ function addon:SaveConfigValue(key, value, global)
 end
 
 --- Resets all config values to PMQ's defaults. Erases SavedVariable data as well.
-function addon:ResetAllConfig()
+function addon.Config:ResetAll()
   assert(addon.ConfigLoaded, "Failed to SetConfigValue: Config is not loaded")
 
-  for k in pairs(addon.config) do
+  for k in pairs(addon.Config.items) do
     setValue(k, nil)
   end
 
@@ -115,43 +159,3 @@ function addon:ResetAllConfig()
 
   addon.AppEvents:Publish("ConfigDataReset")
 end
-
-addon:onload(function()
-  addon.AppEvents:Subscribe("SaveDataLoaded", function()
-    local settingsLoadOrder = {
-      {
-        source = ConfigSource.Default,
-        data = addon.defaultSettings
-      },
-      {
-        source = ConfigSource.Global,
-        data = addon.SaveData:LoadTable("Settings", true)
-      },
-      {
-        source = ConfigSource.Character,
-        data = addon.SaveData:LoadTable("Settings")
-      },
-    }
-
-    for _, s in ipairs(settingsLoadOrder) do
-      for k, v in pairs(s.data) do
-        local tvalue = type(v)
-
-        local existing = addon.config[k]
-        if not existing then
-          existing = {
-            name = k,
-            type = tvalue,
-          }
-          addon.config[k] = existing
-        end
-
-        existing.value = addon:ConvertValue(v, existing.type)
-        existing.source = s.source
-      end
-    end
-
-    addon.ConfigLoaded = true
-    addon.AppEvents:Publish("ConfigDataLoaded")
-  end)
-end)

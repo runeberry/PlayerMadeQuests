@@ -1,5 +1,5 @@
 local _, addon = ...
-local ConfigSource = addon.ConfigSource
+local Config, ConfigSource = addon.Config, addon.ConfigSource
 
 local menu = addon.MainMenu:NewMenuScreen("ConfigMenu")
 
@@ -33,7 +33,7 @@ local options = {
   },
   dataSource = function()
     configRows = {}
-    for _, item in pairs(addon.config) do
+    for _, item in pairs(Config:GetConfig()) do
       if not configExclude[item.name] then
         local value = item.value
         if item.type == "table" then
@@ -84,7 +84,7 @@ function menu:Create(frame)
   dataTable:SubscribeMethodToEvents("RefreshData", "ConfigUpdated", "ConfigDataLoaded", "ConfigDataReset")
   dataTable:SubscribeMethodToEvents("ClearSelection", "ConfigDataLoaded", "ConfigDataReset")
   dataTable:OnGetSelectedItem(function(row)
-    return addon.config[row[1]]
+    return Config:GetConfig()[row[1]]
   end)
 
   frame.dataTable = dataTable
