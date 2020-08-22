@@ -67,6 +67,24 @@ describe("Types", function()
 
   end)
   describe("TryConvertString", function()
-
+      it("returns a number", function()
+      local strNum = "1"
+      local num = 1
+      local actual = addon:TryConvertString(strNum)
+      assert.equals(num, actual)
+      end)
+      
+      it("returns a boolean", function()
+      local strBool = "true"
+      local bool = true
+      local actual = addon:TryConvertString(strBool)
+      assert.equals(bool, actual)
+      end)
+      it("returns a string", function()
+      local strStr = "hello"
+      local str = "hello"
+      local actual = addon:TryConvertString(strStr)
+      assert.equals(str, actual)
+      end)
   end)
 end)
