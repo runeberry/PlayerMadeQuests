@@ -60,6 +60,8 @@ function builder:Build(opts)
   local requires = getIncludedFilesFromXML("index.xml")
 
   local addon = {
+    defaultSettings = {},
+
     GLOBAL_LOG_MODE = "pretty",
     TRANSACTION_LOGS = false,
     USE_INTERNAL_MESSAGING = true,

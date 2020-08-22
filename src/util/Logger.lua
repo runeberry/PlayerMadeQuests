@@ -323,7 +323,7 @@ function addon:ForceLogs(fn, level)
 end
 
 addon:onload(function()
-  addon:OnSaveDataLoaded(function()
+  addon:OnConfigLoaded(function()
     if addon.PlayerSettings.Logging then
       logLevels.user = addon:CopyTable(addon.PlayerSettings.Logging)
     end
