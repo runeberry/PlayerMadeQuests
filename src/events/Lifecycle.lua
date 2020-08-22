@@ -65,7 +65,7 @@ function addon.Lifecycle:OnSubscribe(event, handler)
     if handler.logLevel then
       logLevel = handler.logLevel
     end
-    self.logger:Log(logLevel, "Handling %s: %s", self.name, event)
+    self.logger:Log(logLevel, "Handling: %s", event)
     addon:catch(handler.fn)
     return false -- Do not continue with the subscription
   end
