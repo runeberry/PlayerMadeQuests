@@ -52,19 +52,12 @@ local function broker_publishMessage(self, event, details, ...)
   Ace:SendCommMessage(PMQ_MESSAGE_PREFIX, encoded, details.distribution, details.target, details.priority)
 end
 
-function addon.MessageEvents:Start()
-  if self.started then return end
+addon:OnBackendStart(function()
+  playerName = GetUnitName("player")
 
   -- The original publish method will be used when an incoming message is received
   internalPublish = addon.MessageEvents.Publish
   addon.MessageEvents.Publish = broker_publishMessage
 
   Ace:RegisterComm(PMQ_MESSAGE_PREFIX, onCommReceived)
-
-  self.started = true
-end
-
-addon:onload(function()
-  playerName = GetUnitName("player")
-  addon.MessageEvents:Start()
 end)
