@@ -140,8 +140,7 @@ objectives:
   - explore "Elwynn Forest" "42.41, 64.47, 1"]],
   [9] = [[
 objectives:
-  - gain-aura:
-      aura: Blessing of Might
+  - gain-aura: { aura: Blessing of Might }
   - gain-aura:
       aura: Blessing of Might
       zone: Elwynn Forest
@@ -157,6 +156,25 @@ objectives:
   [10] = [[
 objectives:
   - gain-aura 'Blessing of Might']],
+  [11] = [[
+objectives:
+  - equip-item: { equip: Knitted Belt },
+  - equip-item:
+      equip: Knitted Belt
+      zone: Elwynn Forest
+      subzone: Goldshire
+      coords: 42.41, 64.47, 0.3
+  - equip-item: { equip: Knitted Belt, zone: Lion's Pride Inn }
+  - equip-item:
+      equip: Knitted Belt
+      item: Light Leather
+  - equip-item:
+      equip: Knitted Belt
+      aura: Blessing of Might
+  ]],
+  [12] = [[
+objectives:
+  - equip-item 'Knitted Belt']],
 }
 
 addon.DebugQuestDB = {
@@ -199,6 +217,14 @@ addon.DebugQuestDB = {
   {
     name = "Objective: talk-to (shorthand)",
     script = scripts[4],
+  },
+  {
+    name = "Objective: equip-item",
+    script = scripts[11],
+  },
+  {
+    name = "Objective: equip-item (shorthand)",
+    script = scripts[12],
   },
 }
 

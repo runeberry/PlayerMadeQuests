@@ -11,6 +11,7 @@
   <Script file="qeng/cmd/req.lua"/>
   <Script file="qeng/cmd/startcomplete.lua"/>
 
+  <Script file="qeng/objectives/equip-item.lua"/>
   <Script file="qeng/objectives/explore.lua"/>
   <Script file="qeng/objectives/gain-aura.lua"/>
   <Script file="qeng/objectives/kill.lua"/>

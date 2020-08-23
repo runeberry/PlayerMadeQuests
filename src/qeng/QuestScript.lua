@@ -3,6 +3,7 @@ local _, addon = ...
 addon.QuestScriptTokens = {
   OBJ_AURA = "gain-aura",
   OBJ_EMOTE = "use-emote",
+  OBJ_EQUIP = "equip-item",
   OBJ_EXPLORE = "explore",
   OBJ_KILL = "kill",
   OBJ_TALKTO = "talk-to",
@@ -355,6 +356,28 @@ local objectives = {
       [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
       [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
       [t.PARAM_TARGET] = getParameter(t.PARAM_TARGET),
+    }
+  },
+  [t.OBJ_EQUIP] = {
+    template = "coordobj",
+    shorthand = {
+      t.PARAM_EQUIP,
+    },
+    displaytext = {
+      vars = {
+        ["a"] = t.PARAM_AURA,
+        ["e"] = t.PARAM_EQUIP,
+        ["i"] = t.PARAM_ITEM,
+      },
+      log = "Equip %e",
+      progress = "%e equipped",
+      quest = "Equip %e[%xyz: while in %xyz][%a: while having %a][%i: while having %i]",
+      full = "Equip %e[%xyz: while in %xyrz][%a: while having %a][%i: while having %i]"
+    },
+    params = {
+      [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
+      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP, { required = true }),
+      [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
     }
   },
   [t.OBJ_EXPLORE] = {
