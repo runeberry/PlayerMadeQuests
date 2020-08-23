@@ -9,6 +9,7 @@ local defaultDetails = {
   target = nil, -- player name, required only for "WHISPER"
   priority = "NORMAL" -- also allowed: "BULK", "ALERT"
 }
+local useInternalMessaging
 local internalPublish
 local playerName
 
@@ -44,7 +45,7 @@ local function broker_publishMessage(self, event, details, ...)
   local payload = { e = event, p = { ... } }
   local compressed = addon:CompressTable(payload)
   local encoded = encoder:Encode(compressed)
-  if addon.PlayerSettings["internal-messaging"] or addon.USE_INTERNAL_MESSAGING then
+  if useInternalMessaging then
     -- For development and unit testing only
     onCommReceived(PMQ_MESSAGE_PREFIX, encoded, details.distribution, "*yourself*")
     return
@@ -53,6 +54,8 @@ local function broker_publishMessage(self, event, details, ...)
 end
 
 addon:OnBackendStart(function()
+  useInternalMessaging = addon.Config:GetConfigValue("ENABLE_SELF_MESSAGING")
+
   playerName = GetUnitName("player")
 
   -- The original publish method will be used when an incoming message is received
