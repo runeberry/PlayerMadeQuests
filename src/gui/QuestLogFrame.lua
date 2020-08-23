@@ -155,7 +155,6 @@ local function buildQuestLogFrame()
 end
 
 addon:OnGuiStart(function()
-  if addon.AVOID_BUILDING_UI then return end
   addon.QuestLogFrame = buildQuestLogFrame()
   addon.QuestLogFrame:Refresh()
 end)

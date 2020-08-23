@@ -2,9 +2,9 @@ local _, addon = ...
 
 --- These are the default values for every config item supported by PMQ.
 addon.defaultSettings = {
-  --- Hack for unit testing.
-  --- Enable this to avoid building UI elements when the addon is loaded.
-  AVOID_BUILDING_UI = false,
+  --- Disable this to skip the GUI building events of the Lifecycle.
+  --- Useful for unit testing.
+  ENABLE_GUI = true,
   --- Defines the core method used for logging.
   --- See available options under Logger.lua -> addon.LogMode
   GLOBAL_LOG_MODE = "pretty",

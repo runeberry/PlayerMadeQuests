@@ -49,8 +49,10 @@ function addon.Lifecycle:Init()
   publish(events.QuestTrackingReady)
   publish(events.BackendReady)
 
-  publish(events.GuiStart)
-  publish(events.GuiReady)
+  if addon.Config:GetValue("ENABLE_GUI") then
+    publish(events.GuiStart)
+    publish(events.GuiReady)
+  end
 
   publish(events.AddonReady)
 end

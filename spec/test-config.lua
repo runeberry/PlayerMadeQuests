@@ -1,7 +1,6 @@
 --- This is the default addon config for every addon built with addon-builder
 return {
-  -- todo: need better mocking system for UI, but suppress errors for now
-  AVOID_BUILDING_UI = true,
+  ENABLE_GUI = false,
   GLOBAL_LOG_MODE = "pretty",
   GLOBAL_LOG_FILTER = "silent",
   PLAYER_LOCATION_INTERVAL = 1.0,
