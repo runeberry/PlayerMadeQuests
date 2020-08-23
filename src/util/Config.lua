@@ -14,6 +14,8 @@ local ConfigSource = {
 }
 addon.ConfigSource = ConfigSource
 
+local isConfigLoaded = false
+
 --- Internal function for setting a config value.
 --- @return any value - returns the type-converted value if it was set successfully, or nil if there was an error
 --- @return string source - the resolved source of the updated value, or an error message if it was not set successfully
@@ -76,7 +78,7 @@ function addon.Config:Init()
     end
   end
 
-  addon.ConfigLoaded = true
+  isConfigLoaded = true
 end
 
 function addon.Config:GetConfig()
@@ -88,7 +90,7 @@ end
 --- @return any value - the value at this key
 --- @return string source - one of ConfigSource
 function addon.Config:GetValue(key)
-  assert(addon.ConfigLoaded, "Failed to GetConfigValue: Config is not loaded")
+  assert(isConfigLoaded, "Failed to GetConfigValue: Config is not loaded")
   assert(type(key) == "string", "Failed to GetConfigValue: a string key must be provided")
 
   local item = addon.Config.items[key]
@@ -104,7 +106,7 @@ end
 --- @param key string - the key to assign this value to
 --- @param value any - the value to set
 function addon.Config:SetValue(key, value)
-  assert(addon.ConfigLoaded, "Failed to SetConfigValue: Config is not loaded")
+  assert(isConfigLoaded, "Failed to SetConfigValue: Config is not loaded")
   assert(type(key) == "string", "Failed to SetConfigValue: a string key must be provided")
 
   local v, src = setValue(key, value, ConfigSource.Temporary)
@@ -122,7 +124,7 @@ end
 --- @param value any
 --- @param global boolean - true to save globally (same for all characters), false or nil to save to character
 function addon.Config:SaveValue(key, value, global)
-  assert(addon.ConfigLoaded, "Failed to SaveConfigValue: Config is not loaded")
+  assert(isConfigLoaded, "Failed to SaveConfigValue: Config is not loaded")
   assert(type(key) == "string", "Failed to SaveConfigValue: a string key must be provided")
 
   local source
@@ -148,7 +150,7 @@ end
 
 --- Resets all config values to PMQ's defaults. Erases SavedVariable data as well.
 function addon.Config:ResetAll()
-  assert(addon.ConfigLoaded, "Failed to SetConfigValue: Config is not loaded")
+  assert(isConfigLoaded, "Failed to SetConfigValue: Config is not loaded")
 
   for k in pairs(addon.Config.items) do
     setValue(k, nil)
