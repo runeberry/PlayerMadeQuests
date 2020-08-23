@@ -19,7 +19,8 @@ addon.MainMenu:SetMenuTree({ -- value == menuId
   },
   { value = "SettingsMenu", text = "Settings",
     children = {
-      { value = "ConfigMenu", text = "Config" }
+      { value = "ConfigMenu", text = "Config" },
+      { value = "LoggingMenu", text = "Logging" },
     }
   },
   { value = "HelpMenu-Placeholder", text = "Help",

@@ -49,21 +49,6 @@ handlers = {
     addon.QuestLog:SaveWithStatus(quest, addon.QuestStatus.Active)
     addon:PlaySound("QuestAccepted")
   end,
-  ["log"] = function(name, level)
-    addon:SetUserLogLevel(name, level)
-  end,
-  ["logstats"] = function()
-    local stats = addon:GetLogStats()
-    local sorted = {}
-    for _, v in pairs(stats) do
-      sorted[#sorted+1] = v
-    end
-    table.sort(sorted, function(a, b) return a.name < b.name end)
-    addon.Logger:Info("Logger stats:")
-    for _, stat in pairs(stats) do
-      addon.Logger:Info("    %s (%i printed, %i received @ %s)", stat.name, stat.stats.printed, stat.stats.received, stat.levelname)
-    end
-  end,
   ["show"] = function()
     addon.QuestLogFrame:ToggleShown(true)
   end,

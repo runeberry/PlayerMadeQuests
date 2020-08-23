@@ -108,7 +108,9 @@ local function buildPopup(template, globalId)
         if self.editBox then
           text = self.editBox:GetText()
         end
-        popup._yesHandler(unpack(v), text)
+        local args = { unpack(v) }
+        args[#args+1] = text
+        popup._yesHandler(unpack(args))
         if popup._onYes then
           popup._onYes()
         end

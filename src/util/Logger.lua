@@ -14,7 +14,7 @@ addon.LogLevel = {
 }
 local ll = addon.LogLevel
 
-local logcolors = {
+addon.LogColors = {
   [ll.silent] = "white",
   [ll.fatal] = "red",
   [ll.error] = "red",
@@ -133,7 +133,7 @@ local methods = {
     end
     -- Log must be "higher priority" than both the instance and global log levels
     if loglevel <= getMinLogLevel(self.name) then
-      print(addon:Colorize(logcolors[loglevel], self.prefix..toLogMessage(str, ...)))
+      print(addon:Colorize(addon.LogColors[loglevel], self.prefix..toLogMessage(str, ...)))
       bumpStats(self.stats, true, loglevel)
     else
       bumpStats(self.stats, false, loglevel)
@@ -233,15 +233,14 @@ end
 
 --- Sets a user-defined minimum log level for a given logger
 function addon:SetUserLogLevel(name, level)
-  if not loggers[name] then
-    addon.Logger:Warn("%s is not a known logger.", name)
-    return
-  end
+  assert(name, "Logger name is required")
+  assert(loggers[name], name.." is not a known logger")
 
-  local value = getLogLevel(level)
-  if not value then
-    addon.Logger:Warn("%s is not a valid log level.", level);
-    return
+  -- If no level is specified, then the saved value is removed
+  local value
+  if level then
+    value = getLogLevel(level)
+    assert(value, level.." is not a valid log level")
   end
 
   logLevels.user[name] = value
@@ -250,7 +249,7 @@ function addon:SetUserLogLevel(name, level)
   logSettings[name] = value
   addon.Config:SaveValue("Logging", logSettings)
 
-  addon.Logger:Info("Set log level for %s to %s.", name, level)
+  return value
 end
 
 function addon:GetLogStats()
