@@ -1,5 +1,4 @@
 local _, addon = ...
-local print = addon.G.print
 
 addon.VERSION = 103
 addon.BRANCH = "beta"
@@ -9,17 +8,8 @@ function addon.Ace:OnInitialize()
     addon.Logger:Info("PlayerMadeQuests loaded. Type %s to open the main menu", addon:Colorize("orange", "/pmq"))
   end)
   addon:catch(function()
-    addon:load()
     addon.Lifecycle:Start()
   end)
-end
-
-function addon.Ace:OnEnable()
-
-end
-
-function addon.Ace:OnDisable()
-
 end
 
 -- Runs the provided function, catching any Lua errors and logging them to console
@@ -32,24 +22,6 @@ function addon:catch(fn, ...)
     addon.Logger:Error("Lua script error: %s", result)
   end
   return ok, result, r2, r3, r4
-end
-
--- Defer code execution until AFTER all addon files have been loaded,
--- but BEFORE the addon lifecycle begins
-local _onloadBuffer = {}
-function addon:onload(fn)
-  table.insert(_onloadBuffer, fn)
-end
-
-function addon:load()
-  if _onloadBuffer == nil then return end
-  for _, fn in pairs(_onloadBuffer) do
-    local ok, err = pcall(fn)
-    if not ok then
-      print("[PMQ:onload] Startup error:", err)
-    end
-  end
-  _onloadBuffer = nil
 end
 
 -- Long text to use for display testing

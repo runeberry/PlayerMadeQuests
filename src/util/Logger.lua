@@ -322,25 +322,24 @@ function addon:ForceLogs(fn, level)
   end
 end
 
-addon:onload(function()
-  addon:OnConfigLoaded(function()
-    if addon.PlayerSettings.Logging then
-      logLevels.user = addon:CopyTable(addon.PlayerSettings.Logging)
-    end
-
-    addon:SetGlobalLogFilter(addon.PlayerSettings["global-log-filter"])
-
-    -- Flush all buffered logs
-    -- print("Flushing log buffer:", #globalLogBuffer)
-    useLogBuffer = false
-    for _, l in pairs(globalLogBuffer) do
-      l.logger:Log(l.loglevel, l.str, unpack(l.args))
-    end
-    globalLogBuffer = nil
-    -- print("End flushing log buffer")
-  end)
-end)
-
 -- Cannot create the global logger until this method is available
 addon.Logger = logger_NewLogger(nil, "PMQ", ll.trace)
 addon.UILogger = addon.Logger:NewLogger("UI", ll.info)
+
+--- This is called as part of the addon lifecycle
+function addon.Logger:Init()
+  if addon.PlayerSettings.Logging then
+    logLevels.user = addon:CopyTable(addon.PlayerSettings.Logging)
+  end
+
+  addon:SetGlobalLogFilter(addon.PlayerSettings["global-log-filter"])
+
+  -- Flush all buffered logs
+  -- print("Flushing log buffer:", #globalLogBuffer)
+  useLogBuffer = false
+  for _, l in pairs(globalLogBuffer) do
+    l.logger:Log(l.loglevel, l.str, unpack(l.args))
+  end
+  globalLogBuffer = nil
+  -- print("End flushing log buffer")
+end

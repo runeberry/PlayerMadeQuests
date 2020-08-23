@@ -36,6 +36,7 @@ function addon.Lifecycle:Start()
   addon.SaveData:Init()
   publish(events.SaveDataLoaded)
   addon.Config:Init()
+  addon.Logger:Init()
   publish(events.ConfigLoaded)
 
   publish(events.BackendStart)
