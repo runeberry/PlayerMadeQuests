@@ -58,17 +58,15 @@ local methods = {
     local w, h = self:GetSize()
     local shown = tostring(self:IsVisible() or false)
 
-    if not addon.PlayerSettings.FrameData then
-      addon.PlayerSettings.FrameData = {}
-    end
+    local frameData = addon.Config:GetValue("FrameData")
+    frameData[self._name] = strjoin(",", p1, p2, x, y, w, h, shown)
+    addon.Config:SaveValue("FrameData", frameData)
 
-    addon.PlayerSettings.FrameData[self._name] = strjoin(",", p1, p2, x, y, w, h, shown)
-    addon.SaveData:Save("Settings", addon.PlayerSettings)
     addon.UILogger:Trace("Saved window position: %s %s (%.2f, %.2f) %ix%i (%s)", p1, p2, x, y, w, h, shown)
   end,
   ["LoadWindowState"] = function(self)
     local pos
-    local frameData = addon.PlayerSettings.FrameData
+    local frameData = addon.Config:GetValue("FrameData")
     if frameData and frameData[self._name] then
       local p1, p2, x, y, w, h, shown = strsplit(",", frameData[self._name])
       pos = {
@@ -157,7 +155,7 @@ function widget:Create(frameName, options)
     table.insert(UISpecialFrames, frameName)
   end
 
-  addon:OnSaveDataLoaded(function()
+  addon:OnGuiReady(function()
     frame:LoadWindowState()
   end)
 

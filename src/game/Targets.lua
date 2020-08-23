@@ -63,7 +63,7 @@ function addon:ClearAllTargetExclusions()
   SaveData:Clear(saveDataField)
 end
 
-addon:OnSaveDataLoaded(function()
+addon:OnBackendStart(function()
   targetGuidHistory = SaveData:LoadTable(saveDataField)
 
   -- Subscribe to events that should clean up the target history when appropriate

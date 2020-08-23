@@ -2,11 +2,6 @@ local _, addon = ...
 local logger = addon.Logger:NewLogger("Location")
 local time = addon.G.time
 
---- Time to cache player location in seconds
-addon.PLAYER_LOCATION_TTL = addon.PLAYER_LOCATION_TTL or 0.5
---- Time between polling events in seconds
-addon.PLAYER_LOCATION_INTERVAL = addon.PLAYER_LOCATION_INTERVAL or 1
-
 local GetBestMapForUnit = addon.G.GetBestMapForUnit
 local GetPlayerMapPosition = addon.G.GetPlayerMapPosition
 local GetRealZoneText = addon.G.GetRealZoneText
@@ -15,12 +10,15 @@ local GetMinimapZoneText = addon.G.GetMinimapZoneText
 local GetZoneText = addon.G.GetZoneText
 
 local playerLocation = {}
+local playerLocationInterval -- Set from config
+local playerLocationTtl -- Set from config
 local playerLocationExpires = 0 -- updated when the player location is refreshed
 
 local pollingIds = {}
 local pollingTimerId
 
 function addon:GetPlayerLocation()
+  assert(playerLocationTtl, "PLAYER_LOCATION_TTL is not set")
   local ts = time()
   if playerLocation.timestamp and ts < playerLocationExpires then
     return playerLocation
@@ -42,7 +40,8 @@ function addon:GetPlayerLocation()
   playerLocation.x = x * 100
   playerLocation.y = y * 100
 
-  playerLocationExpires = ts + addon.PLAYER_LOCATION_TTL
+  playerLocationExpires = ts + playerLocationTtl
+
 
   return playerLocation
 end
@@ -66,10 +65,11 @@ end
 
 -- Give an id to indicate the thing you're polling the player's location for
 function addon:StartPollingLocation(id)
+  assert(playerLocationInterval, "PLAYER_LOCATION_INTERVAL is not set")
   pollingIds[id] = true
   -- If polling has already started, don't try to start it again
   if pollingTimerId then return end
-  pollingTimerId = addon.Ace:ScheduleRepeatingTimer(pollingFn, addon.PLAYER_LOCATION_INTERVAL)
+  pollingTimerId = addon.Ace:ScheduleRepeatingTimer(pollingFn, playerLocationInterval)
   logger:Debug("Start polling for player location")
 end
 
@@ -102,6 +102,9 @@ local function stopQuestLocationPolling(quest)
   end
 end
 
-addon:onload(function()
+addon:OnBackendStart(function()
+  playerLocationInterval = addon.Config:GetValue("PLAYER_LOCATION_INTERVAL")
+  playerLocationTtl = addon.Config:GetValue("PLAYER_LOCATION_TTL")
+
   addon.AppEvents:Subscribe("QuestTrackingStopped", stopQuestLocationPolling)
 end)

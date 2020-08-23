@@ -1,22 +1,20 @@
 local _, addon = ...
 local tokens = addon.QuestScriptTokens
-local QuestLog, QuestStatus
-addon:onload(function()
-  QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
-end)
+local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
 local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
 local objectiveLogger = addon.Logger:NewLogger("Objectives", addon.LogLevel.info)
-objectiveLogger.pass = addon:Colorize("green", "[P] ")
-objectiveLogger.fail = addon:Colorize("red", "[F] ")
+
+addon:OnConfigLoaded(function()
+  objectiveLogger.pass = addon:Colorize("green", "[P] ")
+  objectiveLogger.fail = addon:Colorize("red", "[F] ")
+end)
 
 addon.QuestEngine = {
   ObjectiveLogger = objectiveLogger
 }
 
 local objectivesByName = {}
-local isEngineLoaded = false
-local isQuestDataLoaded = false
 
 ---------------------------------------------------
 -- Private functions: Quest objective evaluation --
@@ -131,7 +129,6 @@ local function updateQuestObjectiveProgress(obj)
   end
 
   qobj.progress = obj.progress
-  QuestLog:Save(quest)
 
   local isObjectiveCompleted, isQuestFinished
   -- objective is considered completed if progress is >= goal
@@ -309,7 +306,7 @@ local function setTracking(quest)
   end
 end
 
-local function startTrackingQuestLog()
+function addon.QuestEngine:StartTrackingQuestLog()
   local quests = QuestLog:FindByQuery(function(q) return q.status == QuestStatus.Active end)
   for _, q in pairs(quests) do
     local ok, err = pcall(startTracking, q)
@@ -317,37 +314,9 @@ local function startTrackingQuestLog()
       logger:Error("Failed to start quest tracking for quest \"%s\": %s", q.name, err)
     end
   end
-  addon.AppEvents:Publish("QuestLogBuilt", quests)
 end
 
-addon.AppEvents:Subscribe("QuestAdded", setTracking)
-addon.AppEvents:Subscribe("QuestStatusChanged", function(q)
-  if q.status == QuestStatus.Active then
-    -- Reset quest objective progress when the quest enters the Active status
-    for _, obj in ipairs(q.objectives) do
-      obj.progress = 0
-    end
-    QuestLog:Save(q)
-  end
-  setTracking(q)
-end)
-addon.AppEvents:Subscribe("QuestDeleted", stopTracking)
-
-addon.AppEvents:Subscribe("QuestDataLoaded", function()
-  if isEngineLoaded then
-    startTrackingQuestLog()
-  end
-  isQuestDataLoaded = true
-end)
-
-addon.AppEvents:Subscribe("QuestDataReset", function()
-  for _, objective in pairs(objectivesByName) do
-    objective._active = {}
-  end
-  logger:Trace("Stopped tracking all quests")
-end)
-
-addon.AppEvents:Subscribe("QuestScriptLoaded", function()
+function addon.QuestEngine:Init()
   -- Ensure everything can be setup, then wire up objectives into the engine
   local queryQuestEvents = function(cmd) return cmd.questEvent end
   objectivesByName = addon.QuestScriptCompiler:Find(queryQuestEvents)
@@ -356,9 +325,24 @@ addon.AppEvents:Subscribe("QuestScriptLoaded", function()
     addon.QuestEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))
   end
   logger:Debug("QuestEngine loaded OK!")
-  if isQuestDataLoaded then
-    startTrackingQuestLog()
-  end
-  isEngineLoaded = true
-  addon.AppEvents:Publish("EngineLoaded")
-end)
+
+  addon.AppEvents:Subscribe("QuestAdded", setTracking)
+  addon.AppEvents:Subscribe("QuestStatusChanged", function(q)
+    if q.status == QuestStatus.Active then
+      -- Reset quest objective progress when the quest enters the Active status
+      for _, obj in ipairs(q.objectives) do
+        obj.progress = 0
+      end
+      QuestLog:Save(q)
+    end
+    setTracking(q)
+  end)
+  addon.AppEvents:Subscribe("QuestDeleted", stopTracking)
+
+  addon.AppEvents:Subscribe("QuestDataReset", function()
+    for _, objective in pairs(objectivesByName) do
+      objective._active = {}
+    end
+    logger:Trace("Stopped tracking all quests")
+  end)
+end

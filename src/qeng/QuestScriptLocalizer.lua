@@ -226,12 +226,7 @@ function addon.QuestScriptLocalizer:GetDisplayText(obj, scope)
   return text:gsub("^%s+", ""):gsub("%s+$", ""):gsub(" +", " ")
 end
 
------------------------
--- Event Subscribers --
------------------------
-
-addon.AppEvents:Subscribe("QuestScriptLoaded", function()
+function addon.QuestScriptLocalizer:Init()
   local queryHasDisplayText = function(cmd) return cmd.displaytext end
   localizables = addon.QuestScriptCompiler:Find(queryHasDisplayText)
-  addon.AppEvents:Publish("LocalizerLoaded")
-end)
+end

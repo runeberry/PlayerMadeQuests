@@ -6,7 +6,7 @@ local repos = {}
 local defaultPkey = "id"
 local createDateKey = "cd"
 local updateDateKey = "ud"
-local transactionLogs = addon.TRANSACTION_LOGS or false
+local showTransactionLogs
 
 local function addItemToIndex(indexTable, item, indexProp)
   local indexValue = item[indexProp]
@@ -163,7 +163,10 @@ local function ta_AddStep(self, action, undo)
 end
 
 local function ta_Log(self, ...)
-  if not transactionLogs then return end
+  if showTransactionLogs == nil and addon.Config then
+    showTransactionLogs = addon.Config:GetValue("ENABLE_TRANSACTION_LOGS")
+  end
+  if not showTransactionLogs then return end
   self.repo.logger:Debug(...)
 end
 
@@ -487,11 +490,11 @@ local methods = {
     self.index[indexProp] = indexTable
   end,
   ["SetSaveDataSource"] = function(self, saveDataField)
-    if self._hasDataSource then
-      self.logger:Error("Failed to SetSaveDataSource: a data source is already set")
-      return
-    end
-    addon:OnSaveDataLoaded(function()
+    addon:OnConfigLoaded(function()
+      if self._hasDataSource then
+        self.logger:Error("Failed to SetSaveDataSource: a data source is already set")
+        return
+      end
       local transaction = newTransaction(self)
       transaction:AddStep(function()
         self._saveDataField = saveDataField
@@ -515,35 +518,37 @@ local methods = {
     end)
   end,
   ["SetTableSource"] = function(self, dataSource)
-    if self._hasDataSource then
-      self.logger:Error("Failed to SetTableSource: a data source is already set")
-      return
-    end
-    if type(dataSource) ~= "table" then
-      self.logger:Error("Failed to SetTableSource: expected table, got %s", type(dataSource))
-      return
-    end
-    local transaction = newTransaction(self)
-    local set, count
-    transaction:AddStep(function()
-      set, count = addon:DistinctSet(dataSource)
-      self.data = set
-    end, function()
-      self.data = {}
+    addon:OnConfigLoaded(function()
+      if self._hasDataSource then
+        self.logger:Error("Failed to SetTableSource: a data source is already set")
+        return
+      end
+      if type(dataSource) ~= "table" then
+        self.logger:Error("Failed to SetTableSource: expected table, got %s", type(dataSource))
+        return
+      end
+      local transaction = newTransaction(self)
+      local set, count
+      transaction:AddStep(function()
+        set, count = addon:DistinctSet(dataSource)
+        self.data = set
+      end, function()
+        self.data = {}
+      end)
+      transaction:AddStep(function()
+        indexAllData(self)
+      end, function()
+        deindexAllData(self)
+      end)
+      local ok, err = transaction:Run()
+      if not ok then
+        self.logger:Error("Failed to SetTableSource: %s", err)
+        return
+      end
+      self._hasDataSource = true
+      -- self.logger:Trace("SetTableSource:", count, "item(s)")
+      addon.AppEvents:Publish(self.events.EntityDataLoaded, self)
     end)
-    transaction:AddStep(function()
-      indexAllData(self)
-    end, function()
-      deindexAllData(self)
-    end)
-    local ok, err = transaction:Run()
-    if not ok then
-      self.logger:Error("Failed to SetTableSource: %s", err)
-      return
-    end
-    self._hasDataSource = true
-    -- self.logger:Trace("SetTableSource:", count, "item(s)")
-    addon.AppEvents:Publish(self.events.EntityDataLoaded, self)
   end,
   ["EnableCompression"] = function(self, flag)
     if flag and self._directReadEnabled then

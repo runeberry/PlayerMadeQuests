@@ -383,9 +383,7 @@ function addon.QuestScriptCompiler:TryCompile(script, params)
   return pcall(compiler.Compile, compiler, script, params)
 end
 
-addon:onload(function()
-  addon.AppEvents:Subscribe("QuestScriptLoaded", function()
-    local queryParsable = function(cmd) return cmd.contentParsable end
-    parsable = compiler:Find(queryParsable)
-  end)
-end)
+function addon.QuestScriptCompiler:Init()
+  local queryParsable = function(cmd) return cmd.contentParsable end
+  parsable = compiler:Find(queryParsable)
+end

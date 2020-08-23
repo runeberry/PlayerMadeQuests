@@ -9,20 +9,6 @@ local function wrapPublish(event, ...)
   addon.GameEvents:Publish(event, ...)
 end
 
--- Begins listening for events from WoW's Event API
--- Once started, no new events can be registered
-function addon.GameEvents:Start()
-  if self.started then
-    -- Only allow Start to run once
-    return
-  end
-
-  for event, _ in pairs(self.handlersMap) do
-    addon.Ace:RegisterEvent(event, wrapPublish)
-  end
-  self.started = true
-end
-
 function addon.GameEvents:OnSubscribe(event)
   if self.handlersMap[event] == nil then
     -- If this is the first subscriber for this event, register it with Ace
@@ -60,7 +46,3 @@ function addon.GameEvents:ToggleWatchAll()
     addon.Logger:Warn("GameEvent scanning enabled. (%i events)", #addon.GameEventsList)
   end
 end
-
-addon:onload(function()
-  addon.GameEvents:Start()
-end)

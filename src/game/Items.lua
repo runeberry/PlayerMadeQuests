@@ -139,20 +139,20 @@ function addon:GetPlayerItemQuantity(itemNameOrId)
 end
 
 -- Build the player's inventory when the addon first loads
-addon:onload(function()
+addon:OnBackendStart(function()
   updatePlayerInventory()
   playerInventory.loaded = true
-end)
 
--- Then on every update, scan the inventory again and check if its contents changed
-addon.GameEvents:Subscribe("BAG_UPDATE_DELAYED", function()
-  local prevHash = playerInventory.byId.hash
-  updatePlayerInventory()
-  local newHash = playerInventory.byId.hash
-  if prevHash ~= newHash then
-    addon.AppEvents:Publish("PlayerInventoryChanged")
-    logger:Trace("Player inventory contents changed (hash: %.0f)", newHash)
-  else
-    logger:Trace("Player inventory updated, but no change (hash: %.0f)", newHash)
-  end
+  -- Then on every update, scan the inventory again and check if its contents changed
+  addon.GameEvents:Subscribe("BAG_UPDATE_DELAYED", function()
+    local prevHash = playerInventory.byId.hash
+    updatePlayerInventory()
+    local newHash = playerInventory.byId.hash
+    if prevHash ~= newHash then
+      addon.AppEvents:Publish("PlayerInventoryChanged")
+      logger:Trace("Player inventory contents changed (hash: %.0f)", newHash)
+    else
+      logger:Trace("Player inventory updated, but no change (hash: %.0f)", newHash)
+    end
+  end)
 end)

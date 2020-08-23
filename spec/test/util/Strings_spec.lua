@@ -1,6 +1,9 @@
 local addon = require("spec/addon-builder"):Build()
 
 describe("Strings", function()
+  setup(function()
+    addon:Init()
+  end)
   describe("Colorize", function()
     local str = "test string"
     it("can colorize with named color", function()

@@ -1,4 +1,5 @@
 local deps = require("spec/deps")
+local testConfig = require("spec/test-config")
 
 local builder = {}
 local SRC_DIR = "src/"
@@ -60,12 +61,7 @@ function builder:Build(opts)
   local requires = getIncludedFilesFromXML("index.xml")
 
   local addon = {
-    GLOBAL_LOG_MODE = "pretty",
-    TRANSACTION_LOGS = false,
-    USE_INTERNAL_MESSAGING = true,
-    USE_ANSI_COLORS = true,
-    PLAYER_LOCATION_TTL = 0,
-    AVOID_BUILDING_UI = true, -- todo: need better mocking system for UI, but suppress errors for now
+    defaultSettings = testConfig,
     -- Exception: I want to include the TinyYaml lib for parsing quests
     ParseYaml = loadfile([[src/libs/lua-tinyyaml/tinyyaml.lua]])().parse
   }
@@ -78,18 +74,6 @@ function builder:Build(opts)
   for _, req in pairs(requires) do
     -- print(req)
     assert(loadfile(req))(nil, addon)
-  end
-
-  -- Logger is silent unless manually enabled by a test
-  addon:SetGlobalLogFilter(addon.LogLevel.silent)
-  -- Removes color codes and prints logs immediately instead of buffering them
-  if opts then
-    if opts.LOG_LEVEL then
-      addon:SetGlobalLogFilter(opts.LOG_LEVEL)
-    end
-    if opts.LOG_MODE then
-      addon.Logger:SetLogMode(opts.LOG_MODE)
-    end
   end
 
   return addon
