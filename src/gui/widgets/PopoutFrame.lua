@@ -157,7 +157,7 @@ function widget:Create(frameName, options)
     table.insert(UISpecialFrames, frameName)
   end
 
-  addon:OnSaveDataLoaded(function()
+  addon:OnGuiReady(function()
     frame:LoadWindowState()
   end)
 

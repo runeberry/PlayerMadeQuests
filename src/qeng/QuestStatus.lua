@@ -91,6 +91,12 @@ function addon:ValidateQuestStatusChange(quest)
 end
 
 addon:OnBackendStart(function()
+  -- Get the initial status for each quest in the log so we can detect changes
+  local quests = addon.QuestLog:FindAll()
+  for _, q in ipairs(quests) do
+    statusTracker[q.questId] = q.status
+  end
+
   addon.AppEvents:Subscribe("QuestAdded", function(quest)
     statusTracker[quest.questId] = quest.status
   end)
@@ -103,11 +109,5 @@ addon:OnBackendStart(function()
 
     statusTracker[quest.questId] = quest.status
     addon.AppEvents:Publish("QuestStatusChanged", quest, oldStatus)
-  end)
-  addon.AppEvents:Subscribe("QuestDataLoaded", function()
-    local quests = addon.QuestLog:FindAll()
-    for _, q in ipairs(quests) do
-      statusTracker[q.questId] = q.status
-    end
   end)
 end)

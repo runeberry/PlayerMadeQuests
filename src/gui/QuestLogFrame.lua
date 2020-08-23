@@ -40,7 +40,6 @@ local visConfig = {
 }
 
 local textRedrawEvents = {
-  "QuestLogBuilt",
   "QuestAdded",
   "QuestUpdated",
   "QuestDeleted",
@@ -102,8 +101,6 @@ end
 
 local methods = {
   ["Refresh"] = function(self)
-    -- Don't try to draw quest text until we have confirmation that the quest log is built
-    if not self._isQuestLogBuilt then return end
     local quests = QuestLog:FindAll()
     table.sort(quests, function(a,b) return a.questId < b.questId end)
     SetQuestLogText(self._questList, quests)
@@ -157,11 +154,8 @@ local function buildQuestLogFrame()
   return frame
 end
 
-addon:catch(function()
+addon:OnGuiStart(function()
   if addon.AVOID_BUILDING_UI then return end
   addon.QuestLogFrame = buildQuestLogFrame()
-  addon.AppEvents:Subscribe("QuestLogBuilt", function()
-    addon.QuestLogFrame._isQuestLogBuilt = true
-    addon.QuestLogFrame:Refresh()
-  end)
+  addon.QuestLogFrame:Refresh()
 end)

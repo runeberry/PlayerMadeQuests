@@ -37,7 +37,7 @@ local mmfGlobalName = "PMQ_MainMenuFrame"
 _G[mmfGlobalName] = addon.MainMenu
 table.insert(UISpecialFrames, mmfGlobalName)
 
-addon:OnSaveDataLoaded(function()
+addon:OnGuiReady(function()
   addon.MainMenu:SetVisibleTreeDepth(2)
   if addon.PlayerSettings["start-menu"] then
     defaultMenu = addon.PlayerSettings["start-menu"]

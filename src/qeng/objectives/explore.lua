@@ -28,7 +28,6 @@ local function publish()
 end
 
 addon.AppEvents:Subscribe("QuestAdded", publish)
-addon.AppEvents:Subscribe("QuestLogBuilt", publish)
 addon.AppEvents:Subscribe("QuestTrackingStarted", publish)
 addon.GameEvents:Subscribe("ZONE_CHANGED", publish)
 addon.GameEvents:Subscribe("ZONE_CHANGED_INDOORS", publish)
