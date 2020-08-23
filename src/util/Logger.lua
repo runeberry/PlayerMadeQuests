@@ -44,34 +44,34 @@ end
 
 local globalStats = newStatsTable()
 
---- Log levels below this level are always hidden unless debug-mode is enabled
+--- Log levels below this level are always hidden
 local globalLogFilter = ll.trace
 
--- Buffer logs from all loggers until the app is loaded, then flush them
+--- Buffer logs from all loggers until the app is loaded, then flush them
 local globalLogBuffer = {}
 
--- Each logger that's created will have its log level indexed by name here
+--- Each logger that's created will have its log level indexed by name here
 local logLevels = {
   -- User-defined log levels will take precedence over system log levels
   user = {},
   system = {},
   initial = {}
 }
--- Each logger will also be indexed by name so they can be tracked globally
+--- Each logger will also be indexed by name so they can be tracked globally
 local loggers = {}
 
--- Temporarily set this to a log level to force all logs >= this level to print to print
+--- Temporarily set this to a log level to force all logs >= this level to print to print
 local forceLogs
 
--- For any given logger, the priority is:
--- User-defined level > system defined-level (defined by code) > initial level (defined when logger was created)
--- If there is a global log filter in place, no logs shall be printed below that level (unless overriden by a User-defined level)
--- By default, there is an info-level filter in place
+--- For any given logger, the priority is:
+--- User-defined level > system defined-level (defined by code) > initial level (defined when logger was created)
+--- If there is a global log filter in place, no logs shall be printed below that level (unless overriden by a User-defined level)
+--- By default, there is an info-level filter in place
 local function getMinLogLevel(name)
   return forceLogs or logLevels.user[name] or math.min(globalLogFilter, (logLevels.system[name] or logLevels.initial[name] or ll.silent))
 end
 
--- Returns the (number value) and (string name) of a given number or string representing a log level
+--- Returns the (number value) and (string name) of a given number or string representing a log level
 local function getLogLevel(level)
   local value, name
   if type(level) == "string" then
@@ -231,7 +231,7 @@ local function logger_NewLogger(self, name, min)
   return logger
 end
 
--- Sets a user-defined minimum log level for a given logger
+--- Sets a user-defined minimum log level for a given logger
 function addon:SetUserLogLevel(name, level)
   if not loggers[name] then
     addon.Logger:Warn("%s is not a known logger.", name)
@@ -273,7 +273,7 @@ function addon:SetGlobalLogFilter(level)
   end
 end
 
--- For testing only, forces all logs to print while this function runs
+--- For testing only, forces all logs to print while this function runs
 function addon:ForceLogs(fn, level)
   forceLogs = level or ll.trace
   local ok, err = pcall(fn)
@@ -283,7 +283,7 @@ function addon:ForceLogs(fn, level)
   end
 end
 
--- Cannot create the global logger until this method is available
+--- Cannot create the global logger until this method is available
 addon.Logger = logger_NewLogger(nil, "PMQ", ll.trace)
 addon.UILogger = addon.Logger:NewLogger("UI", ll.info)
 
