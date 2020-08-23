@@ -7,6 +7,12 @@ addon.defaultSettings = {
   --- Disable this to skip the GUI building events of the Lifecycle.
   --- Useful for unit testing.
   ENABLE_GUI = true,
+  --- Enable this to reflect all outbound messages back on the player character.
+  --- The sender's name will be listed as "*yourself*"
+  ENABLE_SELF_MESSAGING = false,
+  --- Enable this for detailed logs on Repository transactions.
+  --- Disabled by default because it can be quite verbose.
+  ENABLE_TRANSACTION_LOGS = false,
   --- All logs below this level will be hidden across all Loggers.
   --- See available options under Logger.lua -> addon.LogLevel
   GLOBAL_LOG_FILTER = "info",
@@ -18,12 +24,6 @@ addon.defaultSettings = {
   --- Show this MainMenu screen immediately when the addon loads.
   --- Set to an empty string to not show any menu on startup.
   START_MENU = "",
-  --- Enable this for detailed logs on Repository transactions.
-  --- Disabled by default because it can be quite verbose.
-  TRANSACTION_LOGS = false,
-  --- Enable this to reflect all outbound messages back on the player character.
-  --- The sender's name will be listed as "*yourself*"
-  USE_INTERNAL_MESSAGING = false,
 
   Logging = {},
   FrameData = {},
