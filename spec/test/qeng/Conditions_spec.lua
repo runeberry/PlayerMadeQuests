@@ -134,6 +134,47 @@ describe("Condition", function()
       end)
     end)
   end)
+  -----------
+  -- equip --
+  -----------
+  describe("equip", function()
+    -- todo: I don't have an equipment-based objective yet, using emote for now
+    setup(function()
+      addon.LastEmoteMessage = "You glare angrily."
+    end)
+    teardown(function()
+      addon.LastEmoteMessage = nil
+    end)
+    describe("when player has the item equipped", function()
+      it("then the condition passes", function()
+        local quest = startQuest("use-emote: { emote: glare, equip: Stinky Hat }")
+        game:AddPlayerEquipment(addon, { name = "Stinky Hat" })
+        assertObjectiveDoesUpdate(quest)
+      end)
+    end)
+    describe("when player has one of multiple items equipped", function()
+      it("then the condition passes", function()
+        local quest = startQuest("use-emote: { emote: glare, equip: [ Stinky Hat, Pretty Hat ] }")
+        addon.LastEmoteMessage = "You glare angrily."
+        game:AddPlayerEquipment(addon, { name = "Stinky Hat" })
+        assertObjectiveDoesUpdate(quest)
+      end)
+    end)
+    describe("when player does not have the item equipped", function()
+      it("then the condition fails", function()
+        local quest = startQuest("use-emote: { emote: glare, equip: Pretty Hat }")
+        game:AddPlayerEquipment(addon, { name = "Stinky Hat" })
+        assertObjectiveDoesNotUpdate(quest)
+      end)
+    end)
+    describe("when player does not have any of multiple items equipped", function()
+      it("then the condition fails", function()
+        local quest = startQuest("use-emote: { emote: glare, equip: [ Pretty Hat, Exquisite Hat ] }")
+        game:AddPlayerEquipment(addon, { name = "Stinky Hat" })
+        assertObjectiveDoesNotUpdate(quest)
+      end)
+    end)
+  end)
   ----------
   -- item --
   ----------

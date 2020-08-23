@@ -133,4 +133,13 @@ function game:AddPlayerItem(addon, item)
   addon:Advance()
 end
 
+function game:AddPlayerEquipment(addon, item)
+  assert(type(item) == "table", "AddPlayerEquipment must receive a table")
+
+  mock:GetFunctionMock(addon.G.IsEquippedItem):SetReturnsWhen(function(itemIdOrName)
+    return itemIdOrName == item.name
+  end, true)
+  mocks[#mocks+1] = addon.G.IsEquippedItem
+end
+
 return game
