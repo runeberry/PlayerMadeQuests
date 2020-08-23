@@ -8,7 +8,7 @@ function addon.Ace:OnInitialize()
     addon.Logger:Info("PlayerMadeQuests loaded. Type %s to open the main menu", addon:Colorize("orange", "/pmq"))
   end)
   addon:catch(function()
-    addon.Lifecycle:Start()
+    addon.Lifecycle:Init()
   end)
 end
 

@@ -30,7 +30,7 @@ local function publish(event)
   addon.Lifecycle:Publish(event)
 end
 
-function addon.Lifecycle:Start()
+function addon.Lifecycle:Init()
   publish(events.AddonStart)
 
   addon.SaveData:Init()
