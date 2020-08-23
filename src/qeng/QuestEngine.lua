@@ -4,8 +4,11 @@ local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
 local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
 local objectiveLogger = addon.Logger:NewLogger("Objectives", addon.LogLevel.info)
-objectiveLogger.pass = addon:Colorize("green", "[P] ")
-objectiveLogger.fail = addon:Colorize("red", "[F] ")
+
+addon:OnConfigLoaded(function()
+  objectiveLogger.pass = addon:Colorize("green", "[P] ")
+  objectiveLogger.fail = addon:Colorize("red", "[F] ")
+end)
 
 addon.QuestEngine = {
   ObjectiveLogger = objectiveLogger

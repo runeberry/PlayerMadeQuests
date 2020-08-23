@@ -246,11 +246,10 @@ function addon:SetUserLogLevel(name, level)
 
   logLevels.user[name] = value
 
-  if not addon.PlayerSettings.Logging then
-    addon.PlayerSettings.Logging = {}
-  end
-  addon.PlayerSettings.Logging[name] = value
-  addon.SaveData:Save("Settings", addon.PlayerSettings)
+  local logSettings = addon.Config:GetValue("Logging")
+  logSettings[name] = value
+  addon.Config:SaveValue("Logging", logSettings)
+
   addon.Logger:Info("Set log level for %s to %s.", name, level)
 end
 

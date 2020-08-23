@@ -54,7 +54,7 @@ local function broker_publishMessage(self, event, details, ...)
 end
 
 addon:OnBackendStart(function()
-  useInternalMessaging = addon.Config:GetConfigValue("ENABLE_SELF_MESSAGING")
+  useInternalMessaging = addon.Config:GetValue("ENABLE_SELF_MESSAGING")
 
   playerName = GetUnitName("player")
 

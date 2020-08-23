@@ -39,8 +39,9 @@ table.insert(UISpecialFrames, mmfGlobalName)
 
 addon:OnGuiReady(function()
   addon.MainMenu:SetVisibleTreeDepth(2)
-  if addon.PlayerSettings["start-menu"] then
-    defaultMenu = addon.PlayerSettings["start-menu"]
+  local startMenu = addon.Config:GetValue("START_MENU")
+  if startMenu and startMenu ~= "" then
+    defaultMenu = startMenu
     addon.MainMenu:Show()
   end
 end)

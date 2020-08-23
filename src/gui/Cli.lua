@@ -91,43 +91,6 @@ handlers = {
       dumpToConsole(nameOrId, quest)
     end
   end,
-  ["get"] = function(name)
-    if not name then
-      addon.Logger:Table(addon.PlayerSettings)
-      return
-    end
-
-    addon.Logger:Info("Config value: %s = %s", name, tostring(addon.PlayerSettings[name]))
-  end,
-  ["set"] = function(name, value)
-    if not name or not value then
-      addon.Logger:Warn("/pmq set - name and value are required")
-      return
-    end
-
-    addon.PlayerSettings[name] = addon:TryConvertString(value)
-    addon.SaveData:Save("Settings", addon.PlayerSettings)
-    addon.Logger:Info("Config value set: %s = %s", name, tostring(addon.PlayerSettings[name]))
-  end,
-  ["unset"] = function(name)
-    if not name then
-      addon.Logger:Warn("/pmq unset - name or \"all\" is required")
-      return
-    end
-
-    if name == "all" then
-      addon.PlayerSettings = {}
-      addon.SaveData:Save("Settings", addon.PlayerSettings)
-      addon.Logger:Info("All player settings have been cleared.")
-      return
-    end
-
-    if addon.PlayerSettings[name] then
-      addon.PlayerSettings[name] = nil
-      addon.SaveData:Save("Settings", addon.PlayerSettings)
-      addon.Logger:Info("Cleared setting: %s", name)
-    end
-  end,
   ["scan-events"] = function()
     addon.GameEvents:ToggleWatchAll()
   end,

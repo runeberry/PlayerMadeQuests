@@ -90,12 +90,12 @@ end
 --- @return any value - the value at this key
 --- @return string source - one of ConfigSource
 function addon.Config:GetValue(key)
-  assert(isConfigLoaded, "Failed to GetConfigValue: Config is not loaded")
-  assert(type(key) == "string", "Failed to GetConfigValue: a string key must be provided")
+  assert(isConfigLoaded, "Failed to GetValue: Config is not loaded")
+  assert(type(key) == "string", "Failed to GetValue: a string key must be provided")
 
   local item = addon.Config.items[key]
   if not item then
-    logger:Warn("Failed to GetConfigValue: %s is not a known config item", key)
+    logger:Warn("Failed to GetValue: %s is not a known config item", key)
     return
   end
 
@@ -106,12 +106,12 @@ end
 --- @param key string - the key to assign this value to
 --- @param value any - the value to set
 function addon.Config:SetValue(key, value)
-  assert(isConfigLoaded, "Failed to SetConfigValue: Config is not loaded")
-  assert(type(key) == "string", "Failed to SetConfigValue: a string key must be provided")
+  assert(isConfigLoaded, "Failed to SetValue: Config is not loaded")
+  assert(type(key) == "string", "Failed to SetValue: a string key must be provided")
 
   local v, src = setValue(key, value, ConfigSource.Temporary)
   if v == nil then
-    logger:Warn("Failed to SetConfigValue: %s", src)
+    logger:Warn("Failed to SetValue: %s", src)
     return
   end
 
@@ -124,14 +124,14 @@ end
 --- @param value any
 --- @param global boolean - true to save globally (same for all characters), false or nil to save to character
 function addon.Config:SaveValue(key, value, global)
-  assert(isConfigLoaded, "Failed to SaveConfigValue: Config is not loaded")
-  assert(type(key) == "string", "Failed to SaveConfigValue: a string key must be provided")
+  assert(isConfigLoaded, "Failed to SaveValue: Config is not loaded")
+  assert(type(key) == "string", "Failed to SaveValue: a string key must be provided")
 
   local source
   if global then source = ConfigSource.Global else source = ConfigSource.Character end
   local v, src = setValue(key, value, source)
   if v == nil then
-    logger:Warn("Failed to SaveConfigValue: %s", src)
+    logger:Warn("Failed to SaveValue: %s", src)
     return
   end
 
@@ -150,7 +150,7 @@ end
 
 --- Resets all config values to PMQ's defaults. Erases SavedVariable data as well.
 function addon.Config:ResetAll()
-  assert(isConfigLoaded, "Failed to SetConfigValue: Config is not loaded")
+  assert(isConfigLoaded, "Failed to ResetAll: Config is not loaded")
 
   for k in pairs(addon.Config.items) do
     setValue(k, nil)

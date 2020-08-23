@@ -9,8 +9,6 @@ local SavedVariables = {
 local isSaveDataLoaded = false
 
 addon.SaveData = {}
-addon.PlayerSettings = nil
-addon.GlobalSettings = nil
 
 local function getSaveTable(global)
   if global then
@@ -32,10 +30,6 @@ function addon.SaveData:Init()
   end
   isSaveDataLoaded = true
   logger:Debug("SaveData loaded")
-
-  -- These are such frequently used tables, just make them easily accessible
-  addon.PlayerSettings = self:LoadTable("Settings")
-  addon.GlobalSettings = self:LoadTable("Settings", true)
 
   addon.AppEvents:Publish("SaveDataLoaded")
 end
