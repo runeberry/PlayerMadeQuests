@@ -611,6 +611,7 @@ function addon:NewRepository(name, pkey)
   return repo
 end
 
-addon:OnBackendStart(function()
+--- Part of the addon Lifecycle
+function addon:RepositoryInit()
   showTransactionLogs = addon.Config:GetValue("ENABLE_TRANSACTION_LOGS")
-end)
+end
