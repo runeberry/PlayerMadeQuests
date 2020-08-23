@@ -5,10 +5,12 @@ addon.VERSION = 103
 addon.BRANCH = "beta"
 
 function addon.Ace:OnInitialize()
+  addon:OnAddonReady(function()
+    addon.Logger:Info("PlayerMadeQuests loaded. Type %s to open the main menu", addon:Colorize("orange", "/pmq"))
+  end)
   addon:catch(function()
     addon:load()
     addon.Lifecycle:Start()
-    addon.Logger:Info("PlayerMadeQuests loaded. Type %s to open the main menu", addon:Colorize("orange", "/pmq"))
   end)
 end
 
