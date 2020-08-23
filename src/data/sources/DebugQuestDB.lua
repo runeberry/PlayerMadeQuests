@@ -22,7 +22,10 @@ objectives:
   - kill:
       target: Stonetusk Boar
       goal: 2
-      item: Light Leather]],
+      item: Light Leather
+  - kill:
+      target: Cow
+      equip: Knitted Belt]],
   [2] = [[
 objectives:
   - kill Cow
@@ -42,7 +45,10 @@ objectives:
       subzone: Goldshire
   - talk-to:
       target: Innkeeper Farley
-      item: Light Leather]],
+      item: Light Leather
+  - talk-to:
+      target: Smith Argus
+      equip: Knitted Belt]],
   [4] = [[
 objectives:
   - talk-to Erma
@@ -84,7 +90,11 @@ objectives:
       emote: growl
       target: Stonetusk Boar
       goal: 2
-      item: Light Leather]],
+      item: Light Leather
+  - use-emote:
+      emote: golfclap
+      target: Erma
+      equip: Knitted Belt]],
   [6] = [[
 objectives:
   - use-emote dance
@@ -114,7 +124,11 @@ objectives:
   - explore:
       zone: Goldshire
       coords: 42.41,64.47,0.3
-      item: Light Leather]],
+      item: Light Leather
+  - explore:
+      zone: Goldshire
+      coords: 42.08, 66.16, 0.1
+      equip: Knitted Belt]],
   [8] = [[
 objectives:
   - explore Goldshire
@@ -136,7 +150,10 @@ objectives:
   - gain-aura: { aura: Blessing of Might, zone: Lion's Pride Inn }
   - gain-aura:
       aura: Blessing of Might
-      item: Light Leather]],
+      item: Light Leather
+  - gain-aura:
+      aura: Blessing of Might
+      equip: Knitted Belt]],
   [10] = [[
 objectives:
   - gain-aura 'Blessing of Might']],
