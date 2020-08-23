@@ -25,6 +25,7 @@ addon.QuestScriptTokens = {
   PARAM_COORDS = "coords",
   PARAM_DESCRIPTION = "description",
   PARAM_EMOTE = "emote",
+  PARAM_EQUIP = "equip",
   PARAM_FACTION = "faction",
   PARAM_GOAL = "goal",
   PARAM_ITEM = "item",
@@ -127,6 +128,13 @@ local parameters = {
     },
   },
   [t.PARAM_EMOTE] = {
+    template = "condition",
+    scripts = {
+      [t.METHOD_PARSE] = { required = true },
+    },
+    multiple = true,
+  },
+  [t.PARAM_EQUIP] = {
     template = "condition",
     scripts = {
       [t.METHOD_PARSE] = { required = true },
@@ -306,15 +314,17 @@ local objectives = {
     displaytext = {
       vars = {
         ["a"] = t.PARAM_AURA,
+        ["e"] = t.PARAM_EQUIP,
         ["i"] = t.PARAM_ITEM,
       },
       log = "Gain %a",
       progress = "%a gained",
-      quest = "Gain the %a aura[%xyz: while in %xyz][%i: while having %i]",
-      full = "Gain the %a aura[%xyz: while in %xyrz][%i: while having %i]"
+      quest = "Gain the %a aura[%xyz: while in %xyz][%i: while having %i][%e: while wearing %e]",
+      full = "Gain the %a aura[%xyz: while in %xyrz][%i: while having %i][%e: while wearing %e]"
     },
     params = {
       [t.PARAM_AURA] = getParameter(t.PARAM_AURA, { required = true }),
+      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
       [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
     }
   },
@@ -329,18 +339,20 @@ local objectives = {
       vars = {
         ["a"] = t.PARAM_AURA,
         ["em"] = t.PARAM_EMOTE,
+        ["e"] = t.PARAM_EQUIP,
         ["i"] = t.PARAM_ITEM,
         ["t"] = t.PARAM_TARGET,
       },
       log = "/%em[%t: with %t][%g2: %p/%g]",
       progress = "/%em[%t: with %t]: %p/%g",
-      quest = "/%em[%t: with [%g2 ]%t|[%g2: %g2 times]][%xysz: in %xysz][%a: while having %a][%i: while having %i]",
-      full = "Use emote /%em[%t: on [%g2 ]%t|[%g2: %g2 times]][%xyz: in %xyrz][%a: while having %a][%i: while having %i]"
+      quest = "/%em[%t: with [%g2 ]%t|[%g2: %g2 times]][%xysz: in %xysz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
+      full = "Use emote /%em[%t: on [%g2 ]%t|[%g2: %g2 times]][%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
     },
     params = {
       [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
       [t.PARAM_GOAL] = getParameter(t.PARAM_GOAL),
       [t.PARAM_EMOTE] = getParameter(t.PARAM_EMOTE, { required = true }),
+      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
       [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
       [t.PARAM_TARGET] = getParameter(t.PARAM_TARGET),
     }
@@ -354,15 +366,17 @@ local objectives = {
     displaytext = {
       vars = {
         ["a"] = t.PARAM_AURA,
+        ["e"] = t.PARAM_EQUIP,
         ["i"] = t.PARAM_ITEM,
       },
       log = "Go to %xysz",
       progress = "%xysz explored: %p/%g",
-      quest = "Explore %xyz[%a: while having %a][%i: while having %i]",
-      full = "Go to %xyrz[%a: while having %a][%i: while having %i]"
+      quest = "Explore %xyz[%a: while having %a][%i: while having %i][%e: while wearing %e]",
+      full = "Go to %xyrz[%a: while having %a][%i: while having %i][%e: while wearing %e]"
     },
     params = {
       [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
+      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
       [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
     }
   },
@@ -375,16 +389,18 @@ local objectives = {
     displaytext = {
       vars = {
         ["a"] = t.PARAM_AURA,
+        ["e"] = t.PARAM_EQUIP,
         ["i"] = t.PARAM_ITEM,
         ["t"] = t.PARAM_KILLTARGET,
       },
       log = "%t %p/%g",
       progress = "%t slain: %p/%g",
-      quest = "Kill [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i]",
-      full = "Kill [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i]"
+      quest = "Kill [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
+      full = "Kill [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
     },
     params = {
       [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
+      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
       [t.PARAM_GOAL] = getParameter(t.PARAM_GOAL),
       [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
       [t.PARAM_KILLTARGET] = getParameter(t.PARAM_KILLTARGET, { alias = t.PARAM_TARGET, required = true }),
@@ -399,16 +415,18 @@ local objectives = {
     displaytext = {
       vars = {
         ["a"] = t.PARAM_AURA,
+        ["e"] = t.PARAM_EQUIP,
         ["i"] = t.PARAM_ITEM,
         ["t"] = t.PARAM_TARGET,
       },
       log = "Talk to %t[%g2: %p/%g]",
       progress = "Talk to %t: %p/%g",
-      quest = "Talk to [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i]",
-      full = "Talk to [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i]"
+      quest = "Talk to [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
+      full = "Talk to [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
     },
     params = {
       [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
+      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
       [t.PARAM_GOAL] = getParameter(t.PARAM_GOAL),
       [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
       [t.PARAM_TARGET] = getParameter(t.PARAM_TARGET, { required = true }),

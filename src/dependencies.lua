@@ -38,6 +38,7 @@ addon.G = {
   GetContainerItemInfo = GetContainerItemInfo,
   GetInventorySlotInfo = GetInventorySlotInfo,
   GetInventoryItemID = GetInventoryItemID,
+  IsEquippedItem = IsEquippedItem,
   PlaySoundFile = PlaySoundFile,
   ReloadUI = ReloadUI,
   SlashCmdList = SlashCmdList,
