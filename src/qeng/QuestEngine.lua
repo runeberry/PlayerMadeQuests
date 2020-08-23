@@ -1,9 +1,6 @@
 local _, addon = ...
 local tokens = addon.QuestScriptTokens
-local QuestLog, QuestStatus
-addon:onload(function()
-  QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
-end)
+local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
 local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
 local objectiveLogger = addon.Logger:NewLogger("Objectives", addon.LogLevel.info)

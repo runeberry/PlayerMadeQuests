@@ -1,5 +1,4 @@
 local _, addon = ...
-local QuestStatus = addon.QuestStatus
 local GetUnitName = addon.G.GetUnitName
 
 --[[
