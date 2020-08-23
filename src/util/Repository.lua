@@ -6,7 +6,7 @@ local repos = {}
 local defaultPkey = "id"
 local createDateKey = "cd"
 local updateDateKey = "ud"
-local transactionLogs = addon.TRANSACTION_LOGS or false
+local showTransactionLogs
 
 local function addItemToIndex(indexTable, item, indexProp)
   local indexValue = item[indexProp]
@@ -163,7 +163,7 @@ local function ta_AddStep(self, action, undo)
 end
 
 local function ta_Log(self, ...)
-  if not transactionLogs then return end
+  if not showTransactionLogs then return end
   self.repo.logger:Debug(...)
 end
 
@@ -610,3 +610,7 @@ function addon:NewRepository(name, pkey)
   logger:Trace("NewRepository: %s", name)
   return repo
 end
+
+addon:OnBackendStart(function()
+  showTransactionLogs = addon.Config:GetValue("TRANSACTION_LOGS")
+end)

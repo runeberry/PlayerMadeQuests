@@ -62,8 +62,6 @@ function builder:Build(opts)
 
   local addon = {
     defaultSettings = testConfig,
-
-    TRANSACTION_LOGS = false,
     USE_INTERNAL_MESSAGING = true,
     -- Exception: I want to include the TinyYaml lib for parsing quests
     ParseYaml = loadfile([[src/libs/lua-tinyyaml/tinyyaml.lua]])().parse
