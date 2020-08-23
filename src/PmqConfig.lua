@@ -2,10 +2,6 @@ local _, addon = ...
 
 --- These are the default values for every config item supported by PMQ.
 addon.defaultSettings = {
-  --- The version and branch of the addon.
-  --- Set branch to false for a production release.
-  VERSION = 103,
-  BRANCH = "beta",
   --- Hack for unit testing.
   --- Enable this to avoid building UI elements when the addon is loaded.
   AVOID_BUILDING_UI = false,

@@ -1,7 +1,5 @@
 --- This is the default addon config for every addon built with addon-builder
 return {
-  VERSION = 1,
-  BRANCH = "test",
   -- todo: need better mocking system for UI, but suppress errors for now
   AVOID_BUILDING_UI = true,
   GLOBAL_LOG_MODE = "pretty",
