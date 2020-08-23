@@ -23,20 +23,22 @@ loader:AddScript(tokens.OBJ_EXPLORE, tokens.METHOD_POST_EVAL, function(obj, resu
   end
 end)
 
-local function publish()
-  addon.QuestEvents:Publish(tokens.OBJ_EXPLORE, addon:GetPlayerLocation())
-end
+addon:OnQuestEngineReady(function()
+  local function publish()
+    addon.QuestEvents:Publish(tokens.OBJ_EXPLORE, addon:GetPlayerLocation())
+  end
 
-addon.AppEvents:Subscribe("QuestAdded", publish)
-addon.AppEvents:Subscribe("QuestTrackingStarted", publish)
-addon.GameEvents:Subscribe("ZONE_CHANGED", publish)
-addon.GameEvents:Subscribe("ZONE_CHANGED_INDOORS", publish)
-addon.GameEvents:Subscribe("ZONE_CHANGED_NEW_AREA", publish)
+  addon.AppEvents:Subscribe("QuestAdded", publish)
+  addon.AppEvents:Subscribe("QuestTrackingStarted", publish)
+  addon.GameEvents:Subscribe("ZONE_CHANGED", publish)
+  addon.GameEvents:Subscribe("ZONE_CHANGED_INDOORS", publish)
+  addon.GameEvents:Subscribe("ZONE_CHANGED_NEW_AREA", publish)
 
-addon.AppEvents:Subscribe("PlayerLocationChanged", function(loc)
-  addon.QuestEvents:Publish(tokens.OBJ_EXPLORE, loc)
-end)
+  addon.AppEvents:Subscribe("PlayerLocationChanged", function(loc)
+    addon.QuestEvents:Publish(tokens.OBJ_EXPLORE, loc)
+  end)
 
-addon.AppEvents:Subscribe("ObjectiveCompleted", function(obj)
-  addon:StopPollingLocation(obj.id)
+  addon.AppEvents:Subscribe("ObjectiveCompleted", function(obj)
+    addon:StopPollingLocation(obj.id)
+  end)
 end)
