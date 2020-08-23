@@ -158,6 +158,7 @@ function deps:Init(addon)
     GetContainerItemInfo = ret(),
     GetInventorySlotInfo = ret(),
     GetInventoryItemID = ret(),
+    IsEquippedItem = ret(),
     PlaySoundFile = ret(),
     ReloadUI = ret(),
     SlashCmdList = {},
