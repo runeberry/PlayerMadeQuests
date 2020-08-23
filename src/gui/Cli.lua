@@ -97,5 +97,8 @@ handlers = {
   ["debug-quests"] = function()
     addon.MainMenu:Show()
     addon.MainMenu:ShowMenuScreen("DebugQuestListMenu")
-  end
+  end,
+  ["reset-config"] = function()
+    addon.StaticPopups:Show("ResetAllConfig")
+  end,
 }

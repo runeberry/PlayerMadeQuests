@@ -105,6 +105,7 @@ end
 --- Sets the value of a config item. Does not persist between reloads.
 --- @param key string - the key to assign this value to
 --- @param value any - the value to set
+--- @return any value - the type-coerced value that was set
 function addon.Config:SetValue(key, value)
   assert(isConfigLoaded, "Failed to SetValue: Config is not loaded")
   assert(type(key) == "string", "Failed to SetValue: a string key must be provided")
@@ -116,6 +117,7 @@ function addon.Config:SetValue(key, value)
   end
 
   addon.AppEvents:Publish("ConfigUpdated", key, v)
+  return v
 end
 
 --- Sets the value of a config item and writes it to the player's SavedVariables
@@ -123,6 +125,7 @@ end
 --- @param key string
 --- @param value any
 --- @param global boolean - true to save globally (same for all characters), false or nil to save to character
+--- @return any value - the type-coerced value that was set
 function addon.Config:SaveValue(key, value, global)
   assert(isConfigLoaded, "Failed to SaveValue: Config is not loaded")
   assert(type(key) == "string", "Failed to SaveValue: a string key must be provided")
@@ -146,6 +149,7 @@ function addon.Config:SaveValue(key, value, global)
   addon.SaveData:Save("Settings", savedSettings, global)
 
   addon.AppEvents:Publish("ConfigUpdated", key, v)
+  return v
 end
 
 --- Resets all config values to PMQ's defaults. Erases SavedVariable data as well.

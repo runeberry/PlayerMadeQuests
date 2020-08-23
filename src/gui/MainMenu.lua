@@ -17,7 +17,11 @@ addon.MainMenu:SetMenuTree({ -- value == menuId
       { value = "QuestArchiveMenu", text = "Quest Archive" },
     }
   },
-  { value = "SettingsMenu", text = "Settings" },
+  { value = "SettingsMenu", text = "Settings",
+    children = {
+      { value = "ConfigMenu", text = "Config" }
+    }
+  },
   { value = "HelpMenu-Placeholder", text = "Help",
     children = {
       { value = "HelpCommandsMenu", text = "Commands" },

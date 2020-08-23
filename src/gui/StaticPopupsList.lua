@@ -185,5 +185,30 @@ addon.StaticPopupsList = {
       addon:PlaySound("QuestAbandoned")
       addon.Logger:Warn("Quest Drafts cleared")
     end,
-  }
+  },
+  ["EditConfigValue"] = {
+    message = function(configItem)
+      return "Edit value for:\n"..configItem.name
+    end,
+    editBox = function(configItem)
+      return tostring(configItem.value)
+    end,
+    yesText = "Save",
+    noText = "Discard",
+    yesHandler = function(configItem, text)
+      local v = addon.Config:SaveValue(configItem.name, text)
+      if v then
+        addon.Logger:Warn("Config value updated: %s = %s", configItem.name, tostring(v))
+      end
+    end,
+  },
+  ["ResetAllConfig"] = {
+    message = "Reset all config values to PMQ defaults?",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function()
+      addon.Config:ResetAll()
+      addon.Logger:Warn("Config values reset")
+    end,
+  },
 }

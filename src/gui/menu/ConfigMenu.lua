@@ -7,8 +7,8 @@ local configRows = {}
 
 --- These config values will not be shown in this menu.
 local configExclude = {
-  VERSION = true,
-  BRANCH = true,
+  FrameData = true,
+  Logging = true,
 }
 
 local colorsBySource = {
@@ -72,7 +72,7 @@ local options = {
       anchor = "BOTTOM",
       enabled = "Row",
       handler = function(configItem)
-        addon:SaveConfigValue(configItem.name, nil)
+        addon.Config:SaveValue(configItem.name, nil)
       end,
     },
   }
