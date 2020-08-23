@@ -13,12 +13,6 @@ addon.LogLevel = {
   none = 7
 }
 local ll = addon.LogLevel
-addon.LogMode = {
-  Pretty = "pretty",
-  Simple = "simple",
-  SimpleUnbuffered = "simple-unbuffered",
-}
-local lm = addon.LogMode
 
 local logcolors = {
   [ll.silent] = "white",
@@ -50,15 +44,10 @@ end
 
 local globalStats = newStatsTable()
 
--- Enable this to bypass all logging rules and print everything to console
--- Only enable this if something is seriously broken with logging
-local globalLogMode = addon.GLOBAL_LOG_MODE or lm.Pretty
-
--- Log levels below this level are always hidden unless debug-mode is enabled
-local globalLogFilter = addon.GLOBAL_LOG_FILTER or ll.info
+--- Log levels below this level are always hidden unless debug-mode is enabled
+local globalLogFilter = ll.trace
 
 -- Buffer logs from all loggers until the app is loaded, then flush them
-local useLogBuffer = true
 local globalLogBuffer = {}
 
 -- Each logger that's created will have its log level indexed by name here
@@ -136,52 +125,19 @@ local function toLogMessage(formatString, ...)
   return msg
 end
 
-local logMethods = {
-  [lm.Pretty] = function(self, loglevel, str, ...)
-    if useLogBuffer then
-      table.insert(globalLogBuffer, { logger = self, loglevel = loglevel, str = str, args = { ... } })
-      return
-    end
-    -- Log must be "higher priority" than both the instance and global log levels
-    if loglevel <= getMinLogLevel(self.name) then
-      print(addon.ESCAPE_START..addon:GetEscapeColor(logcolors[loglevel])..self.prefix, toLogMessage(str, ...)..addon.ESCAPE_END)
-      bumpStats(self.stats, true, loglevel)
-    else
-      bumpStats(self.stats, false, loglevel)
-    end
-  end,
-  [lm.Simple] = function(self, loglevel, str, ...)
-    if useLogBuffer then
-      table.insert(globalLogBuffer, { logger = self, loglevel = loglevel, str = str, args = { ... } })
-      return
-    end
-    -- Log must be "higher priority" than both the instance and global log levels
-    if loglevel <= getMinLogLevel(self.name) then
-      print(self.prefix, toLogMessage(str, ...))
-      bumpStats(self.stats, true, loglevel)
-    else
-      bumpStats(self.stats, false, loglevel)
-    end
-  end,
-  [lm.SimpleUnbuffered] = function(self, loglevel, str, ...)
-    if loglevel <= getMinLogLevel(self.name) then
-      print(self.prefix, toLogMessage(str, ...))
-      bumpStats(self.stats, true, loglevel)
-    else
-      bumpStats(self.stats, false, loglevel)
-    end
-  end
-}
-
 local methods = {
-  -- This method is attached to the Logger and sets the "system" level of the logger (defined by code)
-  ["SetLogLevel"] = function(self, loglevel)
-    local value = getLogLevel(loglevel)
-    if not value then return end
-    logLevels.system[self.name] = value
-  end,
-  ["SetLogMode"] = function(self, logmode)
-    self.Log = logMethods[logmode]
+  ["Log"] = function(self, loglevel, str, ...)
+    if globalLogBuffer then
+      table.insert(globalLogBuffer, { logger = self, loglevel = loglevel, str = str, args = { ... } })
+      return
+    end
+    -- Log must be "higher priority" than both the instance and global log levels
+    if loglevel <= getMinLogLevel(self.name) then
+      print(addon:Colorize(logcolors[loglevel], self.prefix..toLogMessage(str, ...)))
+      bumpStats(self.stats, true, loglevel)
+    else
+      bumpStats(self.stats, false, loglevel)
+    end
   end,
   ["Fatal"] = function(self, str, ...) self:Log(ll.fatal, str, ...) end,
   ["Error"] = function(self, str, ...) self:Log(ll.error, str, ...) end,
@@ -189,19 +145,6 @@ local methods = {
   ["Info"] = function(self, str, ...) self:Log(ll.info, str, ...) end,
   ["Debug"] = function(self, str, ...) self:Log(ll.debug, str, ...) end,
   ["Trace"] = function(self, str, ...) self:Log(ll.trace, str, ...) end,
-  ["Varargs"] = function(self, ...)
-    -- These logs are only intended for debugging, so just print them at the lowest visible log level
-    local level = getMinLogLevel(self.name)
-    local vals, filtered = { ... }, {}
-    for i, val in ipairs(vals) do
-      if val == nil then
-        filtered[i] = "nil"
-      else
-        filtered[i] = val
-      end
-    end
-    self:Log(level, "Variadic args: [%s]", table.concat(filtered, ", "))
-  end,
   ["Table"] = function(self, t, key, indent, circ)
     -- These logs are only intended for debugging, so just print them at the lowest visible log level
     local level = getMinLogLevel(self.name)
@@ -231,6 +174,25 @@ local methods = {
       end
     end
   end,
+  ["Varargs"] = function(self, ...)
+    -- These logs are only intended for debugging, so just print them at the lowest visible log level
+    local level = getMinLogLevel(self.name)
+    local vals, filtered = { ... }, {}
+    for i, val in ipairs(vals) do
+      if val == nil then
+        filtered[i] = "nil"
+      else
+        filtered[i] = val
+      end
+    end
+    self:Log(level, "Variadic args: [%s]", table.concat(filtered, ", "))
+  end,
+  -- This method is attached to the Logger and sets the "system" level of the logger (defined by code)
+  ["SetLogLevel"] = function(self, loglevel)
+    local value = getLogLevel(loglevel)
+    if not value then return end
+    logLevels.system[self.name] = value
+  end,
 }
 
 local function logger_NewLogger(self, name, min)
@@ -249,11 +211,10 @@ local function logger_NewLogger(self, name, min)
 
   local logger = {
     name = name,
-    prefix = "["..name.."]",
+    prefix = "["..name.."] ",
     stats = newStatsTable(),
 
     NewLogger = logger_NewLogger,
-    Log = logMethods[globalLogMode],
   }
 
   for fname, method in pairs(methods) do
@@ -297,10 +258,10 @@ function addon:GetLogStats()
   local stats = {}
   for name, logger in pairs(loggers) do
     local level, levelname = getLogLevel(getMinLogLevel(name))
-    table.insert(stats, { name = name, level = level, levelname = levelname, stats = logger.stats })
+    stats[name] = { name = name, level = level, levelname = levelname, stats = logger.stats }
   end
   local level, levelname = getLogLevel(globalLogFilter)
-  table.insert(stats, { name = "*", level = level, levelname = levelname, stats = globalStats })
+  stats["*"] = { name = "*", level = level, levelname = levelname, stats = globalStats }
   return stats
 end
 
@@ -328,18 +289,26 @@ addon.UILogger = addon.Logger:NewLogger("UI", ll.info)
 
 --- This is called as part of the addon lifecycle
 function addon.Logger:Init()
-  if addon.PlayerSettings.Logging then
-    logLevels.user = addon:CopyTable(addon.PlayerSettings.Logging)
+  local charset = addon.Config:GetValue("CHARSET")
+  if charset then
+    addon:SetCharset(charset)
   end
 
-  addon:SetGlobalLogFilter(addon.PlayerSettings["global-log-filter"])
+  local logging = addon.Config:GetValue("Logging")
+  if logging then
+    logLevels.user = addon:CopyTable(logging)
+  end
 
-  -- Flush all buffered logs
+  local filter = addon.Config:GetValue("GLOBAL_LOG_FILTER")
+  if filter then
+    addon:SetGlobalLogFilter(filter)
+  end
+
   -- print("Flushing log buffer:", #globalLogBuffer)
-  useLogBuffer = false
-  for _, l in pairs(globalLogBuffer) do
+  local globalLogBufferCopy = globalLogBuffer
+  globalLogBuffer = nil -- Setting this to nil tells the Log method to stop writing logs to the buffer
+  for _, l in ipairs(globalLogBufferCopy) do
     l.logger:Log(l.loglevel, l.str, unpack(l.args))
   end
-  globalLogBuffer = nil
   -- print("End flushing log buffer")
 end

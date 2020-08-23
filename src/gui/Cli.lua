@@ -54,7 +54,11 @@ handlers = {
   end,
   ["logstats"] = function()
     local stats = addon:GetLogStats()
-    table.sort(stats, function(a, b) return a.name < b.name end)
+    local sorted = {}
+    for _, v in pairs(stats) do
+      sorted[#sorted+1] = v
+    end
+    table.sort(sorted, function(a, b) return a.name < b.name end)
     addon.Logger:Info("Logger stats:")
     for _, stat in pairs(stats) do
       addon.Logger:Info("    %s (%i printed, %i received @ %s)", stat.name, stat.stats.printed, stat.stats.received, stat.levelname)

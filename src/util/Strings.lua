@@ -1,46 +1,59 @@
 local _, addon = ...
 local strsplit = addon.G.strsplit
 
-addon.ESCAPE_START = "|c"
-addon.ESCAPE_END = "|r"
+addon.Strings = {}
 
-local colors = {
-  red = "ffff0000",
-  green = "ff1eff00",
-  blue = "ff0070dd",
-  grey = "ff9d9d9d",
-  white = "ffffffff",
-  black = "ff000000",
-  purple = "ffa335ee",
-  orange = "ffff8000",
-  yellow = "ffffff00",
-}
-
--- Just for fun, this will color logs for unit tests
-if addon.USE_ANSI_COLORS then
-  addon.ESCAPE_START = "\27["
-  addon.ESCAPE_END = "\27[0m"
-  colors = {
-    red = "0;31m",
-    green = "0;32m",
-    blue = "0;34m",
-    grey = "1;30m",
-    white = "0m",
-    black = "0;30m",
-    purple = "0;35m",
-    orange = "0;33m",
-    yellow = "1;33m",
+local charsets = {
+  --- For use in-game
+  WOW = {
+    ESCAPE_START = "|c",
+    ESCAPE_END = "|r",
+    colors = {
+      red = "ffff0000",
+      green = "ff1eff00",
+      blue = "ff0070dd",
+      grey = "ff9d9d9d",
+      white = "ffffffff",
+      black = "ff000000",
+      purple = "ffa335ee",
+      orange = "ffff8000",
+      yellow = "ffffff00",
+    }
+  },
+  -- For use in terminals outside of game
+  ANSI = {
+    ESCAPE_START = "\27[",
+    ESCAPE_END = "\27[0m",
+    colors = {
+      red = "0;31m",
+      green = "0;32m",
+      blue = "0;34m",
+      grey = "1;30m",
+      white = "0;37m",
+      black = "0;30m",
+      purple = "0;35m",
+      orange = "0;33m",
+      yellow = "1;33m",
+    }
+  },
+  -- Disables all special coloring
+  NONE = {
+    ESCAPE_START = "",
+    ESCAPE_END = "",
+    colors = {}
   }
-end
-
---- Use the mapped color if available.
---- If no valid color is specified, default to white
-function addon:GetEscapeColor(color)
-  return colors[color] or colors.white
-end
+}
+local charset = charsets.NONE
 
 function addon:Colorize(color, str)
-  return addon.ESCAPE_START..addon:GetEscapeColor(color)..str..addon.ESCAPE_END
+  str = str or ""
+  local c = charset.colors[color] or charset.colors.white or ""
+  return charset.ESCAPE_START..c..str..charset.ESCAPE_END
+end
+
+function addon:SetCharset(name)
+  assert(charsets[name], name.." is not a valid charset")
+  charset = charsets[name]
 end
 
 function addon:Pluralize(num, singular, plural)
