@@ -65,7 +65,6 @@ function builder:Build(opts)
 
     TRANSACTION_LOGS = false,
     USE_INTERNAL_MESSAGING = true,
-    PLAYER_LOCATION_TTL = 0,
     -- Exception: I want to include the TinyYaml lib for parsing quests
     ParseYaml = loadfile([[src/libs/lua-tinyyaml/tinyyaml.lua]])().parse
   }
