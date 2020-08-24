@@ -143,7 +143,6 @@ local function buildLocationFinderFrame()
   return frame
 end
 
-addon:OnSaveDataLoaded(function()
-  if addon.AVOID_BUILDING_UI then return end
+addon:OnGuiStart(function()
   addon.LocationFinderFrame = buildLocationFinderFrame()
 end)
