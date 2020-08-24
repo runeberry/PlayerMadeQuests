@@ -131,7 +131,7 @@ handlers = {
     addon.MainMenu:Show()
     addon.MainMenu:ShowMenuScreen("DebugQuestListMenu")
   end,
-  ["position"] = function()
-    addon.PositionFinderFrame:ToggleShown()
+  ["location"] = function()
+    addon.LocationFinderFrame:ToggleShown()
   end,
 }

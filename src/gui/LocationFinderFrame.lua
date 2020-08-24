@@ -1,7 +1,7 @@
 local _, addon = ...
 local Locations = addon.Locations
 
-addon.PositionFinderFrame = nil -- Built at end of file
+addon.LocationFinderFrame = nil -- Built at end of file
 
 local locationRows
 
@@ -114,7 +114,7 @@ local function setLocationText()
   return text
 end
 
-local function buildPositionFinderFrame()
+local function buildLocationFinderFrame()
   local frame = addon.CustomWidgets:CreateWidget("ToolWindowPopout", "LocationFinderFrame", frameOptions)
   local contentFrame = frame:GetContentFrame()
   local text = setLocationText()
@@ -145,5 +145,5 @@ end
 
 addon:OnSaveDataLoaded(function()
   if addon.AVOID_BUILDING_UI then return end
-  addon.PositionFinderFrame = buildPositionFinderFrame()
+  addon.LocationFinderFrame = buildLocationFinderFrame()
 end)
