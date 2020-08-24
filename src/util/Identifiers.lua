@@ -19,7 +19,7 @@ function addon:ParseGUID(guid)
     GUID = guid
   }
 
-  local parts = strsplit("-", parsed.GUID)
+  local parts = { strsplit("-", parsed.GUID) }
   local numParts = addon:tlen(parts)
 
   if numParts == 3 then

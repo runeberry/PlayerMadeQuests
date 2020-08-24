@@ -4,15 +4,10 @@ local tokens = addon.QuestScriptTokens
 
 addon:OnQuestEngineReady(function()
   local function publish()
-    addon.QuestEvents:Publish(tokens.OBJ_AURA)
+    addon.QuestEvents:Publish(tokens.OBJ_EQUIP)
   end
 
-  addon.GameEvents:Subscribe("UNIT_AURA", function(target)
-    if target == "player" then
-      publish()
-    end
-  end)
-
+  addon.AppEvents:Subscribe("PlayerInventoryChanged", publish)
   addon.AppEvents:Subscribe("QuestTrackingStarted", publish)
   addon.AppEvents:Subscribe("QuestAdded", publish)
 end)

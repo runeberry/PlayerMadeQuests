@@ -11,6 +11,7 @@
   <Script file="qeng/cmd/req.lua"/>
   <Script file="qeng/cmd/startcomplete.lua"/>
 
+  <Script file="qeng/objectives/equip-item.lua"/>
   <Script file="qeng/objectives/explore.lua"/>
   <Script file="qeng/objectives/gain-aura.lua"/>
   <Script file="qeng/objectives/kill.lua"/>
@@ -19,6 +20,8 @@
 
   <Script file="qeng/conditions/aura.lua"/>
   <Script file="qeng/conditions/emote.lua"/>
+  <Script file="qeng/conditions/equip.lua"/>
+  <Script file="qeng/conditions/item.lua"/>
   <Script file="qeng/conditions/killtarget.lua"/>
   <Script file="qeng/conditions/position.lua"/>
   <Script file="qeng/conditions/target.lua"/>

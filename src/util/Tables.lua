@@ -157,6 +157,18 @@ function addon:DecompressTable(str)
   return t
 end
 
+--- Returns a 32-bit hash value representing the contents of the table
+--- @param t table
+--- @return number (float)
+function addon:GetTableHash(t)
+  assert(type(t) == "table", "Must provide a table to hash")
+  local serialized = Ace:Serialize(t)
+  local hash = LibCompress:fcs32init()
+  hash = LibCompress:fcs32update(hash, serialized)
+  hash = LibCompress:fcs32final(hash)
+  return hash
+end
+
 -- Unpacks either format { r = r, g = g, b = b, a = a } or { r, g, b, a }
 function addon:UnpackRGBA(t)
   if not t then

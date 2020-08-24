@@ -240,6 +240,45 @@ addon.StaticPopupsList = {
     noText = "Cancel",
     yesHandler = function(location)
      addon.Locations:DeleteAll()
+  ["EditConfigValue"] = {
+    message = function(configItem)
+      return "Edit value for:\n"..configItem.name
+    end,
+    editBox = function(configItem)
+      return tostring(configItem.value), true
+    end,
+    yesText = "Save",
+    noText = "Discard",
+    yesHandler = function(configItem, text)
+      local v = addon.Config:SaveValue(configItem.name, text)
+      if v then
+        addon.Logger:Warn("Config value updated: %s = %s", configItem.name, tostring(v))
+      end
+    end,
+  },
+  ["ResetAllConfig"] = {
+    message = "Reset all config values to PMQ defaults?",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function()
+      addon.Config:ResetAll()
+      addon.Logger:Warn("Config values reset")
+    end,
+  },
+  ["SetLogLevel"] = {
+    message = function(logName)
+      return "Set log level for:\n"..logName
+    end,
+    editBox = function(logName, logLevelName)
+      return logLevelName, true
+    end,
+    yesText = "Save",
+    noText = "Discard",
+    yesHandler = function(logName, logLevelName, text)
+      local v = addon:SetUserLogLevel(logName, text)
+      if v then
+        addon.Logger:Warn("Set log level for %s to %s.", logName, text)
+      end
     end,
   },
 }

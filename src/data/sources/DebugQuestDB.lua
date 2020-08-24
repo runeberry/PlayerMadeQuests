@@ -18,7 +18,14 @@ objectives:
       target: Murloc
       goal: 2
       zone: Crystal Lake
-      coords: 50.57,66.80]],
+      coords: 50.57,66.80
+  - kill:
+      target: Stonetusk Boar
+      goal: 2
+      item: Light Leather
+  - kill:
+      target: Cow
+      equip: Knitted Belt]],
   [2] = [[
 objectives:
   - kill Cow
@@ -35,7 +42,13 @@ objectives:
       target: Chicken
       goal: 2
       zone: Elwynn Forest
-      subzone: Goldshire]],
+      subzone: Goldshire
+  - talk-to:
+      target: Innkeeper Farley
+      item: Light Leather
+  - talk-to:
+      target: Smith Argus
+      equip: Knitted Belt]],
   [4] = [[
 objectives:
   - talk-to Erma
@@ -72,7 +85,16 @@ objectives:
       emote: sigh
       target: Murloc
       zone: Crystal Lake
-      coords: 50.57,66.80]],
+      coords: 50.57,66.80
+  - use-emote:
+      emote: growl
+      target: Stonetusk Boar
+      goal: 2
+      item: Light Leather
+  - use-emote:
+      emote: golfclap
+      target: Erma
+      equip: Knitted Belt]],
   [6] = [[
 objectives:
   - use-emote dance
@@ -98,7 +120,15 @@ objectives:
   - explore:
       zone: Goldshire
       coords: 42.41, 64.47
-      aura: Blessing of Might]],
+      aura: Blessing of Might
+  - explore:
+      zone: Goldshire
+      coords: 42.41,64.47,0.3
+      item: Light Leather
+  - explore:
+      zone: Goldshire
+      coords: 42.08, 66.16, 0.1
+      equip: Knitted Belt]],
   [8] = [[
 objectives:
   - explore Goldshire
@@ -110,17 +140,41 @@ objectives:
   - explore "Elwynn Forest" "42.41, 64.47, 1"]],
   [9] = [[
 objectives:
-  - gain-aura:
-      aura: Blessing of Might
+  - gain-aura: { aura: Blessing of Might }
   - gain-aura:
       aura: Blessing of Might
       zone: Elwynn Forest
       subzone: Goldshire
       coords: 42.41, 64.47, 0.3
-  - gain-aura: { aura: Blessing of Might, zone: Lion's Pride Inn }]],
+  - gain-aura: { aura: Blessing of Might, zone: Lion's Pride Inn }
+  - gain-aura:
+      aura: Blessing of Might
+      item: Light Leather
+  - gain-aura:
+      aura: Blessing of Might
+      equip: Knitted Belt]],
   [10] = [[
 objectives:
   - gain-aura 'Blessing of Might']],
+  [11] = [[
+objectives:
+  - equip-item: { equip: Knitted Belt },
+  - equip-item:
+      equip: Knitted Belt
+      zone: Elwynn Forest
+      subzone: Goldshire
+      coords: 42.41, 64.47, 0.3
+  - equip-item: { equip: Knitted Belt, zone: Lion's Pride Inn }
+  - equip-item:
+      equip: Knitted Belt
+      item: Light Leather
+  - equip-item:
+      equip: Knitted Belt
+      aura: Blessing of Might
+  ]],
+  [12] = [[
+objectives:
+  - equip-item 'Knitted Belt']],
 }
 
 addon.DebugQuestDB = {
@@ -163,6 +217,14 @@ addon.DebugQuestDB = {
   {
     name = "Objective: talk-to (shorthand)",
     script = scripts[4],
+  },
+  {
+    name = "Objective: equip-item",
+    script = scripts[11],
+  },
+  {
+    name = "Objective: equip-item (shorthand)",
+    script = scripts[12],
   },
 }
 

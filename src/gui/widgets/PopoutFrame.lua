@@ -71,31 +71,35 @@ local methods = {
     local w, h = self:GetSize()
     local shown = tostring(self:IsVisible() or false)
 
-    if not addon.PlayerSettings.FrameData then
-      addon.PlayerSettings.FrameData = {}
-    end
+    local frameData = addon.Config:GetValue("FrameData")
+    frameData[self._name] = strjoin(",", p1, p2, x, y, w, h, shown)
+    addon.Config:SaveValue("FrameData", frameData)
 
-    addon.PlayerSettings.FrameData[self._name] = strjoin(",", p1, p2, x, y, w, h, shown)
-    addon.SaveData:Save("Settings", addon.PlayerSettings)
-    addon.UILogger:Trace("Saved %s state: %s %s (%.2f, %.2f) %ix%i (%s)", self:GetName(), p1, p2, x, y, w, h, shown)
+    addon.UILogger:Trace("Saved window position: %s %s (%.2f, %.2f) %ix%i (%s)", p1, p2, x, y, w, h, shown)
   end,
   ["LoadWindowState"] = function(self)
-    local frameData = addon.PlayerSettings.FrameData
-    if not frameData or not frameData[self._name] then return end
-
-    local p1, p2, x, y, w, h, shown = strsplit(",", frameData[self._name])
-    local pos = {
-      p1 = p1,
-      p2 = p2,
-      x = x,
-      y = y,
-      w = w,
-      h = h,
-    }
-
-    if self._options.saveOpenState then
-      -- Only used the saved 'shown' state if explicitly declared
-      pos.shown = addon:ConvertValue(shown, "boolean") or false
+    local pos
+    local frameData = addon.Config:GetValue("FrameData")
+    if frameData and frameData[self._name] then
+      local p1, p2, x, y, w, h, shown = strsplit(",", frameData[self._name])
+      pos = {
+        p1 = p1,
+        p2 = p2,
+        x = x,
+        y = y,
+        w = w,
+        h = h,
+      }
+      if self._options.saveOpenState then
+        -- Only used the saved 'shown' state if explicitly declared
+        pos.shown = shown or false
+      elseif self._options.position then
+        -- Otherwise fall back on the frame's default shown state
+        pos.shown = self._options.position.shown
+      else
+        -- If no default shown state is available, then hide the frame
+        pos.shown = false
+      end
     elseif self._options.position then
       -- Otherwise fall back on the frame's default shown state
       pos.shown = self._options.position.shown
@@ -160,11 +164,7 @@ function widget:Create(frameName, options)
     table.insert(UISpecialFrames, frameName)
   end
 
-  if options.position then
-    frame:SetWindowState(options.position)
-  end
-
-  addon:OnSaveDataLoaded(function()
+  addon:OnGuiReady(function()
     frame:LoadWindowState()
   end)
 

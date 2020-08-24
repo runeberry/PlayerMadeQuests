@@ -103,14 +103,6 @@ local function setup(set, name, param)
   end
 end
 
-local function initQuestScript()
-  local newset = {}
-  for name, command in pairs(addon.QuestScript) do
-    setup(newset, name, command)
-  end
-  addon.QuestScript = newset
-end
-
 --[[
   Registers an arbitrary script by the specified unique name.
   Reference this script name in QuestScript.lua and it will be attached
@@ -140,9 +132,12 @@ function addon.QuestScriptLoader:AddScript(itemName, methodName, fn)
   existing[methodName] = fn
 end
 
-addon:onload(function()
-  initQuestScript()
+function addon.QuestScriptLoader:Init()
+  local newset = {}
+  for name, command in pairs(addon.QuestScript) do
+    setup(newset, name, command)
+  end
+  addon.QuestScript = newset
+
   logger:Debug("QuestScript loaded OK!")
-  addon.AppEvents:Publish("QuestScriptLoaded")
-  addon.QuestScriptLoader = nil -- No longer needed after load
-end)
+end

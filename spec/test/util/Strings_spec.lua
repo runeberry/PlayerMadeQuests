@@ -1,14 +1,13 @@
 local addon = require("spec/addon-builder"):Build()
 
 describe("Strings", function()
+  setup(function()
+    addon:Init()
+  end)
   describe("Colorize", function()
     local str = "test string"
     it("can colorize with named color", function()
       local colorized = addon:Colorize("red", str)
-      assert.not_equals(str, colorized)
-    end)
-    it("can colorize with custom color", function()
-      local colorized = addon:Colorize("|cffaf9023", str)
       assert.not_equals(str, colorized)
     end)
     it("can colorize default", function()

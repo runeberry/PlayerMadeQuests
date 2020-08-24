@@ -2,40 +2,41 @@ local mock = {}
 
 local functionMocks = {}
 
-local function afmt(condition, str, ...)
+local function assertf(condition, str, ...)
   assert(condition, string.format(str, ...))
 end
 
-local function efmt(str, ...)
+local function errorf(str, ...)
   error(string.format(str, ...))
 end
 
 local mockMethods = {
+  -- Assertion methods
   ["AssertCalled"] = function(self, times)
     if times then
-      afmt(self.called == times,
+      assertf(self.called == times,
         "Expected function %s to be called %i times, but it was called %i times.",
         self.name, times, self.called)
     else
-      afmt(self.called > 0,
+      assertf(self.called > 0,
         "Expected function %s to be called at least once, but it was never called.",
         self.name)
     end
   end,
   ["AssertNotCalled"] = function(self)
-    afmt(self.called == 0,
+    assertf(self.called == 0,
       "Expected function %s not to be called, but it was called %i times.",
       self.name, self.called)
   end,
   ["AssertCalledWith"] = function(self, ...)
-    local vals = { ... }
-    if #vals == 0 then
-      efmt("AssertCalledWith must supply at least one expected arg")
+    local expectedArgs = { ... }
+    if #expectedArgs == 0 then
+      errorf("AssertCalledWith must supply at least one expected arg")
     end
-    for _, args in pairs(self.calledArgs) do
+    for _, calledArgs in pairs(self.calledArgs) do
       local found = true
-      for i, val in pairs(vals) do
-        if args[i] ~= val then
+      for i, val in pairs(expectedArgs) do
+        if calledArgs[i] ~= val then
           found = false
           break
         end
@@ -44,8 +45,8 @@ local mockMethods = {
         return
       end
     end
-    efmt("Expected function %s to be called with args: %s",
-      self.name, table.concat(vals, ","))
+    errorf("Expected function %s to be called with args: %s",
+      self.name, table.concat(expectedArgs, ","))
   end,
   ["AssertCalledWhen"] = function(self, condition)
     for _, args in pairs(self.calledArgs) do
@@ -55,105 +56,110 @@ local mockMethods = {
     end
     error("Expected function to be called with a condition, but it was not")
   end,
-  ["Reset"] = function(self)
-    self.called = 0
-    self.calledArgs = {}
-  end,
-  ["SetHandler"] = function(self, fn)
-    self.handler = fn
+  -- Setup methods
+  ["SetFunction"] = function(self, fn)
+    self.fn = fn
   end,
   ["SetReturns"] = function(self, ...)
-    self.defaultReturns = { ... }
+    self.returns = { ... }
   end,
   ["SetReturnsWhen"] = function(self, condition, ...)
     table.insert(self.conditionalReturns, {
-      value = { ... },
-      condition = condition
+      condition = condition,
+      returns = { ... },
     })
   end,
+  ["Reset"] = function(self)
+    self:ClearCalls()
+    self:ClearReturns()
+  end,
+  ["ClearCalls"] = function(self)
+    self.called = 0
+    self.calledArgs = {}
+  end,
   ["ClearReturns"] = function(self)
-    self.defaultReturns = nil
+    self.returns = nil
     self.conditionalReturns = {}
   end
 }
 
-function mock:Returns(...)
-  return {
-    returns = {
-      value = { ... }
-    }
-  }
-end
+local function buildMockFunction(fn, name)
+  local context = functionMocks[fn]
+  if context then return context end -- function has already been mockMethods
 
-function mock:ReturnsWhen(condition, ...)
-  return {
-    returns = {
-      value = { ... },
-      condition = condition
-    }
+  context = {
+    name = name or "Anonymous function", -- For logging and assertions
+    fn = nil, -- The original function that was mocked, assigned below
+    called = 0, -- Number of times the function was called
+    calledArgs = {}, -- An array of the arrays of args the function was called with
+    conditionalReturns = {}, -- Return values to return when specified conditions are met
+    returns = nil, -- Overridden return values when no conditions are met
   }
-end
 
-function mock:Handler(fn)
-  return {
-    handler = fn
-  }
-end
-
-local function createMockWrapper(m)
-  return function(...)
-    m.called = m.called + 1
-    table.insert(m.calledArgs, { ... })
-    for _, ret in pairs(m.conditionalReturns) do
-      if ret.condition(...) then
-        return table.unpack(ret.value)
+  context.fn = function(...)
+    context.called = context.called + 1
+    context.calledArgs[#context.calledArgs+1] = { ... }
+    for _, cr in ipairs(context.conditionalReturns) do
+      if cr.condition(...) then
+        return table.unpack(cr.returns)
       end
     end
-    if m.handler then
-      return m.handler(...)
-    elseif m.defaultReturns then
-      return table.unpack(m.defaultReturns)
+    if context.returns ~= nil then
+      return table.unpack(context.returns)
     end
+    if context.name == "CreateFrame" then
+      print(context.name, ":", table.unpack(fn(...)))
+    end
+    return fn(...)
   end
+
+  functionMocks[context.fn] = context
+  return context.fn
 end
 
-function mock:NewMock(...)
-  local m = {
-    name = "",
-    called = 0,
-    calledArgs = {},
-    handler = nil,
-    defaultReturns = nil,
-    conditionalReturns = {}
-  }
-
-  for name, fn in pairs(mockMethods) do
-    m[name] = fn
-  end
-
-  for _, arg in pairs({ ... }) do
-    if type(arg) == "string" then
-      m.name = arg
-    elseif arg.returns then
-      if not arg.returns.condition then
-        m:SetReturns(table.unpack(arg.returns.value))
+local function buildMockObject(object, circ)
+  circ = circ or {}
+  local copy = {}
+  circ[object] = copy -- Ensure the provided table won't get copied twice
+  for k, v in pairs(object) do
+    if type(v) == "table" then
+      if circ[v] then
+        -- Use the same copy for each instance of the same inner table
+        copy[k] = circ[v]
       else
-        m:SetReturnsWhen(arg.returns.condition, table.unpack(arg.returns.value))
+        copy[k] = buildMockObject(v, circ)
       end
-    elseif arg.handler then
-      m:SetHandler(arg.handler)
+    elseif type(v) == "function" then
+      -- Functions are wrapped with a context that tracks how they were called
+      copy[k] = buildMockFunction(v, k)
+    else
+      -- All other value types (strings, numbers, etc.) are left as-is
+      copy[k] = v
     end
   end
-
-  local fn = createMockWrapper(m)
-  functionMocks[fn] = m
-  return fn, m
+  return copy
 end
 
-function mock:GetMock(fn)
-  assert(type(fn) == "function", "Expected a function arg for GetMock")
-  assert(functionMocks[fn], "No mock registered for function")
-  return functionMocks[fn]
+----------------------
+-- Public functions --
+----------------------
+
+function mock:NewMock(object)
+  assert(type(object) == "table", "Mocked object must be a table, but was "..type(object))
+  return buildMockObject(object)
+end
+
+function mock:GetFunctionMock(fn)
+  assert(type(fn) == "function", "Expected a function arg for GetFunctionMock, but got "..type(fn))
+  local functionMock = functionMocks[fn]
+  assert(functionMock, "No mock registered for function")
+
+  -- Methods aren't assigned until GetFunctionMock is called; this is a performance optimization
+  for name, method in pairs(mockMethods) do
+    functionMock[name] = method
+  end
+
+  return functionMock
 end
 
 return mock

@@ -1,5 +1,4 @@
 local _, addon = ...
-local QuestStatus = addon.QuestStatus
 local GetUnitName = addon.G.GetUnitName
 
 --[[
@@ -92,7 +91,7 @@ local considerDuplicate = {
   [QuestCatalogStatus.Accepted] = true,
 }
 
-addon:onload(function()
+addon:OnBackendStart(function()
   addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, catalogItem)
     -- Check the player's Catalog to see if they're already aware of this quest
     local existingCatalogItem = addon.QuestCatalog:FindByID(catalogItem.questId)

@@ -281,6 +281,39 @@ describe("Tables", function()
     end)
   end)
 
+  describe("ConcatArray", function()
+    it("cannot concat nil tables", function()
+      -- ARRANGE
+      local t1 = {}
+      local t2 = nil
+
+      -- ASSERT
+      assert.has_error(function() addon:ConcatArray(t1, t2) end)
+    end)
+    it("can concat two array tables", function()
+      -- ARRANGE
+      local t1 = {
+        "Midna",
+        "Beedle",
+        "Captain",
+      }
+      local t2 = { "Scout", "Tank", }
+
+      -- ACT
+      local actual = addon:ConcatArray(t1, t2)
+
+      -- ASSERT
+      local expected = {
+        "Midna",
+        "Beedle",
+        "Captain",
+        "Scout",
+        "Tank",
+      }
+      assert.same(expected, actual)
+    end)
+  end)
+
   -- Even though compression/serialization are mocked out, it's worth
   -- testing to ensure the addon's logic is sound
   describe("Compression", function()
@@ -310,6 +343,14 @@ describe("Tables", function()
     end)
     it("can decompress empty string to empty table", function()
       assert.same({}, addon:DecompressTable(""))
+    end)
+  end)
+
+  describe("GetTableHash", function()
+    it("can generate table hash", function()
+      -- This method's dependencies are all mocked out so this doesn't test much
+      -- other than that it doesn't throw any obvious errors
+      assert.has_no_error(function() addon:GetTableHash({}) end)
     end)
   end)
 end)

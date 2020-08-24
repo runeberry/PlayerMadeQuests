@@ -1,26 +1,59 @@
 local _, addon = ...
 local strsplit = addon.G.strsplit
 
-local colors = {
-  red = "ffff0000",
-  green = "ff1eff00",
-  blue = "ff0070dd",
-  grey = "ff9d9d9d",
-  white = "ffffffff",
-  black = "ff000000",
-  purple = "ffa335ee",
-  orange = "ffff8000",
-  yellow = "ffffff00"
-}
+addon.Strings = {}
 
--- Use the mapped color if available, otherwise assume the string is an 8-char hex string
--- If no color is specified, default to white
-function addon:GetEscapeColor(color)
-  return "|c"..(colors[color] or color or colors.white)
-end
+local charsets = {
+  --- For use in-game
+  WOW = {
+    ESCAPE_START = "|c",
+    ESCAPE_END = "|r",
+    colors = {
+      red = "ffff0000",
+      green = "ff1eff00",
+      blue = "ff0070dd",
+      grey = "ff9d9d9d",
+      white = "ffffffff",
+      black = "ff000000",
+      purple = "ffa335ee",
+      orange = "ffff8000",
+      yellow = "ffffff00",
+    }
+  },
+  -- For use in terminals outside of game
+  ANSI = {
+    ESCAPE_START = "\27[",
+    ESCAPE_END = "\27[0m",
+    colors = {
+      red = "0;31m",
+      green = "0;32m",
+      blue = "0;34m",
+      grey = "1;30m",
+      white = "0;37m",
+      black = "0;30m",
+      purple = "0;35m",
+      orange = "0;33m",
+      yellow = "1;33m",
+    }
+  },
+  -- Disables all special coloring
+  NONE = {
+    ESCAPE_START = "",
+    ESCAPE_END = "",
+    colors = {}
+  }
+}
+local charset = charsets.NONE
 
 function addon:Colorize(color, str)
-  return addon:GetEscapeColor(color)..str.."|r"
+  str = str or ""
+  local c = charset.colors[color] or charset.colors.white or ""
+  return charset.ESCAPE_START..c..str..charset.ESCAPE_END
+end
+
+function addon:SetCharset(name)
+  assert(charsets[name], name.." is not a valid charset")
+  charset = charsets[name]
 end
 
 function addon:Pluralize(num, singular, plural)
@@ -141,7 +174,7 @@ local three_ptn = "^"..num_ptn..","..num_ptn..","..num_ptn.."$"
 -- Splits a string of format "0.0,0.0,0.0" into coordinates x, y, and (optionally) radius
 function addon:ParseCoords(str)
   assert(str and type(str) == "string", "Failed to ParseCoords: argument type "..type(str).." is not a string")
-  assert(str:match(two_ptn) or str:match(three_ptn), "Failed to ParseCoords: coordinate string must be in format: \"#,#,#\"")
+  assert(str:match(two_ptn) or str:match(three_ptn), "Failed to ParseCoords: coordinate string \""..str.."\" must be in format \"#,#,#\"")
 
   local x, y, radius = strsplit(",", str)
   x = tonumber(x)
@@ -160,3 +193,14 @@ function addon:PrettyCoords(x, y, radius)
   end
   return coords
 end
+
+-- Long text to use for display testing
+addon.LOREM_IPSUM = [[Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Elementum curabitur vitae nunc sed. Purus ut faucibus pulvinar elementum integer enim neque volutpat. Venenatis tellus in metus vulputate. Porta non pulvinar neque laoreet suspendisse interdum. Nulla aliquet porttitor lacus luctus accumsan tortor posuere. Consequat nisl vel pretium lectus quam id leo. Egestas purus viverra accumsan in nisl nisi scelerisque eu ultrices. Odio aenean sed adipiscing diam. Viverra orci sagittis eu volutpat odio facilisis mauris.
+
+In vitae turpis massa sed elementum tempus egestas sed. Gravida dictum fusce ut placerat. Sit amet mauris commodo quis. Mi proin sed libero enim sed faucibus turpis in eu. Ac turpis egestas integer eget aliquet. Suspendisse interdum consectetur libero id faucibus nisl tincidunt eget nullam. Sollicitudin aliquam ultrices sagittis orci a. Libero enim sed faucibus turpis in eu mi bibendum neque. Pharetra sit amet aliquam id diam maecenas ultricies mi eget. Ut diam quam nulla porttitor massa id. Ipsum consequat nisl vel pretium lectus quam id. Metus vulputate eu scelerisque felis imperdiet proin fermentum leo vel. Volutpat diam ut venenatis tellus. Dui ut ornare lectus sit. Adipiscing at in tellus integer feugiat scelerisque.
+
+Ipsum consequat nisl vel pretium lectus quam id leo in. Porta non pulvinar neque laoreet suspendisse interdum consectetur libero. Congue nisi vitae suscipit tellus mauris. Sit amet cursus sit amet dictum. Neque aliquam vestibulum morbi blandit cursus risus at ultrices. Lectus arcu bibendum at varius vel pharetra vel turpis nunc. Velit aliquet sagittis id consectetur purus ut. Elementum sagittis vitae et leo duis ut diam. Dictumst quisque sagittis purus sit amet volutpat consequat mauris. Ut tellus elementum sagittis vitae et. At tellus at urna condimentum mattis pellentesque. Ultrices sagittis orci a scelerisque. Proin fermentum leo vel orci porta non. Sit amet nisl suscipit adipiscing. Aliquam etiam erat velit scelerisque in dictum. Elit ullamcorper dignissim cras tincidunt lobortis feugiat. Urna cursus eget nunc scelerisque viverra mauris in aliquam sem.
+
+Congue eu consequat ac felis donec et. Nec nam aliquam sem et tortor. Cras semper auctor neque vitae tempus quam pellentesque nec nam. Fermentum dui faucibus in ornare quam. Nisi scelerisque eu ultrices vitae. Etiam tempor orci eu lobortis elementum nibh tellus molestie. Vitae sapien pellentesque habitant morbi tristique senectus et netus. Non odio euismod lacinia at quis. Venenatis cras sed felis eget. Tincidunt id aliquet risus feugiat in ante metus dictum. Aliquam sem et tortor consequat id porta. Urna id volutpat lacus laoreet non curabitur. In hendrerit gravida rutrum quisque non tellus orci. Est velit egestas dui id ornare arcu odio ut sem. Morbi tristique senectus et netus et malesuada. Integer malesuada nunc vel risus commodo viverra maecenas accumsan lacus. Diam quam nulla porttitor massa id neque aliquam vestibulum morbi. Nisi est sit amet facilisis. Metus aliquam eleifend mi in nulla posuere sollicitudin aliquam.
+
+In nisl nisi scelerisque eu ultrices vitae. Donec enim diam vulputate ut pharetra. Pulvinar elementum integer enim neque volutpat. Nunc pulvinar sapien et ligula ullamcorper malesuada proin libero. In hac habitasse platea dictumst quisque sagittis purus sit. Donec ac odio tempor orci dapibus ultrices in. Pulvinar elementum integer enim neque volutpat ac tincidunt. Felis eget nunc lobortis mattis aliquam faucibus. Lectus vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt. Dui nunc mattis enim ut tellus. Amet volutpat consequat mauris nunc congue nisi vitae suscipit. Leo integer malesuada nunc vel.]]
