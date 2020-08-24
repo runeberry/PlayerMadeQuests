@@ -6,14 +6,60 @@ addon.Logger = mock:NewMock(addon.Logger)
 local logSpy = mock:GetFunctionMock(addon.Logger.Log)
 
 describe("Identifiers", function()
-  it("can create different sequential ids", function()
-    local id1, id2 = addon:CreateID(), addon:CreateID()
-    assert.not_equals(id1, id2)
+  describe("CreateID", function()
+    it("can create different sequential ids", function()
+      local id1, id2 = addon:CreateID(), addon:CreateID()
+      assert.not_equals(id1, id2)
+    end)
+    it("can create IDs with format strings", function()
+      local format = "test-id-%i"
+      local id = addon:CreateID(format)
+      assert.not_equals(id, format)
+    end)
   end)
-  it("can create IDs with format strings", function()
-    local format = "test-id-%i"
-    local id = addon:CreateID(format)
-    assert.not_equals(id, format)
+  describe("ParseGUID", function()
+    it("can parse player GUIDs", function()
+      local playerGUID = "Player-970-0002FD64"
+      local expectedType = "Player"
+      local expectedServerID = "970"
+      local expectedUID = "0002FD64"
+      local actual = addon:ParseGUID(playerGUID)
+      assert.equals(expectedType, actual.type)
+      assert.equals(expectedServerID, actual.serverID)
+      assert.equals(expectedUID, actual.UID)
+    end)
+    it("can parse item GUIDs", function()
+      local itemGUID = "Item-970-0-400000076620BFF4"
+      local expectedType = "Item"
+      local expectedServerID = "970"
+      local expectedUID = "400000076620BFF4"
+      local actual = addon:ParseGUID(itemGUID)
+      assert.equals(expectedType, actual.type)
+      assert.equals(expectedServerID, actual.serverID)
+      assert.equals(expectedUID, actual.UID)
+    end)
+    it("can parse creature, pet, object, or vehicle GUIDs", function()
+      local cpovGUID = "Creature-0-970-0-11-31146-000136DF91"
+      local expectedType = "Creature"
+      local expectedServerID = "970"
+      local expectedInstanceID = "0"
+      local expectedZoneUID = "11"
+      local expectedID = "31146"
+      local expectedSpawnUID = "000136DF91"
+      local actual = addon:ParseGUID(cpovGUID)
+      assert.equals(expectedType, actual.type)
+      assert.equals(expectedServerID, actual.serverID)
+      assert.equals(expectedInstanceID, actual.instanceID)
+      assert.equals(expectedZoneUID, actual.zoneUID)
+      assert.equals(expectedID, actual.ID)
+      assert.equals(expectedSpawnUID, actual.spawnUID)
+    end)
+    it("throws an error for an unrecognized format", function()
+      local badGUID = "hello"
+      assert.has_error(function()
+        addon:ParseGUID(badGUID)
+      end)
+    end)
   end)
 end)
 
@@ -51,5 +97,28 @@ describe("Sounds", function()
     addon:PlaySound("literally whatever")
     logSpy:AssertCalled()
     playSoundMock:AssertNotCalled()
+  end)
+end)
+
+describe("Types", function()
+  describe("TryConvertString", function()
+      it("returns a number", function()
+      local strNum = "1"
+      local num = 1
+      local actual = addon:TryConvertString(strNum)
+      assert.equals(num, actual)
+      end)
+      it("returns a boolean", function()
+      local strBool = "true"
+      local bool = true
+      local actual = addon:TryConvertString(strBool)
+      assert.equals(bool, actual)
+      end)
+      it("returns a string", function()
+      local strStr = "hello"
+      local str = "hello"
+      local actual = addon:TryConvertString(strStr)
+      assert.equals(str, actual)
+      end)
   end)
 end)
