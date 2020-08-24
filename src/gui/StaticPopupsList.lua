@@ -240,6 +240,8 @@ addon.StaticPopupsList = {
     noText = "Cancel",
     yesHandler = function(location)
      addon.Locations:DeleteAll()
+    end,
+  },
   ["EditConfigValue"] = {
     message = function(configItem)
       return "Edit value for:\n"..configItem.name
