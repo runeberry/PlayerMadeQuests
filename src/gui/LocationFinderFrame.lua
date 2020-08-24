@@ -95,7 +95,7 @@ local options = {
     {
       text = "Delete All",
       anchor = "TOP",
-      enabled = "Row",
+      enabled = "Always",
       handler = function()
         addon.StaticPopups:Show("ResetLocations")
       end,
