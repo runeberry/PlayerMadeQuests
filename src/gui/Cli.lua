@@ -49,13 +49,7 @@ handlers = {
     addon.QuestLog:SaveWithStatus(quest, addon.QuestStatus.Active)
     addon:PlaySound("QuestAccepted")
   end,
-  ["show"] = function()
-    addon.QuestLogFrame:ToggleShown(true)
-  end,
-  ["hide"] = function()
-    addon.QuestLogFrame:ToggleShown(false)
-  end,
-  ["toggle"] = function()
+  ["log"] = function()
     addon.QuestLogFrame:ToggleShown()
   end,
   ["dump"] = function(varname)
