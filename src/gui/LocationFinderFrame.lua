@@ -18,8 +18,8 @@ local frameOptions = {
     p2 = "RIGHT",
     x = -100,
     y = 0,
-    w = 250,
-    h = 300,
+    w = 400,
+    h = 250,
     shown = true
   }
 }
