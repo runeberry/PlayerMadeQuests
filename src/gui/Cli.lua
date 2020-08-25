@@ -35,19 +35,10 @@ local function dumpToConsole(name, val)
 end
 
 handlers = {
-  ["reset"] = function()
+  ["reset-quests"] = function()
     addon.QuestLog:DeleteAll()
     addon.QuestArchive:DeleteAll()
     addon:PlaySound("QuestAbandoned")
-  end,
-  ["add"] = function(demoId)
-    local ok, quest = addon.QuestDemos:CompileDemo(demoId)
-    if not ok then
-      addon.Logger:Error("Failed to add demo quest: %s", quest)
-      return
-    end
-    addon.QuestLog:SaveWithStatus(quest, addon.QuestStatus.Active)
-    addon:PlaySound("QuestAccepted")
   end,
   ["log"] = function()
     addon.QuestLogFrame:ToggleShown()
