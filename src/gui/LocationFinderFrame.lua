@@ -20,7 +20,7 @@ local frameOptions = {
     y = 0,
     w = 400,
     h = 250,
-    shown = true
+    shown = false
   }
 }
 
