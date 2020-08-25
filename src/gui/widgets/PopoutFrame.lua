@@ -57,6 +57,11 @@ local methods = {
 
     addon.UILogger:Trace("Set %s state: %s %s (%.2f, %.2f) %ix%i (%s)", self:GetName(), pos.p1, pos.p2, pos.x, pos.y, pos.w, pos.h, pos.shown)
   end,
+  ["ResetWindowState"] = function(self)
+    if self._options.position then
+      self:SetWindowState(self._options.position)
+    end
+  end,
   ["SaveWindowState"] = function(self)
     local p1, _, p2, x, y = self:GetPoint()
     local pos = self._options.position
