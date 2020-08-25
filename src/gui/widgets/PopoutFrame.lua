@@ -78,28 +78,22 @@ local methods = {
     addon.UILogger:Trace("Saved window position: %s %s (%.2f, %.2f) %ix%i (%s)", p1, p2, x, y, w, h, shown)
   end,
   ["LoadWindowState"] = function(self)
-    local pos
     local frameData = addon.Config:GetValue("FrameData")
-    if frameData and frameData[self._name] then
-      local p1, p2, x, y, w, h, shown = strsplit(",", frameData[self._name])
-      pos = {
-        p1 = p1,
-        p2 = p2,
-        x = x,
-        y = y,
-        w = w,
-        h = h,
-      }
-      if self._options.saveOpenState then
-        -- Only used the saved 'shown' state if explicitly declared
-        pos.shown = shown or false
-      elseif self._options.position then
-        -- Otherwise fall back on the frame's default shown state
-        pos.shown = self._options.position.shown
-      else
-        -- If no default shown state is available, then hide the frame
-        pos.shown = false
-      end
+    if not frameData or not frameData[self._name] then return end
+
+    local p1, p2, x, y, w, h, shown = strsplit(",", frameData[self._name])
+    local pos = {
+      p1 = p1,
+      p2 = p2,
+      x = x,
+      y = y,
+      w = w,
+      h = h,
+    }
+
+    if self._options.saveOpenState then
+      -- Only used the saved 'shown' state if explicitly declared
+      pos.shown = addon:ConvertValue(shown, "boolean") or false
     elseif self._options.position then
       -- Otherwise fall back on the frame's default shown state
       pos.shown = self._options.position.shown
@@ -143,6 +137,7 @@ function widget:Create(frameName, options)
     end)
     moveFrame:SetScript("OnDragStop", function(self)
       frame:StopMovingOrSizing()
+      frame:SetUserPlaced(false) -- Do not save to the Blizzard default layout cache
       frame:SaveWindowState()
     end)
   end
@@ -162,6 +157,10 @@ function widget:Create(frameName, options)
   if options.escapable then
     -- Make closable with ESC
     table.insert(UISpecialFrames, frameName)
+  end
+
+  if options.position then
+    frame:SetWindowState(options.position)
   end
 
   addon:OnGuiReady(function()
