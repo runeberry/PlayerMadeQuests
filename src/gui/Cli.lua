@@ -35,27 +35,12 @@ local function dumpToConsole(name, val)
 end
 
 handlers = {
-  ["reset"] = function()
+  ["reset-quests"] = function()
     addon.QuestLog:DeleteAll()
     addon.QuestArchive:DeleteAll()
     addon:PlaySound("QuestAbandoned")
   end,
-  ["add"] = function(demoId)
-    local ok, quest = addon.QuestDemos:CompileDemo(demoId)
-    if not ok then
-      addon.Logger:Error("Failed to add demo quest: %s", quest)
-      return
-    end
-    addon.QuestLog:SaveWithStatus(quest, addon.QuestStatus.Active)
-    addon:PlaySound("QuestAccepted")
-  end,
-  ["show"] = function()
-    addon.QuestLogFrame:ToggleShown(true)
-  end,
-  ["hide"] = function()
-    addon.QuestLogFrame:ToggleShown(false)
-  end,
-  ["toggle"] = function()
+  ["log"] = function()
     addon.QuestLogFrame:ToggleShown()
   end,
   ["dump"] = function(varname)
@@ -82,6 +67,9 @@ handlers = {
   ["debug-quests"] = function()
     addon.MainMenu:Show()
     addon.MainMenu:ShowMenuScreen("DebugQuestListMenu")
+  end,
+  ["location"] = function()
+    addon.LocationFinderFrame:ToggleShown()
   end,
   ["reset-config"] = function()
     addon.StaticPopups:Show("ResetAllConfig")

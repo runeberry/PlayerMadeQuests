@@ -10,4 +10,5 @@
   <Script file="data/QuestDemos.lua"/>
   <Script file="data/QuestDrafts.lua"/>
   <Script file="data/QuestLog.lua"/>
+  <Script file="data/Locations.lua"/>
 </Ui>

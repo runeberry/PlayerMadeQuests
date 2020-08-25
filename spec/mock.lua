@@ -107,9 +107,6 @@ local function buildMockFunction(fn, name)
     if context.returns ~= nil then
       return table.unpack(context.returns)
     end
-    if context.name == "CreateFrame" then
-      print(context.name, ":", table.unpack(fn(...)))
-    end
     return fn(...)
   end
 
