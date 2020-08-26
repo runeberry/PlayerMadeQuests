@@ -132,7 +132,7 @@ local function assignShorthandArgs(args, objInfo)
   end
 
   local skipped = 0
-  -- print("----------------")
+  logger:Trace("----------------")
   for i, paramName in pairs(shorthand) do
     local paramInfo = objInfo.params[paramName]
     if not paramInfo then
@@ -141,12 +141,12 @@ local function assignShorthandArgs(args, objInfo)
     end
     local argValue = args[i - skipped]
     if compiler:GetValidatedParameterValue(paramName, { [paramName] = argValue }, objInfo) then
-      -- print("assignment", paramName, argValue)
+        logger:Trace("assignment %s %s", paramName, tostring(argValue))
       args[paramName] = argValue
       args[i - skipped] = nil
     else
       -- Loop to the next shorthand param, but try with this arg value again
-      -- print("skipping", paramName, argValue)
+        logger:Trace("skipping %s %s", paramName, tostring(argValue))
       skipped = skipped + 1
     end
   end
@@ -182,7 +182,7 @@ function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info,
   local val = args[token]
   if not info.params then
     -- Something didn't initialize properly, this will fail
-    addon.Logger:Table(info)
+    logger:Table(info)
   end
   local paramInfo = info.params[token]
   if not paramInfo then
@@ -197,13 +197,13 @@ function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info,
 
   if expectedType == actualType then
     -- Single type is allowed, and they already match
-    -- print("    single-type match", paramInfo.name, val, expectedType)
+    logger:Trace("    single-type match %s %s %s", paramInfo.name, tostring(val), expectedType)
     return val
   elseif type(expectedType) == "table" then
     -- Multiple types are allowed, check for any matches
     for _, t in ipairs(expectedType) do
       if t == actualType then
-        -- print("    multi-type match", paramInfo.name, val, t)
+        logger:Trace("    multi-type match %s %s %s", paramInfo.name, tostring(val), t)
         return val
       end
     end
@@ -213,7 +213,7 @@ function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info,
     for k, _ in pairs(val) do
       local v = compiler:GetValidatedParameterValue(k, val, paramInfo, options)
       if not v then
-        -- print("    multi-value failure", paramInfo.name, v, actualType, expectedType)
+        logger:Debug("    multi-value failure %s %s %s %s", paramInfo.name, tostring(v), actualType, expectedType)
         return
       end
       val2[k] = v
@@ -226,7 +226,7 @@ function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info,
         -- Multiple types are allowed, try converting to all of them
         local ok, converted = pcall(addon.ConvertValue, addon, val, t)
         if ok then
-          -- print("    multi-type conversion", paramInfo.name, converted, t)
+          logger:Trace("    multi-type conversion %s %s %s", paramInfo.name, tostring(converted), t)
           return converted
         end
       end
@@ -234,12 +234,12 @@ function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info,
       -- Single type is allowed, try to convert to that type
       local ok, converted = pcall(addon.ConvertValue, addon, val, expectedType)
       if ok then
-        -- print("    single-type conversion", paramInfo.name, converted, expectedType)
+        logger:Trace("    single-type conversion %s %s %s", paramInfo.name, tostring(converted), expectedType)
         return converted
       end
     end
   end
-  -- print("    type validation failure", paramInfo.name, val, actualType, expectedType)
+  logger:Debug("    type validation failure %s %s %s %s", paramInfo.name, tostring(val), actualType, expectedType)
 end
 
 local function parseFromArgs(param, args)
@@ -366,7 +366,7 @@ function addon.QuestScriptCompiler:Compile(script, params)
 
   if script ~= nil and script ~= "" then
     local yaml = ParseYaml(script)
-    -- addon.Logger:Table(yaml)
+    -- logger:Table(yaml)
     yamlToQuest(quest, yaml)
   end
 
@@ -375,7 +375,7 @@ function addon.QuestScriptCompiler:Compile(script, params)
   addon.QuestEngine:Validate(quest)
 
   logger:Trace("Quest compiled: %s", quest.questId)
-  -- addon.Logger:Table(quest)
+  -- logger:Table(quest)
   return quest
 end
 
