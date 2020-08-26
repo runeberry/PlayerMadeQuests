@@ -3,16 +3,12 @@ local tokens = addon.QuestScriptTokens
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
 local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
-local objectiveLogger = addon.Logger:NewLogger("Objectives", addon.LogLevel.info)
-
+local objectiveLogger
 addon:OnConfigLoaded(function()
-  objectiveLogger.pass = addon:Colorize("green", "[P] ")
-  objectiveLogger.fail = addon:Colorize("red", "[F] ")
+  objectiveLogger = addon.QuestEngineLogger
 end)
 
-addon.QuestEngine = {
-  ObjectiveLogger = objectiveLogger
-}
+addon.QuestEngine = {}
 
 local objectivesByName = {}
 
