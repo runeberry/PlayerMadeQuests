@@ -19,7 +19,7 @@ function addon:catch(fn, ...)
   if not(ok) then
     -- Uncomment this as an escape hatch to print errors if logging breaks
     -- print("Lua script error") if result then print(result) end
-    addon.Logger:Error("Lua script error: %s", result)
+    addon.Logger:Fatal("Lua script error: %s", result)
   end
   return ok, result, r2, r3, r4
 end
