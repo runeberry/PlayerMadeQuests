@@ -16,6 +16,10 @@ function menu:Create(frame)
 
   local commandsList = {
     {
+      command = "/pmq emote",
+      description = "Toggle the Emote Menu frame."
+    },
+    {
       command = "/pmq log",
       description = "Toggle the Quest Log frame."
     },
