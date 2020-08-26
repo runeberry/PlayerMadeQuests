@@ -1,5 +1,5 @@
 local _, addon = ...
-local logger = addon.QuestEngine.ObjectiveLogger
+local logger = addon.QuestEngineLogger
 local tokens = addon.QuestScriptTokens
 
 addon:OnQuestEngineReady(function()
