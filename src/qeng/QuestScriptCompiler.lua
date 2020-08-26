@@ -134,20 +134,32 @@ local function assignShorthandArgs(args, objInfo)
   local skipped = 0
   logger:Trace("----------------")
   for i, paramName in pairs(shorthand) do
-    local paramInfo = objInfo.params[paramName]
-    if not paramInfo then
-      -- If this happens, then a bad token was assigned in QuestScript configuration
-      error("Unrecognized shorthand parameter: "..paramName)
-    end
-    local argValue = args[i - skipped]
-    if compiler:GetValidatedParameterValue(paramName, { [paramName] = argValue }, objInfo) then
+    if objInfo.params[paramName] then
+      -- todo: remove this block, backwards compat for GOAL until that becomes a Condition or something
+      local argValue = args[i - skipped]
+      if compiler:GetValidatedParameterValue(paramName, { [paramName] = argValue }, objInfo) then
         logger:Trace("assignment %s %s", paramName, tostring(argValue))
-      args[paramName] = argValue
-      args[i - skipped] = nil
-    else
-      -- Loop to the next shorthand param, but try with this arg value again
+        args[paramName] = argValue
+        args[i - skipped] = nil
+      else
+        -- Loop to the next shorthand param, but try with this arg value again
         logger:Trace("skipping %s %s", paramName, tostring(argValue))
-      skipped = skipped + 1
+        skipped = skipped + 1
+      end
+    elseif objInfo.conditions[paramName] then
+      local argValue = args[i - skipped]
+      if compiler:GetValidatedConditionValue(paramName, { [paramName] = argValue }, objInfo) then
+        logger:Trace("assignment %s %s", paramName, tostring(argValue))
+        args[paramName] = argValue
+        args[i - skipped] = nil
+      else
+        -- Loop to the next shorthand param, but try with this arg value again
+        logger:Trace("skipping %s %s", paramName, tostring(argValue))
+        skipped = skipped + 1
+      end
+    else
+      logger:Table(objInfo.conditions)
+      error("Unrecognized shorthand parameter or condition: "..paramName)
     end
   end
 end
@@ -242,32 +254,101 @@ function addon.QuestScriptCompiler:GetValidatedParameterValue(token, args, info,
   logger:Debug("    type validation failure %s %s %s %s", paramInfo.name, tostring(val), actualType, expectedType)
 end
 
-local function parseFromArgs(param, args)
-  local val = args[param.name] or args[param.alias]
+function addon.QuestScriptCompiler:GetValidatedConditionValue(token, args, info, options)
+  local val = args[token]
+  if not info.conditions then
+    -- Something didn't initialize properly, this will fail
+    logger:Table(info)
+  end
+  local condInfo = info.conditions[token]
+  if not condInfo then
+    if options and options.optional then
+      return nil
+    end
+    error(token.." is not a recognized condition for "..info.name)
+  end
+
+  local expectedType = condInfo.type
+  local actualType = type(val)
+
+  if not expectedType then
+    -- Any type is allowed, perform no validation
+    return val
+  end
+
+  if expectedType == actualType then
+    -- Single type is allowed, and they already match
+    logger:Trace("    single-type match", condInfo.name, tostring(val), expectedType)
+    return val
+  elseif type(expectedType) == "table" then
+    -- Multiple types are allowed, check for any matches
+    for _, t in ipairs(expectedType) do
+      if t == actualType then
+        logger:Trace("    multi-type match", condInfo.name, tostring(val), t)
+        return val
+      end
+    end
+  elseif actualType == "table" and condInfo.multiple then
+    -- Multiple values are supplied, each value must match an expected type
+    local val2 = {}
+    for k, _ in pairs(val) do
+      local v = compiler:GetValidatedConditionValue(k, val, condInfo, options)
+      if not v then
+        logger:Debug("    multi-value failure", condInfo.name, tostring(v), actualType, expectedType)
+        return
+      end
+      val2[k] = v
+    end
+    return val2
+  elseif options and options.convert then
+    -- All else fails, try to convert the value to an expected type
+    if type(expectedType) == "table" then
+      for _, t in ipairs(expectedType) do
+        -- Multiple types are allowed, try converting to all of them
+        local ok, converted = pcall(addon.ConvertValue, addon, val, t)
+        if ok then
+          logger:Trace("    multi-type conversion", condInfo.name, tostring(converted), t)
+          return converted
+        end
+      end
+    else
+      -- Single type is allowed, try to convert to that type
+      local ok, converted = pcall(addon.ConvertValue, addon, val, expectedType)
+      if ok then
+        logger:Trace("    single-type conversion", condInfo.name, tostring(converted), expectedType)
+        return converted
+      end
+    end
+  end
+  logger:Debug("    type validation failure", condInfo.name, tostring(val), actualType, expectedType)
+end
+
+local function parseFromArgs(cond, args)
+  local val = args[cond.name] or args[cond.alias]
   if not val then
-    if param.required then
-      error(param.name.." is required")
+    if cond.required then
+      error(cond.name.." is required")
     end
     return
   end
 
-  if param.scripts and param.scripts[tokens.METHOD_PARSE] then
-    val = param.scripts[tokens.METHOD_PARSE](val)
+  if cond.Parse then
+    val = cond:Parse(val)
   end
 
   return val
 end
 
-function addon.QuestScriptCompiler:ParseConditions(params, args)
+function addon.QuestScriptCompiler:ParseConditions(conds, args)
   local conditions = {}
 
   -- _ will be the alias here, if the param had one
-  for _, param in pairs(params) do
+  for _, cond in pairs(conds) do
     -- Note: values assigned to an alias in script will be assigned to the primary
     --       condition name in the compiled quest
     -- For example, values assigned to the "target" alias for "killtarget" will be
     -- assigned to obj.conditions["killtarget"]
-    conditions[param.name] = parseFromArgs(param, args)
+    conditions[cond.name] = parseFromArgs(cond, args)
   end
 
   return conditions
@@ -339,7 +420,7 @@ function addon.QuestScriptCompiler:ParseObjective(obj)
     objective.goal = 1
   end
 
-  objective.conditions = compiler:ParseConditions(objInfo.params, args)
+  objective.conditions = compiler:ParseConditions(objInfo.conditions, args)
 
   return objective
 end

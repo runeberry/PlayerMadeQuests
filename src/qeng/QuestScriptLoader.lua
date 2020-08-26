@@ -4,6 +4,7 @@ local logger = addon.Logger:NewLogger("Loader")
 addon.QuestScriptLoader = {}
 
 local scripts = {}
+local conditions = {}
 local cleanNamePattern = "^[%l%d-]+$"
 
 local function validateAndRegister(set, name, param)
@@ -98,8 +99,41 @@ local function setup(set, name, param)
     for pname, p in pairs(params) do
       -- Recursively set up parameters exactly like their parent items
       setup(newset, pname, p)
-        end
+    end
     param.params = newset
+  end
+
+  -- For use with objectives only
+  local conds = param.conditions
+  if conds then
+    local condsByName = {}
+    for i, cond in ipairs(conds) do
+      -- Assign a copy of the registered condition to the template objective
+      local tcond, topts
+      if type(cond) == "string" then
+        assert(conditions[cond], "No condition registered with name: "..cond)
+        tcond = conditions[cond]
+        topts = { required = false }
+      elseif type(cond) == "table" then
+        assert(type(cond.name) == "string", "Name missing or invalid on condition #"..tostring(i).." for objective "..name)
+        assert(conditions[cond.name], "No condition registered with name: "..cond.name)
+        tcond = conditions[cond.name]
+        topts = cond
+      end
+      tcond = addon:CopyTable(tcond)
+      -- Any options specified in QuestScript.lua will get merged on top
+      -- of this copy of the condition and take priority
+      tcond = addon:MergeTable(tcond, topts)
+      tcond.logger = addon.QuestEngineLogger
+
+      -- Index the condition by name for quick lookup during evaluation
+      condsByName[tcond.name] = tcond
+      if tcond.alias then
+        assert(not param.conditions[tcond.alias], "Objective already has alias: "..tcond.alias)
+        condsByName[tcond.alias] = tcond
+      end
+    end
+    param.conditions = condsByName
   end
 end
 
@@ -130,6 +164,36 @@ function addon.QuestScriptLoader:AddScript(itemName, methodName, fn)
   end
 
   existing[methodName] = fn
+end
+
+local conditionMethods = {
+  ["AllowType"] = function(self, ...)
+    self.type = { ... }
+  end,
+  ["AllowMultiple"] = function(self, flag)
+    if flag == nil then flag = true end
+    self.multiple = flag
+  end,
+}
+
+function addon.QuestScriptLoader:NewCondition(condName)
+  local condition = { name = condName }
+  for name, fn in pairs(conditionMethods) do
+    condition[name] = fn
+  end
+
+  if not condName or condName == "" then
+    logger:Error("Failed to create condition: name is required")
+    return condition
+  end
+
+  if conditions[condName] then
+    logger:Error("Failed to create condition: %s is already a registered condition", condName)
+    return condition
+  end
+
+  conditions[condName] = condition
+  return condition
 end
 
 function addon.QuestScriptLoader:Init()

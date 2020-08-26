@@ -115,64 +115,8 @@ local function getInc(obj)
 end
 
 local parameters = {
-  [t.PARAM_AURA] = {
-    template = "condition",
-    scripts = {
-      [t.METHOD_PARSE] = { required = true },
-    },
-    multiple = true,
-  },
-  [t.PARAM_COORDS] = {
-    template = "condition",
-    scripts = {
-      [t.METHOD_PARSE] = { required = true },
-    },
-  },
-  [t.PARAM_EMOTE] = {
-    template = "condition",
-    scripts = {
-      [t.METHOD_PARSE] = { required = true },
-    },
-    multiple = true,
-  },
-  [t.PARAM_EQUIP] = {
-    template = "condition",
-    scripts = {
-      [t.METHOD_PARSE] = { required = true },
-    },
-    multiple = true,
-  },
   [t.PARAM_GOAL] = {
     type = "number"
-  },
-  [t.PARAM_ITEM] = {
-    template = "condition",
-    scripts = {
-      [t.METHOD_PARSE] = { required = true },
-    },
-    multiple = true,
-  },
-  [t.PARAM_KILLTARGET] = {
-    template = "condition",
-    scripts = {
-      [t.METHOD_PARSE] = { required = true },
-      [t.METHOD_POST_EVAL] = { required = true },
-    },
-    multiple = true,
-  },
-  [t.PARAM_SUBZONE] = {
-    template = "condition"
-  },
-  [t.PARAM_TARGET] = {
-    template = "condition",
-    scripts = {
-      [t.METHOD_PARSE] = { required = true },
-      [t.METHOD_POST_EVAL] = { required = true },
-    },
-    multiple = true,
-  },
-  [t.PARAM_ZONE] = {
-    template = "condition"
   },
 }
 
@@ -243,18 +187,14 @@ addon.QuestScriptTemplates = {
   -- Template for all objectives that can be limited by coordinate, zone, and/or subzone conditions
   ["coordobj"] = {
     template = { "objective", "coordtext" },
-    params = {
-      [t.PARAM_ZONE] = getParameter(t.PARAM_ZONE),
-      [t.PARAM_SUBZONE] = getParameter(t.PARAM_SUBZONE),
-      [t.PARAM_COORDS] = getParameter(t.PARAM_COORDS),
+    conditions = {
+      t.PARAM_ZONE,
+      t.PARAM_SUBZONE,
+      t.PARAM_COORDS,
     },
   },
   -- Template for all conditions that can be evaluated against in-game data
-  ["condition"] = {
-    scripts = {
-      [t.METHOD_EVAL] = { required = true },
-    }
-  },
+  ["condition"] = {},
   -- Template for start/complete objectives
   ["startcomplete"] = {
     template = { "toplevel", "coordtext" },
@@ -272,12 +212,14 @@ addon.QuestScriptTemplates = {
       full = "Go to [%t ][%atin ]%xyrz[%a: while having %a]"
     },
     params = {
-      [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
       [t.PARAM_TEXT] = { type = { "string", "table" } },
-      [t.PARAM_TARGET] = getParameter(t.PARAM_TARGET),
-      [t.PARAM_ZONE] = getParameter(t.PARAM_ZONE),
-      [t.PARAM_SUBZONE] = getParameter(t.PARAM_SUBZONE),
-      [t.PARAM_COORDS] = getParameter(t.PARAM_COORDS),
+    },
+    conditions = {
+      t.PARAM_AURA,
+      t.PARAM_TARGET,
+      t.PARAM_ZONE,
+      t.PARAM_SUBZONE,
+      t.PARAM_COORDS,
     }
   },
   -- Template for quest recommendations and requirements
@@ -323,10 +265,10 @@ local objectives = {
       quest = "Gain the %a aura[%xyz: while in %xyz][%i: while having %i][%e: while wearing %e]",
       full = "Gain the %a aura[%xyz: while in %xyrz][%i: while having %i][%e: while wearing %e]"
     },
-    params = {
-      [t.PARAM_AURA] = getParameter(t.PARAM_AURA, { required = true }),
-      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
-      [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
+    conditions = {
+      { name = t.PARAM_AURA, required = true },
+      t.PARAM_EQUIP,
+      t.PARAM_ITEM,
     }
   },
   [t.OBJ_EMOTE] = {
@@ -350,12 +292,14 @@ local objectives = {
       full = "Use emote /%em[%t: on [%g2 ]%t|[%g2: %g2 times]][%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
     },
     params = {
-      [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
       [t.PARAM_GOAL] = getParameter(t.PARAM_GOAL),
-      [t.PARAM_EMOTE] = getParameter(t.PARAM_EMOTE, { required = true }),
-      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
-      [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
-      [t.PARAM_TARGET] = getParameter(t.PARAM_TARGET),
+    },
+    conditions = {
+      t.PARAM_AURA,
+      { name = t.PARAM_EMOTE, { required = true } },
+      t.PARAM_EQUIP,
+      t.PARAM_ITEM,
+      t.PARAM_TARGET,
     }
   },
   [t.OBJ_EQUIP] = {
@@ -374,10 +318,10 @@ local objectives = {
       quest = "Equip %e[%xyz: while in %xyz][%a: while having %a][%i: while having %i]",
       full = "Equip %e[%xyz: while in %xyrz][%a: while having %a][%i: while having %i]"
     },
-    params = {
-      [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
-      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP, { required = true }),
-      [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
+    conditions = {
+      t.PARAM_AURA,
+      { name = t.PARAM_EQUIP, required = true },
+      t.PARAM_ITEM,
     }
   },
   [t.OBJ_EXPLORE] = {
@@ -397,10 +341,10 @@ local objectives = {
       quest = "Explore %xyz[%a: while having %a][%i: while having %i][%e: while wearing %e]",
       full = "Go to %xyrz[%a: while having %a][%i: while having %i][%e: while wearing %e]"
     },
-    params = {
-      [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
-      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
-      [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
+    conditions = {
+      t.PARAM_AURA,
+      t.PARAM_EQUIP,
+      t.PARAM_ITEM,
     }
   },
   [t.OBJ_KILL] = {
@@ -422,11 +366,13 @@ local objectives = {
       full = "Kill [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
     },
     params = {
-      [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
-      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
       [t.PARAM_GOAL] = getParameter(t.PARAM_GOAL),
-      [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
-      [t.PARAM_KILLTARGET] = getParameter(t.PARAM_KILLTARGET, { alias = t.PARAM_TARGET, required = true }),
+    },
+    conditions = {
+      t.PARAM_AURA,
+      t.PARAM_EQUIP,
+      t.PARAM_ITEM,
+      { name = t.PARAM_KILLTARGET, alias = t.PARAM_TARGET, required = true },
     }
   },
   [t.OBJ_TALKTO] = {
@@ -448,11 +394,13 @@ local objectives = {
       full = "Talk to [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
     },
     params = {
-      [t.PARAM_AURA] = getParameter(t.PARAM_AURA),
-      [t.PARAM_EQUIP] = getParameter(t.PARAM_EQUIP),
       [t.PARAM_GOAL] = getParameter(t.PARAM_GOAL),
-      [t.PARAM_ITEM] = getParameter(t.PARAM_ITEM),
-      [t.PARAM_TARGET] = getParameter(t.PARAM_TARGET, { required = true }),
+    },
+    conditions = {
+      t.PARAM_AURA,
+      t.PARAM_EQUIP,
+      t.PARAM_ITEM,
+      { name = t.PARAM_TARGET, required = true },
     }
   }
 }

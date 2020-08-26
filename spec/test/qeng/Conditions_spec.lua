@@ -218,28 +218,28 @@ describe("Condition", function()
     describe("when player kills the target", function()
       it("then the condition passes", function()
         local quest = startQuest("kill 'Mangy Wolf'")
-        addon.LastPartyKill = { destName = 'Mangy Wolf' }
+        addon.LastPartyKill = { destName = 'Mangy Wolf', destGuid = 'wolf-1' }
         assertObjectiveDoesUpdate(quest)
       end)
     end)
     describe("when player kills one of multiple targets", function()
       it("then the condition passes", function()
         local quest = startQuest("kill: { target: [ Mangy Wolf, Chicken ] }")
-        addon.LastPartyKill = { destName = 'Mangy Wolf' }
+        addon.LastPartyKill = { destName = 'Mangy Wolf', destGuid = 'wolf-1' }
         assertObjectiveDoesUpdate(quest)
       end)
     end)
     describe("when player kills a different target", function()
       it("then the condition fails", function()
         local quest = startQuest("kill Ragnaros")
-        addon.LastPartyKill = { destName = 'Mangy Wolf' }
+        addon.LastPartyKill = { destName = 'Mangy Wolf', destGuid = 'wolf-1' }
         assertObjectiveDoesNotUpdate(quest)
       end)
     end)
     describe("when player kills none of multiple targets", function()
       it("then the condition fails", function()
         local quest = startQuest("kill: { target: [ Ragnaros, Onyxia ] }")
-        addon.LastPartyKill = { destName = 'Mangy Wolf' }
+        addon.LastPartyKill = { destName = 'Mangy Wolf', destGuid = 'wolf-1' }
         assertObjectiveDoesNotUpdate(quest)
       end)
     end)

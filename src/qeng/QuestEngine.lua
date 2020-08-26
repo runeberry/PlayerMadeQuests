@@ -38,10 +38,10 @@ local function evaluateObjective(objective, obj, ...)
   local anyFailed
   local conditionPostEvals = {}
   for name, val in pairs(obj.conditions) do
-    local condition = objective.params[name]
-    if condition.scripts and condition.scripts[tokens.METHOD_EVAL] then
-      -- Evaluation receives 2 args: The obj being evaluated, and the value(s) for this condition
-      ok, checkResult = pcall(condition.scripts[tokens.METHOD_EVAL], obj, val)
+    local condition = objective.conditions[name]
+    if condition.Evaluate then
+      -- Evaluation receives 2 args: The parsed value for this condition, and the obj being evaluated
+      ok, checkResult = pcall(condition.Evaluate, condition, val, obj)
       if not ok then
         objectiveLogger:Error("Error evaluating condition %s for %s: %s", name, obj.id, checkResult)
         return
@@ -50,12 +50,12 @@ local function evaluateObjective(objective, obj, ...)
         -- We keep evaluating because there might be side-effects from other conditions that are still required (not ideal, but oh well)
         anyFailed = true
       end
-      if condition.scripts[tokens.METHOD_POST_EVAL] then
+      if condition.AfterEvaluate then
         -- If the condition has a post-evaluation method, reference it here so we can run it
         -- After the objective's post-evaluation method
         conditionPostEvals[#conditionPostEvals+1] = {
-          script = condition.scripts[tokens.METHOD_POST_EVAL],
-          name = name,
+          method = condition.AfterEvaluate,
+          condition = condition,
           val = val,
         }
       end
@@ -82,7 +82,7 @@ local function evaluateObjective(objective, obj, ...)
   -- If there were any condition-level post-evaluation methods, run them now
   local err
   for _, postEval in ipairs(conditionPostEvals) do
-    ok, err = addon:catch(postEval.script, obj, checkResult, postEval.val)
+    ok, err = addon:catch(postEval.method, postEval.condition, postEval.val, obj, checkResult)
     if not ok then
       objectiveLogger:Error("Error during post-evaluation for \"%s\": %s", postEval.name, err)
       -- Continue running, because the method has no effect on the result
@@ -233,7 +233,7 @@ function addon.QuestEngine:Validate(quest)
 
     assert(type(obj.conditions) == "table", addon:Enquote(obj.name).." must have conditions defined")
     for condName, _ in pairs(obj.conditions) do
-      local condition = objTemplate.params[condName]
+      local condition = objTemplate.conditions[condName]
       assert(condition, addon:Enquote(condName).." is not a valid condition for objective "..addon:Enquote(objTemplate.name))
     end
   end
