@@ -200,36 +200,6 @@ describe("QuestScriptLocalizer", function()
       assert.equals("This isn't a genocide playthrough, you know", localizer:GetDisplayText(obj, "quest"))
       assert.equals("Kill Chicken", localizer:GetDisplayText(obj, "full"))
     end)
-    it("can use the %inc var properly", function()
-      local script = [[
-        quest:
-          name: inc test
-        objectives:
-          - explore Durotar
-          - kill:
-              target: Swine
-              goal: 5
-              text: "Complete task #%inc"
-          - talk-to: Orgrimmar Grunt
-          - kill:
-              target: Bloodtalon Scythemaw
-              goal: 3
-              text: "Complete task #%inc"
-          - explore:
-              zone: Durotar
-              subzone: Skull Rock
-              text: "Complete task #%inc"
-      ]]
-      local quest = compiler:Compile(script)
-      local objs = quest.objectives
-      assert.equals("Complete task #1", localizer:GetDisplayText(objs[2]))
-      assert.equals("Complete task #2", localizer:GetDisplayText(objs[4]))
-      assert.equals("Complete task #3", localizer:GetDisplayText(objs[5]))
-      -- Run tests again to ensure that the values persist on each GetDisplayText call
-      assert.equals("Complete task #1", localizer:GetDisplayText(objs[2]))
-      assert.equals("Complete task #2", localizer:GetDisplayText(objs[4]))
-      assert.equals("Complete task #3", localizer:GetDisplayText(objs[5]))
-    end)
   end)
   describe("startcomplete display text", function()
     local testCases = {

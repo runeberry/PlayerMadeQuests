@@ -43,77 +43,6 @@ addon.QuestScriptTokens = {
 }
 local t = addon.QuestScriptTokens
 
--- Common displaytext functions
-local getGoal = function(obj) return obj.goal end
-local getGoal2 = function(obj) if obj.goal > 1 then return obj.goal end end
-local getProgress = function(obj) return obj.progress end
-local getProgress2 = function(obj) if obj.progress < obj.goal then return obj.progress end end
-
-local getX = function(coords) if coords then return coords.x end end
-local getY = function(coords) if coords then return coords.y end end
-local getRad = function(coords) if coords then return coords.radius end end
-local getXY = function(coords) if coords then return addon:PrettyCoords(coords.x, coords.y) end end
-local getXYR = function(coords) if coords then return addon:PrettyCoords(coords.x, coords.y, coords.radius) end end
-
-local getZone2 = function(obj)
-  local zone = obj.conditions[t.PARAM_ZONE]
-  local subzone = obj.conditions[t.PARAM_SUBZONE]
-  if zone and subzone then
-    return subzone.." in "..zone
-  elseif zone then
-    return zone
-  else
-    return subzone
-  end
-end
-
-local getXYZ = function(obj)
-  local zone = getZone2(obj) or ""
-  local coords = getXY(obj.conditions[t.PARAM_COORDS])
-  if not coords then return zone end
-  return coords.." in "..zone
-end
-local getXYSZ = function(obj)
-  local subzone = obj.conditions[t.PARAM_SUBZONE] or obj.conditions[t.PARAM_ZONE] or ""
-  local coords = getXY(obj.conditions[t.PARAM_COORDS])
-  if not coords then return subzone end
-  return coords.." in "..subzone
-end
-local getXYRZ = function(obj)
-  local zone = getZone2(obj) or ""
-  local coords = getXYR(obj.conditions[t.PARAM_COORDS])
-  if not coords then return zone end
-  return coords.." in "..zone
-end
-local getAtin = function(obj)
-  local target = obj.conditions[t.PARAM_TARGET]
-  if not target then return end
-  local zone = obj.conditions[t.PARAM_ZONE]
-  local subzone = obj.conditions[t.PARAM_SUBZONE]
-  local coords = obj.conditions[t.PARAM_COORDS]
-  if coords or subzone then
-    return "at"
-  elseif zone then
-    return "in"
-  end
-end
-
--- incrementing counter unique to a given objective
-local incTable = {}
-local function getInc(obj)
-  local qinc = incTable[obj.questId]
-  if not qinc then
-    qinc = {}
-    incTable[obj.questId] = qinc
-  end
-  local incVal = qinc[obj.id]
-  if not incVal then
-    incVal = addon:tlen(qinc) + 1
-    qinc[obj.id] = incVal
-  end
-  return incVal
-end
-
 local parameters = {
   [t.PARAM_GOAL] = {
     type = "number"
@@ -145,15 +74,6 @@ addon.QuestScriptTemplates = {
     questEvent = true, -- Listen for QuestEvents by this name when the QuestEngine starts up
     contentParsable = true, -- Can be interpreted by ParseObjective
     multiple = true,
-    displaytext = {
-      vars = {
-        ["g"] = getGoal,
-        ["g2"] = getGoal2,
-        ["p"] = getProgress,
-        ["p2"] = getProgress2,
-        ["inc"] = getInc,
-      }
-    },
     scripts = {
       [t.METHOD_PRE_EVAL] = { required = false },
       [t.METHOD_POST_EVAL] = { required = false },
@@ -164,29 +84,9 @@ addon.QuestScriptTemplates = {
       }
     }
   },
-  -- Template for any objective that uses coordinate, zone, and/or subzone display text
-  ["coordtext"] = {
-    displaytext = {
-      vars = {
-        ["co"] = t.PARAM_COORDS,
-        ["z"] = t.PARAM_ZONE,
-        ["sz"] = t.PARAM_SUBZONE,
-        ["x"] = { arg = t.PARAM_COORDS, fn = getX },
-        ["y"] = { arg = t.PARAM_COORDS, fn = getY },
-        ["r"] = { arg = t.PARAM_COORDS, fn = getRad },
-        ["xy"] = { arg = t.PARAM_COORDS, fn = getXY },
-        ["xyz"] = getXYZ,
-        ["xysz"] = getXYSZ,
-        ["xyr"] = { arg = t.PARAM_COORDS, fn = getXYR },
-        ["xyrz"] = getXYRZ,
-        ["z2"] = getZone2,
-        ["atin"] = getAtin,
-      }
-    }
-  },
   -- Template for all objectives that can be limited by coordinate, zone, and/or subzone conditions
   ["coordobj"] = {
-    template = { "objective", "coordtext" },
+    template = { "objective" },
     conditions = {
       t.PARAM_ZONE,
       t.PARAM_SUBZONE,
@@ -197,16 +97,12 @@ addon.QuestScriptTemplates = {
   ["condition"] = {},
   -- Template for start/complete objectives
   ["startcomplete"] = {
-    template = { "toplevel", "coordtext" },
+    template = { "toplevel" },
     contentParsable = true, -- Can be interpreted by ParseObjective
     scripts = {
       [t.METHOD_EVAL] = { required = true },
     },
     displaytext = {
-      vars = {
-        ["a"] = t.PARAM_AURA,
-        ["t"] = t.PARAM_TARGET,
-      },
       log = "Go to %t[%sz:[%t: at] %sz|[%z:[%t: in] %z]]",
       quest = "Go to [%t ][%atin ]%xyz[%a: while having %a]",
       full = "Go to [%t ][%atin ]%xyrz[%a: while having %a]"
@@ -255,11 +151,6 @@ local objectives = {
       t.PARAM_AURA,
     },
     displaytext = {
-      vars = {
-        ["a"] = t.PARAM_AURA,
-        ["e"] = t.PARAM_EQUIP,
-        ["i"] = t.PARAM_ITEM,
-      },
       log = "Gain %a",
       progress = "%a gained",
       quest = "Gain the %a aura[%xyz: while in %xyz][%i: while having %i][%e: while wearing %e]",
@@ -279,13 +170,6 @@ local objectives = {
       t.PARAM_TARGET,
     },
     displaytext = {
-      vars = {
-        ["a"] = t.PARAM_AURA,
-        ["em"] = t.PARAM_EMOTE,
-        ["e"] = t.PARAM_EQUIP,
-        ["i"] = t.PARAM_ITEM,
-        ["t"] = t.PARAM_TARGET,
-      },
       log = "/%em[%t: with %t][%g2: %p/%g]",
       progress = "/%em[%t: with %t]: %p/%g",
       quest = "/%em[%t: with [%g2 ]%t|[%g2: %g2 times]][%xysz: in %xysz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
@@ -308,11 +192,6 @@ local objectives = {
       t.PARAM_EQUIP,
     },
     displaytext = {
-      vars = {
-        ["a"] = t.PARAM_AURA,
-        ["e"] = t.PARAM_EQUIP,
-        ["i"] = t.PARAM_ITEM,
-      },
       log = "Equip %e",
       progress = "%e equipped",
       quest = "Equip %e[%xyz: while in %xyz][%a: while having %a][%i: while having %i]",
@@ -331,11 +210,6 @@ local objectives = {
       t.PARAM_COORDS,
     },
     displaytext = {
-      vars = {
-        ["a"] = t.PARAM_AURA,
-        ["e"] = t.PARAM_EQUIP,
-        ["i"] = t.PARAM_ITEM,
-      },
       log = "Go to %xysz",
       progress = "%xysz explored: %p/%g",
       quest = "Explore %xyz[%a: while having %a][%i: while having %i][%e: while wearing %e]",
@@ -354,12 +228,6 @@ local objectives = {
       t.PARAM_TARGET,
     },
     displaytext = {
-      vars = {
-        ["a"] = t.PARAM_AURA,
-        ["e"] = t.PARAM_EQUIP,
-        ["i"] = t.PARAM_ITEM,
-        ["t"] = t.PARAM_KILLTARGET,
-      },
       log = "%t %p/%g",
       progress = "%t slain: %p/%g",
       quest = "Kill [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
@@ -382,12 +250,6 @@ local objectives = {
       t.PARAM_TARGET,
     },
     displaytext = {
-      vars = {
-        ["a"] = t.PARAM_AURA,
-        ["e"] = t.PARAM_EQUIP,
-        ["i"] = t.PARAM_ITEM,
-        ["t"] = t.PARAM_TARGET,
-      },
       log = "Talk to %t[%g2: %p/%g]",
       progress = "Talk to %t: %p/%g",
       quest = "Talk to [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",

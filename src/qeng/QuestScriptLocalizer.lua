@@ -1,10 +1,106 @@
 local _, addon = ...
 local logger = addon.Logger:NewLogger("Localizer")
+local t = addon.QuestScriptTokens
 
 addon.QuestScriptLocalizer = {}
 
 local localizables = {}
 local rules -- defined below
+
+--- Wraps the handler in a check for the specified parameter
+local function ifCond(name, fn)
+  return function(cp)
+    local param = cp.conditions and cp.conditions[name]
+    if param then
+      return fn(param, cp)
+    end
+  end
+end
+
+local vars
+vars = {
+  ----------------
+  -- Conditions --
+  ----------------
+
+  ["a"] = t.PARAM_AURA,
+  ["co"] = t.PARAM_COORDS,
+  ["e"] = t.PARAM_EQUIP,
+  ["em"] = t.PARAM_EMOTE,
+  ["i"] = t.PARAM_ITEM,
+  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET },
+  ["sz"] = t.PARAM_SUBZONE,
+  ["z"] = t.PARAM_ZONE,
+
+  -----------------------------
+  -- Derived from Conditions --
+  -----------------------------
+
+  --- Decides whether to display "at" or "in" based on context
+  ["atin"] = function(cp)
+    local target = cp.conditions[t.PARAM_TARGET]
+    if not target then return end
+    local zone = cp.conditions[t.PARAM_ZONE]
+    local subzone = cp.conditions[t.PARAM_SUBZONE]
+    local coords = cp.conditions[t.PARAM_COORDS]
+    if coords or subzone then
+      return "at"
+    elseif zone then
+      return "in"
+    end
+  end,
+  --- radius of coords
+  ["r"] = ifCond(t.PARAM_COORDS, function(coords) return coords.radius end),
+  --- x of coords
+  ["x"] = ifCond(t.PARAM_COORDS, function(coords) return coords.x end),
+  --- (x, y)
+  ["xy"] = ifCond(t.PARAM_COORDS, function(coords) return addon:PrettyCoords(coords.x, coords.y) end),
+  --- (x, y) +/- r
+  ["xyr"] = ifCond(t.PARAM_COORDS, function(coords) return addon:PrettyCoords(coords.x, coords.y, coords.radius) end),
+  --- (x, y) +/- r in zone
+  ["xyrz"] = function(cp)
+    local zone = vars["z2"](cp) or ""
+    local coords = vars["xyr"](cp)
+    if not coords then return zone end
+    return coords.." in "..zone
+  end,
+  ["xysz"] = function(cp)
+    local subzone = cp.conditions[t.PARAM_SUBZONE] or cp.conditions[t.PARAM_ZONE] or ""
+    local coords = vars["xy"](cp)
+    if not coords then return subzone end
+    return coords.." in "..subzone
+  end,
+  --- (x, y) in zone
+  ["xyz"] = function(cp)
+    local zone = vars["z2"](cp) or ""
+    local coords = vars["xy"](cp)
+    if not coords then return zone end
+    return coords.." in "..zone
+  end,
+  --- y of coords
+  ["y"] = ifCond(t.PARAM_COORDS, function(coords) return coords.y end),
+  --- zone in subzone
+  ["z2"] = function(cp)
+    local zone = cp.conditions[t.PARAM_ZONE]
+    local subzone = cp.conditions[t.PARAM_SUBZONE]
+    if zone and subzone then
+      return subzone.." in "..zone
+    elseif zone then
+      return zone
+    else
+      return subzone
+    end
+  end,
+
+  ------------------------
+  -- Objective-specific --
+  ------------------------
+
+  ["g"] = function(obj) return obj.goal end,
+  ["g2"] = function(obj) if obj.goal > 1 then return obj.goal end end,
+  ["p"] = function(obj) return obj.progress end,
+  ["p2"] = function(obj) if obj.progress < obj.goal then return obj.progress end end,
+}
 
 -- If the condition value is a table of values, then returns each value in that table
 -- in a reader-friendly comma-separated string, with the last two items separated by "or"
@@ -119,14 +215,10 @@ rules = {
         if not template then return pctstr end -- objective does not have any localizable content
 
         local str = pctstr:sub(2) -- Remove the leading %
-        local handler
-        local dt = localizables[obj.name].displaytext
-        if dt and dt.vars then
-          handler = dt.vars[str]
-        end
-        if not handler then return pctstr end -- objective has no displaytext handler for this var name
+        local handler = vars[str]
+        if not handler then return pctstr end -- no displaytext handler for this var name
 
-        -- Handlers under displaytext.vars[varname] can be registered in multiple ways, but two values are required:
+        -- Handlers under vars[varname] can be registered in multiple ways, but two values are required:
         --   * fn: given some context, returns the value to be displayed (will be converted to string)
         --   * arg: a token name to define which param value should be passed to the fn
         -- This can be registed as a displaytext var in the following ways:
@@ -134,7 +226,18 @@ rules = {
         --   * string: the param name - a default handler fn will be used
         --   * function: a handler - the whole objective will be passed as a parameter
         local result
-        if type(handler) == "table" then
+        if type(handler) == "table" and handler[1] then
+          -- todo: This is sort of a hack to allow multiple params to be used for the same var.
+          -- Consider replacing this with a method to allow the objective to override its the default var
+          -- definitions with ones of its own.
+          for _, var in ipairs(handler) do
+            result = parseConditionValueText(obj, var, nil)
+            if result and result ~= "" then
+              logger:Trace("     ^ handler: string (%s = %s)", pctstr, var)
+              break
+            end
+          end
+        elseif type(handler) == "table" then
           logger:Trace("     ^ handler: table (%s = %s)", pctstr, handler.arg)
           result = parseConditionValueText(obj, handler.arg, handler.fn)
         elseif type(handler) == "string" then
