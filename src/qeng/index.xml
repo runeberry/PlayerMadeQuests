@@ -20,10 +20,13 @@
   <Script file="qeng/objectives/use-emote.lua"/>
 
   <Script file="qeng/conditions/aura.lua"/>
+  <Script file="qeng/conditions/class.lua"/>
   <Script file="qeng/conditions/emote.lua"/>
   <Script file="qeng/conditions/equip.lua"/>
+  <Script file="qeng/conditions/faction.lua"/>
   <Script file="qeng/conditions/item.lua"/>
   <Script file="qeng/conditions/killtarget.lua"/>
+  <Script file="qeng/conditions/level.lua"/>
   <Script file="qeng/conditions/position.lua"/>
   <Script file="qeng/conditions/target.lua"/>
 </Ui>
