@@ -230,7 +230,6 @@ addon.StaticPopupsList = {
     yesText = "OK",
     noText = "Cancel",
     yesHandler = function(location)
-      addon.Logger:Table(location)
       addon.Locations:Delete(location.locationId)
     end,
   },
