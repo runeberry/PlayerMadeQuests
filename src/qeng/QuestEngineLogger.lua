@@ -1,14 +1,9 @@
 local _, addon = ...
 
-addon.QuestEngineLogger = addon.Logger:NewLogger("Objectives")
+addon.QuestEngineLogger = addon.Logger:NewLogger("QuestEngine", addon.LogLevel.info)
 
 local passPrefix = "[P] "
 local failPrefix = "[F] "
-
-local origLog = addon.QuestEngineLogger.Log
-addon.QuestEngineLogger.Log = function(self, loglevel, str, ...)
-  origLog(self, loglevel, "    "..tostring(str), ...)
-end
 
 function addon.QuestEngineLogger:Pass(str, ...)
   self:Debug(passPrefix..tostring(str), ...)

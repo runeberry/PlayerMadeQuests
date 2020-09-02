@@ -17,7 +17,7 @@ function condition:Evaluate(targetCoords)
   local diffX = math.abs(pos.x - targetCoords.x)
   local diffY = math.abs(pos.y - targetCoords.y)
 
-  self.logger:Trace("        Target coords diff: (%.2f, %.2f) @ radius %.2f", diffX, diffY, radius)
+  self.logger:Trace("Target coords diff: (%.2f, %.2f) @ radius %.2f", diffX, diffY, radius)
   local result = diffX < radius and diffY < radius
   if result then
     self.logger:Pass("Player within coords")

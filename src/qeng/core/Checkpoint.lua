@@ -1,11 +1,10 @@
 local _, addon = ...
-local logger = addon.Logger:NewLogger("Checkpoint")
 local assertf, errorf = addon.assertf, addon.errorf
 
 local parameters = addon.QuestEngine.definitions.parameters
 local conditions = addon.QuestEngine.definitions.conditions
 
-local function evaluateConditions(cp)
+local function evaluateConditions(self, cp)
   if not cp.conditions or addon:tlen(cp.conditions) == 0 then
     -- If there are no conditions to evaluate, then all conditions are met
     return true
@@ -19,7 +18,7 @@ local function evaluateConditions(cp)
       -- condition:BeforeEvaluate(val, cp)
       local ok, result = pcall(condition.BeforeEvaluate, condition, val, cp)
       if not ok then
-        logger:Error("Error during Condition:BeforeEvaluate() for %s: %s", name, result)
+        self.logger:Error("Error during Condition:BeforeEvaluate() for %s: %s", name, result)
         return false
       elseif result == false then
         -- If BeforeEvaluate returns explicitly false, then Evalute and AfterEvalute will not
@@ -37,7 +36,7 @@ local function evaluateConditions(cp)
       -- condition:Evaluate(val, cp)
       local ok, result = pcall(condition.Evaluate, condition, val, cp)
       if not ok then
-        logger:Error("Error during Condition:Evaluate() for %s: %s", name, result)
+        self.logger:Error("Error during Condition:Evaluate() for %s: %s", name, result)
         return false
       elseif not result then
         -- The total condition evaluation fails if any Evaluate step returns false or nil
@@ -53,7 +52,7 @@ local function evaluateConditions(cp)
       -- condition:AfterEvaluate(result, val, cp)
       local ok, result = pcall(condition.AfterEvaluate, condition, totalEvaluateResult, val, cp)
       if not ok then
-        logger:Error("Error during Condition:AfterEvaluate() for %s: %s", name, result)
+        self.logger:Error("Error during Condition:AfterEvaluate() for %s: %s", name, result)
         return false
       elseif result == false then
         -- The total condition evaluation fails if any AfterEvaluate step returns explicitly false
@@ -108,7 +107,7 @@ local methods = {
       conditions = {},
     }
 
-    logger:Debug("Parsing checkpoint '%s' (%s)", cp.name, cp.id)
+    self.logger:Debug("Parsing checkpoint '%s' (%s)", cp.name, cp.id)
 
     -- (jb, 9/1/20) Important caveat!
     -- On the checkpoint template (self), every condition is also in the list of parameters
@@ -126,7 +125,7 @@ local methods = {
         rawValue[opts.alias] = nil
       end
       local condition = conditions[cond]
-      logger:Trace("  Condition: %s = %s", cond, tostring(v))
+      -- self.logger:Trace("Condition: %s = %s", cond, tostring(v))
       v = condition:Parse(v, opts)
       cp.conditions[cond] = v
       -- Mark as assigned so that it doesn't get re-processed as a parameter
@@ -144,7 +143,7 @@ local methods = {
           rawValue[opts.alias] = nil
         end
         local parameter = parameters[param]
-        logger:Trace("  Parameter: %s = %s", param, tostring(v))
+        -- self.logger:Trace("Parameter: %s = %s", param, tostring(v))
         v = parameter:Parse(v, opts)
         cp.parameters[param] = v
       end
@@ -162,7 +161,7 @@ local methods = {
     if self.BeforeEvaluate then
       local ok, result = pcall(self.BeforeEvaluate, self, cp)
       if not ok then
-        logger:Error("Error during Checkpoint:BeforeEvaluate() for %s: %s", cp.name, result)
+        self.logger:Error("Error during Checkpoint:BeforeEvaluate() for %s: %s", cp.name, result)
         return
       elseif result == false then
         -- If BeforeEvaluate returns explicitly false, condition evaluation will be skipped entirely
@@ -170,13 +169,13 @@ local methods = {
       end
     end
 
-    local evaluationResult = evaluateConditions(cp)
+    local evaluationResult = evaluateConditions(self, cp)
 
     -- Step 5: Run AfterEvaluate on the checkpoint
     if self.AfterEvaluate then
       local ok, result = pcall(self.AfterEvaluate, self, evaluationResult, cp)
       if not ok then
-        logger:Error("Error during Checkpoint:AfterEvaluate() for %s: %s", cp.name, result)
+        self.logger:Error("Error during Checkpoint:AfterEvaluate() for %s: %s", cp.name, result)
         return
       elseif result ~= nil then
         -- AfterEvaluate can transform the condition evaluation result from a boolean
@@ -197,7 +196,7 @@ local methods = {
 function addon.QuestEngine:NewCheckpoint(name)
   local checkpoint = {
     name = name,
-    logger = logger,
+    logger = addon.QuestEngineLogger,
     parameters = {},
     conditions = {},
   }

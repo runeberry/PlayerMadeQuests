@@ -20,7 +20,7 @@ function condition:Evaluate(emoteNames, obj)
   local expectTargetedEmote = obj.conditions[addon.QuestScriptTokens.PARAM_TARGET]
 
   if expectTargetedEmote then
-    self.logger:Trace("        Expecting emote to be targeted")
+    self.logger:Trace("Expecting emote to be targeted")
   end
 
   -- Determine the expected emote messages, then cache the result
@@ -49,7 +49,7 @@ function condition:Evaluate(emoteNames, obj)
     -- so we can compare to the generic emote message.
     local targetName = GetUnitName("target")
     pem = pem:gsub(targetName, "%%t")
-    self.logger:Trace("        Last emote message modified to: %s", pem)
+    self.logger:Trace("Last emote message modified to: %s", pem)
   end
 
   -- If the emote matches matches the message of any of the

@@ -1,5 +1,4 @@
 local _, addon = ...
-local logger = addon.QuestEngineLogger
 local tokens = addon.QuestScriptTokens
 
 local objective = addon.QuestEngine:NewObjective("explore")
@@ -30,19 +29,19 @@ objective:AddGameEvent("ZONE_CHANGED_NEW_AREA")
 
 function objective:AfterEvaluate(result, obj)
   if obj.conditions[tokens.PARAM_COORDS] then
-    logger:Trace("Objective has a '%s' parameter, checking to poll location...", tokens.PARAM_COORDS)
+    self.logger:Trace("Objective has a '%s' parameter, checking to poll location...", tokens.PARAM_COORDS)
     -- If the objective specifies an X or Y position, then begin polling for X/Y changes
     -- on an interval whenever a player enters the correct zone(s)
     local z, sz = obj.conditions[tokens.PARAM_ZONE], obj.conditions[tokens.PARAM_SUBZONE]
-    logger:Trace("zone: %s, subzone: %s", tostring(z), tostring(sz))
+    self.logger:Trace("zone: %s, subzone: %s", tostring(z), tostring(sz))
     local inZone = (not z) or addon:CheckPlayerInZone(z)
     local inSubZone = (not sz) or addon:CheckPlayerInZone(sz)
 
     if inZone and inSubZone then
-      logger:Trace("Player is in zone, starting location polling")
+      self.logger:Trace("Player is in zone, starting location polling")
       addon:StartPollingLocation(obj.id)
     else
-      logger:Trace("Player is not in zone, stopping location polling")
+      self.logger:Trace("Player is not in zone, stopping location polling")
       addon:StopPollingLocation(obj.id)
     end
   end

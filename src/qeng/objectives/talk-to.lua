@@ -1,5 +1,4 @@
 local _, addon = ...
-local logger = addon.QuestEngineLogger
 local tokens = addon.QuestScriptTokens
 local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
 local CheckInteractDistance = addon.G.CheckInteractDistance
@@ -39,7 +38,7 @@ local isTalkEmoteFilter = function(msg, playerName)
       if CheckInteractDistance("target", 5) then
         addon.QuestEvents:Publish(tokens.OBJ_TALKTO)
       else
-        logger:Trace("Not close enough to /talk to target")
+        addon.logger:Trace("Not close enough to /talk to target")
       end
     end
   end

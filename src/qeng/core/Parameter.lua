@@ -1,6 +1,5 @@
 local _, addon = ...
 local assertf, errorf = addon.assertf, addon.errorf
-local logger = addon.QuestEngineLogger -- todo: reappropriate this logger
 
 local methods = {
   --- When Validate is run, ensures that the input value matches any one of
@@ -153,7 +152,7 @@ local methods = {
 function addon.QuestEngine:NewParameter(name)
   local parameter = {
     name = name,
-    logger = logger,
+    logger = addon.QuestEngineLogger,
     options = {},
   }
 

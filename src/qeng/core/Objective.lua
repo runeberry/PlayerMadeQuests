@@ -1,8 +1,6 @@
 local _, addon = ...
 local tokens = addon.QuestScriptTokens
 
-local objectiveLogger = addon.QuestEngineLogger
-
 local methods = {
   ["AddAppEvent"] = function(self, name, filter)
     self.events[#self.events+1] = { name = name, filter = filter, broker = addon.AppEvents }
@@ -51,7 +49,7 @@ local methods = {
     return obj
   end,
   ["Evaluate"] = function(self, obj)
-    objectiveLogger:Debug("===== Evaluating objective: %s =====", obj.name)
+    self.logger:Debug("===== Evaluating objective: %s =====", obj.name)
     local result = self:_baseEvaluate(obj)
 
     -- Coerce non-numeric results to a goal progress number
@@ -74,18 +72,18 @@ local methods = {
       end
     end
 
-    objectiveLogger:Trace("===== Evaluated objective: %s (%s) =====", obj.name, tostring(result))
+    self.logger:Trace("===== Evaluated objective: %s (%s) =====", obj.name, tostring(result))
     return result
   end,
   --- Runs Evaluate() on all active instances of this objective.
   ["EvaluateAllActive"] = function(self)
     local numActive = addon:tlen(self.active)
     if numActive < 1 then
-      objectiveLogger:Trace("No active objectives for: %s", self.name)
+      self.logger:Trace("No active objectives for: %s", self.name)
       return
     end
 
-    objectiveLogger:Debug("***** Evaluating objectives: %s (%i active) *****", self.name, addon:tlen(self.active))
+    self.logger:Debug("***** Evaluating objectives: %s (%i active) *****", self.name, addon:tlen(self.active))
     -- logger:Table(objective.active)
     -- Completed objectives will be tracked and removed from the list
     local completed = {}
@@ -109,7 +107,7 @@ local methods = {
       self.active[id] = nil
     end
 
-    objectiveLogger:Trace("***** Finished evaluating objectives: %s *****", self.name)
+    self.logger:Trace("***** Finished evaluating objectives: %s *****", self.name)
   end,
 }
 

@@ -2,7 +2,7 @@ local _, addon = ...
 local tokens = addon.QuestScriptTokens
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
-local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
+local logger = addon.QuestEngineLogger:NewLogger("Core", addon.LogLevel.info)
 
 -- QuestEngine is the source of truth for all quest evaluation logic
 addon.QuestEngine = {
