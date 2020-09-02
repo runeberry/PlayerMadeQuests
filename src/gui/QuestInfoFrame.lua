@@ -58,8 +58,7 @@ local buttons = {
     pollIf = function(quest) return addon.QuestEngine:EvaluateRequirements(quest) and quest.start end,
     enableIf = function(quest) return addon.QuestEngine:EvaluateRequirements(quest) and addon.QuestEngine:EvaluateStart(quest) end,
     action = function(quest, sender)
-      local reqs = addon.QuestEngine:EvaluateRequirements(quest)
-      if not reqs.pass then
+      if not addon.QuestEngine:EvaluateRequirements(quest) then
         addon.Logger:Warn("You do not meet the requirements to start this quest.")
         return
       end
@@ -67,11 +66,10 @@ local buttons = {
         addon.Logger:Warn("Unable to accept quest: start conditions are not met")
         return
       end
-      local recs = addon.QuestEngine:EvaluateRecommendations(quest)
-      if recs.pass then
+      if addon.QuestEngine:EvaluateRecommendations(quest) then
         acceptQuest(quest, sender)
       else
-        addon.StaticPopups:Show("StartQuestBelowRequirements", quest, recs):OnYes(function()
+        addon.StaticPopups:Show("StartQuestBelowRequirements"):OnYes(function()
           acceptQuest(quest, sender)
         end)
       end

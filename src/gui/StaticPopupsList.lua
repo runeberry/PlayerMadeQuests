@@ -73,7 +73,7 @@ addon.StaticPopupsList = {
     end,
   },
   ["StartQuestBelowRequirements"] = {
-    message = function(quest, recsResult)
+    message = function()
       return "You do not meet the recommended criteria to start this quest.\n"..
              "Accept anyway?"
     end,
