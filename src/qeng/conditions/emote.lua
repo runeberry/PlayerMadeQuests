@@ -1,15 +1,14 @@
 local _, addon = ...
-local loader = addon.QuestScriptLoader
 local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
 
 -- Expected chat messages indexed by the objective they're expected for
 local expectedEmoteMessages = {}
 
-local condition = loader:NewCondition(addon.QuestScriptTokens.PARAM_EMOTE)
+local condition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_EMOTE)
 condition:AllowType("string")
 condition:AllowMultiple(true)
 
-function condition:Parse(arg)
+function condition:OnParse(arg)
   if type(arg) == "string" then
     arg = { arg }
   end

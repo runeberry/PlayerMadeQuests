@@ -1,12 +1,11 @@
 local _, addon = ...
-local loader = addon.QuestScriptLoader
 
 local defaultRadius = 0.5
 
-local condition = loader:NewCondition(addon.QuestScriptTokens.PARAM_COORDS)
+local condition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_COORDS)
 condition:AllowType("string")
 
-function condition:Parse(arg)
+function condition:OnParse(arg)
   local x, y, radius = addon:ParseCoords(arg)
   return { x = x, y = y, radius = radius }
 end
@@ -28,7 +27,7 @@ function condition:Evaluate(targetCoords)
   return result
 end
 
-local zoneCondition = loader:NewCondition(addon.QuestScriptTokens.PARAM_ZONE)
+local zoneCondition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_ZONE)
 zoneCondition:AllowType("string")
 
 function zoneCondition:Evaluate(targetZone)
@@ -41,7 +40,7 @@ function zoneCondition:Evaluate(targetZone)
   return result
 end
 
-local subzoneCondition = loader:NewCondition(addon.QuestScriptTokens.PARAM_SUBZONE)
+local subzoneCondition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_SUBZONE)
 subzoneCondition:AllowType("string")
 
 function subzoneCondition:Evaluate(targetSubzone)

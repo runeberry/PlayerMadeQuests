@@ -4,7 +4,7 @@ local UnitFactionGroup = addon.G.UnitFactionGroup
 local condition = addon.QuestEngine:NewCondition("faction")
 condition:AllowType("string")
 
-function condition:Parse(args)
+function condition:OnParse(args)
   return args:lower()
 end
 

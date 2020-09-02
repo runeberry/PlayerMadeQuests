@@ -43,247 +43,47 @@ addon.QuestScriptTokens = {
 }
 local t = addon.QuestScriptTokens
 
-local parameters = {
-  [t.PARAM_GOAL] = {
-    type = "number"
-  },
-}
-
--- Returns the parameter from the above table with any optional modifications applied
-local function getParameter(paramName, mod)
-  if not parameters[paramName] then
-    addon.Logger:Error("Failed to load QuestScript data: unrecognized parameter %s", paramName)
-    return
-  end
-  local param = addon:CopyTable(parameters[paramName])
-  if mod then
-    param = addon:MergeTable(param, mod)
-  end
-  return param
-end
-
-addon.QuestScriptTemplates = {
-  -- Template for all top-level QuestScript fields
-  ["toplevel"] = {
-    scripts = {
-      [t.METHOD_PARSE] = { required = true },
-    }
-  },
-  -- Template for all quest objectives that will be tracked by the QuestEngine
-  ["objective"] = {
-    questEvent = true, -- Listen for QuestEvents by this name when the QuestEngine starts up
-    contentParsable = true, -- Can be interpreted by ParseObjective
-    multiple = true,
-    scripts = {
-      [t.METHOD_PRE_EVAL] = { required = false },
-      [t.METHOD_POST_EVAL] = { required = false },
-    },
-    params = {
-      [t.PARAM_TEXT] = {
-        type = { "string", "table" },
-      }
-    }
-  },
-  -- Template for all objectives that can be limited by coordinate, zone, and/or subzone conditions
-  ["coordobj"] = {
-    template = { "objective" },
-    conditions = {
-      t.PARAM_ZONE,
-      t.PARAM_SUBZONE,
-      t.PARAM_COORDS,
-    },
-  },
-  -- Template for all conditions that can be evaluated against in-game data
-  ["condition"] = {},
-  -- Template for start/complete objectives
-  ["startcomplete"] = {
-    template = { "toplevel" },
-    contentParsable = true, -- Can be interpreted by ParseObjective
-    scripts = {
-      [t.METHOD_EVAL] = { required = true },
-    },
-    displaytext = {
-      log = "Go to %t[%sz:[%t: at] %sz|[%z:[%t: in] %z]]",
-      quest = "Go to [%t ][%atin ]%xyz[%a: while having %a]",
-      full = "Go to [%t ][%atin ]%xyrz[%a: while having %a]"
-    },
-    params = {
-      [t.PARAM_TEXT] = { type = { "string", "table" } },
-    },
-    conditions = {
-      t.PARAM_AURA,
-      t.PARAM_TARGET,
-      t.PARAM_ZONE,
-      t.PARAM_SUBZONE,
-      t.PARAM_COORDS,
-    }
-  },
-  -- Template for quest recommendations and requirements
-  ["recreq"] = {
-    template = { "toplevel" },
-    contentParsable = true,
-    scripts = {
-      [t.METHOD_EVAL] = { required = true },
-    },
-    params = {
-      [t.PARAM_CLASS] = {},
-      [t.PARAM_FACTION] = {},
-      [t.PARAM_LEVEL] = { type = "number" },
-      -- todo: test nested params to make sure this is possible
-      -- [tokens.PARAM_REPUTATION] = {
-      --   params = {
-      --     [tokens.PARAM_REPUTATION_NAME] = {
-      --       required = true,
-      --     },
-      --     [tokens.PARAM_REPUTATION_LEVEL] = {
-      --       required = true,
-      --     }
-      --   }
-      -- }
-    }
-  }
-}
-
-local objectives = {
-  [t.OBJ_AURA] = {
-    template = "coordobj",
-    shorthand = {
-      t.PARAM_AURA,
-    },
-    displaytext = {
-      log = "Gain %a",
-      progress = "%a gained",
-      quest = "Gain the %a aura[%xyz: while in %xyz][%i: while having %i][%e: while wearing %e]",
-      full = "Gain the %a aura[%xyz: while in %xyrz][%i: while having %i][%e: while wearing %e]"
-    },
-    conditions = {
-      { name = t.PARAM_AURA, required = true },
-      t.PARAM_EQUIP,
-      t.PARAM_ITEM,
-    }
-  },
-  [t.OBJ_EMOTE] = {
-    template = "coordobj",
-    shorthand = {
-      t.PARAM_EMOTE,
-      t.PARAM_GOAL,
-      t.PARAM_TARGET,
-    },
-    displaytext = {
-      log = "/%em[%t: with %t][%g2: %p/%g]",
-      progress = "/%em[%t: with %t]: %p/%g",
-      quest = "/%em[%t: with [%g2 ]%t|[%g2: %g2 times]][%xysz: in %xysz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
-      full = "Use emote /%em[%t: on [%g2 ]%t|[%g2: %g2 times]][%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
-    },
-    params = {
-      [t.PARAM_GOAL] = getParameter(t.PARAM_GOAL),
-    },
-    conditions = {
-      t.PARAM_AURA,
-      { name = t.PARAM_EMOTE, { required = true } },
-      t.PARAM_EQUIP,
-      t.PARAM_ITEM,
-      t.PARAM_TARGET,
-    }
-  },
-  [t.OBJ_EQUIP] = {
-    template = "coordobj",
-    shorthand = {
-      t.PARAM_EQUIP,
-    },
-    displaytext = {
-      log = "Equip %e",
-      progress = "%e equipped",
-      quest = "Equip %e[%xyz: while in %xyz][%a: while having %a][%i: while having %i]",
-      full = "Equip %e[%xyz: while in %xyrz][%a: while having %a][%i: while having %i]"
-    },
-    conditions = {
-      t.PARAM_AURA,
-      { name = t.PARAM_EQUIP, required = true },
-      t.PARAM_ITEM,
-    }
-  },
-  [t.OBJ_EXPLORE] = {
-    template = "coordobj",
-    shorthand = {
-      t.PARAM_ZONE,
-      t.PARAM_COORDS,
-    },
-    displaytext = {
-      log = "Go to %xysz",
-      progress = "%xysz explored: %p/%g",
-      quest = "Explore %xyz[%a: while having %a][%i: while having %i][%e: while wearing %e]",
-      full = "Go to %xyrz[%a: while having %a][%i: while having %i][%e: while wearing %e]"
-    },
-    conditions = {
-      t.PARAM_AURA,
-      t.PARAM_EQUIP,
-      t.PARAM_ITEM,
-    }
-  },
-  [t.OBJ_KILL] = {
-    template = "coordobj",
-    shorthand = {
-      t.PARAM_GOAL,
-      t.PARAM_TARGET,
-    },
-    displaytext = {
-      log = "%t %p/%g",
-      progress = "%t slain: %p/%g",
-      quest = "Kill [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
-      full = "Kill [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
-    },
-    params = {
-      [t.PARAM_GOAL] = getParameter(t.PARAM_GOAL),
-    },
-    conditions = {
-      t.PARAM_AURA,
-      t.PARAM_EQUIP,
-      t.PARAM_ITEM,
-      { name = t.PARAM_KILLTARGET, alias = t.PARAM_TARGET, required = true },
-    }
-  },
-  [t.OBJ_TALKTO] = {
-    template = "coordobj",
-    shorthand = {
-      t.PARAM_GOAL,
-      t.PARAM_TARGET,
-    },
-    displaytext = {
-      log = "Talk to %t[%g2: %p/%g]",
-      progress = "Talk to %t: %p/%g",
-      quest = "Talk to [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
-      full = "Talk to [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
-    },
-    params = {
-      [t.PARAM_GOAL] = getParameter(t.PARAM_GOAL),
-    },
-    conditions = {
-      t.PARAM_AURA,
-      t.PARAM_EQUIP,
-      t.PARAM_ITEM,
-      { name = t.PARAM_TARGET, required = true },
-    }
-  }
-}
-
 addon.QuestScript = {
   [t.CMD_QUEST] = {
-    template = "toplevel",
-    params = {
-      [t.PARAM_NAME] = {},
-      [t.PARAM_DESCRIPTION] = {},
-      [t.PARAM_COMPLETION] = {},
-    }
+    type = "table",
+    properties = {
+      ["name"] = { type = "string" },
+      ["description"] = { type = "string" },
+      ["completion"] = { type = "string" },
+    },
   },
   [t.CMD_OBJ] = {
-    template = "toplevel",
-    params = objectives,
+    type = "array",
+    properties = {
+      type = { "string", "table" },
+      properties = {
+        [t.PARAM_GOAL] = { type = "number" },
+        [t.PARAM_TEXT] = { type = "string" },
+      },
+    }
   },
-
-  [t.CMD_REC] = { template = "recreq" },
-  [t.CMD_REQ] = { template = "recreq" },
-
-  [t.CMD_START] = { template = "startcomplete" },
-  [t.CMD_COMPLETE] = { template = "startcomplete" },
+  [t.CMD_REC] = {
+    type = "table",
+    properties = {
+      [t.PARAM_TEXT] = { type = "string" },
+    }
+  },
+  [t.CMD_REQ] = {
+    type = "table",
+    properties = {
+      [t.PARAM_TEXT] = { type = "string" },
+    }
+  },
+  [t.CMD_START] = {
+    type = "table",
+    properties = {
+      [t.PARAM_TEXT] = { type = "string" },
+    }
+  },
+  [t.CMD_COMPLETE] = {
+    type = "table",
+    properties = {
+      [t.PARAM_TEXT] = { type = "string" },
+    }
+  },
 }

@@ -1,18 +1,17 @@
 local _, addon = ...
-local loader = addon.QuestScriptLoader
 
-local condition = loader:NewCondition(addon.QuestScriptTokens.PARAM_KILLTARGET)
+local condition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_KILLTARGET)
 condition:AllowType("string")
 condition:AllowMultiple(true)
 
-function condition:Parse(arg)
+function condition:OnParse(arg)
   if type(arg) == "string" then
     arg = { arg }
   end
   return addon:DistinctSet(arg)
 end
 
-function condition:Evaluate(unitNames, obj)
+function condition:Evaluate(unitNames, cp)
   if not addon.LastPartyKill then return end
 
   local targetUnitName = addon.LastPartyKill.destName
@@ -21,12 +20,12 @@ function condition:Evaluate(unitNames, obj)
     self.logger:Fail("Target name does not match")
     return false
   end
-  if obj.goal == 1 then
+  if cp.goal == 1 then
     -- Only one unit to target, so the objective is satisfied
     self.logger:Pass("Target name match, and goal is 1")
     return true
   end
-  local isExcluded = addon:IsTargetExcluded(obj.id, addon.LastPartyKill.destGuid)
+  local isExcluded = addon:IsTargetExcluded(cp.id, addon.LastPartyKill.destGuid)
   if isExcluded then
     self.logger:Fail("Target has already been used for this objective")
   else
@@ -35,9 +34,9 @@ function condition:Evaluate(unitNames, obj)
   return not isExcluded
 end
 
-function condition:AfterEvaluate(unitNames, obj, result)
+function condition:AfterEvaluate(result, unitNames, cp)
   if result then
     -- Objective was successful with this target, so exclude it from further progression
-    addon:AddTargetExclusion(obj.id, addon.LastPartyKill.destGuid)
+    addon:AddTargetExclusion(cp.id, addon.LastPartyKill.destGuid)
   end
 end

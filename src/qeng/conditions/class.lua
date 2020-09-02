@@ -4,7 +4,7 @@ local UnitClass = addon.G.UnitClass
 local condition = addon.QuestEngine:NewCondition("class")
 condition:AllowType("string")
 
-function condition:Parse(args)
+function condition:OnParse(args)
   return args:lower()
 end
 

@@ -1,11 +1,10 @@
 local _, addon = ...
-local loader = addon.QuestScriptLoader
 
-local condition = loader:NewCondition(addon.QuestScriptTokens.PARAM_AURA)
+local condition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_AURA)
 condition:AllowType("string")
 condition:AllowMultiple(true)
 
-function condition:Parse(arg)
+function condition:OnParse(arg)
   if type(arg) == "string" then
     arg = { arg }
   end

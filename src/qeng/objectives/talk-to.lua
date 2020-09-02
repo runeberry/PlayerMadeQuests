@@ -4,39 +4,53 @@ local tokens = addon.QuestScriptTokens
 local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
 local CheckInteractDistance = addon.G.CheckInteractDistance
 
--- Store the /talk chat message on startup for quick comparison
-addon:OnQuestEngineReady(function()
-  -- Get the expected emote message for the /talk emote
-  local emote = addon.Emotes:FindByCommand("/talk")
-  local talkEmoteMsg = emote.targeted
+local objective = addon.QuestEngine:NewObjective("talk-to")
 
-  -- Publish the TalkTo event anytime the player targets a friendly unit
-  -- that activates one of the registered events below
-  local function publishEvent()
-    if UnitExists("target") then
-      addon.QuestEvents:Publish(tokens.OBJ_TALKTO)
-    end
+objective:AddShorthandForm(tokens.PARAM_GOAL, tokens.PARAM_TARGET)
+
+objective:AddParameter(tokens.PARAM_GOAL)
+objective:AddParameter(tokens.PARAM_TEXT, {
+  defaultValue = {
+    log = "Talk to %t[%g2: %p/%g]",
+    progress = "Talk to %t: %p/%g",
+    quest = "Talk to [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
+    full = "Talk to [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
+  },
+})
+
+objective:AddCondition(tokens.PARAM_AURA)
+objective:AddCondition(tokens.PARAM_EQUIP)
+objective:AddCondition(tokens.PARAM_ITEM)
+objective:AddCondition(tokens.PARAM_TARGET, { required = true })
+objective:AddCondition(tokens.PARAM_ZONE)
+objective:AddCondition(tokens.PARAM_SUBZONE)
+objective:AddCondition(tokens.PARAM_COORDS)
+
+local targetExistsFilter = function() return UnitExists("target") end
+
+local talkEmoteMsg
+local isTalkEmoteFilter = function(msg, playerName)
+  if not talkEmoteMsg then
+    talkEmoteMsg = addon.Emotes:FindByCommand("/talk").targeted
   end
-
-  addon.GameEvents:Subscribe("AUCTION_HOUSE_SHOW", publishEvent)
-  addon.GameEvents:Subscribe("BANKFRAME_OPENED", publishEvent)
-  addon.GameEvents:Subscribe("GOSSIP_SHOW", publishEvent)
-  addon.GameEvents:Subscribe("MERCHANT_SHOW", publishEvent)
-  addon.GameEvents:Subscribe("PET_STABLE_SHOW", publishEvent)
-  addon.GameEvents:Subscribe("QUEST_DETAIL", publishEvent)
-  addon.GameEvents:Subscribe("QUEST_PROGRESS", publishEvent)
-
-  -- Allow the /talk emote to trigger this objective as well
-  addon.GameEvents:Subscribe("CHAT_MSG_TEXT_EMOTE", function(msg, playerName)
-    if playerName == GetUnitName("player") and msg and UnitExists("target") then
-      local talkEmoteMsgTargeted = talkEmoteMsg:gsub("%%t", GetUnitName("target"))
-      if msg == talkEmoteMsgTargeted then
-        if CheckInteractDistance("target", 5) then
-          addon.QuestEvents:Publish(tokens.OBJ_TALKTO)
-        else
-          logger:Trace("Not close enough to /talk to target")
-        end
+  if playerName == GetUnitName("player") and msg and UnitExists("target") then
+    local talkEmoteMsgTargeted = talkEmoteMsg:gsub("%%t", GetUnitName("target"))
+    if msg == talkEmoteMsgTargeted then
+      if CheckInteractDistance("target", 5) then
+        addon.QuestEvents:Publish(tokens.OBJ_TALKTO)
+      else
+        logger:Trace("Not close enough to /talk to target")
       end
     end
-  end)
-end)
+  end
+end
+
+objective:AddGameEvent("AUCTION_HOUSE_SHOW", targetExistsFilter)
+objective:AddGameEvent("BANKFRAME_OPENED", targetExistsFilter)
+objective:AddGameEvent("GOSSIP_SHOW", targetExistsFilter)
+objective:AddGameEvent("MERCHANT_SHOW", targetExistsFilter)
+objective:AddGameEvent("PET_STABLE_SHOW", targetExistsFilter)
+objective:AddGameEvent("QUEST_DETAIL", targetExistsFilter)
+objective:AddGameEvent("QUEST_PROGRESS", targetExistsFilter)
+
+objective:AddGameEvent("CHAT_MSG_TEXT_EMOTE", isTalkEmoteFilter)

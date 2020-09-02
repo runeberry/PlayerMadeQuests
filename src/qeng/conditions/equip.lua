@@ -1,13 +1,12 @@
 local _, addon = ...
-local loader = addon.QuestScriptLoader
 
 local IsEquippedItem = addon.G.IsEquippedItem
 
-local condition = loader:NewCondition(addon.QuestScriptTokens.PARAM_EQUIP)
+local condition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_EQUIP)
 condition:AllowType("string")
 condition:AllowMultiple(true)
 
-function condition:Parse(arg)
+function condition:OnParse(arg)
   if type(arg) == "string" then
     arg = { arg }
   end

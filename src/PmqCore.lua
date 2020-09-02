@@ -23,3 +23,13 @@ function addon:catch(fn, ...)
   end
   return ok, result, r2, r3, r4
 end
+
+--- Wrapper for error() that uses string.format for error messages
+function addon.errorf(msg, ...)
+  error(string.format(msg, ...))
+end
+
+--- Wrapper for assert() that uses string.format for error messages
+function addon.assertf(bool, msg, ...)
+  assert(bool, string.format(msg, ...))
+end
