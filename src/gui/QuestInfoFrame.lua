@@ -5,6 +5,7 @@ local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogS
 local StaticPopups = addon.StaticPopups
 local localizer = addon.QuestScriptLocalizer
 
+local pollTimers = {}
 local pollingTimerInterval = 0.5 -- interval to poll for start/complete condition satisfaction, in seconds
 
 local frameOptions = {
@@ -142,6 +143,7 @@ local function setButtonBehavior(btn, behavior, quest)
   btn:Hide()
   if btn._pollTimerId then
     addon.Ace:CancelTimer(btn._pollTimerId)
+    pollTimers[btn._pollTimerId] = nil
     btn._pollTimerId = nil
   end
 
@@ -164,6 +166,8 @@ local function setButtonBehavior(btn, behavior, quest)
       btn._pollTimerId = addon.Ace:ScheduleRepeatingTimer(function()
         btn:SetEnabled(behavior.enableIf(quest))
       end, pollingTimerInterval)
+      -- Keep track of all timers at the top-level so they can be disabled when the window is closed
+      pollTimers[btn._pollTimerId] = true
     end
   end
 
@@ -355,6 +359,13 @@ local frameScripts = {
   end,
   ["OnHide"] = function(self)
     self._shown = nil
+
+    -- Cancel any outstanding polling functions when the window is closed
+    for pollTimerId in pairs(pollTimers) do
+      addon.Ace:CancelTimer(pollTimerId)
+    end
+    pollTimers = {}
+
     addon:PlaySound("BookClose")
   end,
   -- ["OnLoad"] = function() end,
