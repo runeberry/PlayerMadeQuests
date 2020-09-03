@@ -1,6 +1,6 @@
 local _, addon = ...
 local tokens = addon.QuestScriptTokens
-local GetUnitName = addon.G.GetUnitName
+local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
 
 local objective = addon.QuestEngine:NewObjective("use-emote")
 
@@ -24,6 +24,12 @@ objective:AddCondition(tokens.PARAM_TARGET)
 objective:AddCondition(tokens.PARAM_ZONE)
 objective:AddCondition(tokens.PARAM_SUBZONE)
 objective:AddCondition(tokens.PARAM_COORDS)
+
+function objective:AfterEvaluate(result, obj)
+  -- Only concerned with objectives that have passed and have a goal > 1
+  if not result or obj.goal <= 1 then return result end
+  return addon:EvaluateUniqueTargetForObjective(self, obj, UnitGUID("target"))
+end
 
 objective:AddGameEvent("CHAT_MSG_TEXT_EMOTE", function(msg, playerName)
   if playerName == GetUnitName("player") and msg then

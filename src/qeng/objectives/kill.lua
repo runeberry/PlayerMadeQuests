@@ -23,6 +23,12 @@ objective:AddCondition(tokens.PARAM_ZONE)
 objective:AddCondition(tokens.PARAM_SUBZONE)
 objective:AddCondition(tokens.PARAM_COORDS)
 
+function objective:AfterEvaluate(result, obj)
+  -- Only concerned with objectives that have passed and have a goal > 1
+  if not result or obj.goal <= 1 then return result end
+  return addon:EvaluateUniqueTargetForObjective(self, obj, addon.LastPartyKill.destGuid)
+end
+
 objective:AddCombatLogEvent("PARTY_KILL", function(cl)
   addon.LastPartyKill = cl
   return true

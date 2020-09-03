@@ -1,6 +1,6 @@
 local _, addon = ...
 local tokens = addon.QuestScriptTokens
-local UnitExists, GetUnitName = addon.G.UnitExists, addon.G.GetUnitName
+local UnitExists, GetUnitName, UnitGUID = addon.G.UnitExists, addon.G.GetUnitName, addon.G.UnitGUID
 local CheckInteractDistance = addon.G.CheckInteractDistance
 
 local objective = addon.QuestEngine:NewObjective("talk-to")
@@ -24,6 +24,12 @@ objective:AddCondition(tokens.PARAM_TARGET, { required = true })
 objective:AddCondition(tokens.PARAM_ZONE)
 objective:AddCondition(tokens.PARAM_SUBZONE)
 objective:AddCondition(tokens.PARAM_COORDS)
+
+function objective:AfterEvaluate(result, obj)
+  -- Only concerned with objectives that have passed and have a goal > 1
+  if not result or obj.goal <= 1 then return result end
+  return addon:EvaluateUniqueTargetForObjective(self, obj, UnitGUID("target"))
+end
 
 local targetExistsFilter = function() return UnitExists("target") end
 
