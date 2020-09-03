@@ -107,7 +107,7 @@ local methods = {
       conditions = {},
     }
 
-    self.logger:Debug("Parsing checkpoint '%s' (%s)", cp.name, cp.id)
+    -- self.logger:Debug("Parsing checkpoint '%s' (%s)", cp.name, cp.id)
 
     -- (jb, 9/1/20) Important caveat!
     -- On the checkpoint template (self), every condition is also in the list of parameters
