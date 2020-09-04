@@ -1,9 +1,27 @@
 local _, addon = ...
 local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
-local GetUnitName = addon.G.GetUnitName
+local GetBuildInfo, UnitFullName = addon.G.GetBuildInfo, addon.G.UnitFullName
+local time = addon.G.time
 
 addon.QuestScriptCompiler = {}
 local compiler = addon.QuestScriptCompiler
+
+local function buildMetadata()
+  local _, build, _, tocVersion = GetBuildInfo()
+  local playerName, playerRealm = UnitFullName("player")
+
+  local metadata = {
+    addonVersion = addon.VERSION,
+    authorName = playerName,
+    authorRealm = playerRealm,
+    compileDate = time(),
+
+    clientVersion = tocVersion,
+    clientBuild = addon:TryConvertString(build),
+  }
+
+  return metadata
+end
 
 --[[
   Parses a QuestScript "file" (set of lines) and/or a set of quest parameters
@@ -32,23 +50,29 @@ function addon.QuestScriptCompiler:Compile(script, questParams)
 
   -- Finally, supply some default values for required fields that have not yet been defined
   if not quest.questId then
-    local playerName = GetUnitName("player", true)
-    if not playerName then
-      error("Player name is required in order to generate a questId")
+    local playerName, playerRealm = UnitFullName("player")
+    if not playerName or not playerRealm then
+      error("Player name and realm are required in order to generate a questId")
     end
-    quest.questId = addon:CreateID("quest-"..playerName.."-%i")
-  end
-  if not quest.addonVersion then
-    quest.addonVersion = addon.VERSION
+    quest.questId = addon:CreateID("quest-"..playerName.."-"..playerRealm.."-%i")
   end
   if not quest.objectives then
     quest.objectives = {}
   end
 
-  -- As a nice-to-have, give each objective a link back to its quest (not sure if this is still needed)
+  -- Give each objective a link back to its quest
   for _, obj in ipairs(quest.objectives) do
     obj.questId = quest.questId
   end
+
+  -- Finally, add some non-essential data to help recipients and future addon versions
+  -- know where this quest came from and how it was compiled
+  local metadata = buildMetadata()
+  if quest.metadata then
+    -- If metadata was provied in params, then those fields will take priority
+    metadata = addon:MergeTable(metadata, quest.metadata)
+  end
+  quest.metadata = metadata
 
   -- Verify with the QuestEngine that this quest will be runnable
   addon.QuestEngine:Validate(quest)

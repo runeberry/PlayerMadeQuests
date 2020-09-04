@@ -48,7 +48,6 @@ end
 function addon.QuestEngine:Validate(quest)
   assert(type(quest.questId) == "string" and quest.questId ~= "", "questId is required")
   assert(type(quest.name) == "string" and quest.name ~= "", "quest name is required")
-  assert(type(quest.addonVersion) == "number", "quest addonVersion is required")
   assert(type(quest.objectives) == "table", "quest objectives must be defined")
 
   for _, obj in ipairs(quest.objectives) do

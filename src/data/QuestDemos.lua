@@ -17,7 +17,8 @@ function addon.QuestDemos:CompileDemo(demoId)
   if not demo then
     return false, "No demo exists with demoId: "..demoId
   end
-  return addon.QuestScriptCompiler:TryCompile(demo.script, { questId = demoId })
+  local metadata = { authorName = "PMQ", authorRealm = "", isDemo = true }
+  return addon.QuestScriptCompiler:TryCompile(demo.script, { questId = demoId, metadata = metadata })
 end
 
 function addon.QuestDemos:CopyToDrafts(demoId, name)
