@@ -63,6 +63,28 @@ function addon:ClearAllTargetExclusions()
   SaveData:Clear(saveDataField)
 end
 
+--- Ensuring unique targets for objectives is a common pattern, so this
+--- function was placed here to ensure it's handled consistently.
+--- @param objective table - An objective template (for logger access)
+--- @param obj table - The instance of the objective being evaluated
+--- @param targetGuid string - The guid of the target
+function addon:EvaluateUniqueTargetForObjective(objective, obj, targetGuid)
+  if not targetGuid then
+    objective.logger:Fail("No unit is targeted")
+    return false
+  end
+
+  if addon:IsTargetExcluded(obj.id, targetGuid) then
+    -- Target has already been used for this objective, don't count it again
+    objective.logger:Fail("Target has already been used for this objective")
+    return false
+  else
+    objective.logger:Pass("Target is new for this objective")
+    addon:AddTargetExclusion(obj.id, targetGuid)
+    return true
+  end
+end
+
 addon:OnBackendStart(function()
   targetGuidHistory = SaveData:LoadTable(saveDataField)
 

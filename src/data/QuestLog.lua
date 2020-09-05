@@ -31,12 +31,13 @@ local GetUnitName = addon.G.GetUnitName
 --]]
 
 addon.QuestLog = addon:NewRepository("Quest", "questId")
-addon.QuestLog:SetSaveDataSource("QuestLog")
-addon.QuestLog:EnableWrite(true)
-addon.QuestLog:EnableCompression(true)
-addon.QuestLog:EnableTimestamps(true)
+local QuestLog = addon.QuestLog
+QuestLog:SetSaveDataSource("QuestLog")
+QuestLog:EnableWrite(true)
+QuestLog:EnableCompression(true)
+QuestLog:EnableTimestamps(true)
 
-function addon.QuestLog:SaveWithStatus(questOrId, status)
+function QuestLog:SaveWithStatus(questOrId, status)
   assert(type(questOrId) == "table" or type(questOrId) == "string", "Failed to SaveWithStatus: quest or questId are required")
   assert(status ~= nil, "Failed to SaveWithStatus: status is required")
 
@@ -53,11 +54,11 @@ function addon.QuestLog:SaveWithStatus(questOrId, status)
   self:Save(quest)
 end
 
-function addon.QuestLog:Validate(quest)
+function QuestLog:Validate(quest)
   addon:ValidateQuestStatusChange(quest)
 end
 
-function addon.QuestLog:ShareQuest(questId)
+function QuestLog:ShareQuest(questId)
   local catalogItem = addon.QuestCatalog:FindByID(questId)
   if not catalogItem then
     -- If the quest is not in the player's catalog for some reason
@@ -75,3 +76,49 @@ function addon.QuestLog:ShareQuest(questId)
   addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
   addon.Logger:Warn("Sharing quest %s...", catalogItem.quest.name)
 end
+
+-- Need to listen for objective changes and reflect those changes in the quest log
+
+addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
+  local quest = QuestLog:FindByID(obj.questId)
+  if not quest then
+    addon.Logger:Warn("Unable to update quest objective: no quest by id %s", obj.questId)
+    return
+  elseif quest.status ~= addon.QuestStatus.Active then
+    addon.Logger:Warn("Unable to update quest objective: quest \"%s\" is not Active (%s)", quest.name, quest.status)
+    return
+  end
+
+  local qobj
+  for _, qo in ipairs(quest.objectives) do
+    if qo.id == obj.id then
+      qobj = qo
+      break
+    end
+  end
+  if not qobj then
+    addon.Logger:Warn("Unable to update quest objective: no objective on quest \"%s\" with id %s", quest.name, obj.id)
+    return
+  end
+
+  qobj.progress = obj.progress
+
+  local isQuestFinished
+  -- objective is considered completed if progress is >= goal
+  if obj.progress >= obj.goal then
+    -- quest is only considered completed if all objectives would be considered completed
+    isQuestFinished = true
+    for _, qo in pairs(quest.objectives) do
+      if qo.progress < qo.goal then
+        isQuestFinished = false
+        break
+      end
+    end
+  end
+
+  if isQuestFinished then
+    quest.status = addon.QuestStatus.Finished
+  end
+
+  QuestLog:Save(quest)
+end)

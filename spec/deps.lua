@@ -142,6 +142,7 @@ function deps:Init(addon)
     CheckInteractDistance = ret(),
     CreateFrame = function() return {} end,
     GetBestMapForUnit = ret(),
+    GetBuildInfo = ret("1.2.3", "10203", "Jan 1, 2000", 10203),
     GetMapInfo = ret(),
     GetPlayerMapPosition = ret(),
     GetUnitName = function(uid)
@@ -169,6 +170,7 @@ function deps:Init(addon)
     UnitClass = ret(),
     UnitExists = ret(),
     UnitFactionGroup = ret(),
+    UnitFullName = ret("PlayerName", "PlayerRealm"),
     UnitGUID = ret(),
     UnitIsFriend = ret(),
     UnitLevel = ret(),

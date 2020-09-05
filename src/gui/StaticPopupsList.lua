@@ -73,7 +73,7 @@ addon.StaticPopupsList = {
     end,
   },
   ["StartQuestBelowRequirements"] = {
-    message = function(quest, recsResult)
+    message = function()
       return "You do not meet the recommended criteria to start this quest.\n"..
              "Accept anyway?"
     end,
@@ -230,7 +230,6 @@ addon.StaticPopupsList = {
     yesText = "OK",
     noText = "Cancel",
     yesHandler = function(location)
-      addon.Logger:Table(location)
       addon.Locations:Delete(location.locationId)
     end,
   },

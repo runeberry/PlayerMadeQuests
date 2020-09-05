@@ -70,8 +70,18 @@ function addon:MergeTable(t1, t2, circ)
   circ[t1] = merged -- Ensure that both provided tables will only be merged once
   circ[t2] = merged
   circ[merged] = merged -- Ensure that any references to the merged table are not re-merged
-  for k, v in pairs(t2) do
+  for _, v in ipairs(t2) do
+    -- Append all array-like items onto t1's array-like list
     if type(v) == "table" then
+      merged[#merged+1] = self:CopyTable(v)
+    else
+      merged[#merged+1] = v
+    end
+  end
+  for k, v in pairs(t2) do
+    if type(k) == "number" then
+      -- Do nothing, this was already "appended" during ipairs
+    elseif type(v) == "table" then
       if circ[v] then
         merged[k] = circ[v]
       elseif type(merged[k]) == "table" then

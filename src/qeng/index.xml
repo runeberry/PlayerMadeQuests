@@ -1,15 +1,29 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-  <Script file="qeng/QuestStatus.lua"/>
   <Script file="qeng/QuestScript.lua"/>
-  <Script file="qeng/QuestScriptLoader.lua"/>
-  <Script file="qeng/QuestScriptCompiler.lua"/>
-  <Script file="qeng/QuestScriptLocalizer.lua"/>
+  <Script file="qeng/QuestStatus.lua"/>
+  <Script file="qeng/QuestEngineLogger.lua"/>
   <Script file="qeng/QuestEngine.lua"/>
 
-  <Script file="qeng/cmd/objective.lua"/>
-  <Script file="qeng/cmd/quest.lua"/>
-  <Script file="qeng/cmd/req.lua"/>
-  <Script file="qeng/cmd/startcomplete.lua"/>
+  <Script file="qeng/core/Checkpoint.lua"/>
+  <Script file="qeng/core/Condition.lua"/>
+  <Script file="qeng/core/Objective.lua"/>
+  <Script file="qeng/core/Parameter.lua"/>
+  <Script file="qeng/core/Quest.lua"/>
+
+  <!-- Tools require the QuestEngine to be loaded,
+       but need to be available for the compiler, etc. -->
+  <Script file="qeng/tools/DisplayText.lua"/>
+  <Script file="qeng/tools/YamlParser.lua"/>
+
+  <!-- QuestScript runtime files have dependencies on the Engine and Tools. -->
+  <Script file="qeng/QuestScriptCompiler.lua"/>
+  <Script file="qeng/QuestScriptLocalizer.lua"/>
+
+  <Script file="qeng/parameters/goal.lua"/>
+  <Script file="qeng/parameters/text.lua"/>
+
+  <Script file="qeng/checkpoints/recreq.lua"/>
+  <Script file="qeng/checkpoints/startcomplete.lua"/>
 
   <Script file="qeng/objectives/equip-item.lua"/>
   <Script file="qeng/objectives/explore.lua"/>
@@ -19,10 +33,13 @@
   <Script file="qeng/objectives/use-emote.lua"/>
 
   <Script file="qeng/conditions/aura.lua"/>
+  <Script file="qeng/conditions/class.lua"/>
   <Script file="qeng/conditions/emote.lua"/>
   <Script file="qeng/conditions/equip.lua"/>
+  <Script file="qeng/conditions/faction.lua"/>
   <Script file="qeng/conditions/item.lua"/>
   <Script file="qeng/conditions/killtarget.lua"/>
+  <Script file="qeng/conditions/level.lua"/>
   <Script file="qeng/conditions/position.lua"/>
   <Script file="qeng/conditions/target.lua"/>
 </Ui>

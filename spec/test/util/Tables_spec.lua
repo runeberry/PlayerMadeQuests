@@ -24,6 +24,12 @@ describe("Tables", function()
         [{ name = "setItem2", val = 2 }] = true,
         [{ name = "setItem3", val = 3 }] = true,
       },
+      mixed = {
+        { name = "arrayItem1", val = 1 },
+        { name = "arrayItem2", val = 2 },
+        ["id1"] = { name = "tableItem1", val = 1 },
+        ["id2"] = { name = "tableItem2", val = 2 },
+      }
     }
   end)
 
@@ -32,7 +38,7 @@ describe("Tables", function()
       assert.equals(3, addon:tlen(t.table))
       assert.equals(3, addon:tlen(t.array))
       assert.equals(3, addon:tlen(t.set))
-      assert.equals(8, addon:tlen(t))
+      assert.equals(9, addon:tlen(t))
     end)
     it("can return 0 length for nil tables", function()
       assert.equals(0, addon:tlen(nil))
@@ -149,39 +155,51 @@ describe("Tables", function()
 
       assert.same(expected, merged.table)
     end)
-    it("can merge nested array of matching length", function()
+    it("can merge base array by appending items", function()
+      local patch = {
+        { name = "another name" },
+        { value = 300 }
+      }
+
+      local expected = addon:CopyTable(t.array)
+      expected[#expected+1] = patch[1]
+      expected[#expected+1] = patch[2]
+
+      local merged = addon:MergeTable(t.array, patch)
+
+      assert.same(expected, merged)
+    end)
+    it("can merge nested array by appending items", function()
       local patch = {
         array = {
           [1] = { name = "another name" },
-          [3] = { value = 300 }
+          [2] = { value = 300 }
         }
       }
 
       local expected = addon:CopyTable(t.array)
-      expected[1].name = patch.array[1].name
-      expected[3].value = patch.array[3].value
+      expected[#expected+1] = patch.array[1]
+      expected[#expected+1] = patch.array[2]
 
       local merged = addon:MergeTable(t, patch)
 
       assert.same(expected, merged.array)
     end)
-    it("can merge nested array with additional items", function()
+    it("can merge mixed array and key-value table", function()
       local patch = {
-        array = {
-          { name = "arrayItem1", val = 1 },
-          { name = "arrayItem2", val = 2 },
-          { name = "arrayItem3", val = 3 },
-          { name = "arrayItem4", val = 4 },
-          { name = "arrayItem5", val = 5 },
+        mixed = {
+          [1] = { name = "another name" },
+          ["newItem"] = { value = 300 },
         }
       }
 
-      local expected = addon:CopyTable(t)
-      expected.array = patch.array
+      local expected = addon:CopyTable(t.mixed)
+      expected[#expected+1] = patch.mixed[1]
+      expected["newItem"] = patch.mixed["newItem"]
 
       local merged = addon:MergeTable(t, patch)
 
-      assert.same(expected.array, merged.array)
+      assert.same(expected, merged.mixed)
     end)
     it("cannot merge nil tables", function()
       assert.has_error(function() addon:MergeTable(nil, { rootName = "new name" }) end)

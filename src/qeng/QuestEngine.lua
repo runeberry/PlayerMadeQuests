@@ -2,234 +2,59 @@ local _, addon = ...
 local tokens = addon.QuestScriptTokens
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
-local logger = addon.Logger:NewLogger("Engine", addon.LogLevel.info)
-local objectiveLogger = addon.Logger:NewLogger("Objectives", addon.LogLevel.info)
+local logger = addon.QuestEngineLogger:NewLogger("Core", addon.LogLevel.info)
 
-addon:OnConfigLoaded(function()
-  objectiveLogger.pass = addon:Colorize("green", "[P] ")
-  objectiveLogger.fail = addon:Colorize("red", "[F] ")
-end)
-
+-- QuestEngine is the source of truth for all quest evaluation logic
 addon.QuestEngine = {
-  ObjectiveLogger = objectiveLogger
+  definitions = {
+    parameters = {},
+    conditions = {},
+    checkpoints = {},
+    objectives = {},
+  }
 }
 
-local objectivesByName = {}
-
----------------------------------------------------
--- Private functions: Quest objective evaluation --
----------------------------------------------------
-
-local function evaluateObjective(objective, obj, ...)
-  local ok, beforeResult, checkResult, afterResult
-  objectiveLogger:Debug("=== Evaluating objective \"%s\"", obj.name)
-
-  if objective.scripts and objective.scripts[tokens.METHOD_PRE_EVAL] then
-    -- Determine if the objective as a whole should be evaluated
-    ok, beforeResult = pcall(objective.scripts[tokens.METHOD_PRE_EVAL], obj, ...)
-    if not ok then
-      objectiveLogger:Error("Error during pre-evaluation for \"%s\": %s", obj.id, beforeResult)
-      return
-    elseif beforeResult == false then
-      -- If the objective's pre-condition returns boolean false, then do not continue evaluating the objective
-      objectiveLogger:Debug("    Pre-evaluation returned false for %s. Terminating early.", obj.id)
-      return
-    end
-  end
-
-  -- Evaluation is expected to return a boolean value only:
-  -- true if the condition was met, false otherwise
-  local anyFailed
-  local conditionPostEvals = {}
-  for name, val in pairs(obj.conditions) do
-    local condition = objective.params[name]
-    if condition.scripts and condition.scripts[tokens.METHOD_EVAL] then
-      -- Evaluation receives 2 args: The obj being evaluated, and the value(s) for this condition
-      ok, checkResult = pcall(condition.scripts[tokens.METHOD_EVAL], obj, val)
-      if not ok then
-        objectiveLogger:Error("Error evaluating condition %s for %s: %s", name, obj.id, checkResult)
-        return
-      elseif checkResult ~= true then
-        -- If any result was not true, keep evaluating conditions, but set checkResult to false when it's all done
-        -- We keep evaluating because there might be side-effects from other conditions that are still required (not ideal, but oh well)
-        anyFailed = true
-      end
-      if condition.scripts[tokens.METHOD_POST_EVAL] then
-        -- If the condition has a post-evaluation method, reference it here so we can run it
-        -- After the objective's post-evaluation method
-        conditionPostEvals[#conditionPostEvals+1] = {
-          script = condition.scripts[tokens.METHOD_POST_EVAL],
-          name = name,
-          val = val,
-        }
-      end
-    end
-  end
-  if anyFailed then
-    checkResult = false
-  end
-
-  -- Post-evaluation may take the result from evaluation and make a final ruling by
-  -- returning either a boolean or a number to represent objective progress
-  if objective.scripts and objective.scripts[tokens.METHOD_POST_EVAL] then
-    ok, afterResult = addon:catch(objective.scripts[tokens.METHOD_POST_EVAL], obj, checkResult, ...)
-    if not ok then
-      objectiveLogger:Error("Error during post-evaluation for \"%s\": %s", obj.id, afterResult)
-      return
-    elseif afterResult ~= nil then
-      -- If the post-evaluation returns a value, then that value will override the result of evaluation
-      checkResult = afterResult
-      objectiveLogger:Trace("    Post-evaluation overriding result with: %i", checkResult)
-    end
-  end
-
-  -- If there were any condition-level post-evaluation methods, run them now
-  local err
-  for _, postEval in ipairs(conditionPostEvals) do
-    ok, err = addon:catch(postEval.script, obj, checkResult, postEval.val)
-    if not ok then
-      objectiveLogger:Error("Error during post-evaluation for \"%s\": %s", postEval.name, err)
-      -- Continue running, because the method has no effect on the result
-    end
-  end
-
-  -- Coerce non-numeric results to a goal progress number
-  if checkResult == true then
-    -- A boolean result of true will advance the objective by 1
-    checkResult = 1
-  elseif type(checkResult) ~= "number" then
-    -- False, nil, or non-numeric values will result in no objective progress
-    checkResult = 0
-  end
-
-  objectiveLogger:Trace("=== Evaluated \"%s\": %s", obj.name, checkResult)
-  return checkResult
-end
-
-local function updateQuestObjectiveProgress(obj)
-  local quest = QuestLog:FindByID(obj.questId)
-  if not quest then
-    logger:Warn("Unable to update quest objective: no quest by id %s", obj.questId)
-    return
-  elseif quest.status ~= QuestStatus.Active then
-    logger:Warn("Unable to update quest objective: quest \"%s\" is not Active (%s)", quest.name, quest.status)
-    return
-  end
-
-  local qobj
-  for _, qo in ipairs(quest.objectives) do
-    if qo.id == obj.id then
-      qobj = qo
-      break
-    end
-  end
-  if not qobj then
-    logger:Warn("Unable to update quest objective: no objective on quest \"%s\" with id %s", quest.name, obj.id)
-    return
-  end
-
-  qobj.progress = obj.progress
-
-  local isObjectiveCompleted, isQuestFinished
-  -- objective is considered completed if progress is >= goal
-  if obj.progress >= obj.goal then
-    -- quest is only considered completed if all objectives would be considered completed
-    isObjectiveCompleted = true
-    isQuestFinished = true
-    for _, qo in pairs(quest.objectives) do
-      if qo.progress < qo.goal then
-        isQuestFinished = false
-        break
-      end
-    end
-  end
-
-  if isQuestFinished then
-    quest.status = QuestStatus.Finished
-  end
-  QuestLog:Save(quest)
-
-  addon.AppEvents:Publish("ObjectiveUpdated", obj)
-  if isObjectiveCompleted then
-    addon.AppEvents:Publish("ObjectiveCompleted", obj)
-  end
-
-  return isObjectiveCompleted, isQuestFinished
-end
-
-local function wrapObjectiveHandler(objective)
-  -- Given an arbitrary list of game event args, handle them as follows
-  return function(...)
-    local numActive = addon:tlen(objective._active)
-    if numActive < 1 then
-      objectiveLogger:Trace("No active objectives for: %s", objective.name)
-      return
-    end
-
-    objectiveLogger:Debug("***** Evaluating objectives: %s (%i active)", objective.name, addon:tlen(objective._active))
-    -- logger:Table(objective._active)
-    -- Completed objectives will be tracked and removed from the list
-    local completed = {}
-
-    -- For each active instance of this objective
-    for id, obj in pairs(objective._active) do
-      if obj.progress >= obj.goal then
-        -- The objective is already completed, nothing to do
-        completed[id] = obj
-      else
-        local result = evaluateObjective(objective, obj, ...) or 0
-        logger:Debug("    Result: %i", result)
-
-        if result > 0 then
-          obj.progress = obj.progress + result
-          -- Sanity checks: progress must be >= 0, and progress must be an integer
-          obj.progress = math.max(math.floor(obj.progress), 0)
-          local isObjectiveCompleted = updateQuestObjectiveProgress(obj)
-          if isObjectiveCompleted then
-            -- Mark objective for removal from further checks
-            completed[id] = obj
-          end
-        end
-      end
-    end
-
-    for id, _ in pairs(completed) do
-      -- Stop trying to update that objective on subsequent game events
-      objective._active[id] = nil
-    end
-
-    objectiveLogger:Trace("***** Finished evaluating objectives: %s", objective.name)
-  end
-end
-
-local function evaluateStartComplete(section, token)
-  if not section or not section.conditions then
-    -- Nothing to evaluate, the quest can be started/completed
-    return true
-  end
-
-  logger:Debug("Evaluating %s condition...", token)
-  local objective = addon.QuestScript[token] -- "start" or "complete"
-  local result = evaluateObjective(objective, section)
-  logger:Debug("    Result: %s", result)
-  return result > 0
-end
+-- Local vars for easier reference within this file
+local parameters = addon.QuestEngine.definitions.parameters
+local conditions = addon.QuestEngine.definitions.conditions
+local checkpoints = addon.QuestEngine.definitions.checkpoints
+local objectives = addon.QuestEngine.definitions.objectives
 
 --------------------
 -- Public methods --
 --------------------
 
+function addon.QuestEngine:AddDefinition(defType, name, val)
+  local defs = addon.QuestEngine.definitions
+
+  if not defs[defType] then
+    logger:Fatal("Failed to create definition: '%s' is not a recognized definition type", tostring(defType))
+    return
+  end
+
+  if type(name) ~= "string" or name == "" then
+    logger:Fatal("Failed to create %s: '%s' is not a valid definition name", defType, tostring(name))
+    return
+  end
+
+  if defs[defType][name] then
+    logger:Fatal("Failed to create %s: '%s' is already a registered %s", defType, name, defType)
+    return
+  end
+
+  defs[defType][name] = val
+end
+
 function addon.QuestEngine:Validate(quest)
   assert(type(quest.questId) == "string" and quest.questId ~= "", "questId is required")
   assert(type(quest.name) == "string" and quest.name ~= "", "quest name is required")
-  assert(type(quest.addonVersion) == "number", "quest addonVersion is required")
   assert(type(quest.objectives) == "table", "quest objectives must be defined")
 
   for _, obj in ipairs(quest.objectives) do
     assert(type(obj.id) == "string" and obj.id ~= "", "objective id is required")
     assert(type(obj.name) == "string" and obj.name ~= "", "objective name is required")
 
-    local objTemplate = objectivesByName[obj.name]
+    local objTemplate = objectives[obj.name]
     assert(objTemplate, addon:Enquote(obj.name).." is not a valid objective")
 
     assert(type(obj.goal) == "number" and obj.goal > 0, addon:Enquote(obj.name).." objective must have a goal > 0")
@@ -237,26 +62,30 @@ function addon.QuestEngine:Validate(quest)
 
     assert(type(obj.conditions) == "table", addon:Enquote(obj.name).." must have conditions defined")
     for condName, _ in pairs(obj.conditions) do
-      local condition = objTemplate.params[condName]
+      local condition = objTemplate.conditions[condName]
       assert(condition, addon:Enquote(condName).." is not a valid condition for objective "..addon:Enquote(objTemplate.name))
     end
   end
 end
 
 function addon.QuestEngine:EvaluateStart(quest)
-  return evaluateStartComplete(quest.start, tokens.CMD_START)
+  if not quest.start then return true end
+  return checkpoints[tokens.CMD_START]:Evaluate(quest.start)
 end
 
 function addon.QuestEngine:EvaluateComplete(quest)
-  return evaluateStartComplete(quest.complete, tokens.CMD_COMPLETE)
+  if not quest.complete then return true end
+  return checkpoints[tokens.CMD_COMPLETE]:Evaluate(quest.complete)
 end
 
 function addon.QuestEngine:EvaluateRecommendations(quest)
-  return addon.QuestScript[tokens.CMD_REC].scripts[tokens.METHOD_EVAL](quest)
+  if not quest.recommended then return true end
+  return checkpoints[tokens.CMD_REC]:Evaluate(quest.recommended)
 end
 
 function addon.QuestEngine:EvaluateRequirements(quest)
-  return addon.QuestScript[tokens.CMD_REQ].scripts[tokens.METHOD_EVAL](quest)
+  if not quest.required then return true end
+  return checkpoints[tokens.CMD_REQ]:Evaluate(quest.required)
 end
 
 -------------------------
@@ -271,8 +100,8 @@ local function startTracking(quest)
   for _, obj in pairs(quest.objectives) do
     -- All active instances of a created objective are stored together
     -- so that they can be quickly evaluated together
-    if not objectivesByName[obj.name]._active[obj.id] then
-      objectivesByName[obj.name]._active[obj.id] = obj
+    if not objectives[obj.name].active[obj.id] then
+      objectives[obj.name].active[obj.id] = obj
       didStartTracking = true
     end
   end
@@ -285,8 +114,8 @@ end
 local function stopTracking(quest)
   local didStopTracking = false
   for _, obj in pairs(quest.objectives) do
-    if objectivesByName[obj.name]._active[obj.id] then
-      objectivesByName[obj.name]._active[obj.id] = nil
+    if objectives[obj.name].active[obj.id] then
+      objectives[obj.name].active[obj.id] = nil
       didStopTracking = true
     end
   end
@@ -318,11 +147,8 @@ end
 
 function addon.QuestEngine:Init()
   -- Ensure everything can be setup, then wire up objectives into the engine
-  local queryQuestEvents = function(cmd) return cmd.questEvent end
-  objectivesByName = addon.QuestScriptCompiler:Find(queryQuestEvents)
-  for _, objective in pairs(objectivesByName) do
-    objective._active = {} -- Every active instance of this objective will be tracked
-    addon.QuestEvents:Subscribe(objective.name, wrapObjectiveHandler(objective))
+  for _, objective in pairs(objectives) do
+    objective:Init()
   end
   logger:Debug("QuestEngine loaded OK!")
 
@@ -340,8 +166,8 @@ function addon.QuestEngine:Init()
   addon.AppEvents:Subscribe("QuestDeleted", stopTracking)
 
   addon.AppEvents:Subscribe("QuestDataReset", function()
-    for _, objective in pairs(objectivesByName) do
-      objective._active = {}
+    for _, objective in pairs(objectives) do
+      objective.active = {}
     end
     logger:Trace("Stopped tracking all quests")
   end)

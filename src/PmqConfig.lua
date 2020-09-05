@@ -13,6 +13,8 @@ addon.defaultSettings = {
   --- Enable this for detailed logs on Repository transactions.
   --- Disabled by default because it can be quite verbose.
   ENABLE_TRANSACTION_LOGS = false,
+  --- Feature flag: Count player pet kills towards kill objectives.
+  FEATURE_PET_KILLS = true,
   --- All logs below this level will be hidden across all Loggers.
   --- See available options under Logger.lua -> addon.LogLevel
   GLOBAL_LOG_FILTER = "info",
