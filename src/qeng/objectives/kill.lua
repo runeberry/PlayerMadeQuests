@@ -40,23 +40,27 @@ objective:AddCombatLogEvent("PARTY_KILL", function(cl)
   return true
 end)
 
--- Pet kills don't fire a PARTY_KILL event, but we can estimate when your pet has killed something.
--- Any unit that dies which your pet previously attacked will grant you credit for party kills
+addon:OnConfigLoaded(function()
+  if addon.Config:GetValue("FEATURE_PET_KILLS") then
+    -- Pet kills don't fire a PARTY_KILL event, but we can estimate when your pet has killed something.
+    -- Any unit that dies which your pet previously attacked will grant you credit for party kills
 
-local function isPetDamage(cl)
-  if cl.destName == GetUnitName("pet") and cl.sourceGuid then
-    petDamageTable[cl.sourceGuid] = true -- Remember pet's guid so we can attribute a unit kill to the pet
-    return true
-  end
-end
+    local function rememberPetDamage(cl)
+      if cl.destName == GetUnitName("pet") and cl.sourceGuid then
+        petDamageTable[cl.sourceGuid] = true -- Remember pet's guid so we can attribute a unit kill to the pet
+      end
+    end
 
-objective:AddCombatLogEvent("SWING_DAMAGE", isPetDamage)
-objective:AddCombatLogEvent("SPELL_CAST_SUCCESS", isPetDamage)
+    addon.CombatLogEvents:Subscribe("SWING_DAMAGE", rememberPetDamage)
+    addon.CombatLogEvents:Subscribe("SPELL_CAST_SUCCESS", rememberPetDamage)
 
-objective:AddCombatLogEvent("UNIT_DIED", function(cl)
-  if cl.destGuid and petDamageTable[cl.destGuid] then
-    objective.logger:Trace("Attributing kill to pet: %s", cl.destGuid)
-    petDamageTable[cl.destGuid] = nil
-    return true
+    objective:AddCombatLogEvent("UNIT_DIED", function(cl)
+      if cl.destGuid and petDamageTable[cl.destGuid] then
+        objective.logger:Trace("Attributing kill to pet: %s", cl.destGuid)
+        addon.LastPartyKill = cl
+        petDamageTable[cl.destGuid] = nil
+        return true
+      end
+    end)
   end
 end)
