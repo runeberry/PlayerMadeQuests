@@ -28,7 +28,6 @@ addon:OnQuestEngineReady(function()
     end
   end)
   addon.CombatLogEvents:Subscribe("UNIT_DIED", function(cl)
-    logger:Table(cl)
     if(petDamageTable[cl.destGuid] == true)
     then
       logger:Trace(cl.destGuid)
@@ -36,9 +35,4 @@ addon:OnQuestEngineReady(function()
     end
     petDamageTable[cl.destGuid] = nil
   end)
-  -- addon.GameEvents:Subscribe("COMBAT_LOG_EVENT_UNFILTERED", function(...)
-  --   logger:Table({ CombatLogGetCurrentEventInfo() })
-  --   local info = { CombatLogGetCurrentEventInfo() }
-  --   logger:Table(info)
-  -- end)
 end)

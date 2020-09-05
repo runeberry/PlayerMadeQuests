@@ -28,14 +28,12 @@ loader:AddScript(tokens.PARAM_KILLTARGET, tokens.METHOD_EVAL, function(obj, unit
     logger:Debug(logger.pass.."Target name match, and goal is 1")
     return true
   end
-  logger:Warn("Got here uwu")
   local isExcluded = addon:IsTargetExcluded(obj.id, addon.LastPartyKill.destGuid)
   if isExcluded then
     logger:Debug(logger.fail.."Target has already been used for this objective")
   else
     logger:Debug(logger.pass.."Target is new for this objective")
   end
-  logger:Warn("Got here uwu too")
   return not isExcluded
 end)
 
