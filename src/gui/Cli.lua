@@ -71,6 +71,15 @@ handlers = {
   ["location"] = function()
     addon.LocationFinderFrame:ToggleShown()
   end,
+  ["locations"] = function()
+    addon.LocationFinderFrame:ToggleShown()
+  end,  
+  ["emote"] = function()
+    addon.EmoteFrame:ToggleShown()
+  end,
+  ["emotes"] = function()
+    addon.EmoteFrame:ToggleShown()
+  end,
   ["reset-config"] = function()
     addon.StaticPopups:Show("ResetAllConfig")
   end,

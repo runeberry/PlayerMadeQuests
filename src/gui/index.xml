@@ -28,6 +28,7 @@
   <Script file="gui/LocationFinderFrame.lua"/>
   <Script file="gui/UIErrorsFrame.lua"/>
   <Script file="gui/YamlFormatting.lua"/>
+  <Script file="gui/EmoteFrame.lua"/>
 
   <!-- MainMenu screens -->
   <Script file="gui/menu/ConfigMenu.lua"/>

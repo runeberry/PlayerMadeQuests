@@ -9,6 +9,7 @@ function menu:Create(frame)
   resetFramesButton:SetScript("OnClick", function()
     -- todo: Come up with some way to grab all PopoutFrames and reset them
     addon.LocationFinderFrame:ResetWindowState()
+    addon.EmoteFrame:ResetWindowState()
     addon.QuestLogFrame:ResetWindowState()
     addon.Config:SaveValue("FrameData", {})
     addon.Logger:Warn("Frame positions reset.")

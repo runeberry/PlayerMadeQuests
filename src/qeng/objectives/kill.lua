@@ -1,5 +1,9 @@
 local _, addon = ...
 local tokens = addon.QuestScriptTokens
+local GetUnitName = addon.G.GetUnitName
+
+local petDamageTable = {}
+local petName = GetUnitName("pet")
 
 local objective = addon.QuestEngine:NewObjective("kill")
 
