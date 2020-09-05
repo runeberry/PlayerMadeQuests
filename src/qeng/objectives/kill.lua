@@ -2,9 +2,6 @@ local _, addon = ...
 local tokens = addon.QuestScriptTokens
 local GetUnitName = addon.G.GetUnitName
 
-local petDamageTable = {}
-local petName = GetUnitName("pet")
-
 local objective = addon.QuestEngine:NewObjective("kill")
 
 objective:AddShorthandForm(tokens.PARAM_GOAL, tokens.PARAM_KILLTARGET)
@@ -33,7 +30,33 @@ function objective:AfterEvaluate(result, obj)
   return addon:EvaluateUniqueTargetForObjective(self, obj, addon.LastPartyKill.destGuid)
 end
 
+local petDamageTable = {}
+
 objective:AddCombatLogEvent("PARTY_KILL", function(cl)
   addon.LastPartyKill = cl
+  if cl.sourceGuid then
+    petDamageTable[cl.sourceGuid] = nil
+  end
   return true
+end)
+
+-- Pet kills don't fire a PARTY_KILL event, but we can estimate when your pet has killed something.
+-- Any unit that dies which your pet previously attacked will grant you credit for party kills
+
+local function isPetDamage(cl)
+  if cl.destName == GetUnitName("pet") and cl.sourceGuid then
+    petDamageTable[cl.sourceGuid] = true -- Remember pet's guid so we can attribute a unit kill to the pet
+    return true
+  end
+end
+
+objective:AddCombatLogEvent("SWING_DAMAGE", isPetDamage)
+objective:AddCombatLogEvent("SPELL_CAST_SUCCESS", isPetDamage)
+
+objective:AddCombatLogEvent("UNIT_DIED", function(cl)
+  if cl.destGuid and petDamageTable[cl.destGuid] then
+    objective.logger:Trace("Attributing kill to pet: %s", cl.destGuid)
+    petDamageTable[cl.destGuid] = nil
+    return true
+  end
 end)
