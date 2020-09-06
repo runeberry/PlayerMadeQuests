@@ -27,7 +27,11 @@ local playerInventory = {
   },
 }
 
-local bagIds = { -2, 0, 1, 2, 3, 4 } -- All the bags to scan for player inventory
+-- Note on bagIds:
+-- Bag -2 is supposed to be the keyring according to: https://wow.gamepedia.com/BagID
+-- But I was getting weird results like "Light Leather" when scanning that bag.
+-- What is the actual keyring id? Idk...
+local bagIds = { 0, 1, 2, 3, 4 } -- All the bags to scan for player inventory
 local maxBagSlots = 20
 
 -- https://wow.gamepedia.com/API_GetContainerItemInfo
