@@ -24,12 +24,13 @@ function addon:RunMigrations()
   -- Don't perform any migrations if this addon version has already been run
   if lastVersion >= addon.VERSION then return end
 
-  local ok, err
+  local ok, err, migrationApplied
   local fromMigrationVersion = lastVersion
   for _, migration in ipairs(migrations) do
     -- Only run migration functions if:
-    --   1. The character's last-run version is
+    -- * The character's last-run version is lower than the migration's designated version
     if fromMigrationVersion < migration.version and migration.version <= addon.VERSION then
+      migrationApplied = true
       addon.Logger:Trace("Applying migration: %i -> %i", fromMigrationVersion, migration.version)
       ok, err = pcall(migration.fn)
       if not ok then
@@ -42,7 +43,7 @@ function addon:RunMigrations()
     end
   end
 
-  if not ok then
+  if migrationApplied and not ok then
     addon.Logger:Error(err)
     addon.Logger:Error("Please report this error to the developers!")
     return
