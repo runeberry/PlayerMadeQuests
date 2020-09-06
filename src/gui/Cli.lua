@@ -25,13 +25,25 @@ SlashCmdList.PMQ = function(msg)
   end)
 end
 
-local function dumpToConsole(name, val)
-  if type(val) == "table" then
-    addon.Logger:Table(val)
-    addon.Logger:Debug("^ Dumped table value for: %s", name)
-  else
-    addon.Logger:Debug("%s: %s", name, val)
+local function tryRunScript(str)
+  local func, err = loadstring(tostring(str))
+  if not func then
+    addon.Logger:Error("Error compiling script: %s", err)
+    return false, err
   end
+
+  setfenv(func, { addon = addon })
+
+  local ret
+  local ok, err2 = pcall(function()
+    ret = { func() }
+  end)
+  if not ok then
+    addon.Logger:Error("Error running script: %s", err2)
+    return false, err2
+  end
+
+  return true, ret
 end
 
 handlers = {
@@ -43,12 +55,33 @@ handlers = {
   ["log"] = function()
     addon.QuestLogFrame:ToggleShown()
   end,
+  ["run"] = function(script)
+    local ok, ret = tryRunScript(script)
+    if not ok then return end
+
+    if #ret > 0 then
+      local stringed = {}
+      for i, r in ipairs(ret) do
+        stringed[i] = tostring(r)
+      end
+      ret = table.concat(stringed, ", ")
+    else
+      ret = "nil"
+    end
+
+    addon.Logger:Info("Script returned: %s", ret)
+  end,
   ["dump"] = function(varname)
-    local func = loadstring("return "..varname)
-    setfenv(func, addon)
-    local val = func()
-    varname = "addon."..varname
-    dumpToConsole(varname, val)
+    local ok, ret = tryRunScript("return "..varname)
+    if not ok then return end
+
+    local val = ret[1]
+    if type(val) == "table" then
+      addon.Logger:Table(val)
+      addon.Logger:Warn("^ Dumped table value for: %s", varname)
+    else
+      addon.Logger:Warn("%s: %s", varname, tostring(val))
+    end
   end,
   ["dump-quest"] = function(nameOrId)
     local quest = addon.QuestLog:FindByID(nameOrId)
@@ -58,7 +91,8 @@ handlers = {
     if not quest then
       addon.Logger:Warn("Quest not found: %s", nameOrId)
     else
-      dumpToConsole(nameOrId, quest)
+      addon.Logger:Table(quest)
+      addon.Logger:Warn("^ Dumped quest object: %s", tostring(nameOrId))
     end
   end,
   ["scan-events"] = function()
@@ -73,7 +107,7 @@ handlers = {
   end,
   ["locations"] = function()
     addon.LocationFinderFrame:ToggleShown()
-  end,  
+  end,
   ["emote"] = function()
     addon.EmoteFrame:ToggleShown()
   end,
