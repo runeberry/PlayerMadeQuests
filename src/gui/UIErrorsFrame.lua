@@ -9,7 +9,6 @@ addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
   local lastProgress = progressCache[obj.id]
   progressCache[obj.id] = obj.progress
 
-  addon.Logger:Info("LastProgress: %s, CurrentProgress: %i", tostring(lastProgress), obj.progress)
   -- Only publish message for objectives with > 0 progress
   if obj.progress == 0 then return end
   -- Only publish message for objectives that have advanced forward, not back
