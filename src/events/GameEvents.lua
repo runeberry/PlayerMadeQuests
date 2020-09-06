@@ -3,6 +3,7 @@ local _, addon = ...
 -- Note that this event should NOT be executed async, because some global functions only return
 -- correct data on the same frame that the event is fired
 addon.GameEvents = addon.Events:CreateBroker("GameEvent")
+addon.GameEvents:ExcludeFromLogging("COMBAT_LOG_EVENT_UNFILTERED")
 
 -- This function can be used to pipe Event API events to this broker's Publish function
 local function wrapPublish(event, ...)
