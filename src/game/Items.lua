@@ -4,6 +4,9 @@ local logger = addon.Logger:NewLogger("Items")
 local GetItemInfo = addon.G.GetItemInfo
 local GetContainerItemInfo = addon.G.GetContainerItemInfo
 
+-- Keeps track of when an inventory change is due to looting a mob
+local didJustLoot = false
+
 --- Represents the player's inventory in the order that it appears in the player's bags
 local playerInventory = {
   loaded = false,
@@ -153,10 +156,17 @@ addon:OnBackendStart(function()
     updatePlayerInventory()
     local newHash = playerInventory.byId.hash
     if prevHash ~= newHash then
-      addon.AppEvents:Publish("PlayerInventoryChanged")
       logger:Trace("Player inventory contents changed (hash: %.0f)", newHash)
+      addon.AppEvents:Publish("PlayerInventoryChanged")
+      if didJustLoot then
+        didJustLoot = false
+        addon.AppEvents:Publish("PlayerLootedItem")
+      end
     else
       logger:Trace("Player inventory updated, but no change (hash: %.0f)", newHash)
     end
+  end)
+  addon.GameEvents:Subscribe("LOOT_SLOT_CLEARED", function()
+    didJustLoot = true
   end)
 end)
