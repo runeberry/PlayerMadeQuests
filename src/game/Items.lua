@@ -180,7 +180,11 @@ function addon:GetInventorySnapshotDelta(name)
   assert(playerInventory, "Failed to GetInventorySnapshotDelta: player inventory is not loaded")
   assert(type(name) == "string", "Failed to GetInventorySnapshotDelta: a snapshot name must be provided")
   local snapshot = inventorySnapshots[name]
-  assert(snapshot, "Failed to GetInventorySnapshotDelta: no snapshot exists with name: "..name)
+
+  if not snapshot then
+    logger:Trace("GetInventorySnapshotDelta: no snapshot exists with name '%s'", name)
+    return {}
+  end
 
   if playerInventory.byId.hash == snapshot.byId.hash then
     logger:Trace("GetInventorySnapshotDelta: no inventory change detected")
@@ -234,13 +238,16 @@ addon:OnBackendStart(function()
       addon.AppEvents:Publish("PlayerInventoryChanged")
       if didJustLoot then
         didJustLoot = false
-        addon.AppEvents:Publish("PlayerLootedItem")
+        local delta = addon:GetInventorySnapshotDelta("before-player-loot")
+        addon:ClearInventorySnapshot("before-player-loot")
+        addon.AppEvents:Publish("PlayerLootedItem", delta)
       end
     else
       logger:Trace("Player inventory updated, but no change (hash: %.0f)", newHash)
     end
   end)
-  addon.GameEvents:Subscribe("LOOT_SLOT_CLEARED", function()
+  addon.GameEvents:Subscribe("CHAT_MSG_LOOT", function()
+    addon:CreateInventorySnapshot("before-player-loot")
     didJustLoot = true
   end)
 end)

@@ -29,6 +29,7 @@
   <Script file="qeng/objectives/explore.lua"/>
   <Script file="qeng/objectives/gain-aura.lua"/>
   <Script file="qeng/objectives/kill.lua"/>
+  <Script file="qeng/objectives/loot-item.lua"/>
   <Script file="qeng/objectives/talk-to.lua"/>
   <Script file="qeng/objectives/use-emote.lua"/>
 
