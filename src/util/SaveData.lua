@@ -23,6 +23,8 @@ function addon.SaveData:Init()
   for varname in pairs(SavedVariables) do
     local saved = _G[varname]
     if not saved then
+      -- No SaveData means this is the first run of the addon
+      addon.IsFirstRun = true
       saved = {}
       _G[varname] = saved
     end
