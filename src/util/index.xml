@@ -10,6 +10,8 @@
   <!-- Logger dependency -->
   <Script file="util/Config.lua"/>
   <Script file="util/Events.lua"/>
+  <Script file="util/Migrations.lua"/>
+  <Script file="util/MigrationsList.lua"/>
   <Script file="util/Repository.lua"/>
   <Script file="util/SaveData.lua"/>
 </Ui>

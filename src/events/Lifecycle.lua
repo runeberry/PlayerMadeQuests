@@ -39,6 +39,8 @@ function addon.Lifecycle:Init()
   addon.Logger:Init()
   publish(events.ConfigLoaded)
 
+  addon:RunMigrations()
+
   publish(events.BackendStart)
   addon.QuestEngine:Init()
   publish(events.QuestEngineReady)
