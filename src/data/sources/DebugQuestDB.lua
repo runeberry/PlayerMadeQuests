@@ -170,8 +170,7 @@ objectives:
       item: Light Leather
   - equip-item:
       equip: Knitted Belt
-      aura: Blessing of Might
-  ]],
+      aura: Blessing of Might]],
   [12] = [[
 objectives:
   - equip-item 'Knitted Belt']],
