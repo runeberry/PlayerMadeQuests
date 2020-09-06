@@ -4,38 +4,40 @@ local logger = addon.Logger:NewLogger("Items")
 local GetItemInfo = addon.G.GetItemInfo
 local GetContainerItemInfo = addon.G.GetContainerItemInfo
 
--- Keeps track of when an inventory change is due to looting a mob
-local didJustLoot = false
-
---- Represents the player's inventory in the order that it appears in the player's bags
-local playerInventory = {
-  loaded = false,
-  -- Items are grouped per bag slot, as ordered in the player's inventory.
-  -- Empty slots are not accounted for.
-  bySlot = {
-    -- Hash will change if the order of any items changes
-    hash = 0,
-    list = {},
-  },
-  -- Items are grouped by name and associated quantity
-  byName = {
-    -- use byId's hash
-    list = {},
-  },
-  -- Items are grouped by id and associated quantity
-  byId = {
-    -- Hash will change only if an item is added or removed from the inventory
-    hash = 0,
-    list = {},
-  },
-}
-
 -- Note on bagIds:
 -- Bag -2 is supposed to be the keyring according to: https://wow.gamepedia.com/BagID
 -- But I was getting weird results like "Light Leather" when scanning that bag.
 -- What is the actual keyring id? Idk...
 local bagIds = { 0, 1, 2, 3, 4 } -- All the bags to scan for player inventory
 local maxBagSlots = 20
+local didJustLoot = false -- Keeps track of when an inventory change is due to looting a mob
+
+--- Represents the player's inventory in the order that it appears in the player's bags
+--- The current and previous copies are kept so the delta can be calculated
+local playerInventory, lastPlayerInventory
+
+local function buildInventory()
+  return {
+    -- Items are grouped per bag slot, as ordered in the player's inventory.
+    -- Empty slots are not accounted for.
+    bySlot = {
+      -- Hash will change if the order of any items changes
+      hash = 0,
+      list = {},
+    },
+    -- Items are grouped by name and associated quantity
+    byName = {
+      -- use byId's hash
+      list = {},
+    },
+    -- Items are grouped by id and associated quantity
+    byId = {
+      -- Hash will change only if an item is added or removed from the inventory
+      hash = 0,
+      list = {},
+    },
+  }
+end
 
 -- https://wow.gamepedia.com/API_GetContainerItemInfo
 local function getContainerItem(bagId, slot)
@@ -68,14 +70,12 @@ end
 local function invSort(a, b) return a.order < b.order end
 local function contSort(a, b) return a.itemId < b.itemId end
 local function updatePlayerInventory()
-  -- Reset the existing inventory and its indexes
-  local slotList, nameList, idList = {}, {}, {}
-  playerInventory.bySlot.list = slotList
-  playerInventory.byName.list = nameList
-  playerInventory.byId.list = idList
-  -- Reset hash values in case of an unexpected error
-  playerInventory.bySlot.hash = 0
-  playerInventory.byId.hash = 0
+  lastPlayerInventory = playerInventory
+  playerInventory = buildInventory()
+
+  local slotList = playerInventory.bySlot.list
+  local idList = playerInventory.byId.list
+  local nameList = playerInventory.byName.list
 
   for _, bagId in ipairs(bagIds) do
     for slot = 0, maxBagSlots do
@@ -120,6 +120,7 @@ end
 --- Gets the player's inventory sorted by how it appears in their bags.
 --- @return table array of items
 function addon:GetPlayerInventory()
+  assert(playerInventory, "Failed to GetPlayerInventory: player inventory is not loaded")
   return playerInventory.bySlot.list
 end
 
@@ -127,6 +128,7 @@ end
 --- Items that span across multiple bag slots will be grouped together and counted.
 --- @return table { ['Hearthstone'] = 1, ['Linen Cloth'] = 120, ... }
 function addon:GetPlayerInventoryContents()
+  assert(playerInventory, "Failed to GetPlayerInventoryContents: player inventory is not loaded")
   return playerInventory.byId.list
 end
 
@@ -134,7 +136,7 @@ end
 --- @param itemNameOrId string or number, the item to search for
 --- @return number the number of that item the player has
 function addon:GetPlayerItemQuantity(itemNameOrId)
-  assert(playerInventory.loaded, "Failed to GetPlayerItemQuantity: player inventory is not loaded")
+  assert(playerInventory, "Failed to GetPlayerItemQuantity: player inventory is not loaded")
   assert(itemNameOrId, "Failed to GetPlayerItemQuantity: itemNameOrId is required")
 
   local item = playerInventory.byId.list[itemNameOrId] or playerInventory.byName.list[itemNameOrId]
@@ -145,16 +147,31 @@ function addon:GetPlayerItemQuantity(itemNameOrId)
   return item.itemCount
 end
 
+--- Returns the quantity that the player gained or lost of this item during the last inventory update.
+--- If positive, the player gained the item(s). If negative, the player lost the item(s).
+--- If 0, the player did not gain or lose any of that item.
+--- @param itemNameOrId string or number, the item to search for
+--- @return number the change in quantity of that item
+function addon:GetLastInventoryChange(itemNameOrId)
+  assert(playerInventory, "Failed to GetLastInventoryChange: player inventory is not loaded")
+
+  -- If there is no previous inventory to compare to, assume no change
+  if not lastPlayerInventory then return 0 end
+
+  local currentCount = playerInventory.byId.list[itemNameOrId] or playerInventory.byName.list[itemNameOrId] or 0
+  local prevCount = lastPlayerInventory.byId.list[itemNameOrId] or playerInventory.byName.list[itemNameOrId] or 0
+
+  return currentCount - prevCount
+end
+
 -- Build the player's inventory when the addon first loads
 addon:OnBackendStart(function()
   updatePlayerInventory()
-  playerInventory.loaded = true
 
   -- Then on every update, scan the inventory again and check if its contents changed
   addon.GameEvents:Subscribe("BAG_UPDATE_DELAYED", function()
-    local prevHash = playerInventory.byId.hash
     updatePlayerInventory()
-    local newHash = playerInventory.byId.hash
+    local newHash, prevHash = playerInventory.byId.hash, lastPlayerInventory.byId.hash
     if prevHash ~= newHash then
       logger:Trace("Player inventory contents changed (hash: %.0f)", newHash)
       addon.AppEvents:Publish("PlayerInventoryChanged")
