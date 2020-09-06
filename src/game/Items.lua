@@ -14,7 +14,8 @@ local didJustLoot = false -- Keeps track of when an inventory change is due to l
 
 --- Represents the player's inventory in the order that it appears in the player's bags
 --- The current and previous copies are kept so the delta can be calculated
-local playerInventory, lastPlayerInventory
+local playerInventory
+local inventorySnapshots = {}
 
 local function buildInventory()
   return {
@@ -70,7 +71,6 @@ end
 local function invSort(a, b) return a.order < b.order end
 local function contSort(a, b) return a.itemId < b.itemId end
 local function updatePlayerInventory()
-  lastPlayerInventory = playerInventory
   playerInventory = buildInventory()
 
   local slotList = playerInventory.bySlot.list
@@ -147,21 +147,77 @@ function addon:GetPlayerItemQuantity(itemNameOrId)
   return item.itemCount
 end
 
---- Returns the quantity that the player gained or lost of this item during the last inventory update.
---- If positive, the player gained the item(s). If negative, the player lost the item(s).
---- If 0, the player did not gain or lose any of that item.
---- @param itemNameOrId string or number, the item to search for
---- @return number the change in quantity of that item
-function addon:GetLastInventoryChange(itemNameOrId)
-  assert(playerInventory, "Failed to GetLastInventoryChange: player inventory is not loaded")
+--- Creates a copy of the player's current inventory contents that can be referenced later.
+--- @param name string - the name of the snapshot
+function addon:CreateInventorySnapshot(name)
+  assert(playerInventory, "Failed to CreateInventorySnapshot: player inventory is not loaded")
+  assert(type(name) == "string", "Failed to CreateInventorySnapshot: a snapshot name must be provided")
 
-  -- If there is no previous inventory to compare to, assume no change
-  if not lastPlayerInventory then return 0 end
+  local currentInventory = addon:CopyTable(playerInventory)
+  inventorySnapshots[name] = currentInventory
+  logger:Trace("Saved inventory snapshot: %s", name)
+end
 
-  local currentCount = playerInventory.byId.list[itemNameOrId] or playerInventory.byName.list[itemNameOrId] or 0
-  local prevCount = lastPlayerInventory.byId.list[itemNameOrId] or playerInventory.byName.list[itemNameOrId] or 0
+--- Removes a saved copy of the player's inventory contents
+--- @param name string - the name of the snapshot
+function addon:ClearInventorySnapshot(name)
+  assert(playerInventory, "Failed to ClearInventorySnapshot: player inventory is not loaded")
+  assert(type(name) == "string", "Failed to ClearInventorySnapshot: a snapshot name must be provided")
 
-  return currentCount - prevCount
+  local snapshot = inventorySnapshots[name]
+  inventorySnapshots[name] = nil
+  if snapshot then
+    logger:Trace("Cleared inventory snapshot: %s", name)
+  else
+    logger:Trace("No inventory snapshot to clear with name: %s", name)
+  end
+end
+
+--- Calculates what items the player has lost or gained since the specified inventory snapshot
+--- @param name string - the name of the snapshot
+--- @return table - { ["item name"] = 1, ["other item name"] = -1 }
+function addon:GetInventorySnapshotDelta(name)
+  assert(playerInventory, "Failed to GetInventorySnapshotDelta: player inventory is not loaded")
+  assert(type(name) == "string", "Failed to GetInventorySnapshotDelta: a snapshot name must be provided")
+  local snapshot = inventorySnapshots[name]
+  assert(snapshot, "Failed to GetInventorySnapshotDelta: no snapshot exists with name: "..name)
+
+  if playerInventory.byId.hash == snapshot.byId.hash then
+    logger:Trace("GetInventorySnapshotDelta: no inventory change detected")
+    return {}
+  end
+
+  local currentList = playerInventory.byName.list
+  local prevList = snapshot.byName.list
+
+  local delta = {}
+
+  for itemName, curInfo in pairs(currentList) do
+    local prevInfo = prevList[itemName]
+    if not curInfo and not prevInfo then
+      -- noop: Player does not have this item and didn't have it during the snapshot
+    elseif not prevInfo then
+      -- Player has this item now, but didn't have it during the snapshot
+      delta[itemName] = curInfo.itemCount
+    elseif not curInfo then
+      -- Player had this item during the snapshot, but doesn't have it now
+      delta[itemName] = -1 * prevInfo.itemCount
+    else
+      -- Player has this item now as well as during the snapshot
+      local diff = curInfo.itemCount - prevInfo.itemCount
+      if diff ~= 0 then
+        -- Only add it to the delta if the quantity changed
+        delta[itemName] = diff
+      end
+    end
+  end
+
+  local logMsg = {}
+  for itemName, itemCount in pairs(delta) do
+    logMsg[#logMsg+1] = string.format("%ix %s", itemCount, itemName)
+  end
+  logger:Trace("GetInventorySnapshotDelta: %s", table.concat(logMsg, ", "))
+  return delta
 end
 
 -- Build the player's inventory when the addon first loads
@@ -170,8 +226,9 @@ addon:OnBackendStart(function()
 
   -- Then on every update, scan the inventory again and check if its contents changed
   addon.GameEvents:Subscribe("BAG_UPDATE_DELAYED", function()
+    local prevHash = playerInventory.byId.hash
     updatePlayerInventory()
-    local newHash, prevHash = playerInventory.byId.hash, lastPlayerInventory.byId.hash
+    local newHash = playerInventory.byId.hash
     if prevHash ~= newHash then
       logger:Trace("Player inventory contents changed (hash: %.0f)", newHash)
       addon.AppEvents:Publish("PlayerInventoryChanged")
