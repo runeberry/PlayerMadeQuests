@@ -7,8 +7,8 @@ local GetUnitName = addon.G.GetUnitName
     questId: "string",  -- The questId copied from the compiled quest object
     quest: {},          -- The compiled quest object
     status: "string",   -- QuestCatalogStatus
+    -- todo: Revisit metadata, some of this is now written to quest.metadata at compile time
     metadata: {         -- Additional information about this quest (like author, version, create date, etc.)
-      author: "string",     -- "name-server" of the player who created this quest
       version: 0,           -- The version of this draft of the quest
       demo: true,           -- True if this quest was generated directly from a demo, nil otherwise
       demoId: "string",     -- The id of the demo this quest or its draft was generated from, if applicable
@@ -91,6 +91,15 @@ local considerDuplicate = {
   [QuestCatalogStatus.Accepted] = true,
 }
 
+-- Received quests need to have the sender's status and quest progress reset
+local function cleanQuest(quest)
+  quest.status = nil
+
+  for _, obj in pairs(quest.objectives) do
+    obj.progress = 0
+  end
+end
+
 addon:OnBackendStart(function()
   addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, catalogItem)
     -- Check the player's Catalog to see if they're already aware of this quest
@@ -108,6 +117,15 @@ addon:OnBackendStart(function()
       addon.MessageEvents:Publish("QuestInviteDuplicate", { distribution = "WHISPER", target = sender }, quest.questId, quest.status)
       return
     end
+
+    local ok, err = addon:MigrateQuest(catalogItem.quest)
+    if not ok then
+      addon.Logger:Error("Failed to accept shared quest: %s", err)
+      addon.Logger:Warn("Ask the sender to update PMQ and try again!")
+      return
+    end
+
+    cleanQuest(catalogItem.quest)
 
     addon.QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Invited)
     addon.Logger:Warn("%s has invited you to a quest: %s", sender, catalogItem.quest.name)
