@@ -170,11 +170,37 @@ objectives:
       item: Light Leather
   - equip-item:
       equip: Knitted Belt
-      aura: Blessing of Might
-  ]],
+      aura: Blessing of Might]],
   [12] = [[
 objectives:
   - equip-item 'Knitted Belt']],
+  [13] = [=[
+objectives:
+  - loot-item: { item: Linen Cloth },
+  - loot-item: { goal: 3, item: Light Leather }
+  - loot-item:
+      goal: 3
+      item: [ Light Leather, Ruined Pelt, Ruined Leather Scraps ]
+  - loot-item:
+      goal: 3
+      item: [ Broken Boar Tusk, Chipped Boar Tusk ]
+      zone: Elwynn Forest
+      coords: 40,75,2
+      text: Boar tusks @ field south of Goldshire %p/%g
+  - loot-item:
+      goal: 3
+      item: [ Light Leather, Ruined Pelt, Ruined Leather Scraps ]]
+      aura: Blessing of Might
+      text: Leather products w/ %a %p/%g
+  - loot-item:
+      goal: 3
+      item: [ Light Leather, Ruined Pelt, Ruined Leather Scraps ]]
+      equip: Knitted Belt
+      text: Leather products w/ %e %p/%g]=],
+  [14] = [[
+objectives:
+  - loot-item 'Linen Cloth'
+  - loot-item 3 'Light Leather']]
 }
 
 addon.DebugQuestDB = {
@@ -226,6 +252,14 @@ addon.DebugQuestDB = {
     name = "Objective: equip-item (shorthand)",
     script = scripts[12],
   },
+  {
+    name = "Objective: loot-item",
+    script = scripts[13],
+  },
+  {
+    name = "Objective: loot-item (shorthand)",
+    script = scripts[14],
+  }
 }
 
 for i, quest in ipairs(addon.DebugQuestDB) do

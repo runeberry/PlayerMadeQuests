@@ -1,24 +1,12 @@
 local _, addon = ...
 
 addon.QuestScriptTokens = {
-  OBJ_AURA = "gain-aura",
-  OBJ_EMOTE = "use-emote",
-  OBJ_EQUIP = "equip-item",
-  OBJ_EXPLORE = "explore",
-  OBJ_KILL = "kill",
-  OBJ_TALKTO = "talk-to",
-
   CMD_COMPLETE = "complete",
   CMD_OBJ = "objectives",
   CMD_QUEST = "quest",
   CMD_REC = "recommended",
   CMD_REQ = "required",
   CMD_START = "start",
-
-  METHOD_PARSE = "Parse",
-  METHOD_PRE_EVAL = "BeforeEvaluate",
-  METHOD_EVAL = "Evaluate",
-  METHOD_POST_EVAL = "AfterEvaluate",
 
   PARAM_AURA = "aura",
   PARAM_CLASS = "class",

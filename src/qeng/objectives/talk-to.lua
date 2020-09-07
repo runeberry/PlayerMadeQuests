@@ -42,7 +42,7 @@ local isTalkEmoteFilter = function(msg, playerName)
     local talkEmoteMsgTargeted = talkEmoteMsg:gsub("%%t", GetUnitName("target"))
     if msg == talkEmoteMsgTargeted then
       if CheckInteractDistance("target", 5) then
-        addon.QuestEvents:Publish(tokens.OBJ_TALKTO)
+        return true
       else
         addon.Logger:Trace("Not close enough to /talk to target")
       end

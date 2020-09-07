@@ -62,9 +62,16 @@ local methods = {
     end
 
     if result ~= 0 then
-      obj.progress = obj.progress + result
-      -- Sanity checks: progress must be >= 0, and progress must be an integer
-      obj.progress = math.max(math.floor(obj.progress), 0)
+      -- Sanity checks:
+      --   * progress must be an integer
+      --   * progress must be >= 0
+      --   * progress must be <= goal
+      local newProgress = obj.progress + result
+      newProgress = math.floor(newProgress)
+      newProgress = math.max(newProgress, 0)
+      newProgress = math.min(newProgress, obj.goal)
+
+      obj.progress = newProgress
 
       addon.AppEvents:Publish("ObjectiveUpdated", obj)
       if obj.progress >= obj.goal then
