@@ -1,6 +1,6 @@
 local _, addon = ...
 
-addon.VERSION = 200
+addon.VERSION = 201
 addon.BRANCH = "beta"
 
 function addon.Ace:OnInitialize()
