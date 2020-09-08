@@ -10,7 +10,7 @@ local frameOptions = {
     text = "Location Finder"
   },
   resizable = {
-    minWidth = 400,
+    minWidth = 600,
     minHeight = 250,
   },
   position = {
@@ -28,22 +28,22 @@ local options = {
   colInfo = {
     {
       name = "Name",
-      pwidth = 0.4,
+      width = { flexSize = 1, min = 60 },
       align = "LEFT"
     },
     {
       name = "Zone",
-      pwidth = 0.2,
+      width = { flexSize = 2, min = 60, max = 120 },
       align = "RIGHT"
     },
     {
       name = "Subzone",
-      pwidth = 0.2,
+      width = { flexSize = 2, min = 60, max = 120 },
       align = "RIGHT"
     },
     {
       name = "Coords",
-      pwidth = 0.2,
+      width = { px = 100 },
       align = "RIGHT"
     }
   },

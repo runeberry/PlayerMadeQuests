@@ -10,17 +10,17 @@ local options = {
     {
       name = "Logger",
       align = "LEFT",
-      pwidth = 0.6,
+      width = { flexSize = 3, min = 80 },
     },
     {
       name = "# Logs",
       align = "RIGHT",
-      pwidth = 0.2,
+      width = { min = 80 }
     },
     {
       name = "Level",
       align = "RIGHT",
-      pwidth = 0.2,
+      width = { min = 60 }
     }
   },
   dataSource = function()

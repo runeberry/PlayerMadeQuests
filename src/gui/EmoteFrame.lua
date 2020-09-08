@@ -25,12 +25,12 @@ local options = {
   colInfo = {
     {
       name = "Emote",
-      pwidth = 0.6,
+      width = { flexSize = 3 },
       align = "LEFT"
     },
     {
       name = "Command",
-      pwidth = 0.4,
+      width = { flexSize = 2 },
       align = "RIGHT"
     },
   },

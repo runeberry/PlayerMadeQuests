@@ -10,12 +10,11 @@ local options = {
   colInfo = {
     {
       name = "Quest",
-      pwidth = 0.7,
+      width = { flexSize = 4 },
       align = "LEFT"
     },
     {
       name = "Faction",
-      pwidth = 0.3,
       align = "RIGHT"
     }
   },

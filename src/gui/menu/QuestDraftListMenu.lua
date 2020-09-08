@@ -10,11 +10,12 @@ local options = {
   colInfo = {
     {
       name = "Draft",
-      pwidth = 0.6,
+      width = { flexSize = 3 },
       align = "LEFT"
     },
     {
       name = "Last Modified",
+      width = { flexSize = 2 },
       align = "RIGHT"
     }
   },

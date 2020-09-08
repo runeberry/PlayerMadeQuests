@@ -15,7 +15,6 @@ local options = {
   colInfo = {
     {
       name = "Quest",
-      pwidth = 0.5,
       align = "LEFT"
     },
     {

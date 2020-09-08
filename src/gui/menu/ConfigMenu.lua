@@ -23,12 +23,12 @@ local options = {
     {
       name = "Key",
       align = "LEFT",
-      pwidth = 0.6,
+      width = { flexSize = 3 },
     },
     {
       name = "Value",
       align = "RIGHT",
-      pwidth = 0.4,
+      width = { flexSize = 2 },
     },
   },
   dataSource = function()
