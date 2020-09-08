@@ -207,13 +207,13 @@ frameModes = {
       if quest.required or quest.recommended then
         fs[index]:SetText("Requirements")
         local recString = ""
-        if quest.required then
-          for k, v in pairs(quest.required) do
+        if quest.required and quest.required.conditions then
+          for k, v in pairs(quest.required.conditions) do
             recString = string.format("%s* %s: %s\n", recString, k, v)
           end
         end
-        if quest.recommended then
-          for k, v in pairs(quest.recommended) do
+        if quest.recommended and quest.recommended.conditions then
+          for k, v in pairs(quest.recommended.conditions) do
             recString = string.format("%s* %s: %s (Recommended)\n", recString, k, v)
           end
         end
