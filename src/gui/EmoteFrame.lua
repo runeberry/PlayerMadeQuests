@@ -54,7 +54,7 @@ local function buildEmoteFrame()
   local dt = addon.CustomWidgets:CreateWidget("DataTable", contentFrame, options.colInfo, options.dataSource)
   dt:ClearAllPoints()
   dt:SetPoint("TOPLEFT", contentFrame, "TOPLEFT")
-  dt:SetPoint("BOTTOMRIGHT", contentFrame, "BOTTOMRIGHT", 0, 9)
+  dt:SetPoint("BOTTOMRIGHT", contentFrame, "BOTTOMRIGHT")
   dt:RefreshData()
   return frame
 end
