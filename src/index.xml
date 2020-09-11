@@ -7,5 +7,6 @@
   <Include file="data/index.xml"/>
   <Include file="game/index.xml"/>
   <Include file="qeng/index.xml"/>
+  <Include file="msg/index.xml"/>
   <Include file="gui/index.xml"/>
 </Ui>
