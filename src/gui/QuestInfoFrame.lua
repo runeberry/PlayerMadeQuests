@@ -117,7 +117,7 @@ local buttons = {
     text = "Share Quest",
     width = 122, -- todo: lookup actual width
     action = function(quest)
-      QuestLog:ShareQuest(quest.questId)
+      addon:ShareQuest(quest)
     end
   },
   ["Retry"] = {

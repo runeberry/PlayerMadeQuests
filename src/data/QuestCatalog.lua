@@ -7,16 +7,11 @@ local GetUnitName = addon.G.GetUnitName
     questId: "string",  -- The questId copied from the compiled quest object
     quest: {},          -- The compiled quest object
     status: "string",   -- QuestCatalogStatus
-    -- todo: Revisit metadata, some of this is now written to quest.metadata at compile time
-    metadata: {         -- Additional information about this quest (like author, version, create date, etc.)
-      version: 0,           -- The version of this draft of the quest
-      demo: true,           -- True if this quest was generated directly from a demo, nil otherwise
-      demoId: "string",     -- The id of the demo this quest or its draft was generated from, if applicable
-      draftStatus: "string" -- The status of this version of this draft of the quest
-      created: 0,           -- Timestamp indicating when the first version of this draft was originally created
-      versionCreated: 0,    -- Timestamp indicating when this version of the quest was created
-      published: 0,         -- Timestamp indicating when this version of the quest was moved to "published", if applicable
-      sender: "string",     -- "name-server" of the player who invited you to this quest, if applicable
+    from: {
+      source: "string", -- Where the quest came from (QuestCatalogSource)
+      id: "string",     -- Unique id of this quest's source (e.g. demoId if source == demo)
+      name: "string",   -- The name of the player this quest came from (if applicable)
+      realm: "string",  -- The realm of the player this quest came from (if applicable)
     },
   }
 --]]
@@ -36,6 +31,13 @@ local QuestCatalogStatus = {
 }
 addon.QuestCatalogStatus = QuestCatalogStatus
 
+local QuestCatalogSource = {
+  Demo = "Demo",
+  Draft = "Draft",
+  Shared = "Shared",
+}
+addon.QuestCatlogSource = QuestCatalogSource
+
 function addon.QuestCatalog:NewCatalogItem(quest)
   assert(quest and quest.questId, "NewCatalogItem failed: a quest must be provided")
 
@@ -43,7 +45,7 @@ function addon.QuestCatalog:NewCatalogItem(quest)
     questId = quest.questId,
     quest = addon:CopyTable(quest),
     status = QuestCatalogStatus.Available,
-    metadata = {},
+    from = {},
   }
 
   return item
@@ -66,18 +68,6 @@ function addon.QuestCatalog:SaveWithStatus(catalogItemOrId, status)
   self:Save(catalogItem)
 end
 
-function addon.QuestCatalog:ShareFromCatalog(questId)
-  local catalogItem = self:FindByID(questId)
-  if not catalogItem then
-    addon.Logger:Error("Failed to ShareFromCatalog: no item with id %s", questId)
-    return
-  end
-
-  catalogItem.metadata.sender = GetUnitName("player", true)
-  addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
-  addon.Logger:Warn("Sharing quest %s...", catalogItem.quest.name)
-end
-
 function addon.QuestCatalog:StartFromCatalog(questId)
   local catalogItem = self:FindByID(questId)
   if not catalogItem then
@@ -86,62 +76,3 @@ function addon.QuestCatalog:StartFromCatalog(questId)
   end
   addon:ShowQuestInfoFrame(true, catalogItem.quest)
 end
-
-local considerDuplicate = {
-  [QuestCatalogStatus.Accepted] = true,
-}
-
--- Received quests need to have the sender's status and quest progress reset
-local function cleanQuest(quest)
-  quest.status = nil
-
-  for _, obj in pairs(quest.objectives) do
-    obj.progress = 0
-  end
-end
-
-addon:OnBackendStart(function()
-  addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, catalogItem)
-    -- Check the player's Catalog to see if they're already aware of this quest
-    local existingCatalogItem = addon.QuestCatalog:FindByID(catalogItem.questId)
-    if existingCatalogItem and considerDuplicate[catalogItem.status] then
-      addon.MessageEvents:Publish("QuestInviteDuplicate", { distribution = "WHISPER", target = sender }, catalogItem.questId, catalogItem.status)
-      return
-    end
-
-    -- Check the player's QuestLog to see if they're already doing (or have done) have this quest
-    local quest = addon.QuestLog:FindByID(catalogItem.questId)
-    if quest then
-      -- Consider this a duplicate, but add the quest to their catalog as "Invited" anyway
-      addon.QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Invited)
-      addon.MessageEvents:Publish("QuestInviteDuplicate", { distribution = "WHISPER", target = sender }, quest.questId, quest.status)
-      return
-    end
-
-    local ok, err = addon:MigrateQuest(catalogItem.quest)
-    if not ok then
-      addon.Logger:Error("Failed to accept shared quest: %s", err)
-      addon.Logger:Warn("Ask the sender to update PMQ and try again!")
-      return
-    end
-
-    cleanQuest(catalogItem.quest)
-
-    addon.QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Invited)
-    addon.Logger:Warn("%s has invited you to a quest: %s", sender, catalogItem.quest.name)
-    addon:ShowQuestInfoFrame(true, catalogItem.quest, sender)
-  end)
-
-  addon.MessageEvents:Subscribe("QuestInviteAccepted", function(distribution, sender, questId)
-    addon.Logger:Warn("%s has accepted your quest.", sender)
-  end)
-  addon.MessageEvents:Subscribe("QuestInviteDeclined", function(distribution, sender, questId)
-    addon.Logger:Warn("%s has declined your quest.", sender)
-  end)
-  addon.MessageEvents:Subscribe("QuestInviteDuplicate", function(distribution, sender, questId, status)
-    addon.Logger:Warn("%s is already on that quest.", sender)
-  end)
-  addon.MessageEvents:Subscribe("QuestInviteRequirements", function(distribution, sender, questId)
-    addon.Logger:Warn("%s does not meet the requirements for that quest.", sender)
-  end)
-end)

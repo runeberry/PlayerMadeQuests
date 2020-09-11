@@ -39,7 +39,7 @@ function addon.QuestDrafts:NewDraft()
   return draft
 end
 
-function addon.QuestDrafts:CompileDraft(draftId)
+function addon.QuestDrafts:TryCompileDraft(draftId)
   if not draftId then
     return false, "draftId is required"
   end
@@ -59,47 +59,10 @@ function addon.QuestDrafts:CompileDraft(draftId)
   return true, quest
 end
 
-function addon.QuestDrafts:CatalogDraft(draftId)
-  local ok, quest = self:CompileDraft(draftId)
-  if not ok then
-    addon.Logger:Error("Failed to catalog draft: %s", quest)
-    return
-  end
-
-  local catalogItem = addon.QuestCatalog:FindByID(quest.questId)
-  if not catalogItem then
-    addon.Logger:Debug("Catalog item does not exist for draft. Creating it now...")
-    local draft = self:FindByID(draftId)
-    catalogItem = addon.QuestCatalog:NewCatalogItem(quest)
-    catalogItem.metadata = {
-      author = GetUnitName("player", true),
-      version = draft.version,
-      demoId = draft.parameters.demoId,
-      draftId = draftId,
-      draftStatus = draft.status,
-      created = draft.cd,
-      -- versionCreated = nil,
-      -- published = nil,
-    }
-    addon.QuestCatalog:Save(catalogItem)
-  end
-
-  return catalogItem
-end
-
-function addon.QuestDrafts:ShareDraft(draftId)
-  local catalogItem = self:CatalogDraft(draftId)
-  if not catalogItem then return end
-
-  catalogItem.metadata.sender = GetUnitName("player", true)
-  addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
-  addon.Logger:Warn("Sharing quest %s...", catalogItem.quest.name)
-end
-
 function addon.QuestDrafts:StartDraft(draftId)
-  local ok, quest = self:CompileDraft(draftId)
+  local ok, quest = self:TryCompileDraft(draftId)
   if not ok then
-    addon.Logger:Error("Failed to start draft: %s", quest)
+    addon.Logger:Warn("Failed to start draft: %s", quest)
     return
   end
   addon:ShowQuestInfoFrame(true, quest)

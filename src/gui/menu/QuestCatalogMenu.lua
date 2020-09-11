@@ -41,7 +41,7 @@ local options = {
       anchor = "TOP",
       enabled = "Row",
       handler = function(catalogItem)
-        QuestCatalog:ShareFromCatalog(catalogItem.questId)
+        addon:ShareQuest(catalogItem.quest)
       end,
     },
     {

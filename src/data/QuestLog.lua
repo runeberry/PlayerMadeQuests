@@ -58,25 +58,6 @@ function QuestLog:Validate(quest)
   addon:ValidateQuestStatusChange(quest)
 end
 
-function QuestLog:ShareQuest(questId)
-  local catalogItem = addon.QuestCatalog:FindByID(questId)
-  if not catalogItem then
-    -- If the quest is not in the player's catalog for some reason
-    -- create a temporary catalog item for the message.
-    -- This could happen when trying to share a demo quest.
-    local quest = self:FindByID(questId)
-    catalogItem = addon.QuestCatalog:NewCatalogItem(quest)
-    if quest.demoId then
-      catalogItem.metadata.demo = true
-      catalogItem.metadata.demoId = quest.demoId
-    end
-  end
-
-  catalogItem.metadata.sender = GetUnitName("player", true)
-  addon.MessageEvents:Publish("QuestInvite", nil, catalogItem)
-  addon.Logger:Warn("Sharing quest %s...", catalogItem.quest.name)
-end
-
 -- Need to listen for objective changes and reflect those changes in the quest log
 
 addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
