@@ -486,6 +486,8 @@ end
 local questInfoFrame
 
 function addon:ShowQuestInfoFrame(flag, quest, sender, modeName)
+  if not addon.Config:GetValue("ENABLE_GUI") then return end
+
   if flag == nil then flag = true end
   if not questInfoFrame then
     questInfoFrame = buildQuestInfoFrame()
