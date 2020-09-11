@@ -36,7 +36,7 @@ local QuestCatalogSource = {
   Draft = "Draft",
   Shared = "Shared",
 }
-addon.QuestCatlogSource = QuestCatalogSource
+addon.QuestCatalogSource = QuestCatalogSource
 
 function addon.QuestCatalog:NewCatalogItem(quest)
   assert(quest and quest.questId, "NewCatalogItem failed: a quest must be provided")
