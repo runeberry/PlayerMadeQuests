@@ -118,7 +118,7 @@ addon:OnBackendStart(function()
       addon.QuestCatalog:Save(catalogItem, QuestCatalogStatus.Invited)
     end
 
-    -- Now that we have catalogged the latest version of the quest, how do we notify the receiving player?
+    -- Now that we have catalogued the latest version of the quest, how do we notify the receiving player?
     local duplicateStatus
 
     -- If the catalog status is "Accepted", then the player has accepted an invite for this quest in the past
