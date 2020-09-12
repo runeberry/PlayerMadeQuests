@@ -1,6 +1,7 @@
 local _, addon = ...
 local logger = addon.Logger:NewLogger("Share")
 local QuestCatalogSource, QuestCatalogStatus, QuestStatus = addon.QuestCatalogSource, addon.QuestCatalogStatus, addon.QuestStatus
+local MessageEvents, MessageDistribution = addon.MessageEvents, addon.MessageDistribution
 local UnitFullName = addon.G.UnitFullName
 
 local function cleanQuestForSharing(quest)
@@ -51,7 +52,7 @@ function addon:ShareQuest(quest)
   cleanQuestForSharing(quest)
   addon.QuestEngine:Validate(quest) -- Sanity check, don't want to send players broken quests
 
-  addon.MessageEvents:Publish("QuestInvite", nil, quest) -- Currently only shares with default channel ("PARTY")
+  MessageEvents:Publish("QuestInvite", nil, quest) -- Currently only shares with default channel ("PARTY")
   addon.Logger:Warn("Sharing quest %s...", quest.name)
 end
 
@@ -68,13 +69,13 @@ addon:OnBackendStart(function()
     }
   }
 
-  addon.MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
+  MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
     if quest.quest then
       -- The payload is probably a QuestCatalog item, stop handling now
       -- todo: come up with a better method for handling version incompatibilities
       addon.Logger:Warn("%s tried to share a quest with you, but their addon is out-of-date.", sender)
       addon.Logger:Warn("Please ask them to update PMQ to %s or later and restart their game.", addon:GetVersionText())
-      addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = sender })
+      MessageEvents:Publish("QuestInviteDeclined", { distribution = MessageDistribution.Whisper, target = sender })
       return
     end
 
@@ -89,7 +90,7 @@ addon:OnBackendStart(function()
     if not ok then
       addon.Logger:Warn("%s tried to share a quest with you, but there was a migration error: %s", sender, err)
       addon.Logger:Warn("Please ask them to update PMQ to %s or later and restart their game.", addon:GetVersionText())
-      addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = sender })
+      MessageEvents:Publish("QuestInviteDeclined", { distribution = MessageDistribution.Whisper, target = sender })
       return
     end
 
@@ -140,7 +141,7 @@ addon:OnBackendStart(function()
 
     -- If the quest is a duplicate, simply notify the receiver that a quest in their catalog has been updated
     if duplicateStatus then
-      addon.MessageEvents:Publish("QuestInviteDuplicate", { distribution = "WHISPER", target = sender }, quest.questId, duplicateStatus)
+      MessageEvents:Publish("QuestInviteDuplicate", { distribution = MessageDistribution.Whisper, target = sender }, quest.questId, duplicateStatus)
       if catalogQuestVersionUpdated then
         addon.Logger:Warn("%s shared a new version of a quest: %s", sender, quest.name)
         addon.Logger:Warn("Start this quest from your Catalog to play this new version.")
@@ -157,22 +158,22 @@ addon:OnBackendStart(function()
       addon:ShowQuestInfoFrame(true, catalogItem.quest, sender)
     else
       addon.Logger:Warn("You do not meet the requirements, but it has been saved to your Catalog.")
-      addon.MessageEvents:Publish("QuestInviteRequirements", { distribution = "WHISPER", target = sender }, quest.questId)
+      MessageEvents:Publish("QuestInviteRequirements", { distribution = MessageDistribution.Whisper, target = sender }, quest.questId)
     end
   end)
 
-  addon.MessageEvents:Subscribe("QuestInviteAccepted", function(distribution, sender, questId)
+  MessageEvents:Subscribe("QuestInviteAccepted", function(distribution, sender, questId)
     addon.Logger:Warn("%s has accepted your quest.", sender)
   end)
-  addon.MessageEvents:Subscribe("QuestInviteDeclined", function(distribution, sender, questId)
+  MessageEvents:Subscribe("QuestInviteDeclined", function(distribution, sender, questId)
     addon.Logger:Warn("%s has declined your quest.", sender)
   end)
-  addon.MessageEvents:Subscribe("QuestInviteDuplicate", function(distribution, sender, questId, status)
+  MessageEvents:Subscribe("QuestInviteDuplicate", function(distribution, sender, questId, status)
     if status and considerDuplicate[status] then
       addon.Logger:Warn(considerDuplicate[status].message, sender)
     end
   end)
-  addon.MessageEvents:Subscribe("QuestInviteRequirements", function(distribution, sender, questId)
+  MessageEvents:Subscribe("QuestInviteRequirements", function(distribution, sender, questId)
     addon.Logger:Warn("%s does not meet the requirements for that quest.", sender)
   end)
 end)

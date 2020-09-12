@@ -3,11 +3,31 @@ local Ace, unpack = addon.Ace, addon.G.unpack
 local GetUnitName = addon.G.GetUnitName
 local encoder = addon.LibCompress:GetAddonEncodeTable()
 
+--- Values defined here: https://wow.gamepedia.com/API_C_ChatInfo.SendAddonMessage
+addon.MessageDistribution = {
+  Party = "PARTY",
+  Raid = "RAID",
+  Instance = "INSTANCE_CHAT",
+  Guild = "GUILD",
+  Officer = "OFFICER",
+  Whisper = "WHISPER",
+  -- Channel = "CHANNEL", -- Not supported in Classic
+  Say = "SAY", -- Only supported in Classic
+  Yell = "YELL", -- Only supported in Classic
+}
+
+--- Values defined here: https://wow.gamepedia.com/ChatThrottleLib
+addon.MessagePriority = {
+  Normal = "NORMAL",
+  Bulk = "BULK",
+  Alert = "ALERT",
+}
+
 local PMQ_MESSAGE_PREFIX = "PMQ"
 local defaultDetails = {
-  distribution = "PARTY", -- see: https://wow.gamepedia.com/API_C_ChatInfo.SendAddonMessage
+  distribution = addon.MessageDistribution.Party,
   target = nil, -- player name, required only for "WHISPER"
-  priority = "NORMAL" -- also allowed: "BULK", "ALERT"
+  priority = addon.MessagePriority.Normal,
 }
 local useInternalMessaging
 local internalPublish

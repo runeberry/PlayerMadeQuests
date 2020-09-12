@@ -25,7 +25,7 @@ describe("ShareQuest", function()
 
   local function assertResponded(event)
     local options = eventSpy:GetPublishPayload(event)
-    assert.equals("WHISPER", options.distribution)
+    assert.equals(addon.MessageDistribution.Whisper, options.distribution)
     assert.equals("*yourself*", options.target)
   end
 
