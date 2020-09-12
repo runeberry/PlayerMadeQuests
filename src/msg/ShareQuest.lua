@@ -1,4 +1,5 @@
 local _, addon = ...
+local logger = addon.Logger:NewLogger("Share")
 local QuestCatalogSource, QuestCatalogStatus, QuestStatus = addon.QuestCatalogSource, addon.QuestCatalogStatus, addon.QuestStatus
 local UnitFullName = addon.G.UnitFullName
 
@@ -121,22 +122,20 @@ addon:OnBackendStart(function()
     -- Now that we have catalogued the latest version of the quest, how do we notify the receiving player?
     local duplicateStatus
 
-    -- If the catalog status is "Accepted", then the player has accepted an invite for this quest in the past
-    -- and no changes were made (otherwise it would have reverted back to "Invited")
-    if catalogItem.status == "Accepted" then
-      duplicateStatus = catalogItem.quest.status
+    -- Quest is considered a duplicate if it's already in the log or archive with a recognized "duplicate" status
+    local questLogQuest = addon.QuestLog:FindByID(quest.questId)
+    if questLogQuest and considerDuplicate[questLogQuest.status] then
+      logger:Trace("Quest is duplicate: already in log with status '%s'", questLogQuest.status)
+      duplicateStatus = questLogQuest.status
     else
-      local questLogQuest = addon.QuestLog:FindByID(quest.questId)
-      if questLogQuest and considerDuplicate[questLogQuest.status] then
-        duplicateStatus = questLogQuest.status
-      else
-        local archiveQuest = addon.QuestArchive:FindByID(quest.questId)
-        if archiveQuest and considerDuplicate[archiveQuest.status] then
-          duplicateStatus = archiveQuest.status
-        end
+      local archiveQuest = addon.QuestArchive:FindByID(quest.questId)
+      if archiveQuest and considerDuplicate[archiveQuest.status] then
+        logger:Trace("Quest is duplicate: already in archive with status '%s'", archiveQuest.status)
+        duplicateStatus = archiveQuest.status
       end
     end
 
+    -- If the quest is a duplicate, simply notify the receiver that a quest in their catalog has been updated
     if duplicateStatus then
       addon.MessageEvents:Publish("QuestInviteDuplicate", { distribution = "WHISPER", target = sender }, quest.questId, duplicateStatus)
       if catalogQuestVersionUpdated then
@@ -151,6 +150,7 @@ addon:OnBackendStart(function()
     -- Finally, check the quest's requirements to ensure the player can start it
     local meetsRequirements = addon.QuestEngine:EvaluateRequirements(quest)
     if meetsRequirements then
+      logger:Trace("Quest requirements met, showing QuestInfoFrame")
       addon:ShowQuestInfoFrame(true, catalogItem.quest, sender)
     else
       addon.Logger:Warn("You do not meet the requirements, but it has been saved to your Catalog.")

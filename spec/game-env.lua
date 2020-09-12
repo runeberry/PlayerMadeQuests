@@ -142,4 +142,11 @@ function game:AddPlayerEquipment(addon, item)
   mocks[#mocks+1] = addon.G.IsEquippedItem
 end
 
+function game:SetPlayerLevel(addon, level)
+  assert(type(level) == "number", "SetPlayerLevel must receive a number")
+
+  mock:GetFunctionMock(addon.G.UnitLevel):SetReturnsWhen(unitIdIsPlayer, level)
+  mocks[#mocks+1] = addon.G.UnitLevel
+end
+
 return game
