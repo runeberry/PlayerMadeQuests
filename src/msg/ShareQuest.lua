@@ -22,7 +22,9 @@ local function getNewerQuest(q1, s1, q2, s2)
     return q2, s2
   end
 
-  if q2.metadata.compileDate > q1.metadata.compileDate and q2.metadata.hash ~= q1.metadata.hash then
+  if q2.metadata.compileDate == nil then
+    return q1, s1
+  elseif q2.metadata.compileDate > q1.metadata.compileDate and q2.metadata.hash ~= q1.metadata.hash then
     -- q2 must be more recently compiled AND have a different hash in order to overtake q1
     return q2, s2
   end
