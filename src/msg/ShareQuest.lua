@@ -61,7 +61,7 @@ addon:OnBackendStart(function()
       message = "%s is already on that quest."
     },
     [QuestStatus.Finished] = {
-      message = "%s has finished that quest, but has not yet completed it.",
+      message = "%s has finished that quest, but has not turned it in.",
     },
     [QuestStatus.Completed] = {
       message = "%s has completed that quest."
