@@ -23,6 +23,16 @@ local function buildMetadata()
   return metadata
 end
 
+local function signQuestHash(quest)
+  -- Temporarily remove metadata from the quest, as it should not affect the hash
+  local metadata = quest.metadata
+  quest.metadata = nil
+
+  metadata.hash = tostring(addon:GetTableHash(quest))
+
+  quest.metadata = metadata
+end
+
 --[[
   Parses a QuestScript "file" (set of lines) and/or a set of quest parameters
   into a Quest that can be stored in the QuestLog and tracked.
@@ -73,6 +83,9 @@ function addon.QuestScriptCompiler:Compile(script, questParams)
     metadata = addon:MergeTable(metadata, quest.metadata)
   end
   quest.metadata = metadata
+
+  -- Final step: sign the quest with a hash
+  signQuestHash(quest)
 
   -- Verify with the QuestEngine that this quest will be runnable
   addon.QuestEngine:Validate(quest)

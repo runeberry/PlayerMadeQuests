@@ -83,22 +83,37 @@ describe("ShareQuest", function()
         QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Invited)
       end)
       it("then newer shared quest versions are saved to the Catalog", function()
-        catalogItem.quest.metadata.compileDate = catalogItem.quest.metadata.compileDate + 1
-        QuestCatalog:Save(catalogItem)
-
-        addon:Advance()
-        local updatedCatalogItem = QuestCatalog:FindByID(sharedQuest.questId)
-        assert.equals(catalogItem.quest.name, updatedCatalogItem.quest.name)
-      end)
-      it("then older shared quest versions are not saved to the Catalog", function()
-        catalogItem.quest.metadata.compileDate = catalogItem.quest.metadata.compileDate - 1
+        catalogItem.quest.metadata.compileDate = sharedQuest.metadata.compileDate - 1
+        catalogItem.quest.metadata.hash = sharedQuest.metadata.hash.."-different"
         QuestCatalog:Save(catalogItem)
 
         addon:Advance()
         local updatedCatalogItem = QuestCatalog:FindByID(sharedQuest.questId)
         assert.same(sharedQuest, updatedCatalogItem.quest)
       end)
+      it("then newer shared quest versions with the same hash are not saved to the Catalog", function()
+        catalogItem.quest.metadata.compileDate = sharedQuest.metadata.compileDate - 1
+        catalogItem.quest.metadata.hash = sharedQuest.metadata.hash -- Already setup, just here for emphasis
+        QuestCatalog:Save(catalogItem)
+
+        addon:Advance()
+        local updatedCatalogItem = QuestCatalog:FindByID(sharedQuest.questId)
+        assert.same(catalogItem.quest, updatedCatalogItem.quest)
+      end)
+      it("then older shared quest versions are not saved to the Catalog", function()
+        catalogItem.quest.metadata.compileDate = sharedQuest.metadata.compileDate + 1
+        catalogItem.quest.metadata.hash = sharedQuest.metadata.hash.."-different"
+        QuestCatalog:Save(catalogItem)
+
+        addon:Advance()
+        local updatedCatalogItem = QuestCatalog:FindByID(sharedQuest.questId)
+        assert.same(catalogItem.quest, updatedCatalogItem.quest)
+      end)
       it("then shared quests of the same version are not saved to the Catalog", function()
+        catalogItem.quest.metadata.compileDate = sharedQuest.metadata.compileDate -- Already setup, just here for emphasis
+        catalogItem.quest.metadata.hash = sharedQuest.metadata.hash -- Already setup, just here for emphasis
+        QuestCatalog:Save(catalogItem)
+
         addon:Advance()
         local updatedCatalogItem = QuestCatalog:FindByID(sharedQuest.questId)
         assert.same(catalogItem.quest, updatedCatalogItem.quest)
@@ -108,7 +123,7 @@ describe("ShareQuest", function()
     describe("and the quest is already in the QuestLog", function()
       local questLogQuest, catalogItem
       before_each(function()
-        catalogItem = QuestCatalog:NewCatalogItem(addon:CopyTable(questToShare))
+        catalogItem = QuestCatalog:NewCatalogItem(addon:CopyTable(sharedQuest))
         catalogItem.quest.name = catalogItem.quest.name.." (Catalog)"
         QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Accepted)
 
@@ -129,6 +144,7 @@ describe("ShareQuest", function()
       end)
       it("then older catalog versions will still be updated", function()
         catalogItem.quest.metadata.compileDate = catalogItem.quest.metadata.compileDate - 10
+        catalogItem.quest.metadata.hash = catalogItem.quest.metadata.hash.."-different"
         QuestCatalog:Save(catalogItem)
 
         addon:Advance()
@@ -163,7 +179,7 @@ describe("ShareQuest", function()
       end)
     end)
   end)
-  describe("when a shared quest is received requirements", function()
+  describe("when a shared quest is received with requirements", function()
     local sharedQuest
     before_each(function()
       sharedQuest = addon.QuestScriptCompiler:Compile(goodScriptWithRequirements)
