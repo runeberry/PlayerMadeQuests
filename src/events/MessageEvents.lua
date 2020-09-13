@@ -17,6 +17,8 @@ MessageDistribution = {
 }
 addon.MessageDistribution = MessageDistribution
 
+local mdValidate = addon:InvertTable(MessageDistribution)
+
 --- Values defined here: https://wow.gamepedia.com/ChatThrottleLib
 MessagePriority = {
   Normal = "NORMAL",
@@ -24,6 +26,8 @@ MessagePriority = {
   Alert = "ALERT",
 }
 addon.MessagePriority = MessagePriority
+
+local mpValidate = addon:InvertTable(MessagePriority)
 
 local PMQ_MESSAGE_PREFIX = "PMQ"
 local defaultDetails = {
@@ -66,9 +70,9 @@ local function broker_publishMessage(self, event, details, ...)
   details = details or defaultDetails
 
   assert(details.distribution, "A message distribution must be specified")
-  assert(MessageDistribution[details.distribution], details.distribution.." is not a valid message distribution option")
+  assert(mdValidate[details.distribution], details.distribution.." is not a valid message distribution option")
   if details.priority then
-    assert(MessagePriority[details.priority], details.priority.." is not a valid message priority option")
+    assert(mpValidate[details.priority], details.priority.." is not a valid message priority option")
   end
   if details.distribution == MessageDistribution.Whisper then
     assert(details.target, "Attempted to send a message over WHISPER without a target")
