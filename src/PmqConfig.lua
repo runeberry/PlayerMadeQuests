@@ -13,6 +13,9 @@ addon.defaultSettings = {
   --- Enable this for detailed logs on Repository transactions.
   --- Disabled by default because it can be quite verbose.
   ENABLE_TRANSACTION_LOGS = false,
+  --- Enable version update notifications whenever a newer version
+  --- of the addon is detected.
+  ENABLE_UPDATE_NOTIFICATIONS = true,
   --- Feature flag: Count player pet kills towards kill objectives.
   FEATURE_PET_KILLS = true,
   --- All logs below this level will be hidden across all Loggers.
@@ -26,6 +29,9 @@ addon.defaultSettings = {
   --- Show this MainMenu screen immediately when the addon loads.
   --- Set to an empty string to not show any menu on startup.
   START_MENU = "",
+  --- The amount of time in seconds that "known version" info should be cached
+  --- for the purpose of notifying the player of version updates.
+  VERSION_INFO_TTL = 3 * 86400, -- 3 days
 
   Logging = {},
   FrameData = {},
