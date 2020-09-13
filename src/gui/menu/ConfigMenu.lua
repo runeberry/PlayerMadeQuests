@@ -1,5 +1,6 @@
 local _, addon = ...
 local Config, ConfigSource = addon.Config, addon.ConfigSource
+local CreateFrame = addon.G.CreateFrame
 
 local menu = addon.MainMenu:NewMenuScreen("ConfigMenu")
 
@@ -7,6 +8,10 @@ local configRows = {}
 
 --- These config values will not be shown in this menu.
 local configExclude = {
+  CHARSET = true,
+  URL_DISCORD = true,
+  URL_GITHUB = true,
+  URL_WIKI = true,
   FrameData = true,
   Logging = true,
 }
@@ -79,7 +84,38 @@ local options = {
 }
 
 function menu:Create(frame)
-  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
+  local textinfo = {
+    static = true,
+    styles = addon.DefaultArticleTextStyle,
+    text = {
+      {
+        style = "page-header",
+        text = "Configuration",
+      },
+      {
+        style = "default",
+        text = "Use this menu to change settings within PMQ.\nYou must "..addon:Colorize("orange", "/reload").." for changes to take effect."
+
+      },
+      {
+        style = "default",
+        text = "For more information, check out the Configuration page on the PMQ wiki:\n"..
+               "        "..addon:Colorize("blue", addon.Config:GetValue("URL_WIKI").."/wiki/Configuration")
+      }
+    }
+  }
+
+  local article = addon.CustomWidgets:CreateWidget("ArticleText", frame, textinfo)
+  article:ClearAllPoints(true)
+  article:SetPoint("TOPLEFT", frame, "TOPLEFT")
+  article:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
+  article:SetHeight(90)
+
+  local dtFrame = CreateFrame("Frame", nil, frame)
+  dtFrame:SetPoint("TOPLEFT", article, "BOTTOMLEFT")
+  dtFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
+
+  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", dtFrame, options)
   local dataTable = dtwb:GetDataTable()
   dataTable:SubscribeMethodToEvents("RefreshData", "ConfigUpdated", "ConfigDataLoaded", "ConfigDataReset")
   dataTable:SubscribeMethodToEvents("ClearSelection", "ConfigDataLoaded", "ConfigDataReset")
