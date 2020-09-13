@@ -51,9 +51,13 @@ local function tellVersion(event, distro, target)
     addon.VERSION, addon.BRANCH)
 end
 
-function addon:BroadcastVersion()
+function addon:BroadcastAddonVersion()
   tellVersion("AddonVersionRequest", MessageDistribution.Yell)
   tellVersion("AddonVersionRequest", MessageDistribution.Guild)
+end
+
+function addon:RequestAddonVersion(distro, target)
+  tellVersion("AddonVersionRequest", distro, target)
 end
 
 addon:OnBackendStart(function()
@@ -70,5 +74,5 @@ addon:OnBackendStart(function()
 end)
 
 addon:OnAddonReady(function()
-  addon:BroadcastVersion()
+  addon:BroadcastAddonVersion()
 end)

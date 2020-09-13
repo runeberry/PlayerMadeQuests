@@ -70,6 +70,9 @@ addon:OnBackendStart(function()
   }
 
   MessageEvents:Subscribe("QuestInvite", function(distribution, sender, quest)
+    -- As a bonus, do a version check whenever you receive a quest invite
+    addon:RequestAddonVersion(MessageDistribution.Whisper, sender)
+
     if quest.quest then
       -- The payload is probably a QuestCatalog item, stop handling now
       -- todo: come up with a better method for handling version incompatibilities
