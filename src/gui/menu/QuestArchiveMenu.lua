@@ -42,7 +42,7 @@ local options = {
       anchor = "TOP",
       enabled = "Row",
       handler = function(quest)
-        QuestArchive:ShareQuest(quest.questId)
+        addon:ShareQuest(quest)
       end,
     },
     {

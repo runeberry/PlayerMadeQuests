@@ -65,12 +65,16 @@ function addon:Pluralize(num, singular, plural)
   end
 end
 
-function addon:GetVersionText()
-  local major, minor, patch = addon.VERSION / 10000, (addon.VERSION / 100) % 100, addon.VERSION % 100
+function addon:GetVersionText(version, branch)
+  version = version or addon.VERSION
+  branch = branch or addon.BRANCH
+
+  local major, minor, patch = version / 10000, (version / 100) % 100, version % 100
   local text = string.format("v%i.%i.%i", major, minor, patch)
-  if addon.BRANCH then
-    text = text.."-"..addon.BRANCH
+  if branch then
+    text = text.."-"..branch
   end
+
   return text
 end
 

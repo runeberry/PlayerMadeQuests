@@ -36,52 +36,54 @@ function addon.SaveData:Init()
   addon.AppEvents:Publish("SaveDataLoaded")
 end
 
--- Returns the value of the specified field from SavedVariables
--- If the value is a table, then a copy of the saved table is returned
+--- Returns the value of the specified field from SavedVariables
+--- If the value is a table, then a copy of the saved table is returned
 function addon.SaveData:Load(field, global)
   assert(isSaveDataLoaded, "Failed to Load field"..field..": SaveData not loaded")
   local value = getSaveTable(global)[field]
-  logger:Trace("SaveData field loaded: %s", field)
+  if value ~= nil then
+    logger:Trace("SaveData field loaded: %s", field)
+  end
   return value
 end
 
--- Same as Load, but ensures that the returned value is a table
--- If the value is not a table, then a new empty table is returned
+--- Same as Load, but ensures that the returned value is a table
+--- If the value is not a table, then a new empty table is saved and returned
 function addon.SaveData:LoadTable(field, global)
   local saved = self:Load(field, global)
-  if saved == nil or type(saved) ~= "table" then
+  if type(saved) ~= "table" then
     saved = {}
     self:Save(field, saved, global)
   end
   return saved
 end
 
--- Same as Load, but ensures that the returned value is a string
--- If the value is not a string, then an empty string is returned
+--- Same as Load, but ensures that the returned value is a string
+--- If the value is not a string, then an empty string is saved and returned
 function addon.SaveData:LoadString(field, global)
   local saved = self:Load(field, global)
-  if saved == nil or type(saved) ~= "string" then
+  if type(saved) ~= "string" then
     saved = ""
     self:Save(field, saved, global)
   end
   return saved
 end
 
--- Saves the value to the specified field in SavedVariables
+--- Saves the value to the specified field in SavedVariables
 function addon.SaveData:Save(field, value, global)
   assert(isSaveDataLoaded, "Failed to Save field"..field..": SaveData not loaded")
   getSaveTable(global)[field] = value
   logger:Trace("SaveData field saved: %s", field)
 end
 
--- Saves nil to the specified field in SavedVariables
+--- Saves nil to the specified field in SavedVariables
 function addon.SaveData:Clear(field, global)
   assert(isSaveDataLoaded, "Failed to Clear field "..field..": SaveData not loaded")
   getSaveTable(global)[field] = nil
   logger:Debug("SaveData field cleared: %s", field)
 end
 
--- Resets all SavedVariables
+--- Resets all SavedVariables
 function addon.SaveData:ClearAll(global)
   assert(isSaveDataLoaded, "Failed to ClearAll: SaveData not loaded")
   local t = getSaveTable(global)

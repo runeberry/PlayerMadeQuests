@@ -2,6 +2,7 @@ local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogStatus
+local MessageEvents, MessageDistribution = addon.MessageEvents, addon.MessageDistribution
 local StaticPopups = addon.StaticPopups
 local localizer = addon.QuestScriptLocalizer
 
@@ -43,7 +44,7 @@ local function acceptQuest(quest, sender)
     QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
   end
   if sender then
-    addon.MessageEvents:Publish("QuestInviteAccepted", { distribution = "WHISPER", target = sender }, quest.questId)
+    MessageEvents:Publish("QuestInviteAccepted", { distribution = MessageDistribution.Whisper, target = sender }, quest.questId)
   end
   addon:PlaySound("QuestAccepted")
   addon:ShowQuestInfoFrame(false)
@@ -81,7 +82,7 @@ local buttons = {
     width = 78,
     action = function(quest, sender)
       if sender then
-        addon.MessageEvents:Publish("QuestInviteDeclined", { distribution = "WHISPER", target = sender }, quest.questId)
+        MessageEvents:Publish("QuestInviteDeclined", { distribution = MessageDistribution.Whisper, target = sender }, quest.questId)
         QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Declined)
       end
       addon:ShowQuestInfoFrame(false)
@@ -117,7 +118,7 @@ local buttons = {
     text = "Share Quest",
     width = 122, -- todo: lookup actual width
     action = function(quest)
-      QuestLog:ShareQuest(quest.questId)
+      addon:ShareQuest(quest)
     end
   },
   ["Retry"] = {
@@ -486,6 +487,8 @@ end
 local questInfoFrame
 
 function addon:ShowQuestInfoFrame(flag, quest, sender, modeName)
+  if not addon.Config:GetValue("ENABLE_GUI") then return end
+
   if flag == nil then flag = true end
   if not questInfoFrame then
     questInfoFrame = buildQuestInfoFrame()

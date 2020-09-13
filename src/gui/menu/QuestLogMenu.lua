@@ -55,7 +55,7 @@ local options = {
       anchor = "TOP",
       enabled = "Row",
       handler = function(quest)
-        QuestLog:ShareQuest(quest.questId)
+        addon:ShareQuest(quest)
       end,
     },
     {

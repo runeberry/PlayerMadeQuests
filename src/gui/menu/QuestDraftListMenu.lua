@@ -61,7 +61,12 @@ local options = {
       anchor = "TOP",
       enabled = "Row",
       handler = function(draft)
-        addon.QuestDrafts:ShareDraft(draft.draftId)
+        local ok, quest = addon.QuestDrafts:TryCompileDraft(draft.draftId)
+        if not ok then
+          addon.Logger:Warn("Your quest contains an error and cannot be shared: %s", quest)
+          return
+        end
+        addon:ShareQuest(quest)
       end,
     },
     {
