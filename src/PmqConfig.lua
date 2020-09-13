@@ -18,8 +18,10 @@ addon.defaultSettings = {
   --- All logs below this level will be hidden across all Loggers.
   --- See available options under Logger.lua -> addon.LogLevel
   GLOBAL_LOG_FILTER = "info",
-  --- Enable version update notifications whenever a newer version
-  --- of the addon is detected.
+  -- Settings for various in-game notifications.
+  NOTIFY_COMPLETE_AUTHOR = true,
+  NOTIFY_COMPLETE_SHARER = true,
+  NOTIFY_COMPLETE_BULK = true,
   NOTIFY_VERSION_UPDATE = true,
   --- The amount of time in seconds between checks for the player's location
   --- when location polling is enabled.
