@@ -1,3 +1,4 @@
+local assert = require("luassert") -- Use extended assertions from busted
 local events = {}
 
 local methods = {
