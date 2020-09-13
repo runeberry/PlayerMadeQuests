@@ -1,4 +1,5 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="msg/QuestTracking.lua"/>
   <Script file="msg/ShareQuest.lua"/>
   <Script file="msg/VersionCheck.lua"/>
 </Ui>

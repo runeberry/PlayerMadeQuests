@@ -1,5 +1,4 @@
 local _, addon = ...
-local GetUnitName = addon.G.GetUnitName
 
 --[[
   Quest model:

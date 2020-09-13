@@ -4,7 +4,7 @@ local GetUnitName = addon.G.GetUnitName
 local encoder = addon.LibCompress:GetAddonEncodeTable()
 
 --- Values defined here: https://wow.gamepedia.com/API_C_ChatInfo.SendAddonMessage
-addon.MessageDistribution = {
+MessageDistribution = {
   Party = "PARTY",
   Raid = "RAID",
   Instance = "INSTANCE_CHAT",
@@ -15,13 +15,19 @@ addon.MessageDistribution = {
   Say = "SAY", -- Only supported in Classic
   Yell = "YELL", -- Only supported in Classic
 }
+addon.MessageDistribution = MessageDistribution
+
+local mdValidate = addon:InvertTable(MessageDistribution)
 
 --- Values defined here: https://wow.gamepedia.com/ChatThrottleLib
-addon.MessagePriority = {
+MessagePriority = {
   Normal = "NORMAL",
   Bulk = "BULK",
   Alert = "ALERT",
 }
+addon.MessagePriority = MessagePriority
+
+local mpValidate = addon:InvertTable(MessagePriority)
 
 local PMQ_MESSAGE_PREFIX = "PMQ"
 local defaultDetails = {
@@ -62,6 +68,16 @@ end
 -- { distribution = "", target = "", priority = "" }
 local function broker_publishMessage(self, event, details, ...)
   details = details or defaultDetails
+
+  assert(details.distribution, "A message distribution must be specified")
+  assert(mdValidate[details.distribution], details.distribution.." is not a valid message distribution option")
+  if details.priority then
+    assert(mpValidate[details.priority], details.priority.." is not a valid message priority option")
+  end
+  if details.distribution == MessageDistribution.Whisper then
+    assert(details.target, "Attempted to send a message over WHISPER without a target")
+  end
+
   local payload = { e = event, p = { ... } }
   local compressed = addon:CompressTable(payload)
   local encoded = encoder:Encode(compressed)

@@ -62,7 +62,7 @@ end
 
 addon:OnBackendStart(function()
   loadVersionInfo()
-  updateNotificationsEnabled = addon.Config:GetValue("ENABLE_UPDATE_NOTIFICATIONS")
+  updateNotificationsEnabled = addon.Config:GetValue("NOTIFY_VERSION_UPDATE")
 
   MessageEvents:Subscribe("AddonVersionRequest", function(distribution, sender, version, branch)
     notifyVersion(version, branch)

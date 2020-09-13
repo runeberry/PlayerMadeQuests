@@ -149,4 +149,23 @@ function game:SetPlayerLevel(addon, level)
   mocks[#mocks+1] = addon.G.UnitLevel
 end
 
+function game:SetPlayerName(addon, name, realm)
+  assert(type(name) == "string", "SetPlayerName must receive a string")
+
+  mock:GetFunctionMock(addon.G.GetUnitName):SetReturnsWhen(unitIdIsPlayer, name)
+  mock:GetFunctionMock(addon.G.UnitFullName):SetReturnsWhen(unitIdIsPlayer, name, realm or "PlayerRealm")
+  mocks[#mocks+1] = addon.G.GetUnitName
+  mocks[#mocks+1] = addon.G.UnitFullName
+end
+
+function game:SetPlayerGroup(addon, groupType)
+  local isInGroup = groupType == "PARTY" or groupType == "RAID"
+  local isInRaid = groupType == "RAID"
+
+  mock:GetFunctionMock(addon.G.IsInGroup):SetReturns(isInGroup)
+  mock:GetFunctionMock(addon.G.IsInRaid):SetReturns(isInRaid)
+  mocks[#mocks+1] = addon.G.IsInRaid
+  mocks[#mocks+1] = addon.G.IsInGroup
+end
+
 return game
