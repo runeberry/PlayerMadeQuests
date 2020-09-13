@@ -13,14 +13,14 @@ addon.defaultSettings = {
   --- Enable this for detailed logs on Repository transactions.
   --- Disabled by default because it can be quite verbose.
   ENABLE_TRANSACTION_LOGS = false,
-  --- Enable version update notifications whenever a newer version
-  --- of the addon is detected.
-  ENABLE_UPDATE_NOTIFICATIONS = true,
   --- Feature flag: Count player pet kills towards kill objectives.
   FEATURE_PET_KILLS = true,
   --- All logs below this level will be hidden across all Loggers.
   --- See available options under Logger.lua -> addon.LogLevel
   GLOBAL_LOG_FILTER = "info",
+  --- Enable version update notifications whenever a newer version
+  --- of the addon is detected.
+  NOTIFY_VERSION_UPDATE = true,
   --- The amount of time in seconds between checks for the player's location
   --- when location polling is enabled.
   PLAYER_LOCATION_INTERVAL = 1.0,
