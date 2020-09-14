@@ -18,8 +18,8 @@ function menu:Create(frame)
       },
       {
         style = "default-centered",
-        text = "Developed & Produced By: Runeberry Software LLC",
-      }
+        text = "(c) 2020 Runeberry Software, LLC\nLicensed under GNU GPL v3.0",
+      },
     }
   }
 
@@ -34,7 +34,26 @@ function menu:Create(frame)
     text = {
       {
         style = "header",
-        text = "Community Resources",
+        text = "Getting Started",
+      },
+      {
+        style = "default",
+        text = "PMQ allows you to write, play, and share your own custom quests. With a few lines of script, you can create an adventure that plays just like a real World of Warcraft quest, complete with tracked objectives, custom dialogue, and more!"
+      },
+      {
+        style = "default",
+        text = "Ready to get started?"
+      },
+      {
+        style = "default",
+        text = "    > Try out the "..addon:Colorize("orange", "Demo Quests").." bundled with PMQ to learn how to write your own.\n"..
+               "    > Start customizing any Demo Quest with "..addon:Colorize("orange", "Copy to Drafts").." from the View Code page.\n"..
+               "    > Write quests from scratch and share them with your party from the "..addon:Colorize("orange", "My Drafts").." page.\n"..
+               "    > Checkout the "..addon:Colorize("orange", "PMQ Wiki").." (link below) for even more ways to customize your quests.",
+      },
+      {
+        style = "header",
+        text = "\nCommunity Resources", -- Extra newline for spacing
       },
       {
         style = "highlight",
