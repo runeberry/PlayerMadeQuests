@@ -12,6 +12,10 @@ local knownVersionInfo
 -- Not truly a timeout, just a feedback device for players
 local updateResponseTimeout = 3
 
+-- Throttle version checks so they can't be spammed
+local lastVersionCheck = 0
+local versionCheckThrottle = 10
+
 local function saveVersionInfo(version, branch)
   version = version or addon.VERSION
   branch = branch or addon.BRANCH
@@ -64,6 +68,13 @@ function addon:SetUpdateCheckFlag(flag)
 end
 
 function addon:BroadcastAddonVersion(notify)
+  local currentTime = time()
+  if currentTime - lastVersionCheck < versionCheckThrottle then
+    addon.Logger:Trace("Version has been checked too recently")
+    return
+  end
+  lastVersionCheck = currentTime
+
   if notify then
     addon.Logger:Info("Checking nearby players for updates...")
 
