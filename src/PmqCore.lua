@@ -2,6 +2,7 @@ local _, addon = ...
 
 addon.VERSION = 202
 addon.BRANCH = "beta"
+addon.TIMESTAMP = 0
 
 function addon.Ace:OnInitialize()
   addon:OnAddonReady(function()

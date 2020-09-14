@@ -26,6 +26,11 @@ sed -ri "s/^(addon.VERSION = ).+$/\1$VERSION_NUMBER/" "$ADDON_DIR/$VERSION_FILE"
 sed -ri "s/^(addon.BRANCH = ).+$/\1\"$BRANCH\"/" "$ADDON_DIR/$VERSION_FILE"
 sed -ri "s/^(## Version: ).+$/\1$VERSION_STRING/" "$ADDON_DIR/$ADDON_NAME.toc"
 
+echo "Setting build timestamp..."
+
+TIMESTAMP=$(date +%s)
+sed -ri "s/^(addon.TIMESTAMP = ).+$/\1$TIMESTAMP/" "$ADDON_DIR/$VERSION_FILE"
+
 echo "Compressing files..."
 
 # Compressed folder must contain a folder called $ADDON_NAME with all the contents in it
