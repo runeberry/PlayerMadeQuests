@@ -64,7 +64,7 @@ end
 
 function addon:BroadcastAddonVersion(notify)
   if notify then
-    addon.Logger:Info("Checking nearby players for newer versions...")
+    addon.Logger:Info("Checking nearby players for updates...")
 
     addon.Ace:ScheduleTimer(function()
       if not hasNotifiedVersion then

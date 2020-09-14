@@ -80,7 +80,7 @@ end
 
 function addon:GetVersionDate(timestamp)
   timestamp = timestamp or addon.TIMESTAMP
-  return date("%x %X", timestamp)
+  return date("%b %d %Y %H:%M", timestamp)
 end
 
 function addon:Enquote(str, quotes)

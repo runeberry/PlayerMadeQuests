@@ -1,5 +1,5 @@
 local _, addon = ...
-local Config, ConfigSource = addon.Config
+local Config = addon.Config
 local CreateFrame = addon.G.CreateFrame
 
 local menu = addon.MainMenu:NewMenuScreen("AboutMenu")
@@ -14,12 +14,20 @@ function menu:Create(frame)
     text = {
       {
         style = "page-header",
-        text = string.format("PlayerMadeQuests (%s)", addon:GetVersionText()),
+        text = "PlayerMadeQuests",
       },
       {
         style = "default-centered",
         text = "(c) 2020 Runeberry Software, LLC\nLicensed under GNU GPL v3.0",
       },
+      {
+        style = "highlight",
+        text = "Version: "..addon:Colorize("white", addon:GetVersionText()),
+      },
+      {
+        style = "highlight",
+        text = "Build Date: "..addon:Colorize("white", addon:GetVersionDate()),
+      }
     }
   }
 
@@ -27,6 +35,17 @@ function menu:Create(frame)
   headerArticle:ClearAllPoints(true)
   headerArticle:SetPoint("TOPLEFT", frame, "TOPLEFT")
   headerArticle:SetPoint("BOTTOMRIGHT", logo, "BOTTOMLEFT")
+
+  local updateButton = CreateFrame("Button", nil, headerArticle, "UIPanelButtonTemplate")
+  updateButton:SetPoint("BOTTOM", headerArticle, "BOTTOM", 0, 12)
+  updateButton:SetWidth(150)
+  updateButton:SetText("Check for Updates")
+  updateButton:SetScript("OnClick", function()
+    addon:catch(function()
+      addon:SetUpdateCheckFlag(false)
+      addon:BroadcastAddonVersion(true)
+    end)
+  end)
 
   local bodyTextInfo = {
     static = true,
@@ -57,7 +76,7 @@ function menu:Create(frame)
       },
       {
         style = "highlight",
-        text = "PMQ Wiki - "..addon:Colorize("blue", addon.Config:GetValue("URL_WIKI"))
+        text = "PMQ Wiki - "..addon:Colorize("blue", Config:GetValue("URL_WIKI"))
       },
       {
         style = "default",
@@ -65,7 +84,7 @@ function menu:Create(frame)
       },
       {
         style = "highlight",
-        text = "Discord - "..addon:Colorize("blue", addon.Config:GetValue("URL_DISCORD")),
+        text = "Discord - "..addon:Colorize("blue", Config:GetValue("URL_DISCORD")),
       },
       {
         style = "default",
@@ -73,7 +92,7 @@ function menu:Create(frame)
       },
       {
         style = "highlight",
-        text = "Github - "..addon:Colorize("blue", addon.Config:GetValue("URL_GITHUB")),
+        text = "Github - "..addon:Colorize("blue", Config:GetValue("URL_GITHUB")),
       },
       {
         style = "default",
