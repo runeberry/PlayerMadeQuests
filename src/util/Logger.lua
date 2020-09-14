@@ -233,7 +233,14 @@ end
 --- Sets a user-defined minimum log level for a given logger
 function addon:SetUserLogLevel(name, level)
   assert(name, "Logger name is required")
-  assert(loggers[name], name.." is not a known logger")
+
+  if not loggers[name] then
+    addon.Logger:Trace(name.." is not a known logger. Removing it from save data...")
+    local logSettings = addon.Config:GetValue("Logging")
+    logSettings[name] = nil
+    addon.Config:SaveValue("Logging", logSettings)
+    return
+  end
 
   -- If no level is specified, then the saved value is removed
   local value

@@ -1,5 +1,5 @@
 local _, addon = ...
-local strsplit = addon.G.strsplit
+local strsplit, date = addon.G.strsplit, addon.G.date
 
 addon.Strings = {}
 
@@ -76,6 +76,11 @@ function addon:GetVersionText(version, branch)
   end
 
   return text
+end
+
+function addon:GetVersionDate(timestamp)
+  timestamp = timestamp or addon.TIMESTAMP
+  return date("%b %d %Y %H:%M", timestamp)
 end
 
 function addon:Enquote(str, quotes)

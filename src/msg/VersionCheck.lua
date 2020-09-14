@@ -1,11 +1,20 @@
 local _, addon = ...
 local MessageEvents, MessageDistribution, MessagePriority = addon.MessageEvents, addon.MessageDistribution, addon.MessagePriority
+local IsInGroup, IsInRaid = addon.G.IsInGroup, addon.G.IsInRaid
 local time = addon.G.time
 
 --- Only notify player of version updates once per session
 local hasNotifiedVersion
 local updateNotificationsEnabled
 local knownVersionInfo
+
+-- Time in seconds to post back to the player that "no new version has been found"
+-- Not truly a timeout, just a feedback device for players
+local updateResponseTimeout = 3
+
+-- Throttle version checks so they can't be spammed
+local lastVersionCheck = 0
+local versionCheckThrottle = 10
 
 local function saveVersionInfo(version, branch)
   version = version or addon.VERSION
@@ -20,8 +29,9 @@ end
 local function loadVersionInfo()
   knownVersionInfo = addon.SaveData:LoadTable("KnownVersionInfo", true)
 
-  if not knownVersionInfo.version then
-    -- Nothing is saved, save current addon version as highest known version
+  if not knownVersionInfo.version or knownVersionInfo.version < addon.VERSION then
+    -- Nothing is saved, or outdated info is saved
+    -- Save current addon version as highest known version
     saveVersionInfo()
     return
   end
@@ -51,9 +61,38 @@ local function tellVersion(event, distro, target)
     addon.VERSION, addon.BRANCH)
 end
 
-function addon:BroadcastAddonVersion()
+-- Set to "false" to allow another update notification to occur
+-- Set to "true" to suppress update notifications for this session
+function addon:SetUpdateCheckFlag(flag)
+  hasNotifiedVersion = flag
+end
+
+function addon:BroadcastAddonVersion(notify)
+  local currentTime = time()
+  if currentTime - lastVersionCheck < versionCheckThrottle then
+    addon.Logger:Trace("Version has been checked too recently")
+    return
+  end
+  lastVersionCheck = currentTime
+
+  if notify then
+    addon.Logger:Info("Checking nearby players for updates...")
+
+    addon.Ace:ScheduleTimer(function()
+      if not hasNotifiedVersion then
+        addon.Logger:Info("No updates found.")
+      end
+    end, updateResponseTimeout)
+  end
+
   tellVersion("AddonVersionRequest", MessageDistribution.Yell)
   tellVersion("AddonVersionRequest", MessageDistribution.Guild)
+
+  if IsInRaid() then
+    tellVersion("AddonVersionRequest", MessageDistribution.Raid)
+  elseif IsInGroup() then
+    tellVersion("AddonVersionRequest", MessageDistribution.Party)
+  end
 end
 
 function addon:RequestAddonVersion(distro, target)

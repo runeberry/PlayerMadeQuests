@@ -2,12 +2,13 @@ local _, addon = ...
 local UISpecialFrames = addon.G.UISpecialFrames
 
 local firstShow = true
-local defaultMenu = "QuestDemoListMenu"
+local defaultMenu = "AboutMenu"
 
 addon.MainMenu = addon.CustomWidgets:CreateWidget("TreeMenuFrame")
 addon.MainMenu:SetTitle("PlayerMadeQuests")
 addon.MainMenu:SetStatusText("PMQ "..addon:GetVersionText().." (thank you for testing! <3)")
 addon.MainMenu:SetMenuTree({ -- value == menuId
+  { value = "AboutMenu", text = "About PMQ" },
   { value = "QuestMenu-Placeholder", text = "Quests",
     children = {
       { value = "QuestCatalogMenu", text = "Quest Catalog" },
@@ -19,7 +20,7 @@ addon.MainMenu:SetMenuTree({ -- value == menuId
   },
   { value = "SettingsMenu", text = "Settings",
     children = {
-      { value = "ConfigMenu", text = "Config" },
+      { value = "ConfigMenu", text = "Configuration" },
       { value = "LoggingMenu", text = "Logging" },
     }
   },

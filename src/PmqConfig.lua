@@ -31,6 +31,10 @@ addon.defaultSettings = {
   --- Show this MainMenu screen immediately when the addon loads.
   --- Set to an empty string to not show any menu on startup.
   START_MENU = "",
+  --- Links to external PMQ references.
+  URL_DISCORD = "https://discord.gg/HBsNJTY",
+  URL_GITHUB = "https://github.com/runeberry/PlayerMadeQuests",
+  URL_WIKI = "https://pmq.runeberry.com",
   --- The amount of time in seconds that "known version" info should be cached
   --- for the purpose of notifying the player of version updates.
   VERSION_INFO_TTL = 3 * 86400, -- 3 days

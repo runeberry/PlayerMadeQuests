@@ -29,11 +29,21 @@ addon.DefaultArticleTextStyle = {
     justifyH = "LEFT",
     spacing = 2,
   },
+  ["default-centered"] = {
+    inheritsFrom = "GameFontHighlightSmall",
+    justifyH = "CENTER",
+    spacing = 2,
+  },
   ["highlight"] = {
     inheritsFrom = "GameFontNormalSmall",
     justifyH = "LEFT",
     spacing = 2,
-  }
+  },
+  ["highlight-centered"] = {
+    inheritsFrom = "GameFontNormalSmall",
+    justifyH = "CENTER",
+    spacing = 2,
+  },
 }
 
 function addon:ApplyBackgroundStyle(frame)

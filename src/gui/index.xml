@@ -31,6 +31,7 @@
   <Script file="gui/EmoteFrame.lua"/>
 
   <!-- MainMenu screens -->
+  <Script file="gui/menu/AboutMenu.lua"/>
   <Script file="gui/menu/ConfigMenu.lua"/>
   <Script file="gui/menu/DebugQuestListMenu.lua"/>
   <Script file="gui/menu/HelpCommandsMenu.lua"/>
