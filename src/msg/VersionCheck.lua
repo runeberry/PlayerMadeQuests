@@ -25,8 +25,9 @@ end
 local function loadVersionInfo()
   knownVersionInfo = addon.SaveData:LoadTable("KnownVersionInfo", true)
 
-  if not knownVersionInfo.version then
-    -- Nothing is saved, save current addon version as highest known version
+  if not knownVersionInfo.version or knownVersionInfo.version < addon.VERSION then
+    -- Nothing is saved, or outdated info is saved
+    -- Save current addon version as highest known version
     saveVersionInfo()
     return
   end
