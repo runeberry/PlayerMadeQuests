@@ -32,6 +32,10 @@ function menu:Create(frame)
       description = "Prompts you to reset all config values for the addon."
     },
     {
+      command = "/pmq update",
+      description = "Checks nearby players for PMQ version updates (this happens automatically on load)."
+    },
+    {
       command = "/talk",
       description = "You can use this emote on a target to complete any talk-to objective, including targets that you're unable to talk to otherwise. However, you must be within 10y of the target for it to count."
     }

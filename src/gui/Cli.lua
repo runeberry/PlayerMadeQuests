@@ -117,4 +117,8 @@ handlers = {
   ["reset-config"] = function()
     addon.StaticPopups:Show("ResetAllConfig")
   end,
+  ["update"] = function()
+    addon:SetUpdateCheckFlag(false)
+    addon:BroadcastAddonVersion(true)
+  end,
 }
