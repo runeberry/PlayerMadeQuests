@@ -1,9 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
-local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
-local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogStatus
-local MessageEvents, MessageDistribution = addon.MessageEvents, addon.MessageDistribution
-local StaticPopups = addon.StaticPopups
+local QuestStatus = addon.QuestStatus
+local QuestCatalog, QuestCatalogSource = addon.QuestCatalog, addon.QuestCatalogSource
 local localizer = addon.QuestScriptLocalizer
 
 local pollTimers = {}
@@ -38,20 +36,6 @@ local textStyles = {
   }
 }
 
-local function acceptQuest(quest, sender)
-  QuestLog:SaveWithStatus(quest, QuestStatus.Active)
-  if QuestCatalog:FindByID(quest.questId) then
-    QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Accepted)
-  end
-  if sender then
-    MessageEvents:Publish("QuestInviteAccepted", { distribution = MessageDistribution.Whisper, target = sender }, quest.questId)
-  end
-  addon:PlaySound("QuestAccepted")
-  addon:ShowQuestInfoFrame(false)
-  addon.QuestLogFrame:Show()
-  addon.Logger:Warn("Quest Accepted: %s", quest.name)
-end
-
 local buttons = {
   ["Accept"] = {
     text = "Accept",
@@ -59,33 +43,15 @@ local buttons = {
     -- If the player meets requirements and the quest contains a start step, run start evaluation on an interval
     pollIf = function(quest) return addon.QuestEngine:EvaluateRequirements(quest) and quest.start end,
     enableIf = function(quest) return addon.QuestEngine:EvaluateRequirements(quest) and addon.QuestEngine:EvaluateStart(quest) end,
-    action = function(quest, sender)
-      if not addon.QuestEngine:EvaluateRequirements(quest) then
-        addon.Logger:Warn("You do not meet the requirements to start this quest.")
-        return
-      end
-      if not addon.QuestEngine:EvaluateStart(quest) then
-        addon.Logger:Warn("Unable to accept quest: start conditions are not met")
-        return
-      end
-      if addon.QuestEngine:EvaluateRecommendations(quest) then
-        acceptQuest(quest, sender)
-      else
-        addon.StaticPopups:Show("StartQuestBelowRequirements"):OnYes(function()
-          acceptQuest(quest, sender)
-        end)
-      end
+    action = function(quest)
+      addon:AcceptQuest(quest)
     end
   },
   ["Decline"] = {
     text = "Decline",
     width = 78,
-    action = function(quest, sender)
-      if sender then
-        MessageEvents:Publish("QuestInviteDeclined", { distribution = MessageDistribution.Whisper, target = sender }, quest.questId)
-        QuestCatalog:SaveWithStatus(quest.questId, QuestCatalogStatus.Declined)
-      end
-      addon:ShowQuestInfoFrame(false)
+    action = function(quest)
+      addon:DeclineQuest(quest)
     end
   },
   ["Complete"] = {
@@ -95,23 +61,14 @@ local buttons = {
     pollIf = function(quest) return quest.complete end,
     enableIf = function(quest) return addon.QuestEngine:EvaluateComplete(quest) end,
     action = function(quest)
-      if not addon.QuestEngine:EvaluateComplete(quest) then
-        addon.Logger:Warn("Unable to complete quest: completion conditions are not met")
-        return
-      end
-      QuestLog:SaveWithStatus(quest, QuestStatus.Completed)
-      addon:PlaySound("QuestComplete")
-      addon:ShowQuestInfoFrame(false)
-      addon.Logger:Warn("%s completed.", quest.name)
+      addon:CompleteQuest(quest)
     end
   },
   ["Abandon"] = {
     text = "Abandon Quest",
     width = 122, -- todo: lookup actual width
     action = function(quest)
-      StaticPopups:Show("AbandonQuest", quest):OnYes(function()
-        addon:ShowQuestInfoFrame(false)
-      end)
+      addon:AbandonQuest(quest)
     end
   },
   ["Share"] = {
@@ -125,9 +82,7 @@ local buttons = {
     text = "Replay Quest",
     width = 122,
     action = function(quest)
-      StaticPopups:Show("RetryQuest", quest):OnYes(function()
-        addon:ShowQuestInfoFrame(false)
-      end)
+      addon:RetryQuest(quest)
     end
   },
   ["Empty"] = {
@@ -186,14 +141,16 @@ frameModes = {
   ["NewQuest"] = {
     leftButton = buttons.Accept,
     rightButton = buttons.Decline,
-    busy = function(frame, quest, sender)
-      if sender then
+    busy = function(frame, quest)
+      local catalogItem = QuestCatalog:FindByID(quest.questId)
+      local sender = catalogItem.from and catalogItem.from.name
+      if sender and catalogItem.from.source == QuestCatalogSource.Shared then
         addon.Logger:Warn("%s invited you to a quest. View it in your Quest Catalog.", sender)
       else
         addon.Logger:Warn("Close this window before trying to view another quest.")
       end
     end,
-    content = function(frame, quest, sender)
+    content = function(frame, quest)
       frame.titleFontString:SetText("[PMQ] Quest Info")
 
       local fs = frame.article:GetFontStrings()
@@ -248,10 +205,10 @@ frameModes = {
   ["FinishedQuest"] = {
     leftButton = buttons.Empty,
     rightButton = buttons.Complete, -- todo: incorporate "Abandon" into this mode
-    busy = function(frame, quest, sender)
+    busy = function(frame, quest)
 
     end,
-    content = function(frame, quest, sender)
+    content = function(frame, quest)
       frame.titleFontString:SetText("[PMQ] Quest Completion")
 
       local fs = frame.article:GetFontStrings()
@@ -270,10 +227,10 @@ frameModes = {
   ["ActiveQuest"] = {
     leftButton = buttons.Share,
     rightButton = buttons.Abandon,
-    busy = function(frame, quest, sender)
+    busy = function(frame, quest)
 
     end,
-    content = function(frame, quest, sender)
+    content = function(frame, quest)
       frame.titleFontString:SetText("[PMQ] Quest Info")
 
       local fs = frame.article:GetFontStrings()
@@ -298,40 +255,38 @@ frameModes = {
   ["TerminatedQuest"] = {
     leftButton = buttons.Share,
     rightButton = buttons.Retry,
-    busy = function(frame, quest, sender)
+    busy = function(frame, quest)
 
     end,
-    content = function(frame, quest, sender)
+    content = function(frame, quest)
       -- Using the same frame as NewQuest for now, may update this later
-      frameModes["NewQuest"].content(frame, quest, sender)
+      frameModes["NewQuest"].content(frame, quest)
     end,
   }
 }
 
 local frameMethods = {
-  ["ShowQuest"] = function(self, quest, sender, mode)
+  ["ShowQuest"] = function(self, quest, mode)
     if self._shown and mode.busy then
       -- Another quest is already being interacted with
       -- If no "busy" function is specified, will proceed to draw content as normal
-      mode.busy(self, quest, sender)
+      mode.busy(self, quest)
       return
     end
 
     self:ClearContent()
 
-    mode.content(self, quest, sender)
+    mode.content(self, quest)
     setButtonBehavior(self.leftButton, mode.leftButton, quest)
     setButtonBehavior(self.rightButton, mode.rightButton, quest)
 
     self._quest = quest
-    self._sender = sender
     self._shown = true
 
     self:Show()
   end,
   ["CloseQuest"] = function(self)
     self._quest = nil
-    self._sender = nil
     self._shown = nil
 
     setButtonBehavior(self.leftButton)
@@ -346,9 +301,9 @@ local frameMethods = {
     end
   end,
   ["RefreshMode"] = function(self)
-    local quest, sender = self._quest, self._sender
+    local quest = self._quest
     addon:ShowQuestInfoFrame(false)
-    addon:ShowQuestInfoFrame(true, quest, sender)
+    addon:ShowQuestInfoFrame(true, quest)
   end
 }
 
@@ -421,7 +376,7 @@ local function buildQuestInfoFrame()
   questFrameRightButton:SetScript("OnClick", function()
     if questFrameRightButton._action then
       addon:catch(function()
-        questFrameRightButton._action(questFrame._quest, questFrame._sender)
+        questFrameRightButton._action(questFrame._quest)
       end)
     else
       addon.UILogger:Warn("No action assigned to questFrameRightButton")
@@ -435,7 +390,7 @@ local function buildQuestInfoFrame()
   questFrameLeftButton:SetScript("OnClick", function()
     if questFrameLeftButton._action then
       addon:catch(function()
-        questFrameLeftButton._action(questFrame._quest, questFrame._sender)
+        questFrameLeftButton._action(questFrame._quest)
       end)
     else
       addon.UILogger:Warn("No action assigned to questFrameLeftButton")
@@ -486,7 +441,7 @@ end
 
 local questInfoFrame
 
-function addon:ShowQuestInfoFrame(flag, quest, sender, modeName)
+function addon:ShowQuestInfoFrame(flag, quest, modeName)
   if not addon.Config:GetValue("ENABLE_GUI") then return end
 
   if flag == nil then flag = true end
@@ -512,7 +467,7 @@ function addon:ShowQuestInfoFrame(flag, quest, sender, modeName)
       addon.UILogger:Warn("Unable to show QuestInfoFrame: %s is not a valid view mode", modeName)
       return
     end
-    questInfoFrame:ShowQuest(quest, sender, mode)
+    questInfoFrame:ShowQuest(quest, mode)
   else
     questInfoFrame:CloseQuest()
   end

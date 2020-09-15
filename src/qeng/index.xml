@@ -3,6 +3,7 @@
   <Script file="qeng/QuestStatus.lua"/>
   <Script file="qeng/QuestEngineLogger.lua"/>
   <Script file="qeng/QuestEngine.lua"/>
+  <Script file="qeng/QuestActions.lua"/>
 
   <Script file="qeng/core/Checkpoint.lua"/>
   <Script file="qeng/core/Condition.lua"/>
