@@ -252,7 +252,7 @@ addon.StaticPopupsList = {
     noText = "Discard",
     yesHandler = function(configItem, text)
       local v = addon.Config:SaveValue(configItem.name, text)
-      if v then
+      if v ~= nil then
         addon.Logger:Warn("Config value updated: %s = %s", configItem.name, tostring(v))
       end
     end,

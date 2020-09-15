@@ -65,6 +65,21 @@ local options = {
       end,
     },
     {
+      text = "Toggle",
+      anchor = "TOP",
+      enabled = "Row",
+      condition = function(configItem)
+        return configItem.type == "boolean"
+      end,
+      handler = function(configItem)
+        configItem.value = not configItem.value
+        local v = Config:SaveValue(configItem.name, configItem.value)
+        if v ~= nil then
+          addon.Logger:Warn("Config value updated: %s = %s", configItem.name, tostring(v))
+        end
+      end,
+    },
+    {
       text = "Reset All",
       anchor = "BOTTOM",
       enabled = "Always",
