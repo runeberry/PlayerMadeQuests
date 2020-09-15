@@ -32,7 +32,7 @@ local options = {
       anchor = "TOP",
       enabled = "Row",
       handler = function(catalogItem, dataTable)
-        QuestCatalog:StartFromCatalog(catalogItem.questId)
+        addon:ShowQuestInfoFrame(true, catalogItem.quest)
         dataTable:ClearSelection()
       end,
     },

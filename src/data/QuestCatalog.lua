@@ -66,12 +66,3 @@ function addon.QuestCatalog:SaveWithStatus(catalogItemOrId, status)
   catalogItem.status = status
   self:Save(catalogItem)
 end
-
-function addon.QuestCatalog:StartFromCatalog(questId)
-  local catalogItem = self:FindByID(questId)
-  if not catalogItem then
-    addon.Logger:Error("Failed to StartFromCatalog: no item with id %s", questId)
-    return
-  end
-  addon:ShowQuestInfoFrame(true, catalogItem.quest)
-end
