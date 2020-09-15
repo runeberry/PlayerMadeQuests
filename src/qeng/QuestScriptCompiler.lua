@@ -2,6 +2,7 @@ local _, addon = ...
 local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
 local GetBuildInfo, UnitFullName = addon.G.GetBuildInfo, addon.G.UnitFullName
 local time = addon.G.time
+local Ace, LibCompress = addon.Ace, addon.LibCompress
 
 addon.QuestScriptCompiler = {}
 local compiler = addon.QuestScriptCompiler
@@ -21,6 +22,22 @@ local function buildMetadata()
   }
 
   return metadata
+end
+
+local function signObjectiveHashes(quest)
+  if not quest.objectives then return end
+
+  for _, obj in ipairs(quest.objectives) do
+    -- An objective's id must be both globally unique and reproducible.
+    -- * Must be unique among all quests and all objectives on this character. (questId)
+    -- * Must be the same between compilations if its content did not change. (serialized obj)
+    local hash = LibCompress:fcs32init()
+    hash = LibCompress:fcs32update(hash, quest.questId)
+    hash = LibCompress:fcs32update(hash, Ace:Serialize(obj))
+    hash = LibCompress:fcs32final(hash)
+
+    obj.id = "obj-"..tostring(hash)
+  end
 end
 
 local function signQuestHash(quest)
@@ -83,6 +100,9 @@ function addon.QuestScriptCompiler:Compile(script, questParams)
     metadata = addon:MergeTable(metadata, quest.metadata)
   end
   quest.metadata = metadata
+
+  -- Assign predictable ids to all objectives
+  signObjectiveHashes(quest)
 
   -- Final step: sign the quest with a hash
   signQuestHash(quest)

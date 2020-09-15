@@ -101,7 +101,7 @@ local methods = {
     end
 
     local cp = {
-      id = addon:CreateID("checkpoint-"..self.name.."-%i"),
+      -- The "id" property is now assigned as a hash at compile-time
       name = self.name,
       parameters = {},
       conditions = {},
