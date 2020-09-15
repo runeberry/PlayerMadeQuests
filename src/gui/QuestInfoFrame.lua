@@ -317,15 +317,15 @@ local frameMethods = {
       return
     end
 
-    self._quest = quest
-    self._sender = sender
-    self._shown = true
-
     self:ClearContent()
 
     mode.content(self, quest, sender)
     setButtonBehavior(self.leftButton, mode.leftButton, quest)
     setButtonBehavior(self.rightButton, mode.rightButton, quest)
+
+    self._quest = quest
+    self._sender = sender
+    self._shown = true
 
     self:Show()
   end,
