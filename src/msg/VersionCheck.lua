@@ -44,8 +44,8 @@ end
 local function loadVersionInfo()
   local kvi = addon.SaveData:Load("KnownVersionInfo", true)
 
-  if not kvi then
-    -- Nothing is saved
+  if not kvi or not kvi.VERSION or not kvi.TIMESTAMP then
+    -- Nothing is saved, or invalid data is saved
     return
   elseif not isNewerThanAddon(kvi.VERSION, kvi.BRANCH, kvi.TIMESTAMP) then
     -- The version we know about is now older than our current version
