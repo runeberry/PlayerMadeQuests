@@ -2,6 +2,7 @@ local _, addon = ...
 local Ace, unpack = addon.Ace, addon.G.unpack
 local GetUnitName = addon.G.GetUnitName
 local encoder = addon.LibCompress:GetAddonEncodeTable()
+local AddMessageEventFilter = addon.G.AddMessageEventFilter
 
 --- Values defined here: https://wow.gamepedia.com/API_C_ChatInfo.SendAddonMessage
 MessageDistribution = {
@@ -99,4 +100,14 @@ addon:OnBackendStart(function()
   addon.MessageEvents.Publish = broker_publishMessage
 
   Ace:RegisterComm(PMQ_MESSAGE_PREFIX, onCommReceived)
+
+  -- WoW has decided that it will spam the chatbox with the following message if you try to
+  -- WHISPER a player that isn't online, even through background (addon) channels.
+  -- Looking them up with /who is protected and throttled, so instead I'm just going to filter out
+  -- all of this type of message while the addon is running.
+  if addon.Config:GetValue("FILTER_OFFLINE_MESSAGE") then
+    AddMessageEventFilter("CHAT_MSG_SYSTEM", function(frame, event, message)
+      return message:find("No player named '%w-' is currently playing.")
+    end)
+  end
 end)

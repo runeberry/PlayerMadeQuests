@@ -15,6 +15,9 @@ addon.defaultSettings = {
   ENABLE_TRANSACTION_LOGS = false,
   --- Feature flag: Count player pet kills towards kill objectives.
   FEATURE_PET_KILLS = true,
+  --- Applies a global chat filter that suppresses 'player not online' messages.
+  --- Disabling this will result in some spam from the addon.
+  FILTER_OFFLINE_MESSAGE = true,
   --- All logs below this level will be hidden across all Loggers.
   --- See available options under Logger.lua -> addon.LogLevel
   GLOBAL_LOG_FILTER = "info",

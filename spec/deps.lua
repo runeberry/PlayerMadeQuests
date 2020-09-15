@@ -138,6 +138,7 @@ function deps:Init(addon)
     time = function() return math.floor(os.clock() * 1000) end,
     unpack = function(...) return table.unpack(...) end,
 
+    AddMessageEventFilter = ret(),
     CombatLogGetCurrentEventInfo = ret(),
     CheckInteractDistance = ret(),
     CreateFrame = function() return {} end,

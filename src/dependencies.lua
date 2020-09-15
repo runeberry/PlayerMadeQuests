@@ -23,6 +23,7 @@ addon.G = {
   time = time,
   unpack = unpack,
 
+  AddMessageEventFilter = ChatFrame_AddMessageEventFilter,
   CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo,
   CheckInteractDistance = CheckInteractDistance,
   CreateFrame = CreateFrame,
