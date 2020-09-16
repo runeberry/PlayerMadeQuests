@@ -81,6 +81,7 @@ addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
     return
   end
 
+  -- Update progress on the quest's objective to match the progress of the message's objective
   qobj.progress = obj.progress
 
   local isQuestFinished
@@ -101,4 +102,8 @@ addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
   end
 
   QuestLog:Save(quest)
+
+  if isQuestFinished then
+    addon.QuestEngine:StopTracking(quest)
+  end
 end)

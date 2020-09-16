@@ -3,19 +3,26 @@ local QuestEngine = addon.QuestEngine
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogStatus
 local QuestArchive = addon.QuestArchive
-local StaticPopups = addon.StaticPopups
 
 --[[
   QuestActions are complex actions that users may perform on quests.
   The code in QuestActions should only concern the following things:
     * Updating any data entities
     * Whether to show or suppress StaticPopups
+    * QuestEngine tracking
     * Printing chat feedback for the player
   Any other side-effects of these actions should be handled elsewhere
   by subscribing to the AppEvents published here.
 --]]
 
 local function startQuest(quest)
+  -- If this quest is already in the quest log...
+  local existingQuest = QuestLog:FindByID(quest.questId)
+  if existingQuest then
+    -- Need to ensure that this quest is not being tracked before starting tracking again
+    QuestEngine:StopTracking(existingQuest)
+  end
+
   -- Clean quest progress on fresh accept, just in case
   if quest.objectives then
     for _, obj in pairs(quest.objectives) do
@@ -24,6 +31,7 @@ local function startQuest(quest)
   end
 
   QuestLog:SaveWithStatus(quest, QuestStatus.Active)
+  QuestEngine:StartTracking(quest)
 
   local catalogItem = QuestCatalog:FindByID(quest.questId)
   if catalogItem and catalogItem.status ~= QuestCatalogStatus.Accepted then
@@ -75,6 +83,7 @@ function addon:AbandonQuest(quest, suppressPopup)
   end
 
   QuestLog:SaveWithStatus(quest, QuestStatus.Abandoned)
+  QuestEngine:StopTracking(quest)
   addon.Logger:Warn("Quest abandoned: %s", quest.name)
   addon.AppEvents:Publish("QuestAbandoned", quest)
 end
@@ -86,13 +95,14 @@ function addon:CompleteQuest(quest)
   end
 
   QuestLog:SaveWithStatus(quest, QuestStatus.Completed)
+  QuestEngine:StopTracking(quest)
   addon.Logger:Warn("%s completed.", quest.name)
-  addon.AppEvents:Publish("QuestCompleted")
+  addon.AppEvents:Publish("QuestCompleted", quest)
 end
 
 function addon:RestartQuest(quest, suppressPopup)
   if not suppressPopup then
-    StaticPopups:Show("RestartQuest", quest)
+    addon.StaticPopups:Show("RestartQuest", quest)
     return
   end
 

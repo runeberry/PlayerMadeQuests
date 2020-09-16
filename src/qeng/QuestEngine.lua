@@ -5,7 +5,7 @@ local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 local logger = addon.QuestEngineLogger:NewLogger("Core", addon.LogLevel.info)
 
 -- QuestEngine is the source of truth for all quest evaluation logic
-addon.QuestEngine = {
+local QuestEngine = {
   definitions = {
     parameters = {},
     conditions = {},
@@ -13,19 +13,20 @@ addon.QuestEngine = {
     objectives = {},
   }
 }
+addon.QuestEngine = QuestEngine
 
 -- Local vars for easier reference within this file
-local parameters = addon.QuestEngine.definitions.parameters
-local conditions = addon.QuestEngine.definitions.conditions
-local checkpoints = addon.QuestEngine.definitions.checkpoints
-local objectives = addon.QuestEngine.definitions.objectives
+local parameters = QuestEngine.definitions.parameters
+local conditions = QuestEngine.definitions.conditions
+local checkpoints = QuestEngine.definitions.checkpoints
+local objectives = QuestEngine.definitions.objectives
 
 --------------------
 -- Public methods --
 --------------------
 
-function addon.QuestEngine:AddDefinition(defType, name, val)
-  local defs = addon.QuestEngine.definitions
+function QuestEngine:AddDefinition(defType, name, val)
+  local defs = QuestEngine.definitions
 
   if not defs[defType] then
     logger:Fatal("Failed to create definition: '%s' is not a recognized definition type", tostring(defType))
@@ -45,7 +46,7 @@ function addon.QuestEngine:AddDefinition(defType, name, val)
   defs[defType][name] = val
 end
 
-function addon.QuestEngine:Validate(quest)
+function QuestEngine:Validate(quest)
   assert(type(quest.questId) == "string" and quest.questId ~= "", "questId is required")
   assert(type(quest.name) == "string" and quest.name ~= "", "quest name is required")
   assert(type(quest.objectives) == "table", "quest objectives must be defined")
@@ -68,33 +69,29 @@ function addon.QuestEngine:Validate(quest)
   end
 end
 
-function addon.QuestEngine:EvaluateStart(quest)
+function QuestEngine:EvaluateStart(quest)
   if not quest.start then return true end
   return checkpoints[tokens.CMD_START]:Evaluate(quest.start)
 end
 
-function addon.QuestEngine:EvaluateComplete(quest)
+function QuestEngine:EvaluateComplete(quest)
   if not quest.complete then return true end
   return checkpoints[tokens.CMD_COMPLETE]:Evaluate(quest.complete)
 end
 
-function addon.QuestEngine:EvaluateRecommendations(quest)
+function QuestEngine:EvaluateRecommendations(quest)
   if not quest.recommended then return true end
   return checkpoints[tokens.CMD_REC]:Evaluate(quest.recommended)
 end
 
-function addon.QuestEngine:EvaluateRequirements(quest)
+function QuestEngine:EvaluateRequirements(quest)
   if not quest.required then return true end
   return checkpoints[tokens.CMD_REQ]:Evaluate(quest.required)
 end
 
--------------------------
--- Event Subscriptions --
--------------------------
-
-local function startTracking(quest)
+function QuestEngine:StartTracking(quest)
   -- sanity check: validate quest before tracking it
-  addon.QuestEngine:Validate(quest)
+  QuestEngine:Validate(quest)
 
   local didStartTracking = false
   for _, obj in pairs(quest.objectives) do
@@ -105,13 +102,18 @@ local function startTracking(quest)
       didStartTracking = true
     end
   end
+
   if didStartTracking then
     addon.AppEvents:Publish("QuestTrackingStarted", quest)
+    logger:Trace("Started tracking quest: %s", quest.name)
+  else
+    logger:Trace("All objective are already being tracked for: %s", quest.name)
   end
-  logger:Trace("Started tracking quest: %s", quest.name)
+
+  return didStartTracking
 end
 
-local function stopTracking(quest)
+function QuestEngine:StopTracking(quest)
   local didStopTracking = false
   for _, obj in pairs(quest.objectives) do
     if objectives[obj.name].active[obj.id] then
@@ -119,47 +121,46 @@ local function stopTracking(quest)
       didStopTracking = true
     end
   end
+
   if didStopTracking then
     addon.AppEvents:Publish("QuestTrackingStopped", quest)
-  end
-  logger:Trace("Stopped tracking quest: %s", quest.name)
-end
-
-local function setTracking(quest)
-  if quest.status == QuestStatus.Active then
-    -- If start tracking fails, let it throw an error
-    startTracking(quest)
+    logger:Trace("Stopped tracking quest: %s", quest.name)
   else
-    -- If stop tracking fails, simply log the error
-    addon:catch(stopTracking, quest)
+    logger:Trace("No objectives were being tracked for: %s", quest.name)
   end
+
+  return didStopTracking
 end
 
-function addon.QuestEngine:StartTrackingQuestLog()
-  local quests = QuestLog:FindByQuery(function(q) return q.status == QuestStatus.Active end)
-  for _, q in pairs(quests) do
-    local ok, err = pcall(startTracking, q)
-    if not ok then
-      logger:Error("Failed to start quest tracking for quest \"%s\": %s", q.name, err)
-    end
-  end
-end
+----------------------
+-- Lifecycle Events --
+----------------------
 
-function addon.QuestEngine:Init()
+function QuestEngine:Init()
   -- Ensure everything can be setup, then wire up objectives into the engine
   for _, objective in pairs(objectives) do
     objective:Init()
   end
   logger:Debug("QuestEngine loaded OK!")
 
-  addon.AppEvents:Subscribe("QuestAdded", setTracking)
-  addon.AppEvents:Subscribe("QuestStatusChanged", setTracking)
-  addon.AppEvents:Subscribe("QuestDeleted", stopTracking)
+  addon.AppEvents:Subscribe("QuestDeleted", function(quest)
+    QuestEngine:StopTracking(quest)
+  end)
 
   addon.AppEvents:Subscribe("QuestDataReset", function()
     for _, objective in pairs(objectives) do
       objective.active = {}
     end
-    logger:Trace("Stopped tracking all quests")
+    logger:Trace("QuestDataReset - Stopped tracking all objectives")
   end)
+end
+
+function QuestEngine:StartTrackingQuestLog()
+  local quests = QuestLog:FindByQuery(function(q) return q.status == QuestStatus.Active end)
+  for _, q in pairs(quests) do
+    local ok, err = pcall(QuestEngine.StartTracking, QuestEngine, q)
+    if not ok then
+      logger:Error("Failed to start quest tracking for quest \"%s\": %s", q.name, err)
+    end
+  end
 end
