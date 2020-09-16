@@ -16,7 +16,7 @@ local questStub = [[
 --- and begins tracking that quest
 local function startQuest(script)
   local quest = compiler:Compile(string.format(questStub, script))
-  QuestLog:SaveWithStatus(quest, QuestStatus.Active)
+  addon:AcceptQuest(quest)
   addon:Advance()
   return quest
 end
@@ -28,7 +28,6 @@ local function assertObjectiveDoesUpdate(quest, appEventSpy)
   local objective = quest.objectives[1]
   assert.is_not_nil(objective, "Quest has no objectives")
   appEventSpy = appEventSpy or events:SpyOnEvents(addon.AppEvents)
-  assert.equals(0, objective.progress, "Quest objective should start at 0 progress")
   -- addon:ForceLogs(function()
     addon.QuestEvents:Publish(objective.name)
     addon:Advance()
