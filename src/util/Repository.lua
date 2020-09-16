@@ -8,47 +8,61 @@ local createDateKey = "cd"
 local updateDateKey = "ud"
 local showTransactionLogs
 
-local function addItemToIndex(indexTable, item, indexProp)
+addon.Data = {
+  --- Called during Lifecycle, just after config is loaded
+  Init = function()
+    if showTransactionLogs == nil then
+      showTransactionLogs = addon.Config:GetValue("ENABLE_TRANSACTION_LOGS")
+    end
+  end
+}
+
+local function addItemToIndex(indexTable, item, indexProp, ta)
   local indexValue = item[indexProp]
   if indexValue == nil then
     if indexTable.optional then
+      ta:Log("Index value for '%s' is nil, but it is optional", indexProp)
       return
     elseif indexTable.generator then
       indexValue = indexTable.generator(item)
       if indexValue == nil then
-        error("Required index value "..indexProp.." could not be generated")
+        ta:Error("Required index value '%s' could not be generated", indexProp)
       end
+      ta:Log("Index value for '%s' successfully generated: %s", indexProp, tostring(indexValue))
       item[indexProp] = indexValue
     else
-      error("Required index value "..indexProp.." is missing")
+      ta:Error("Required index value '%s' is missing", indexProp)
     end
   end
 
   if indexTable.unique then
     if indexTable.data[indexValue] then
-      error("Index value is not unique for property "..indexProp.." = "..indexValue)
+      ta:Error("Unique index value is already in use: %s[%s]", indexProp, tostring(indexValue))
     end
-    -- If index is 1:1, set the item for this index value here
+    ta:Log("Assigning item to unique index: %s[%s]", indexProp, tostring(indexValue))
     indexTable.data[indexValue] = item
   else
-    -- If index is 1:many, create a new table (if needed) and add this
-    -- item to this index value's table
     if not indexTable.data[indexValue] then
+      ta:Log("First item in index, creating table")
       indexTable.data[indexValue] = {}
     end
+    ta:Log("Adding item to non-unique index: %s[%s]", indexProp, tostring(indexValue))
     indexTable.data[indexValue][item] = true
   end
 end
 
-local function removeItemFromIndex(indexTable, item, indexProp)
+local function removeItemFromIndex(indexTable, item, indexProp, ta)
   local indexValue = item[indexProp]
-  if indexValue == nil then return end
+  if indexValue == nil then
+    ta:Log("Value for index '%s' is nil, nothing to remove", indexProp)
+    return
+  end
 
   if indexTable.unique then
-    -- If index is 1:1, then just set this index value to nil
+    ta:Log("Unassigning item from unique index: %s[%s]", indexProp, tostring(indexValue))
     indexTable.data[indexValue] = nil
   else
-    -- If index is 1:many, then remove this item from the list
+    ta:Log("Removing item from non-unique index: %s[%s]", indexProp, tostring(indexValue))
     indexTable.data[indexValue][item] = nil
     local isIndexEmpty = true
     for _, _ in pairs(indexTable.data[indexValue]) do
@@ -56,50 +70,55 @@ local function removeItemFromIndex(indexTable, item, indexProp)
       break
     end
     if isIndexEmpty then
-      -- If this was the last item at this index value, set this index value to nil
+      ta:Log("Last item in index, removing table")
       indexTable.data[indexValue] = nil
     end
   end
 end
 
-local function indexItem(repo, item)
+local function indexItem(repo, item, ta)
+  ta:Log("Indexing item")
   for indexProp, indexTable in pairs(repo.index) do
-    addItemToIndex(indexTable, item, indexProp)
+    addItemToIndex(indexTable, item, indexProp, ta)
   end
 end
 
-local function deindexItem(repo, item)
+local function deindexItem(repo, item, ta)
+  ta:Log("Deindexing item")
   for indexProp, indexTable in pairs(repo.index) do
-    removeItemFromIndex(indexTable, item, indexProp)
+    removeItemFromIndex(indexTable, item, indexProp, ta)
   end
 end
 
-local function createIndexTable(data, indexProp, options)
+local function createIndexTable(data, indexProp, options, ta)
+  ta:Log("Creating index for '%s'", indexProp)
   local indexTable = { data = {} }
   if options then
+    ta:Log("Options: unique = %s, optional = %s, generator = %s", tostring(options.unique), tostring(options.optional), tostring(options.generator))
     indexTable.unique = options.unique
     indexTable.optional = options.optional
     indexTable.generator = options.generator
   end
-  -- Index any existing data
+  ta:Log("Indexing existing data")
   for item in pairs(data) do
-    addItemToIndex(indexTable, item, indexProp)
+    addItemToIndex(indexTable, item, indexProp, ta)
   end
   return indexTable
 end
 
 -- Clears out existing indexes and rebuilds them all for the repo's data
-local function indexAllData(repo)
+local function indexAllData(repo, ta)
+  ta:Log("Reindexing all data")
   for indexProp, indexTable in pairs(repo.index) do
     indexTable.data = {}
     for item in pairs(repo.data) do
-      addItemToIndex(indexTable, item, indexProp)
+      addItemToIndex(indexTable, item, indexProp, ta)
     end
   end
-  repo.logger:Trace("Reindexed repository")
 end
 
-local function deindexAllData(repo)
+local function deindexAllData(repo, ta)
+  ta:Log("Deindexing all data")
   for indexProp, indexTable in pairs(repo.index) do
     indexTable.data = {}
   end
@@ -163,18 +182,20 @@ local function ta_AddStep(self, action, undo)
 end
 
 local function ta_Log(self, ...)
-  if showTransactionLogs == nil and addon.Config then
-    showTransactionLogs = addon.Config:GetValue("ENABLE_TRANSACTION_LOGS")
-  end
   if not showTransactionLogs then return end
   self.repo.logger:Debug(...)
+end
+
+local function ta_Error(self, msg, ...)
+  self.repo.logger:Error(msg, ...)
+  error(string.format(msg, ...))
 end
 
 local function ta_Run(self)
   local ok, err, failstep
   -- Run each step in the transaction, and break out if any step fails
   for i, t in ipairs(self.steps) do
-    self:Log("Running transaction step:", i)
+    self:Log("Running transaction step: %i", i)
     ok, err = pcall(t.action)
     if not ok then
       self:Log("Failed step, beginning undo")
@@ -189,14 +210,14 @@ local function ta_Run(self)
     for i = failstep, 1, -1 do
       local t = self.steps[i]
       if t.undo then
-        self:Log("Undoing transaction step:", i)
+        self:Log("Undoing transaction step: %i", i)
         undoOk, undoErr = pcall(t.undo)
         if not undoOk then
           logger:Fatal("Transaction undo failed. Repository may be in a bad state!\n%s", undoErr)
           break
         end
       else
-        self:Log("Undoing transaction step:", i, "(no-op)")
+        self:Log("Undoing transaction step: %i (no-op)", i)
       end
     end
     -- Return the original transaction error for the repository to handle
@@ -214,7 +235,8 @@ local function newTransaction(repo)
     steps = {},
     AddStep = ta_AddStep,
     Run = ta_Run,
-    Log = ta_Log
+    Log = ta_Log,
+    Error = ta_Error,
   }
 end
 
@@ -249,12 +271,12 @@ local methods = {
   ["FindByIndex"] = function(self, indexProp, indexValue)
     if type(indexProp) ~= "string" then
       self.logger:Error("Failed to FindByIndex: %s is not a valid property name", type(indexProp))
-      return nil
+      return {}
     end
     local indexTable = self.index[indexProp]
     if not indexTable then
       self.logger:Error("Failed to FindByIndex: no index exists for property %s", indexProp)
-      return nil
+      return {}
     end
 
     local result, count = findEntitiesByIndex(self, indexProp, indexValue)
@@ -303,17 +325,20 @@ local methods = {
       self.logger:Error("Failed to Save: Repository is read-only")
       return
     end
-    local transaction = newTransaction(self)
+    local ta = newTransaction(self)
     if self._pkgenEnabled and not entity[self.pkey] then
-      transaction:AddStep(function()
+      ta:AddStep(function()
         entity[self.pkey] = self.index[self.pkey].generator(entity)
+        ta:Log("Generated primary key: %s", tostring(entity[self.pkey]))
       end, function()
+        ta:Log("Returning primary key to nil")
         entity[self.pkey] = nil
       end)
     end
-    transaction:AddStep(function()
+    ta:AddStep(function()
       assert(entity[self.pkey], "Primary key "..self.pkey.." is required")
       if self.Validate then
+        ta:Log("Running Validate step")
         self:Validate(entity)
       end
     end)
@@ -325,91 +350,109 @@ local methods = {
         -- If direct read is enabled, then the entity being saved will be
         -- the same entity in the data source, so it is already updated
         event, msg = self.events.EntityUpdated, "Entity updated (direct read)"
-        transaction:AddStep(function()
-          deindexItem(self, entity)
-          indexItem(self, entity)
+        ta:AddStep(function()
+          ta:Log("Beginning entity update for an existing direct-read entity")
+          deindexItem(self, entity, ta)
+          indexItem(self, entity, ta)
         end, function()
           -- I do not know how to recover if this happens
-          error("Reindexing failed, unrecoverable error")
+          ta:Error("Reindexing failed, unrecoverable error")
         end)
         if self._timestampsEnabled then
           local ts, origUpdateDate = time()
-          transaction:AddStep(function()
+          ta:AddStep(function()
+            ta:Log("Setting update timestamp")
             origUpdateDate = entity[updateDateKey]
             entity[updateDateKey] = ts
           end, function()
+            ta:Log("Reverting update timestamp")
             entity[updateDateKey] = origUpdateDate
           end)
         end
       elseif self.data[existing] then
         event, msg = self.events.EntityUpdated, "Entity updated"
         local dsCopy
-        transaction:AddStep(function()
+        ta:AddStep(function()
+          ta:Log("Creating data source copy of entity")
           dsCopy = addon:CopyTable(entity)
         end)
         if self._timestampsEnabled then
           local ts, origUpdateDate = time()
-          transaction:AddStep(function()
+          ta:AddStep(function()
+            ta:Log("Setting update timestamp on copy of entity")
             origUpdateDate = dsCopy[updateDateKey]
             dsCopy[updateDateKey] = ts
           end, function()
+            ta:Log("Revert update timestamp on copy of entity")
             dsCopy[updateDateKey] = origUpdateDate
           end)
         end
-        transaction:AddStep(function()
-          deindexItem(self, existing)
+        ta:AddStep(function()
+          ta:Log("Deindexing original entity")
+          deindexItem(self, existing, ta)
         end, function()
-          indexItem(self, existing)
+          ta:Log("Reindexing original entity")
+          indexItem(self, existing, ta)
         end)
-        transaction:AddStep(function()
-          indexItem(self, dsCopy)
+        ta:AddStep(function()
+          ta:Log("Indexing copy of entity")
+          indexItem(self, dsCopy, ta)
         end, function()
-          deindexItem(self, dsCopy)
+          ta:Log("Deindexing copy of entity")
+          deindexItem(self, dsCopy, ta)
         end)
-        transaction:AddStep(function()
+        ta:AddStep(function()
+          ta:Log("Replacing original entity with copy in data set")
           self.data[existing] = nil
           self.data[dsCopy] = true
         end, function()
+          ta:Log("Replacing copy with original entity in data set")
           self.data[existing] = true
           self.data[dsCopy] = nil
         end)
       else
-        transaction:AddStep(function()
-          error("No update path for entity:"..entity[self.pkey])
+        ta:AddStep(function()
+          ta:Error("No update path for entity: %s", entity[self.pkey])
         end)
       end
     else
       -- If an entity does not exist by this ID, then it's an insert
       event, msg = self.events.EntityAdded, "Entity added"
       local insertable
-      transaction:AddStep(function()
+      ta:AddStep(function()
+        ta:Log("Beginning creation of new entity")
         insertable = entity
         if not self._directReadEnabled then
+          ta:Log("Entity is not direct-read, creating a copy")
           insertable = addon:CopyTable(insertable)
         end
       end)
       if self._timestampsEnabled then
         local ts = time()
-        transaction:AddStep(function()
+        ta:AddStep(function()
+          ta:Log("Setting create and update timestamps")
           insertable[createDateKey] = ts
           insertable[updateDateKey] = ts
         end, function()
+          ta:Log("Reverting create and update timestamps")
           insertable[createDateKey] = nil
           insertable[updateDateKey] = nil
         end)
       end
-      transaction:AddStep(function()
+      ta:AddStep(function()
+        ta:Log("Inserting entity into data set")
         self.data[insertable] = true
       end, function()
+        ta:Log("Removing entity from data set")
         self.data[insertable] = nil
       end)
-      transaction:AddStep(function()
-        indexItem(self, insertable)
+      ta:AddStep(function()
+        indexItem(self, insertable, ta)
       end, function()
-        deindexItem(self, insertable)
+        deindexItem(self, insertable, ta)
       end)
     end
-    local ok, err = transaction:Run()
+    local ok, err = ta:Run()
     if not ok then
       self.logger:Error("Failed to Save: %s", err)
       return
@@ -439,16 +482,20 @@ local methods = {
       return
     end
 
-    local transaction = newTransaction(self)
-    transaction:AddStep(function()
-      deindexItem(self, existing)
+    local ta = newTransaction(self)
+    ta:AddStep(function()
+      ta:Log("Deindexing entity for delete")
+      deindexItem(self, existing, ta)
+      ta:Log("Deleting entity from data set")
       self.data[existing] = nil
     end, function()
+      ta:Log("Restoring entity to data set")
       self.data[existing] = true
-      indexItem(self, existing)
+      ta:Log("Reindexing entity from delete")
+      indexItem(self, existing, ta)
     end)
 
-    local ok, err = transaction:Run()
+    local ok, err = ta:Run()
     if not ok then
       self.logger:Error("Failed to Delete: %s", err)
       return
@@ -481,13 +528,18 @@ local methods = {
       self.logger:Warn("Index already exists for property: %s", indexProp)
       return
     end
-    local result, indexTable = pcall(createIndexTable, self.data, indexProp, options)
+
+    local ta = newTransaction(self)
+    ta:AddStep(function()
+      self.index[indexProp] = createIndexTable(self.data, indexProp, options, ta)
+    end)
+
+    local result, err = ta:Run()
     if not result then
-      self.logger:Error("Failed to AddIndex: %s", indexTable)
+      self.logger:Error("Failed to AddIndex: %s", err)
       return
     end
     self.logger:Trace("Added index on property: %s", indexProp)
-    self.index[indexProp] = indexTable
   end,
   ["SetSaveDataSource"] = function(self, saveDataField)
     addon:OnConfigLoaded(function()
@@ -495,19 +547,19 @@ local methods = {
         self.logger:Error("Failed to SetSaveDataSource: a data source is already set")
         return
       end
-      local transaction = newTransaction(self)
-      transaction:AddStep(function()
+      local ta = newTransaction(self)
+      ta:AddStep(function()
         self._saveDataField = saveDataField
         readSaveData(self)
       end, function()
         self._saveDataField = nil
       end)
-      transaction:AddStep(function()
-        indexAllData(self)
+      ta:AddStep(function()
+        indexAllData(self, ta)
       end, function()
-        deindexAllData(self)
+        deindexAllData(self, ta)
       end)
-      local ok, err = transaction:Run()
+      local ok, err = ta:Run()
       if not ok then
         self.logger:Error("Failed to SetSaveDataSource: %s", err)
         return
@@ -527,20 +579,20 @@ local methods = {
         self.logger:Error("Failed to SetTableSource: expected table, got %s", type(dataSource))
         return
       end
-      local transaction = newTransaction(self)
+      local ta = newTransaction(self)
       local set, count
-      transaction:AddStep(function()
+      ta:AddStep(function()
         set, count = addon:DistinctSet(dataSource)
         self.data = set
       end, function()
         self.data = {}
       end)
-      transaction:AddStep(function()
-        indexAllData(self)
+      ta:AddStep(function()
+        indexAllData(self, ta)
       end, function()
-        deindexAllData(self)
+        deindexAllData(self, ta)
       end)
-      local ok, err = transaction:Run()
+      local ok, err = ta:Run()
       if not ok then
         self.logger:Error("Failed to SetTableSource: %s", err)
         return

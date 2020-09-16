@@ -37,6 +37,7 @@ function addon.Lifecycle:Init()
   publish(events.SaveDataLoaded)
   addon.Config:Init()
   addon.Logger:Init()
+  addon.Data:Init()
   publish(events.ConfigLoaded)
 
   addon:RunAddonMigrations()
