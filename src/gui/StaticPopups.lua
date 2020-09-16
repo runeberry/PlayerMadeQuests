@@ -99,6 +99,8 @@ local function buildPopup(template, globalId)
     end
   end
 
+  -- todo: the OnYes handler can only be triggered if the SP's yesHandler is not nil
+  -- Ideally this should work whether or not you have a yesHandler on the SP
   if template.yesHandler then
     popup._yesHandler = template.yesHandler
     popup.OnAccept = function(self)

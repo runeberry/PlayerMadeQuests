@@ -11,6 +11,9 @@ addon.StaticPopupsList = {
     end,
     yesText = "OK",
     noText = "Cancel",
+    yesHandler = function(quest)
+      addon:AbandonQuest(quest, true)
+    end,
   },
   ["ArchiveQuest"] = {
     message = function(quest)
@@ -59,6 +62,9 @@ addon.StaticPopupsList = {
     end,
     yesText = "OK",
     noText = "Cancel",
+    yesHandler = function(quest)
+      addon:RestartQuest(quest, true)
+    end
   },
   ["StartQuestBelowRequirements"] = {
     message = function()
@@ -67,7 +73,9 @@ addon.StaticPopupsList = {
     end,
     yesText = "OK",
     noText = "Cancel",
-    yesHandler = function() end, -- Need an empty function to trigger the OnYes handler
+    yesHandler = function(quest)
+      addon:AcceptQuest(quest, true)
+    end,
   },
   ["DeleteCatalogItem"] = {
     message = function(catalogItem)
