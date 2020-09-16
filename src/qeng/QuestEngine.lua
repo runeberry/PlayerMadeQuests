@@ -153,16 +153,7 @@ function addon.QuestEngine:Init()
   logger:Debug("QuestEngine loaded OK!")
 
   addon.AppEvents:Subscribe("QuestAdded", setTracking)
-  addon.AppEvents:Subscribe("QuestStatusChanged", function(q)
-    if q.status == QuestStatus.Active then
-      -- Reset quest objective progress when the quest enters the Active status
-      for _, obj in ipairs(q.objectives) do
-        obj.progress = 0
-      end
-      QuestLog:Save(q)
-    end
-    setTracking(q)
-  end)
+  addon.AppEvents:Subscribe("QuestStatusChanged", setTracking)
   addon.AppEvents:Subscribe("QuestDeleted", stopTracking)
 
   addon.AppEvents:Subscribe("QuestDataReset", function()

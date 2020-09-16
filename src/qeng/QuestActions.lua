@@ -12,6 +12,13 @@ local function notifySender(catalogItem, event)
 end
 
 local function acceptQuest(quest)
+  -- Clean quest progress on fresh accept, just in case
+  if quest.objectives then
+    for _, obj in pairs(quest.objectives) do
+      obj.progress = 0
+    end
+  end
+
   QuestLog:SaveWithStatus(quest, QuestStatus.Active)
 
   local catalogItem = QuestCatalog:FindByID(quest.questId)
@@ -77,6 +84,6 @@ end
 
 function addon:RetryQuest(quest)
   addon.StaticPopups:Show("RetryQuest", quest):OnYes(function()
-    addon.QuestInfoFrame:Hide()
+    acceptQuest(quest)
   end)
 end
