@@ -15,7 +15,7 @@ local function acceptQuest(quest)
   QuestLog:SaveWithStatus(quest, QuestStatus.Active)
 
   local catalogItem = QuestCatalog:FindByID(quest.questId)
-  if catalogItem then
+  if catalogItem and catalogItem.status ~= QuestCatalogStatus.Accepted then
     QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Accepted)
     notifySender(catalogItem, "QuestInviteAccepted")
   end
