@@ -298,6 +298,55 @@ describe("Repository", function()
       assert.equals(1, #results)
       assert.same(expected, results[1])
     end)
+    it("can create an optional index", function()
+      repo:AddIndex("value", { optional = true })
+      local testData = createTestEntities(3)
+      testData[1].value = nil
+      repo:EnablePrimaryKeyGeneration(true)
+      repo:SetTableSource(testData)
+      local expected = testData[3]
+
+      local results = repo:FindByIndex("value", expected.value)
+
+      assert.equals(1, #results)
+      assert.same(expected, results[1])
+
+      results = repo:FindAll()
+
+      assert.equals(3, #results)
+    end)
+    it("can create a unique, optional index", function()
+      repo:AddIndex("value", { unique = true, optional = true })
+      local testData = createTestEntities(5)
+      testData[1].value = nil
+      testData[2].value = nil
+      repo:EnableWrite(true)
+      repo:EnablePrimaryKeyGeneration(true)
+      repo:SetTableSource(testData)
+      local expected = testData[4]
+
+      local results
+      -- addon:ForceLogs(function()
+      results = repo:FindByIndex("value", expected.value)
+      -- end)
+      assert.equals(1, #results)
+      assert.same(expected, results[1])
+
+      expected.value = nil
+      repo:Save(expected)
+      expected = testData[3]
+
+      results = repo:FindByIndex("value", expected.value)
+
+      assert.equals(1, #results)
+      assert.same(expected, results[1])
+
+      expected.value = 80085;
+      testData[5].value = 80085;
+      repo:Save(expected)
+      repo:Save(testData[5])
+
+    end)
     it("can create an index after table source is set", function()
       local testData = createTestEntities(3)
       repo:EnablePrimaryKeyGeneration(true)
@@ -309,6 +358,17 @@ describe("Repository", function()
 
       assert.equals(1, #results)
       assert.same(expected, results[1])
+
+      repo:EnableWrite(true)
+      local additional = createTestEntity()
+      additional.name = expected.name
+      addon:ForceLogs(function()
+      repo:Save(expected)
+      end)
+
+      results = repo:FindByIndex("name", expected.name)
+
+      assert.equals(2, #results)
     end)
   end)
   describe("SetSaveDataSource", function()
