@@ -5,6 +5,11 @@ local unpack = addon.G.unpack
 
 addon.StaticPopups = {}
 
+local popupsEnabled
+addon:OnGuiStart(function()
+  popupsEnabled = addon.Config:GetValue("ENABLE_GUI")
+end)
+
 --[[
   Properties reserved for the popup by WoW:
   {
@@ -146,6 +151,7 @@ local function buildPopup(template, globalId)
 end
 
 local function getGlobalPopup(name)
+  if not popupsEnabled then return end
   local globalId = "PMQ_"..name
 
   local existing = StaticPopupDialogs[globalId]
