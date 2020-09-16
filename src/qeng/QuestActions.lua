@@ -22,7 +22,7 @@ local function acceptQuest(quest)
 
   -- todo: Should probably move this so it responds to a QuestAccepted app event
   addon:PlaySound("QuestAccepted")
-  addon:ShowQuestInfoFrame(false)
+  addon.QuestInfoFrame:Hide()
   addon.QuestLogFrame:Show()
   addon.Logger:Warn("Quest Accepted: %s", quest.name)
 end
@@ -55,12 +55,12 @@ function addon:DeclineQuest(quest)
     QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Declined)
     notifySender(catalogItem, "QuestInviteDeclined")
   end
-  addon:ShowQuestInfoFrame(false)
+  addon.QuestInfoFrame:Hide()
 end
 
 function addon:AbandonQuest(quest)
   addon.StaticPopups:Show("AbandonQuest", quest):OnYes(function()
-    addon:ShowQuestInfoFrame(false)
+    addon.QuestInfoFrame:Hide()
   end)
 end
 
@@ -71,12 +71,12 @@ function addon:CompleteQuest(quest)
   end
   QuestLog:SaveWithStatus(quest, QuestStatus.Completed)
   addon:PlaySound("QuestComplete")
-  addon:ShowQuestInfoFrame(false)
+  addon.QuestInfoFrame:Hide()
   addon.Logger:Warn("%s completed.", quest.name)
 end
 
 function addon:RetryQuest(quest)
   addon.StaticPopups:Show("RetryQuest", quest):OnYes(function()
-    addon:ShowQuestInfoFrame(false)
+    addon.QuestInfoFrame:Hide()
   end)
 end

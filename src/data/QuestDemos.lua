@@ -43,5 +43,5 @@ function addon.QuestDemos:StartDemo(demoId)
     addon.Logger:Error("Unable to start demo quest: %s", quest)
     return
   end
-  addon:ShowQuestInfoFrame(true, quest)
+  addon.QuestInfoFrame:ShowQuest(quest)
 end

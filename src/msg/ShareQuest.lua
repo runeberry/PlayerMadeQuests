@@ -155,7 +155,7 @@ addon:OnBackendStart(function()
     local meetsRequirements = addon.QuestEngine:EvaluateRequirements(quest)
     if meetsRequirements then
       logger:Trace("Quest requirements met, showing QuestInfoFrame")
-      addon:ShowQuestInfoFrame(true, catalogItem.quest)
+      addon.QuestInfoFrame:ShowQuest(catalogItem.quest)
     else
       addon.Logger:Warn("You do not meet the requirements, but it has been saved to your Catalog.")
       MessageEvents:Publish("QuestInviteRequirements", { distribution = MessageDistribution.Whisper, target = sender }, quest.questId)

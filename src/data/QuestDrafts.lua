@@ -74,5 +74,5 @@ function QuestDrafts:StartDraft(draftId)
     addon.Logger:Warn("Failed to start draft: %s", quest)
     return
   end
-  addon:ShowQuestInfoFrame(true, quest)
+  addon.QuestInfoFrame:ShowQuest(quest)
 end

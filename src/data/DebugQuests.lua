@@ -21,5 +21,5 @@ function addon.DebugQuests:StartDebugQuest(questId)
     addon.Logger:Error("Unable to start debug quest: %s", quest)
     return
   end
-  addon:ShowQuestInfoFrame(true, quest)
+  addon.QuestInfoFrame:ShowQuest(quest)
 end
