@@ -95,9 +95,13 @@ addon:OnBackendStart(function()
   addon.AppEvents:Subscribe("QuestDataReset", function()
     addon:ClearAllTargetExclusions()
   end)
-  addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
+
+  local function clearQuest(quest)
     for _, obj in ipairs(quest.objectives) do
       addon:ClearTargetExclusions(obj.id)
     end
-  end)
+  end
+
+  addon.AppEvents:Subscribe("QuestStatusChanged", clearQuest)
+  addon.AppEvents:Subscribe("QuestStarted", clearQuest)
 end)
