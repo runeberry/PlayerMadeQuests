@@ -80,11 +80,11 @@ local buttons = {
       addon:ShareQuest(quest)
     end
   },
-  ["Retry"] = {
-    text = "Replay Quest",
+  ["Restart"] = {
+    text = "Restart Quest",
     width = 122,
     action = function(quest)
-      addon:RetryQuest(quest)
+      addon:RestartQuest(quest)
     end
   },
   ["Empty"] = {
@@ -265,7 +265,7 @@ frameModes = {
   },
   ["TerminatedQuest"] = {
     leftButton = buttons.Share,
-    rightButton = buttons.Retry,
+    rightButton = buttons.Restart,
     busy = function(frame, quest)
 
     end,
@@ -297,6 +297,9 @@ local frameMethods = {
     self._shown = true
 
     self:Show()
+  end,
+  ["IsShowingQuest"] = function(self, quest)
+    return self._shown and self._quest and self._quest.questId == quest.questId and true
   end,
   ["ClearContent"] = function(self)
     self.titleFontString:SetText("")
@@ -440,4 +443,16 @@ end
 
 addon:OnGuiStart(function()
   addon.QuestInfoFrame = buildQuestInfoFrame()
+
+  local function hide(quest)
+    if addon.QuestInfoFrame:IsShowingQuest(quest) then
+      addon.QuestInfoFrame:Hide()
+    end
+  end
+
+  addon.AppEvents:Subscribe("QuestAccepted", hide)
+  addon.AppEvents:Subscribe("QuestAbandoned", hide)
+  addon.AppEvents:Subscribe("QuestDeclined", hide)
+  addon.AppEvents:Subscribe("QuestCompleted", hide)
+  addon.AppEvents:Subscribe("QuestRestarted", hide)
 end)

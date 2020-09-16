@@ -1,17 +1,20 @@
 local _, addon = ...
 local QuestEngine = addon.QuestEngine
 local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
-local QuestCatalog, QuestCatalogStatus, QuestCatalogSource = addon.QuestCatalog, addon.QuestCatalogStatus, addon.QuestCatalogSource
-local MessageEvents, MessageDistribution = addon.MessageEvents, addon.MessageDistribution
+local QuestCatalog, QuestCatalogStatus = addon.QuestCatalog, addon.QuestCatalogStatus
+local QuestArchive = addon.QuestArchive
 
-local function notifySender(catalogItem, event)
-  local sender = catalogItem.from and catalogItem.from.name
-  if sender and catalogItem.from.source == QuestCatalogSource.Shared then
-    MessageEvents:Publish(event, { distribution = MessageDistribution.Whisper, target = sender }, catalogItem.questId)
-  end
-end
+--[[
+  QuestActions are complex actions that users may perform on quests.
+  The code in QuestActions should only concern the following things:
+    * Updating any data entities
+    * StaticPopups (may move this later)
+    * Printing chat feedback for the player
+  Any other side-effects of these actions should be handled elsewhere
+  by subscribing to the AppEvents published here.
+--]]
 
-local function acceptQuest(quest)
+local function startQuest(quest)
   -- Clean quest progress on fresh accept, just in case
   if quest.objectives then
     for _, obj in pairs(quest.objectives) do
@@ -24,14 +27,19 @@ local function acceptQuest(quest)
   local catalogItem = QuestCatalog:FindByID(quest.questId)
   if catalogItem and catalogItem.status ~= QuestCatalogStatus.Accepted then
     QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Accepted)
-    notifySender(catalogItem, "QuestInviteAccepted")
   end
 
-  -- todo: Should probably move this so it responds to a QuestAccepted app event
-  addon:PlaySound("QuestAccepted")
-  addon.QuestInfoFrame:Hide()
-  addon.QuestLogFrame:Show()
+  -- A quest is no longer archived once it becomes active
+  local archivedQuest = QuestArchive:FindByID(quest.questId)
+  if archivedQuest then
+    QuestArchive:Delete(archivedQuest)
+  end
+end
+
+local function acceptQuest(quest)
+  startQuest(quest)
   addon.Logger:Warn("Quest Accepted: %s", quest.name)
+  addon.AppEvents:Publish("QuestAccepted", quest)
 end
 
 --------------------
@@ -58,16 +66,17 @@ end
 
 function addon:DeclineQuest(quest)
   local catalogItem = QuestCatalog:FindByID(quest.questId)
-  if catalogItem then
+  if catalogItem and catalogItem.status ~= QuestCatalogStatus.Declined then
     QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Declined)
-    notifySender(catalogItem, "QuestInviteDeclined")
   end
-  addon.QuestInfoFrame:Hide()
+  addon.AppEvents:Publish("QuestDeclined", quest)
 end
 
 function addon:AbandonQuest(quest)
   addon.StaticPopups:Show("AbandonQuest", quest):OnYes(function()
-    addon.QuestInfoFrame:Hide()
+    QuestLog:SaveWithStatus(quest, QuestStatus.Abandoned)
+    addon.Logger:Warn("Quest abandoned: %s", quest.name)
+    addon.AppEvents:Publish("QuestAbandoned", quest)
   end)
 end
 
@@ -77,13 +86,14 @@ function addon:CompleteQuest(quest)
     return
   end
   QuestLog:SaveWithStatus(quest, QuestStatus.Completed)
-  addon:PlaySound("QuestComplete")
-  addon.QuestInfoFrame:Hide()
   addon.Logger:Warn("%s completed.", quest.name)
+  addon.AppEvents:Publish("QuestCompleted")
 end
 
-function addon:RetryQuest(quest)
-  addon.StaticPopups:Show("RetryQuest", quest):OnYes(function()
-    acceptQuest(quest)
+function addon:RestartQuest(quest)
+  addon.StaticPopups:Show("RestartQuest", quest):OnYes(function()
+    startQuest(quest)
+    addon.Logger:Warn("Quest Restarted: %s", quest.name)
+    addon.AppEvents:Publish("QuestRestarted", quest)
   end)
 end

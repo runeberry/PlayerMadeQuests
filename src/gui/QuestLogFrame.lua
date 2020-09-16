@@ -157,4 +157,11 @@ end
 addon:OnGuiStart(function()
   addon.QuestLogFrame = buildQuestLogFrame()
   addon.QuestLogFrame:Refresh()
+
+  local function show()
+    addon.QuestLogFrame:Show()
+  end
+
+  addon.AppEvents:Subscribe("QuestAccepted", show)
+  addon.AppEvents:Subscribe("QuestRestarted", show)
 end)

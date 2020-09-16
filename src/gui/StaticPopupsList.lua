@@ -11,11 +11,6 @@ addon.StaticPopupsList = {
     end,
     yesText = "OK",
     noText = "Cancel",
-    yesHandler = function(quest)
-      QuestLog:SaveWithStatus(quest, QuestStatus.Abandoned)
-      addon:PlaySound("QuestAbandoned")
-      addon.Logger:Warn("Quest abandoned: %s", quest.name)
-    end,
   },
   ["ArchiveQuest"] = {
     message = function(quest)
@@ -52,25 +47,18 @@ addon.StaticPopupsList = {
       addon.Logger:Warn("Quest Log cleared")
     end,
   },
-  ["RetryQuest"] = {
+  ["RestartQuest"] = {
     message = function(quest)
       if quest.status == QuestStatus.Completed then
         -- Provide an additional warning only if the quest has already been successfully finished
-        return "Replay \"%s\"?\n"..
+        return "Restart \"%s\"?\n"..
                "This will erase your previous completion of this quest.", quest.name
       else
-        return "Replay \"%s\"?", quest.name
+        return "Restart \"%s\"?", quest.name
       end
     end,
     yesText = "OK",
     noText = "Cancel",
-    yesHandler = function(quest)
-      QuestLog:SaveWithStatus(quest, QuestStatus.Active)
-      if QuestArchive:FindByID(quest.questId) then
-        -- If the quest was in the archive, remove it from there
-        QuestArchive:Delete(quest.questId)
-      end
-    end,
   },
   ["StartQuestBelowRequirements"] = {
     message = function()
