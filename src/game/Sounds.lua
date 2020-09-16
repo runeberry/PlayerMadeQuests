@@ -5,7 +5,7 @@ local sounds = {
   ["QuestAccepted"] = {
     fileId = 567400,
     path = "sound/interface/iquestactivate.ogg",
-    events = { "QuestAccepted", "QuestRestarted" },
+    events = { "QuestStarted" },
   },
   ["QuestAbandoned"] = {
     fileId = 567459,

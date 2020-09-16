@@ -32,6 +32,8 @@ local function startQuest(quest)
 
   QuestLog:SaveWithStatus(quest, QuestStatus.Active)
   QuestEngine:StartTracking(quest)
+  -- Can listen to this even when you need both "QuestAccepted" and "QuestRestarted"
+  addon.AppEvents:Publish("QuestStarted", quest)
 
   local catalogItem = QuestCatalog:FindByID(quest.questId)
   if catalogItem and catalogItem.status ~= QuestCatalogStatus.Accepted then

@@ -162,6 +162,5 @@ addon:OnGuiStart(function()
     addon.QuestLogFrame:Show()
   end
 
-  addon.AppEvents:Subscribe("QuestAccepted", show)
-  addon.AppEvents:Subscribe("QuestRestarted", show)
+  addon.AppEvents:Subscribe("QuestStarted", show)
 end)

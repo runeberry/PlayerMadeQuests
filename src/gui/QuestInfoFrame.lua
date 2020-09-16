@@ -450,9 +450,8 @@ addon:OnGuiStart(function()
     end
   end
 
-  addon.AppEvents:Subscribe("QuestAccepted", hide)
+  addon.AppEvents:Subscribe("QuestStarted", hide)
   addon.AppEvents:Subscribe("QuestAbandoned", hide)
   addon.AppEvents:Subscribe("QuestDeclined", hide)
   addon.AppEvents:Subscribe("QuestCompleted", hide)
-  addon.AppEvents:Subscribe("QuestRestarted", hide)
 end)
