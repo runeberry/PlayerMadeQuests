@@ -1,7 +1,6 @@
 local builder = require("spec/addon-builder")
 local events = require("spec/events")
 local addon = builder:Build()
-local testLogger = addon.Logger:NewLogger("UnitTest", "debug")
 
 local counter = 0
 local function createTestEntity()
