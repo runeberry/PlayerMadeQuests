@@ -72,7 +72,7 @@ end
 
 function addon:DeclineQuest(quest)
   local catalogItem = QuestCatalog:FindByID(quest.questId)
-  if catalogItem and catalogItem.status ~= QuestCatalogStatus.Declined then
+  if catalogItem and catalogItem.status == QuestCatalogStatus.Invited then
     QuestCatalog:SaveWithStatus(catalogItem, QuestCatalogStatus.Declined)
   end
   addon.AppEvents:Publish("QuestDeclined", quest)
