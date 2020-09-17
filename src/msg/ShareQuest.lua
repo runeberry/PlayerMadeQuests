@@ -155,7 +155,9 @@ addon:OnBackendStart(function()
     local meetsRequirements = addon.QuestEngine:EvaluateRequirements(quest)
     if meetsRequirements then
       logger:Trace("Quest requirements met, showing QuestInfoFrame")
-      addon:ShowQuestInfoFrame(true, catalogItem.quest)
+      if addon.QuestInfoFrame then
+        addon.QuestInfoFrame:ShowQuest(catalogItem.quest)
+      end
     else
       addon.Logger:Warn("You do not meet the requirements, but it has been saved to your Catalog.")
       MessageEvents:Publish("QuestInviteRequirements", { distribution = MessageDistribution.Whisper, target = sender }, quest.questId)
@@ -175,5 +177,23 @@ addon:OnBackendStart(function()
   end)
   MessageEvents:Subscribe("QuestInviteRequirements", function(distribution, sender, questId)
     addon.Logger:Warn("%s does not meet the requirements for that quest.", sender)
+  end)
+
+  -- Respond to certain quest actions by notifying the sender
+  local function notifySender(quest, event)
+    local catalogItem = addon.QuestCatalog:FindByID(quest.questId)
+    if not catalogItem then return end
+
+    local sender = catalogItem.from and catalogItem.from.name
+    if sender and catalogItem.from.source == QuestCatalogSource.Shared then
+      MessageEvents:Publish(event, { distribution = MessageDistribution.Whisper, target = sender }, catalogItem.questId)
+    end
+  end
+
+  addon.AppEvents:Subscribe("QuestAccepted", function(quest)
+    notifySender(quest, "QuestInviteAccepted")
+  end)
+  addon.AppEvents:Subscribe("QuestDeclined", function(quest)
+    notifySender(quest, "QuestInviteDeclined")
   end)
 end)

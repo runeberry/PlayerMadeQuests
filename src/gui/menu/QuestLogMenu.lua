@@ -46,7 +46,7 @@ local options = {
       anchor = "TOP",
       enabled = "Row",
       handler = function(quest, dataTable)
-        addon:ShowQuestInfoFrame(true, quest)
+        addon.QuestInfoFrame:ShowQuest(quest)
         dataTable:ClearSelection()
       end,
     },

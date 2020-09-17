@@ -85,9 +85,8 @@ end
 function addon:ValidateQuestStatusChange(quest)
   local oldStatus = statusTracker[quest.questId]
   local ok, reason = addon:IsValidQuestStatusChange(oldStatus, quest.status)
-  if not ok then
-    error(reason)
-  end
+  assert(ok, reason)
+  addon.Logger:Trace("QuestStatus change is valid: %s -> %s", oldStatus, quest.status)
 end
 
 addon:OnBackendStart(function()

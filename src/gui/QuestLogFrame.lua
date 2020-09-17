@@ -74,7 +74,7 @@ local function AddQuest(questList, quest)
   qLabel:SetFullWidth(true)
   qLabel:SetHighlight(136810) -- Interface\\QuestFrame\\UI-QuestTitleHighlight
   qLabel:SetCallback("OnClick", function()
-    addon:ShowQuestInfoFrame(true, quest)
+    addon.QuestInfoFrame:ShowQuest(quest)
   end)
   questList:AddChild(qLabel)
   SetQuestText(qLabel, quest)
@@ -157,4 +157,10 @@ end
 addon:OnGuiStart(function()
   addon.QuestLogFrame = buildQuestLogFrame()
   addon.QuestLogFrame:Refresh()
+
+  local function show()
+    addon.QuestLogFrame:Show()
+  end
+
+  addon.AppEvents:Subscribe("QuestStarted", show)
 end)

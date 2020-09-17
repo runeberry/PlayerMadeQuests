@@ -4,6 +4,8 @@ local QuestStatus = addon.QuestStatus
 local QuestCatalog, QuestCatalogSource = addon.QuestCatalog, addon.QuestCatalogSource
 local localizer = addon.QuestScriptLocalizer
 
+addon.QuestInfoFrame = nil -- Defined during lifecycle event
+
 local pollTimers = {}
 local pollingTimerInterval = 0.5 -- interval to poll for start/complete condition satisfaction, in seconds
 
@@ -78,11 +80,11 @@ local buttons = {
       addon:ShareQuest(quest)
     end
   },
-  ["Retry"] = {
-    text = "Replay Quest",
+  ["Restart"] = {
+    text = "Restart Quest",
     width = 122,
     action = function(quest)
-      addon:RetryQuest(quest)
+      addon:RestartQuest(quest)
     end
   },
   ["Empty"] = {
@@ -90,6 +92,15 @@ local buttons = {
     width = 78,
     action = function() end
   }
+}
+
+local statusModeMap = {
+  ["default"] = "NewQuest",
+  [QuestStatus.Active] = "ActiveQuest",
+  [QuestStatus.Failed] = "TerminatedQuest",
+  [QuestStatus.Abandoned] = "TerminatedQuest",
+  [QuestStatus.Finished] = "FinishedQuest",
+  [QuestStatus.Completed] = "TerminatedQuest",
 }
 
 local function setButtonBehavior(btn, behavior, quest)
@@ -254,7 +265,7 @@ frameModes = {
   },
   ["TerminatedQuest"] = {
     leftButton = buttons.Share,
-    rightButton = buttons.Retry,
+    rightButton = buttons.Restart,
     busy = function(frame, quest)
 
     end,
@@ -266,7 +277,9 @@ frameModes = {
 }
 
 local frameMethods = {
-  ["ShowQuest"] = function(self, quest, mode)
+  ["ShowQuest"] = function(self, quest, modeName)
+    local mode = frameModes[modeName or statusModeMap[quest.status or "default"]]
+
     if self._shown and mode.busy then
       -- Another quest is already being interacted with
       -- If no "busy" function is specified, will proceed to draw content as normal
@@ -285,14 +298,8 @@ local frameMethods = {
 
     self:Show()
   end,
-  ["CloseQuest"] = function(self)
-    self._quest = nil
-    self._shown = nil
-
-    setButtonBehavior(self.leftButton)
-    setButtonBehavior(self.rightButton)
-
-    self:Hide()
+  ["IsShowingQuest"] = function(self, quest)
+    return self._shown and self._quest and self._quest.questId == quest.questId and true
   end,
   ["ClearContent"] = function(self)
     self.titleFontString:SetText("")
@@ -302,8 +309,8 @@ local frameMethods = {
   end,
   ["RefreshMode"] = function(self)
     local quest = self._quest
-    addon:ShowQuestInfoFrame(false)
-    addon:ShowQuestInfoFrame(true, quest)
+    addon.QuestInfoFrame:Hide()
+    addon.QuestInfoFrame:ShowQuest(quest)
   end
 }
 
@@ -314,7 +321,11 @@ local frameScripts = {
     addon:PlaySound("BookOpen")
   end,
   ["OnHide"] = function(self)
+    self._quest = nil
     self._shown = nil
+
+    setButtonBehavior(self.leftButton)
+    setButtonBehavior(self.rightButton)
 
     -- Cancel any outstanding polling functions when the window is closed
     for pollTimerId in pairs(pollTimers) do
@@ -326,15 +337,6 @@ local frameScripts = {
   end,
   -- ["OnLoad"] = function() end,
   -- ["OnEvent"] = function() end,
-}
-
-local defaultStatusMode = "NewQuest"
-local statusModeMap = {
-  [QuestStatus.Active] = "ActiveQuest",
-  [QuestStatus.Failed] = "TerminatedQuest",
-  [QuestStatus.Abandoned] = "TerminatedQuest",
-  [QuestStatus.Finished] = "FinishedQuest",
-  [QuestStatus.Completed] = "TerminatedQuest",
 }
 
 local function buildQuestInfoFrame()
@@ -439,36 +441,17 @@ local function buildQuestInfoFrame()
   return questFrame
 end
 
-local questInfoFrame
+addon:OnGuiStart(function()
+  addon.QuestInfoFrame = buildQuestInfoFrame()
 
-function addon:ShowQuestInfoFrame(flag, quest, modeName)
-  if not addon.Config:GetValue("ENABLE_GUI") then return end
-
-  if flag == nil then flag = true end
-  if not questInfoFrame then
-    questInfoFrame = buildQuestInfoFrame()
+  local function hide(quest)
+    if addon.QuestInfoFrame:IsShowingQuest(quest) then
+      addon.QuestInfoFrame:Hide()
+    end
   end
-  if flag then
-    if not quest then
-      addon.UILogger:Error("Unable to show QuestInfoFrame: no quest provided")
-      return
-    end
 
-    -- Unless overridden, the mode that this frame displays in is determined directly by the quest's status
-    if not modeName then
-      if quest.status then
-        modeName = statusModeMap[quest.status]
-      else
-        modeName = defaultStatusMode
-      end
-    end
-    local mode = frameModes[modeName]
-    if not mode then
-      addon.UILogger:Warn("Unable to show QuestInfoFrame: %s is not a valid view mode", modeName)
-      return
-    end
-    questInfoFrame:ShowQuest(quest, mode)
-  else
-    questInfoFrame:CloseQuest()
-  end
-end
+  addon.AppEvents:Subscribe("QuestStarted", hide)
+  addon.AppEvents:Subscribe("QuestAbandoned", hide)
+  addon.AppEvents:Subscribe("QuestDeclined", hide)
+  addon.AppEvents:Subscribe("QuestCompleted", hide)
+end)

@@ -11,12 +11,13 @@ local _, addon = ...
   }
 --]]
 
-addon.QuestDrafts = addon:NewRepository("Draft", "draftId")
-addon.QuestDrafts:SetSaveDataSource("Drafts")
-addon.QuestDrafts:EnableWrite(true)
-addon.QuestDrafts:EnableCompression(true)
-addon.QuestDrafts:EnableGlobalSaveData(true)
-addon.QuestDrafts:EnableTimestamps(true)
+local QuestDrafts = addon:NewRepository("Draft", "draftId")
+QuestDrafts:SetSaveDataSource("Drafts")
+QuestDrafts:EnableWrite(true)
+QuestDrafts:EnableCompression(true)
+QuestDrafts:EnableGlobalSaveData(true)
+QuestDrafts:EnableTimestamps(true)
+addon.QuestDrafts = QuestDrafts
 
 addon.QuestDraftStatus = {
   Draft = "Draft",
@@ -26,7 +27,7 @@ addon.QuestDraftStatus = {
 }
 local status = addon.QuestDraftStatus
 
-function addon.QuestDrafts:NewDraft()
+function QuestDrafts:NewDraft()
   local draft = {
     draftId = addon:CreateID("draft-%i"),
     version = 1,
@@ -38,7 +39,16 @@ function addon.QuestDrafts:NewDraft()
   return draft
 end
 
-function addon.QuestDrafts:TryCompileDraft(draftId)
+function QuestDrafts:FindByQuestID(questId)
+  local drafts = self:FindByQuery(function(d) return d.parameters.questId == questId end)
+  if #drafts > 1 then
+    addon.Logger:Warn("Ambigious draft match on questId: %s (%i results)", questId, #drafts)
+    return
+  end
+  return drafts[1]
+end
+
+function QuestDrafts:TryCompileDraft(draftId)
   if not draftId then
     return false, "draftId is required"
   end
@@ -58,11 +68,11 @@ function addon.QuestDrafts:TryCompileDraft(draftId)
   return true, quest
 end
 
-function addon.QuestDrafts:StartDraft(draftId)
+function QuestDrafts:StartDraft(draftId)
   local ok, quest = self:TryCompileDraft(draftId)
   if not ok then
     addon.Logger:Warn("Failed to start draft: %s", quest)
     return
   end
-  addon:ShowQuestInfoFrame(true, quest)
+  addon.QuestInfoFrame:ShowQuest(quest)
 end

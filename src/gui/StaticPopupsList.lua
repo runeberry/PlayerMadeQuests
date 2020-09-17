@@ -12,9 +12,7 @@ addon.StaticPopupsList = {
     yesText = "OK",
     noText = "Cancel",
     yesHandler = function(quest)
-      QuestLog:SaveWithStatus(quest, QuestStatus.Abandoned)
-      addon:PlaySound("QuestAbandoned")
-      addon.Logger:Warn("Quest abandoned: %s", quest.name)
+      addon:AbandonQuest(quest, true)
     end,
   },
   ["ArchiveQuest"] = {
@@ -52,25 +50,21 @@ addon.StaticPopupsList = {
       addon.Logger:Warn("Quest Log cleared")
     end,
   },
-  ["RetryQuest"] = {
+  ["RestartQuest"] = {
     message = function(quest)
       if quest.status == QuestStatus.Completed then
         -- Provide an additional warning only if the quest has already been successfully finished
-        return "Replay \"%s\"?\n"..
+        return "Restart \"%s\"?\n"..
                "This will erase your previous completion of this quest.", quest.name
       else
-        return "Replay \"%s\"?", quest.name
+        return "Restart \"%s\"?", quest.name
       end
     end,
     yesText = "OK",
     noText = "Cancel",
     yesHandler = function(quest)
-      QuestLog:SaveWithStatus(quest, QuestStatus.Active)
-      if QuestArchive:FindByID(quest.questId) then
-        -- If the quest was in the archive, remove it from there
-        QuestArchive:Delete(quest.questId)
-      end
-    end,
+      addon:RestartQuest(quest, true)
+    end
   },
   ["StartQuestBelowRequirements"] = {
     message = function()
@@ -79,7 +73,9 @@ addon.StaticPopupsList = {
     end,
     yesText = "OK",
     noText = "Cancel",
-    yesHandler = function() end, -- Need an empty function to trigger the OnYes handler
+    yesHandler = function(quest)
+      addon:AcceptQuest(quest, true)
+    end,
   },
   ["DeleteCatalogItem"] = {
     message = function(catalogItem)

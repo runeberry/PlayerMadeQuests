@@ -5,6 +5,11 @@ local unpack = addon.G.unpack
 
 addon.StaticPopups = {}
 
+local popupsEnabled
+addon:OnGuiStart(function()
+  popupsEnabled = addon.Config:GetValue("ENABLE_GUI")
+end)
+
 --[[
   Properties reserved for the popup by WoW:
   {
@@ -99,6 +104,8 @@ local function buildPopup(template, globalId)
     end
   end
 
+  -- todo: the OnYes handler can only be triggered if the SP's yesHandler is not nil
+  -- Ideally this should work whether or not you have a yesHandler on the SP
   if template.yesHandler then
     popup._yesHandler = template.yesHandler
     popup.OnAccept = function(self)
@@ -144,6 +151,7 @@ local function buildPopup(template, globalId)
 end
 
 local function getGlobalPopup(name)
+  if not popupsEnabled then return end
   local globalId = "PMQ_"..name
 
   local existing = StaticPopupDialogs[globalId]

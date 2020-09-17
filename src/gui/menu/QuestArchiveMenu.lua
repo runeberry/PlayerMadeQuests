@@ -33,7 +33,7 @@ local options = {
       anchor = "TOP",
       enabled = "Row",
       handler = function(quest, dataTable)
-        addon:ShowQuestInfoFrame(true, quest, "TerminatedQuest")
+        addon.QuestInfoFrame:ShowQuest(quest, "TerminatedQuest")
         dataTable:ClearSelection()
       end,
     },
