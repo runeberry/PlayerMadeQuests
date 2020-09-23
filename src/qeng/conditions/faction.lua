@@ -1,5 +1,4 @@
 local _, addon = ...
-local UnitFactionGroup = addon.G.UnitFactionGroup
 
 local condition = addon.QuestEngine:NewCondition("faction")
 condition:AllowType("string")
@@ -9,5 +8,5 @@ function condition:OnParse(args)
 end
 
 function condition:Evaluate(faction)
-  return UnitFactionGroup("player"):lower() == faction
+  return addon:GetPlayerFaction() == faction
 end

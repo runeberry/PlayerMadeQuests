@@ -1,6 +1,6 @@
 local _, addon = ...
 local logger = addon.Logger:NewLogger("Compiler", addon.LogLevel.info)
-local GetBuildInfo, UnitFullName = addon.G.GetBuildInfo, addon.G.UnitFullName
+local GetBuildInfo = addon.G.GetBuildInfo
 local time = addon.G.time
 local Ace, LibCompress = addon.Ace, addon.LibCompress
 
@@ -9,7 +9,8 @@ local compiler = addon.QuestScriptCompiler
 
 local function buildMetadata()
   local _, build, _, tocVersion = GetBuildInfo()
-  local playerName, playerRealm = UnitFullName("player")
+  local playerName = addon:GetPlayerName()
+  local playerRealm = addon:GetPlayerRealm()
 
   local metadata = {
     addonVersion = addon.VERSION,
@@ -77,7 +78,9 @@ function addon.QuestScriptCompiler:Compile(script, questParams)
 
   -- Finally, supply some default values for required fields that have not yet been defined
   if not quest.questId then
-    local playerName, playerRealm = UnitFullName("player")
+    local playerName = addon:GetPlayerName()
+    local playerRealm = addon:GetPlayerRealm()
+
     if not playerName or not playerRealm then
       error("Player name and realm are required in order to generate a questId")
     end

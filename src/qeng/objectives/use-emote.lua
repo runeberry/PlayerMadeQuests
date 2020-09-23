@@ -1,6 +1,6 @@
 local _, addon = ...
 local tokens = addon.QuestScriptTokens
-local GetUnitName, UnitGUID = addon.G.GetUnitName, addon.G.UnitGUID
+local UnitGUID = addon.G.UnitGUID
 
 local objective = addon.QuestEngine:NewObjective("use-emote")
 
@@ -32,7 +32,7 @@ function objective:AfterEvaluate(result, obj)
 end
 
 objective:AddGameEvent("CHAT_MSG_TEXT_EMOTE", function(msg, playerName)
-  if playerName == GetUnitName("player") and msg then
+  if playerName == addon:GetPlayerName() and msg then
     -- Only handle emotes that the player performs
     addon.LastEmoteMessage = msg
     return true

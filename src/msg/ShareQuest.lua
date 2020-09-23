@@ -2,7 +2,6 @@ local _, addon = ...
 local logger = addon.Logger:NewLogger("Share")
 local QuestCatalogSource, QuestCatalogStatus, QuestStatus = addon.QuestCatalogSource, addon.QuestCatalogStatus, addon.QuestStatus
 local MessageEvents, MessageDistribution = addon.MessageEvents, addon.MessageDistribution
-local UnitFullName = addon.G.UnitFullName
 
 local function cleanQuestForSharing(quest)
   quest.status = nil
@@ -114,11 +113,10 @@ addon:OnBackendStart(function()
     -- Update the "from" information to be whoever sent this QuestInvite
     if doSaveCatalog then
       -- Since there is no cross-realm in classic, we can assume the sender's realm is the same as the player's realm
-      local _, realm = UnitFullName("player")
       catalogItem.from = {
         source = QuestCatalogSource.Shared,
         name = sender,
-        realm = realm,
+        realm = addon:GetPlayerRealm(),
       }
       addon.QuestCatalog:Save(catalogItem, QuestCatalogStatus.Invited)
     end

@@ -1,6 +1,5 @@
 local _, addon = ...
 local Ace, unpack = addon.Ace, addon.G.unpack
-local GetUnitName = addon.G.GetUnitName
 local encoder = addon.LibCompress:GetAddonEncodeTable()
 local AddMessageEventFilter = addon.G.AddMessageEventFilter
 
@@ -93,7 +92,7 @@ end
 addon:OnBackendStart(function()
   useInternalMessaging = addon.Config:GetValue("ENABLE_SELF_MESSAGING")
 
-  playerName = GetUnitName("player")
+  playerName = addon:GetPlayerName()
 
   -- The original publish method will be used when an incoming message is received
   internalPublish = addon.MessageEvents.Publish

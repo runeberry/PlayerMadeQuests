@@ -1,5 +1,4 @@
 local _, addon = ...
-local UnitClass = addon.G.UnitClass
 
 local condition = addon.QuestEngine:NewCondition("class")
 condition:AllowType("string")
@@ -9,5 +8,5 @@ function condition:OnParse(args)
 end
 
 function condition:Evaluate(class)
-  return UnitClass("player"):lower() == class
+  return addon:GetPlayerClass() == class
 end

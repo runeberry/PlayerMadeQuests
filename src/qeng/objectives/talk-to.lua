@@ -38,7 +38,7 @@ local isTalkEmoteFilter = function(msg, playerName)
   if not talkEmoteMsg then
     talkEmoteMsg = addon.Emotes:FindByCommand("/talk").targeted
   end
-  if playerName == GetUnitName("player") and msg and UnitExists("target") then
+  if playerName == addon:GetPlayerName() and msg and UnitExists("target") then
     local talkEmoteMsgTargeted = talkEmoteMsg:gsub("%%t", GetUnitName("target"))
     if msg == talkEmoteMsgTargeted then
       if CheckInteractDistance("target", 5) then

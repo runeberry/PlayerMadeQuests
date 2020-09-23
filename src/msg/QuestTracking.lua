@@ -3,7 +3,7 @@ local logger = addon.Logger:NewLogger("Tracking")
 local MessageEvents, MessageDistribution, MessagePriority = addon.MessageEvents, addon.MessageDistribution, addon.MessagePriority
 local QuestCatalog, QuestCatalogSource = addon.QuestCatalog, addon.QuestCatalogSource
 local QuestStatus = addon.QuestStatus
-local GetUnitName, IsInGroup, IsInRaid = addon.G.GetUnitName, addon.G.IsInGroup, addon.G.IsInRaid
+local IsInGroup, IsInRaid = addon.G.IsInGroup, addon.G.IsInRaid
 
 -- Cache the last known quest status per player to avoid duplicate notifications
 local questStatusCache = {}
@@ -43,7 +43,7 @@ local function publish(quest, distro, target, reason)
 end
 
 addon:OnBackendStart(function()
-  playerName = GetUnitName("player")
+  playerName = addon:GetPlayerName()
 
   for k, v in pairs(notificationsEnabled) do
     notificationsEnabled[k] = addon.Config:GetValue(v)
