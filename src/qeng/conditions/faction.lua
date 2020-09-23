@@ -8,5 +8,5 @@ function condition:OnParse(args)
 end
 
 function condition:Evaluate(faction)
-  return addon:GetPlayerFaction() == faction
+  return addon:GetPlayerFaction():lower() == faction
 end

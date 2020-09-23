@@ -177,6 +177,8 @@ function deps:Init(addon)
     UnitGUID = ret(),
     UnitIsFriend = ret(),
     UnitLevel = ret(),
+    UnitRace = ret(),
+    UnitSex = ret(),
     UIErrorsFrame = {
       AddMessage = ret(),
     },
