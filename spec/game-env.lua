@@ -142,20 +142,43 @@ function game:AddPlayerEquipment(addon, item)
   mocks[#mocks+1] = addon.G.IsEquippedItem
 end
 
-function game:SetPlayerLevel(addon, level)
-  assert(type(level) == "number", "SetPlayerLevel must receive a number")
+function game:SetPlayerInfo(addon, info)
+  assert(type(info) == "table", "SetPlayerInfo must receive a table")
 
-  mock:GetFunctionMock(addon.G.UnitLevel):SetReturnsWhen(unitIdIsPlayer, level)
-  mocks[#mocks+1] = addon.G.UnitLevel
-end
+  if info.name or info.realm then
+    local name = info.name or "PlayerName"
+    local realm = info.realm or "PlayerRealm"
 
-function game:SetPlayerName(addon, name, realm)
-  assert(type(name) == "string", "SetPlayerName must receive a string")
+    mock:GetFunctionMock(addon.G.GetUnitName):SetReturnsWhen(unitIdIsPlayer, name)
+    mock:GetFunctionMock(addon.G.UnitFullName):SetReturnsWhen(unitIdIsPlayer, name, realm)
+    mocks[#mocks+1] = addon.G.GetUnitName
+    mocks[#mocks+1] = addon.G.UnitFullName
+  end
 
-  mock:GetFunctionMock(addon.G.GetUnitName):SetReturnsWhen(unitIdIsPlayer, name)
-  mock:GetFunctionMock(addon.G.UnitFullName):SetReturnsWhen(unitIdIsPlayer, name, realm or "PlayerRealm")
-  mocks[#mocks+1] = addon.G.GetUnitName
-  mocks[#mocks+1] = addon.G.UnitFullName
+  if info.level then
+    mock:GetFunctionMock(addon.G.UnitLevel):SetReturnsWhen(unitIdIsPlayer, info.level)
+    mocks[#mocks+1] = addon.G.UnitLevel
+  end
+
+  if info.class then
+    mock:GetFunctionMock(addon.G.UnitClass):SetReturnsWhen(unitIdIsPlayer, info.class)
+    mocks[#mocks+1] = addon.G.UnitClass
+  end
+
+  if info.faction then
+    mock:GetFunctionMock(addon.G.UnitFactionGroup):SetReturnsWhen(unitIdIsPlayer, info.faction)
+    mocks[#mocks+1] = addon.G.UnitFactionGroup
+  end
+
+  if info.race then
+    mock:GetFunctionMock(addon.G.UnitRace):SetReturnsWhen(unitIdIsPlayer, info.race)
+    mocks[#mocks+1] = addon.G.UnitRace
+  end
+
+  if info.sex then
+    mock:GetFunctionMock(addon.G.UnitSex):SetReturnsWhen(unitIdIsPlayer, info.sex)
+    mocks[#mocks+1] = addon.G.UnitSex
+  end
 end
 
 function game:SetPlayerGroup(addon, groupType)

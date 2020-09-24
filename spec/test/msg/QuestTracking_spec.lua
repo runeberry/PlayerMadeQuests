@@ -34,7 +34,7 @@ describe("QuestTracking", function()
     -- First, compile a quest with a known author
     local tempAddon = builder:Build()
     local authorName = "AuthorName"
-    game:SetPlayerName(tempAddon, authorName)
+    game:SetPlayerInfo(tempAddon, { name = authorName })
     tempAddon:Init()
     local quest = tempAddon.QuestScriptCompiler:Compile(goodScript)
     assert.equals(authorName, quest.metadata.authorName)
