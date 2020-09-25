@@ -20,3 +20,9 @@ addon:NewQuestMigration(200, function(quest)
     quest.complete.displaytext = nil
   end
 end)
+
+addon:NewQuestMigration(301, function(quest)
+  if not quest.metadata then
+    quest.metadata = {} -- Ensure that this isn't null so I don't have to null check it
+  end
+end)
