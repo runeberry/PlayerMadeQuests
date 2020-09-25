@@ -121,13 +121,7 @@ vars = {
   -- Inserts the name of the player who wrote the quest
   ["author"] = function(quest) return quest.metadata.authorName end,
   -- Inserts the name of the player who shared the quest, or the player's name if not found
-  ["giver"] = function(quest)
-    local catalogItem = addon.QuestCatalog:FindByID(quest.questId)
-    if catalogItem and catalogItem.from and catalogItem.from.name and catalogItem.from.source == addon.QuestCatalogSource.Shared then
-      return catalogItem.from.name
-    end
-    return addon:GetPlayerName()
-  end,
+  ["giver"] = function(quest) return quest.metadata.giverName or addon:GetPlayerName() end,
 
   ----------------
   -- Formatting --

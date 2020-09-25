@@ -1,7 +1,6 @@
 local _, addon = ...
 local logger = addon.Logger:NewLogger("Tracking")
 local MessageEvents, MessageDistribution, MessagePriority = addon.MessageEvents, addon.MessageDistribution, addon.MessagePriority
-local QuestCatalog, QuestCatalogSource = addon.QuestCatalog, addon.QuestCatalogSource
 local QuestStatus = addon.QuestStatus
 local IsInGroup, IsInRaid = addon.G.IsInGroup, addon.G.IsInRaid
 
@@ -60,16 +59,12 @@ addon:OnBackendStart(function()
 
   -- When a player's quest status changes, notify all concerned parties
   addon.AppEvents:Subscribe("QuestStatusChanged", function(quest)
-    local catalogItem = QuestCatalog:FindByID(quest.questId)
-    if catalogItem then
-      local from = catalogItem.from
-      if from and from.source == QuestCatalogSource.Shared and from.name and from.name ~= playerName then
-        logger:Trace("Notifying SHARER of quest status change")
-        publish(quest, MessageDistribution.Whisper, from.name, "sharer")
-      end
+    if quest.metadata.giverName and quest.metadata.giverName ~= playerName then
+      logger:Trace("Notifying SHARER of quest status change")
+      publish(quest, MessageDistribution.Whisper, quest.metadata.giverName, "sharer")
     end
 
-    if quest.metadata and quest.metadata.authorName and quest.metadata.authorName ~= playerName then
+    if quest.metadata.authorName and quest.metadata.authorName ~= playerName then
       logger:Trace("Notifying AUTHOR of quest status change")
       publish(quest, MessageDistribution.Whisper, quest.metadata.authorName, "author")
     end

@@ -6,12 +6,6 @@ local _, addon = ...
     questId: "string",  -- The questId copied from the compiled quest object
     quest: {},          -- The compiled quest object
     status: "string",   -- QuestCatalogStatus
-    from: {
-      source: "string", -- Where the quest came from (QuestCatalogSource)
-      id: "string",     -- Unique id of this quest's source (e.g. demoId if source == demo)
-      name: "string",   -- The name of the player this quest came from (if applicable)
-      realm: "string",  -- The realm of the player this quest came from (if applicable)
-    },
   }
 --]]
 
@@ -29,13 +23,6 @@ local QuestCatalogStatus = {
   Accepted = "Accepted",
 }
 addon.QuestCatalogStatus = QuestCatalogStatus
-
-local QuestCatalogSource = {
-  Demo = "Demo",
-  Draft = "Draft",
-  Shared = "Shared",
-}
-addon.QuestCatalogSource = QuestCatalogSource
 
 function addon.QuestCatalog:NewCatalogItem(quest)
   assert(quest and quest.questId, "NewCatalogItem failed: a quest must be provided")

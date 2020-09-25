@@ -1,6 +1,6 @@
 local _, addon = ...
 local logger = addon.Logger:NewLogger("Share")
-local QuestCatalogSource, QuestCatalogStatus, QuestStatus = addon.QuestCatalogSource, addon.QuestCatalogStatus, addon.QuestStatus
+local QuestCatalogStatus, QuestStatus = addon.QuestCatalogStatus, addon.QuestStatus
 local MessageEvents, MessageDistribution = addon.MessageEvents, addon.MessageDistribution
 
 local function cleanQuestForSharing(quest)
@@ -50,6 +50,10 @@ function addon:ShareQuest(quest)
   quest = addon:CopyTable(quest)
   cleanQuestForSharing(quest)
   addon.QuestEngine:Validate(quest) -- Sanity check, don't want to send players broken quests
+
+  quest.metadata.giverName = addon:GetPlayerName()
+  quest.metadata.giverRealm = addon:GetPlayerRealm()
+  quest.metadata.giverGuild = addon:GetPlayerGuildName()
 
   MessageEvents:Publish("QuestInvite", nil, quest) -- Currently only shares with default channel ("PARTY")
   addon.Logger:Warn("Sharing quest %s...", quest.name)
@@ -112,12 +116,6 @@ addon:OnBackendStart(function()
     -- If there were any updates made to the catalog entry (or a new entry was created), save it now
     -- Update the "from" information to be whoever sent this QuestInvite
     if doSaveCatalog then
-      -- Since there is no cross-realm in classic, we can assume the sender's realm is the same as the player's realm
-      catalogItem.from = {
-        source = QuestCatalogSource.Shared,
-        name = sender,
-        realm = addon:GetPlayerRealm(),
-      }
       addon.QuestCatalog:Save(catalogItem, QuestCatalogStatus.Invited)
     end
 
@@ -179,12 +177,8 @@ addon:OnBackendStart(function()
 
   -- Respond to certain quest actions by notifying the sender
   local function notifySender(quest, event)
-    local catalogItem = addon.QuestCatalog:FindByID(quest.questId)
-    if not catalogItem then return end
-
-    local sender = catalogItem.from and catalogItem.from.name
-    if sender and catalogItem.from.source == QuestCatalogSource.Shared then
-      MessageEvents:Publish(event, { distribution = MessageDistribution.Whisper, target = sender }, catalogItem.questId)
+    if quest.metadata.giverName then
+      MessageEvents:Publish(event, { distribution = MessageDistribution.Whisper, target = quest.metadata.giverName }, quest.questId)
     end
   end
 

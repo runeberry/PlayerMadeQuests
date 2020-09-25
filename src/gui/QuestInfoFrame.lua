@@ -1,7 +1,6 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 local QuestStatus = addon.QuestStatus
-local QuestCatalog, QuestCatalogSource = addon.QuestCatalog, addon.QuestCatalogSource
 
 addon.QuestInfoFrame = nil -- Defined during lifecycle event
 
@@ -162,9 +161,8 @@ frameModes = {
     leftButton = buttons.Accept,
     rightButton = buttons.Decline,
     busy = function(frame, quest)
-      local catalogItem = QuestCatalog:FindByID(quest.questId)
-      local sender = catalogItem.from and catalogItem.from.name
-      if sender and catalogItem.from.source == QuestCatalogSource.Shared then
+      local sender = quest.metadata.giverName
+      if sender then
         addon.Logger:Warn("%s invited you to a quest. View it in your Quest Catalog.", sender)
       else
         addon.Logger:Warn("Close this window before trying to view another quest.")
