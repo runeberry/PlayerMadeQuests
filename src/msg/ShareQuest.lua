@@ -43,7 +43,8 @@ local function findNewestQuestVersion(quest)
   return quest, source
 end
 
-function addon:ShareQuest(quest)
+-- Suppression flag was added for unit tests
+function addon:ShareQuest(quest, suppressMetadata)
   assert(type(quest) == "table", "Failed to ShareQuest: a quest must be provided")
 
   -- Make a copy for sharing, and clean the current player's status/progress from it
@@ -51,9 +52,11 @@ function addon:ShareQuest(quest)
   cleanQuestForSharing(quest)
   addon.QuestEngine:Validate(quest) -- Sanity check, don't want to send players broken quests
 
-  quest.metadata.giverName = addon:GetPlayerName()
-  quest.metadata.giverRealm = addon:GetPlayerRealm()
-  quest.metadata.giverGuild = addon:GetPlayerGuildName()
+  if not suppressMetadata then
+    quest.metadata.giverName = addon:GetPlayerName()
+    quest.metadata.giverRealm = addon:GetPlayerRealm()
+    quest.metadata.giverGuild = addon:GetPlayerGuildName()
+  end
 
   MessageEvents:Publish("QuestInvite", nil, quest) -- Currently only shares with default channel ("PARTY")
   addon.Logger:Warn("Sharing quest %s...", quest.name)

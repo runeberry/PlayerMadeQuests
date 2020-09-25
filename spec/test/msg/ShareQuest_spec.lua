@@ -60,7 +60,7 @@ describe("ShareQuest", function()
   describe("when a shared quest is received", function()
     local sharedQuest
     before_each(function()
-      addon:ShareQuest(questToShare)
+      addon:ShareQuest(questToShare, true)
       sharedQuest = questToShare
     end)
     after_each(function()
@@ -183,7 +183,7 @@ describe("ShareQuest", function()
     local sharedQuest
     before_each(function()
       sharedQuest = addon.QuestScriptCompiler:Compile(goodScriptWithRequirements)
-      addon:ShareQuest(sharedQuest)
+      addon:ShareQuest(sharedQuest, true)
     end)
     describe("and the player meets the requirements", function()
       before_each(function()
