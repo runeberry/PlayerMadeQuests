@@ -359,7 +359,7 @@ function addon:PopulateText(str, context)
   local text = populateDisplayText(str, context)
 
   -- Clean up any leading, trailing, or duplicate spaces before returning
-  return text:gsub("^%s+", ""):gsub("%s+$", ""):gsub(" +", " ")
+  return text:gsub("^%s+", ""):gsub("%s+$", ""):gsub(" +", " "):gsub("\n ", "\n")
 end
 
 -- Valid values for scope are: log [default], progress, quest, full
