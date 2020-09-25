@@ -18,7 +18,6 @@
 
   <!-- QuestScript runtime files have dependencies on the Engine and Tools. -->
   <Script file="qeng/QuestScriptCompiler.lua"/>
-  <Script file="qeng/QuestScriptLocalizer.lua"/>
 
   <Script file="qeng/parameters/goal.lua"/>
   <Script file="qeng/parameters/text.lua"/>

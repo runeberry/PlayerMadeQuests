@@ -1,6 +1,5 @@
 local _, addon = ...
 local frame = addon.G.UIErrorsFrame
-local localizer = addon.QuestScriptLocalizer
 
 local progressCache = {}
 
@@ -14,7 +13,7 @@ addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
   -- Only publish message for objectives that have advanced forward, not back
   if lastProgress and lastProgress > obj.progress then return end
 
-  local msg = localizer:GetDisplayText(obj, "progress")
+  local msg = addon:GetCheckpointDisplayText(obj, "progress")
 
   if obj.progress >= obj.goal then
     msg = msg.." (Complete)"

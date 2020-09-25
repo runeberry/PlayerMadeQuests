@@ -2,7 +2,6 @@ local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 local QuestStatus = addon.QuestStatus
 local QuestCatalog, QuestCatalogSource = addon.QuestCatalog, addon.QuestCatalogSource
-local localizer = addon.QuestScriptLocalizer
 
 addon.QuestInfoFrame = nil -- Defined during lifecycle event
 
@@ -203,7 +202,7 @@ frameModes = {
       -- Starting condition
       if quest.start and quest.start.conditions then
         fs[index]:SetText("Getting Started")
-        fs[index+1]:SetText(localizer:GetDisplayText(quest.start, "quest").."\n")
+        fs[index+1]:SetText(addon:GetCheckpointDisplayText(quest.start, "quest").."\n")
         index = index + 2
       end
 
@@ -212,7 +211,7 @@ frameModes = {
       if quest.objectives then
         local objString = ""
         for _, obj in ipairs(quest.objectives) do
-          objString = string.format("%s* %s\n", objString, localizer:GetDisplayText(obj, "quest"))
+          objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
         end
         objString = objString.."\n\n" -- Spacer for bottom margin
         fs[index+1]:SetText(objString)
@@ -241,7 +240,7 @@ frameModes = {
       -- Completion objectives
       if quest.complete and quest.complete.conditions then
         fs[3]:SetText("Finishing Up")
-        fs[4]:SetText(localizer:GetDisplayText(quest.complete, "quest").."\n")
+        fs[4]:SetText(addon:GetCheckpointDisplayText(quest.complete, "quest").."\n")
       end
     end,
   },
@@ -261,7 +260,7 @@ frameModes = {
       if quest.objectives then
         local objString = ""
         for _, obj in ipairs(quest.objectives) do
-          objString = string.format("%s* %s\n", objString, localizer:GetDisplayText(obj, "quest"))
+          objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
         end
         fs[2]:SetText(objString)
       else

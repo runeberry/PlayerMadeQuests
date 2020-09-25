@@ -1,6 +1,6 @@
 local _, addon = ...
 local AceGUI = addon.AceGUI
-local QuestLog, QuestStatus, localizer = addon.QuestLog, addon.QuestStatus, addon.QuestScriptLocalizer
+local QuestLog, QuestStatus = addon.QuestLog, addon.QuestStatus
 
 addon.QuestLogFrame = nil -- Built at end of file
 
@@ -60,7 +60,7 @@ local function SetQuestText(label, quest)
 end
 
 local function SetObjectiveText(label, obj)
-  local displayText = string.format("    - %s", localizer:GetDisplayText(obj, "log"))
+  local displayText = string.format("    - %s", addon:GetCheckpointDisplayText(obj, "log"))
   if obj.progress >= obj.goal then
     displayText = addon:Colorize("grey", displayText)
   end
