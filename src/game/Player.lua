@@ -1,4 +1,5 @@
 local _, addon = ...
+local GetGuildInfo = addon.G.GetGuildInfo
 local UnitFullName = addon.G.UnitFullName
 local UnitClass = addon.G.UnitClass
 local UnitLevel = addon.G.UnitLevel
@@ -37,4 +38,9 @@ function addon:GetPlayerGender()
   local sex = UnitSex("player")
   if sex == 2 then return "male" end
   if sex == 3 then return "female" end
+end
+
+function addon:GetPlayerGuildName()
+  local name = GetGuildInfo("player")
+  return name
 end

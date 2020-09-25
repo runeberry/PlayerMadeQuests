@@ -9,18 +9,19 @@ local compiler = addon.QuestScriptCompiler
 
 local function buildMetadata()
   local _, build, _, tocVersion = GetBuildInfo()
-  local playerName = addon:GetPlayerName()
-  local playerRealm = addon:GetPlayerRealm()
 
   local metadata = {
     addonVersion = addon.VERSION,
-    authorName = playerName,
-    authorRealm = playerRealm,
+    authorName = addon:GetPlayerName(),
+    authorRealm = addon:GetPlayerRealm(),
+    authorGuild = addon:GetPlayerGuildName(),
     compileDate = time(),
 
     clientVersion = tocVersion,
     clientBuild = addon:TryConvertString(build),
   }
+
+  -- logger:Table(metadata)
 
   return metadata
 end

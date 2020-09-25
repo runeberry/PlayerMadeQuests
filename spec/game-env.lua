@@ -179,6 +179,11 @@ function game:SetPlayerInfo(addon, info)
     mock:GetFunctionMock(addon.G.UnitSex):SetReturnsWhen(unitIdIsPlayer, info.sex)
     mocks[#mocks+1] = addon.G.UnitSex
   end
+
+  if info.guild then
+    mock:GetFunctionMock(addon.G.GetGuildInfo):SetReturnsWhen(unitIdIsPlayer, info.guild)
+    mocks[#mocks+1] = addon.G.GetGuildInfo
+  end
 end
 
 function game:SetPlayerGroup(addon, groupType)

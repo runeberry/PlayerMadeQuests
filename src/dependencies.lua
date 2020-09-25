@@ -29,6 +29,7 @@ addon.G = {
   CreateFrame = CreateFrame,
   GetBestMapForUnit = C_Map.GetBestMapForUnit,
   GetBuildInfo = GetBuildInfo,
+  GetGuildInfo = GetGuildInfo,
   GetMapInfo = C_Map.GetMapInfo,
   GetPlayerMapPosition = C_Map.GetPlayerMapPosition,
   GetUnitName = GetUnitName,
