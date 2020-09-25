@@ -10,12 +10,6 @@ function addon:ParseQuest(questRaw)
     objectives = {}
   }
 
-  -- Quest details
-  -- todo: add wider support for this newline behavior
-  local function subNewlines(str)
-    return str:gsub([[\n]], "\n"):gsub("%%br", "\n\n"):gsub("\n ", "\n")
-  end
-
   local questSection = questRaw[tokens.CMD_QUEST]
   if questSection then
     quest.name = questSection[tokens.PARAM_NAME]
@@ -23,10 +17,10 @@ function addon:ParseQuest(questRaw)
     local description, completion = questSection[tokens.PARAM_DESCRIPTION], questSection[tokens.PARAM_COMPLETION]
 
     if description then
-      quest.description = subNewlines(description)
+      quest.description = description
     end
     if completion then
-      quest.completion = subNewlines(completion)
+      quest.completion = description
     end
   end
 

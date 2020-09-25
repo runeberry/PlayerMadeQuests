@@ -22,6 +22,16 @@ local frameOptions = {
   }
 }
 
+local function getQuestDescription(quest)
+  if not quest.description then return " " end
+  return addon:PopulateText(quest.description, quest)
+end
+
+local function getQuestCompletion(quest)
+  if not quest.completion then return getQuestDescription(quest) end
+  return addon:PopulateText(quest.completion, quest)
+end
+
 local pageStyle = {
   margins = { 8, 8, 10, 0 }, -- bottom spacing doesn't work on a scroll frame
   spacing = 6
@@ -168,7 +178,7 @@ frameModes = {
 
       -- Quest name & description
       fs[1]:SetText(quest.name)
-      fs[2]:SetText(quest.description or " ")
+      fs[2]:SetText(getQuestDescription(quest))
 
       local index = 3
 
@@ -226,7 +236,7 @@ frameModes = {
 
       -- Quest name & description
       fs[1]:SetText(quest.name)
-      fs[2]:SetText(quest.completion or quest.description or " ")
+      fs[2]:SetText(getQuestCompletion(quest))
 
       -- Completion objectives
       if quest.complete and quest.complete.conditions then
@@ -260,7 +270,7 @@ frameModes = {
 
       -- Quest Description
       fs[3]:SetText("Description")
-      fs[4]:SetText((quest.description or " ").."\n\n") -- Space for bottom margin
+      fs[4]:SetText(getQuestDescription(quest).."\n\n") -- Space for bottom margin
     end,
   },
   ["TerminatedQuest"] = {

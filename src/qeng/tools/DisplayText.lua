@@ -103,6 +103,38 @@ vars = {
   ["g2"] = function(obj) if obj.goal > 1 then return obj.goal end end,
   ["p"] = function(obj) return obj.progress end,
   ["p2"] = function(obj) if obj.progress < obj.goal then return obj.progress end end,
+
+  -----------------
+  -- Player Info --
+  -----------------
+
+  ["name"] = function() return addon:GetPlayerName() end,
+  ["class"] = function() return addon:GetPlayerClass() end,
+  ["race"] = function() return addon:GetPlayerRace() end,
+  -- Use as a gender conditional flag, e.g. [%gen:his|her]
+  ["gen"] = function() return (addon:GetPlayerGender() == "male") or nil end,
+
+  --------------------
+  -- Quest-specific --
+  --------------------
+
+  -- Inserts the name of the player who wrote the quest
+  ["author"] = function(quest) return quest.metadata.authorName end,
+  -- Inserts the name of the player who shared the quest, or the player's name if not found
+  ["giver"] = function(quest)
+    local catalogItem = addon.QuestCatalog:FindByID(quest.questId)
+    if catalogItem and catalogItem.from and catalogItem.from.name and catalogItem.from.source == addon.QuestCatalogSource.Shared then
+      return catalogItem.from.name
+    end
+    return addon:GetPlayerName()
+  end,
+
+  ----------------
+  -- Formatting --
+  ----------------
+
+  ["n"] = function() return "\n" end,
+  ["br"] = function() return "\n\n" end,
 }
 
 -- If the condition value is a table of values, then returns each value in that table
@@ -320,6 +352,16 @@ bracketRule = rules.standard[1]
 -- Public methods --
 --------------------
 
+function addon:PopulateText(str, context)
+  if not str then return "" end
+  context = context or {}
+
+  local text = populateDisplayText(str, context)
+
+  -- Clean up any leading, trailing, or duplicate spaces before returning
+  return text:gsub("^%s+", ""):gsub("%s+$", ""):gsub(" +", " ")
+end
+
 -- Valid values for scope are: log [default], progress, quest, full
 -- Use this method at runtime
 function addon:GetCheckpointDisplayText(cp, scope)
@@ -339,8 +381,5 @@ function addon:GetCheckpointDisplayText(cp, scope)
   end
 
   assertf(displayText, "Cannot determine how to display text for checkpoint '%s' in scope: %s ", cp.name, tostring(scope))
-  local text = populateDisplayText(displayText, cp)
-
-  -- Clean up any leading, trailing, or duplicate spaces before returning
-  return text:gsub("^%s+", ""):gsub("%s+$", ""):gsub(" +", " ")
+  return addon:PopulateText(displayText, cp)
 end

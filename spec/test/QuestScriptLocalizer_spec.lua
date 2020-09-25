@@ -1,5 +1,12 @@
 local addon = require("spec/addon-builder"):Build()
+local game = require("spec/game-env")
 local compiler, localizer = addon.QuestScriptCompiler, addon.QuestScriptLocalizer
+
+local objectiveScriptTemplate = [[
+  quest:
+    name: Objective displaytext parser test
+  objectives:
+    - ]]
 
 describe("QuestScriptLocalizer", function()
   setup(function()
@@ -127,11 +134,7 @@ describe("QuestScriptLocalizer", function()
       },
     }
     for num, tc in ipairs(testCases) do
-      local script = [[
-        quest:
-          name: Objective displaytext parser test
-        objectives:
-          - ]]..tc.objective
+      local script = objectiveScriptTemplate..tc.objective
       local quest = compiler:Compile(script)
 
       local objective = quest.objectives[1]
@@ -296,5 +299,60 @@ describe("QuestScriptLocalizer", function()
         end)
       end
     end
+  end)
+  describe("player information", function()
+    before_each(function()
+      game:ResetEnv(addon)
+    end)
+    it("can display the player's name", function()
+      game:SetPlayerInfo(addon, { name = "Hank" })
+      local str = addon:PopulateText("Good %name")
+      assert.equals("Good Hank", str)
+    end)
+    it("can display the player's class", function()
+      game:SetPlayerInfo(addon, { class = "mage" })
+      local str = addon:PopulateText("Not bad for a %class.")
+      assert.equals("Not bad for a mage.", str)
+    end)
+    it("can display the player's race", function()
+      game:SetPlayerInfo(addon, { race = "Night Elf" })
+      local str = addon:PopulateText("You call yourself a %race?")
+      assert.equals("You call yourself a Night Elf?", str)
+    end)
+    it("can display based on the player's gender", function()
+      game:SetPlayerInfo(addon, { sex = 2 })
+      local text = "Look at [%gen:him|her]!"
+      local str = addon:PopulateText(text)
+      assert.equals("Look at him!", str)
+
+      game:ResetEnv(addon)
+      game:SetPlayerInfo(addon, { sex = 3 })
+      str = addon:PopulateText(text)
+      assert.equals("Look at her!", str)
+    end)
+  end)
+  describe("quest information", function()
+    local script = objectiveScriptTemplate.."kill 5 Chicken"
+    before_each(function()
+      game:ResetEnv(addon)
+      addon.QuestLog:DeleteAll()
+      addon.QuestCatalog:DeleteAll()
+    end)
+    it("can display the author's name", function()
+      game:SetPlayerInfo(addon, { name = "Bobby" })
+      local quest = compiler:Compile(script)
+
+      local str = addon:PopulateText("Dang it, %author", quest)
+      assert.equals("Dang it, Bobby", str)
+    end)
+    it("can display the sharer's name", function()
+      local quest = compiler:Compile(script)
+      game:SetPlayerInfo(addon, { name = "Peggy" })
+      addon:ShareQuest(quest)
+      addon:AcceptQuest(quest, true)
+
+      local str = addon:PopulateText("Spa-%giver and meatballs", quest)
+      assert.equals("Spa-Peggy and meatballs", str)
+    end)
   end)
 end)
