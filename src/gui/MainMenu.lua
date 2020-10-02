@@ -48,6 +48,9 @@ addon:OnGuiReady(function()
   local startMenu = addon.Config:GetValue("START_MENU")
   if startMenu and startMenu ~= "" then
     defaultMenu = startMenu
-    addon.MainMenu:Show()
+    -- For some reason, the menu won't show on this frame, so let's delay it
+    addon.Ace:ScheduleTimer(function()
+      addon.MainMenu:Show()
+    end, 0.5)
   end
 end)
