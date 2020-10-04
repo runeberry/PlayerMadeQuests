@@ -4,7 +4,7 @@ local textureBasePath = [[Interface\AddOns\PlayerMadeQuests\assets\img\]]
 
 local textures = {
   ["Logo"] = {
-    filename = "pmq_logo.tga",
+    filename = "Logo.tga",
     width = 128,
     height = 128,
   }
