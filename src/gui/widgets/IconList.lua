@@ -49,3 +49,66 @@ addon.IconList = {
   ["more-green"]    = { 8, 4 },
   ["more-red"]      = { 8, 5 },
 }
+
+addon.IconButtonTemplates = {
+  ["default"] = {
+    template = nil,
+    icon = nil,
+    iconAnchor = "CENTER",
+    width = 16,
+    height = 16,
+    highlightIcon = nil,
+    disabledIcon = nil,
+    tooltipText = nil,
+    tooltipDescription = nil,
+    tooltipDelay = 0.5,
+  },
+  ["plus"] = {
+    template = "default",
+    icon = "plus-yellow",
+    highlightIcon = "plus-green",
+    disabledIcon = "plus-grey",
+  },
+  ["minus"] = {
+    template = "default",
+    icon = "minus-yellow",
+    highlightIcon = "minus-red",
+    disabledIcon = "minus-grey",
+  },
+  ["x"] = {
+    template = "default",
+    icon = "x-yellow",
+    highlightIcon = "x-red",
+    disabledIcon = "x-grey",
+  },
+  ["!"] = {
+    template = "default",
+    icon = "!-yellow",
+    highlightIcon = "!-green",
+    disabledIcon = "!-grey",
+  },
+  ["?"] = {
+    template = "default",
+    icon = "?-yellow",
+    highlightIcon = "?-green",
+    disabledIcon = "?-grey",
+  },
+  ["play"] = {
+    template = "default",
+    icon = "play-yellow",
+    highlightIcon = "play-green",
+    disabledIcon = "play-grey",
+  },
+  ["copy"] = {
+    template = "default",
+    icon = "copy-yellow",
+    highlightIcon = "copy-green",
+    disabledIcon = "copy-grey",
+  },
+  ["more"] = {
+    template = "default",
+    icon = "more-yellow",
+    highlightIcon = "more-green",
+    disabledIcon = "more-grey",
+  },
+}

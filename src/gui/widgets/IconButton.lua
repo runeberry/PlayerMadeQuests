@@ -4,7 +4,6 @@ local CreateFrame = addon.G.CreateFrame
 local widget = addon.CustomWidgets:NewWidget("IconButton")
 
 local tooltip
-local tooltipDelay = 0.5
 local tooltipCancelToken
 addon:OnGuiReady(function()
   tooltip = CreateFrame("GameTooltip", "PMQ_MenuIconTooltip", nil, "GameTooltipTemplate")
@@ -16,20 +15,7 @@ local numTilesY = 8
 local tileWidthPx = 16
 local tileHeightPx = 16
 
-local defaultOptions = {
-  --- Expects the 1-based tile coordinate of the icon within the atlas
-  icon = "?-white",
-  iconAnchor = "CENTER",
-  width = 16,
-  height = 16,
-  highlightIcon = nil,
-  disabledIcon = nil,
-  tooltipText = nil,
-  tooltipDescription = nil,
-}
-
 local methods = {
-  --- Expects the 1-based tile coordinate of the icon within the atlas
   ["SetIconTile"] = function(self, tileName)
     local tileInfo = addon.IconList[tileName]
     assert(tileInfo, tileName.." is not recognized icon tile name")
@@ -61,7 +47,7 @@ local methods = {
         tooltip:AddLine(self._options.tooltipDescription)
       end
       tooltip:Show()
-    end, tooltipDelay)
+    end, self._options.tooltipDelay)
   end,
   ["HideTooltip"] = function(self)
     if not self._hasTooltip then return end
@@ -101,11 +87,17 @@ local scripts = {
 }
 
 function widget:Create(parent, options)
-  if options then
-    options = addon:MergeTable(defaultOptions, options)
-  else
-    options = addon:CopyTable(defaultOptions)
+  options = options or { template = "default" }
+
+  while options.template do
+    local template = addon.IconButtonTemplates[options.template]
+    assert(template, options.template.." is not a valid icon button template")
+    local nextTemplate = template.template
+    options = addon:MergeTable(template, options)
+    options.template = nextTemplate
   end
+
+  assert(options.icon, "An icon tile name is required")
 
   local button = CreateFrame("Button", nil, parent)
   button._options = options
