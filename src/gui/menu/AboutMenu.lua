@@ -5,7 +5,8 @@ local CreateFrame = addon.G.CreateFrame
 local menu = addon.MainMenu:NewMenuScreen("AboutMenu")
 
 function menu:Create(frame)
-  local logo = addon:CreateImageFrame("Logo", frame)
+  local logo, w, h = addon:CreateImageTexture(frame, "Logo")
+  logo:SetSize(w, h)
   logo:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
 
   local headerTextInfo = {

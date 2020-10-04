@@ -7,19 +7,25 @@ local textures = {
     filename = "Logo.tga",
     width = 128,
     height = 128,
+  },
+  ["MenuIcons"] = {
+    filename = "MenuIcons.tga",
+    width = 128,
+    height = 128,
   }
 }
 
-function addon:CreateImageFrame(imageName, parentFrame)
-  assert(type(imageName) == "string", "An imageName must be provided")
-  local textureInfo = textures[imageName]
-  assert(textureInfo, imageName.." is not a recognized image name")
+--- Creates a texture from the parent frame using the information stored in the table above
+function addon:CreateImageTexture(parent, textureName, layer)
+  layer = layer or "ARTWORK"
 
-  parentFrame = parentFrame or addon.G.UIParent
+  assert(type(parent) == "table", "A parent frame must be provided")
+  assert(type(textureName) == "string", "A textureName must be provided")
+  local textureInfo = textures[textureName]
+  assert(textureInfo, textureName.." is not a recognized textureName")
 
-  local imgFrame = parentFrame:CreateTexture(nil, "ARTWORK")
-  imgFrame:SetSize(textureInfo.width, textureInfo.height)
-  imgFrame:SetTexture(textureBasePath..textureInfo.filename)
+  local texture = parent:CreateTexture(nil, layer)
+  texture:SetTexture(textureBasePath..textureInfo.filename)
 
-  return imgFrame
+  return texture, textureInfo.width, textureInfo.height
 end
