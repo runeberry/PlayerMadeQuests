@@ -179,7 +179,7 @@ function addon:GetTableHash(t)
   return hash
 end
 
--- Unpacks either format { r = r, g = g, b = b, a = a } or { r, g, b, a }
+--- Unpacks either format { r = r, g = g, b = b, a = a } or { r, g, b, a }
 function addon:UnpackRGBA(t)
   if not t then
     return 0.0, 0.0, 0.0, 1.0
@@ -191,7 +191,7 @@ function addon:UnpackRGBA(t)
   end
 end
 
--- Unpacks either format { x = x, y = y } or { x, y }
+--- Unpacks either format { l = l, r = r, t = t, b = b } or { l, r, t, b }
 function addon:UnpackLRTB(t)
   if not t then
     return 0, 0, 0, 0
@@ -203,7 +203,7 @@ function addon:UnpackLRTB(t)
   end
 end
 
--- Unpacks either format { l = l, r = r, t = t, b = b } or { l, r, t, b }
+--- Unpacks either format { x = x, y = y } or { x, y }
 function addon:UnpackXY(t)
   if not t then
     return 0.0, 0.0
