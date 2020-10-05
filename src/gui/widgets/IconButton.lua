@@ -59,6 +59,9 @@ local methods = {
 
     tooltip:Hide()
   end,
+  ["OnClick"] = function(self, fn)
+    self._onClick = fn
+  end
 }
 
 local scripts = {
@@ -84,10 +87,19 @@ local scripts = {
       self:SetIconTile(self._options.disabledIcon)
     end
   end,
+  ["OnClick"] = function(self, ...)
+    if self._onClick then
+      addon:catch(self._onClick, self, ...)
+    end
+  end,
 }
 
 function widget:Create(parent, options)
-  options = options or { template = "default" }
+  assert(options, "IconButton options are required")
+
+  if type(options) == "string" then
+    options = { template = options }
+  end
 
   while options.template do
     local template = addon.IconButtonTemplates[options.template]
