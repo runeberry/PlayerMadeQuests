@@ -35,7 +35,6 @@ local options = {
   buttons = {
     {
       text = "Toggle Window",
-      anchor = "TOP",
       enabled = "Always",
       handler = function()
         addon.QuestLogFrame:ToggleShown()
@@ -43,7 +42,6 @@ local options = {
     },
     {
       text = "View Quest Info",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(quest, dataTable)
         addon.QuestInfoFrame:ShowQuest(quest)
@@ -52,7 +50,6 @@ local options = {
     },
     {
       text = "Share Quest",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(quest)
         addon:ShareQuest(quest)
@@ -60,7 +57,6 @@ local options = {
     },
     {
       text = "Abandon Quest",
-      anchor = "TOP",
       enabled = "Row",
       condition = function(quest)
         return abandonableStatuses[quest.status]
@@ -71,7 +67,7 @@ local options = {
     },
     {
       text = "Clear All",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Always",
       handler = function(quest)
         StaticPopups:Show("ResetQuestLog", quest)
@@ -79,7 +75,7 @@ local options = {
     },
     {
       text = "Delete",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Row",
       handler = function(quest)
         StaticPopups:Show("DeleteQuest", quest)
@@ -87,7 +83,7 @@ local options = {
     },
     {
       text = "Archive Quest",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Row",
       handler = function(quest)
         StaticPopups:Show("ArchiveQuest", quest)

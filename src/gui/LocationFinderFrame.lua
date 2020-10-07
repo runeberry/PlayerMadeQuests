@@ -61,7 +61,6 @@ local options = {
   buttons = {
     {
       text = "New",
-      anchor = "TOP",
       enabled = "Always",
       handler = function()
         local location = addon:GetPlayerLocation()
@@ -70,7 +69,6 @@ local options = {
     },
     {
       text = "Update",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(location)
         addon.StaticPopups:Show("UpdateLocation", location)
@@ -78,7 +76,6 @@ local options = {
     },
     {
       text = "Rename",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(location)
         addon.StaticPopups:Show("RenameLocation", location)
@@ -86,7 +83,6 @@ local options = {
     },
     {
       text = "Delete",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(location)
         addon.StaticPopups:Show("DeleteLocation", location)
@@ -94,7 +90,6 @@ local options = {
     },
     {
       text = "Delete All",
-      anchor = "TOP",
       enabled = "Always",
       handler = function()
         addon.StaticPopups:Show("ResetLocations")

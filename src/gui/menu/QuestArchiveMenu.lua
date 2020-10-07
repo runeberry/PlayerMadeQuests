@@ -30,7 +30,6 @@ local options = {
   buttons = {
     {
       text = "View Quest Info",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(quest, dataTable)
         addon.QuestInfoFrame:ShowQuest(quest, "TerminatedQuest")
@@ -39,7 +38,6 @@ local options = {
     },
     {
       text = "Share Quest",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(quest)
         addon:ShareQuest(quest)
@@ -47,7 +45,7 @@ local options = {
     },
     {
       text = "Clear All",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Always",
       handler = function()
         StaticPopups:Show("ResetArchive")
@@ -55,7 +53,7 @@ local options = {
     },
     {
       text = "Delete",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Row",
       handler = function(quest)
         StaticPopups:Show("DeleteArchive", quest)

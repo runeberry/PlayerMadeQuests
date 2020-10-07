@@ -29,7 +29,6 @@ local options = {
   buttons = {
     {
       text = "Start Quest",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(catalogItem, dataTable)
         addon.QuestInfoFrame:ShowQuest(catalogItem.quest)
@@ -38,7 +37,6 @@ local options = {
     },
     {
       text = "Share Quest",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(catalogItem)
         addon:ShareQuest(catalogItem.quest)
@@ -46,7 +44,7 @@ local options = {
     },
     {
       text = "Clear All",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Always",
       handler = function()
         addon.StaticPopups:Show("ResetCatalog")
@@ -54,7 +52,7 @@ local options = {
     },
     {
       text = "Delete",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Row",
       handler = function(catalogItem)
         addon.StaticPopups:Show("DeleteCatalogItem", catalogItem)

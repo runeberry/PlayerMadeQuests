@@ -33,7 +33,6 @@ local options = {
   buttons = {
     {
       text = "New",
-      anchor = "TOP",
       enabled = "Always",
       handler = function()
         addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu")
@@ -41,7 +40,6 @@ local options = {
     },
     {
       text = "Edit",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(draft)
         addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu", draft.draftId)
@@ -49,7 +47,6 @@ local options = {
     },
     {
       text = "Start Quest",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(draft, dataTable)
         addon.QuestDrafts:StartDraft(draft.draftId)
@@ -58,7 +55,6 @@ local options = {
     },
     {
       text = "Share Quest",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(draft)
         local ok, quest = addon.QuestDrafts:TryCompileDraft(draft.draftId)
@@ -71,7 +67,7 @@ local options = {
     },
     {
       text = "Clear All",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Always",
       handler = function()
         addon.StaticPopups:Show("ResetDrafts")
@@ -79,7 +75,7 @@ local options = {
     },
     {
       text = "Delete",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Row",
       handler = function(draft)
         addon.StaticPopups:Show("DeleteDraft", draft.draftId, draft.draftName or "(untitled draft)")

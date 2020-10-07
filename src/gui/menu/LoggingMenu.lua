@@ -40,7 +40,6 @@ local options = {
   buttons = {
     {
       text = "Set Log Level",
-      anchor = "TOP",
       enabled = "Row",
       condition = function(row)
         return row[1] ~= "*"
@@ -53,7 +52,7 @@ local options = {
     },
     {
       text = "Reset All",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Always",
       handler = function()
         local logSettings = Config:GetValue("Logging")
@@ -66,7 +65,7 @@ local options = {
     },
     {
       text = "Reset",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Row",
       handler = function(row)
         addon:SetUserLogLevel(row[1], nil)

@@ -19,7 +19,6 @@ local options = {
   buttons = {
     {
       text = "Start Quest",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(row, dataTable)
         DebugQuests:StartDebugQuest(row[2])
@@ -28,7 +27,6 @@ local options = {
     },
     {
       text = "Print Code",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(row)
         local dq = DebugQuests:FindByID(row[2])

@@ -24,7 +24,6 @@ local options = {
   buttons = {
     {
       text = "Start Quest",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(demo, dataTable)
         addon.QuestDemos:StartDemo(demo.demoId)
@@ -33,7 +32,6 @@ local options = {
     },
     {
       text = "View Code",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(demo)
         addon.MainMenu:ShowMenuScreen("QuestDemoViewMenu", demo.demoId)
@@ -41,7 +39,6 @@ local options = {
     },
     {
       text = "Copy to Drafts",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(demo)
         addon.StaticPopups:Show("RenameDemoCopy", demo)

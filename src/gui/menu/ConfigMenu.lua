@@ -58,7 +58,6 @@ local options = {
   buttons = {
     {
       text = "Edit",
-      anchor = "TOP",
       enabled = "Row",
       handler = function(configItem)
         addon.StaticPopups:Show("EditConfigValue", configItem)
@@ -66,7 +65,6 @@ local options = {
     },
     {
       text = "Toggle",
-      anchor = "TOP",
       enabled = "Row",
       condition = function(configItem)
         return configItem.type == "boolean"
@@ -81,7 +79,7 @@ local options = {
     },
     {
       text = "Reset All",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Always",
       handler = function()
         addon.StaticPopups:Show("ResetAllConfig")
@@ -89,7 +87,7 @@ local options = {
     },
     {
       text = "Reset",
-      anchor = "BOTTOM",
+      opposite = true,
       enabled = "Row",
       handler = function(configItem)
         addon.Config:SaveValue(configItem.name, nil)
