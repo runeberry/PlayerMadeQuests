@@ -13,6 +13,7 @@
   <Script file="gui/widgets/DataTable.lua"/>
   <Script file="gui/widgets/DataTableWithButtons.lua"/>
   <Script file="gui/widgets/DataTableWithIcons.lua"/>
+  <Script file="gui/widgets/FramePanel.lua"/>
   <Script file="gui/widgets/Heading.lua"/>
   <Script file="gui/widgets/IconButton.lua"/>
   <Script file="gui/widgets/IconButtonPane.lua"/>
