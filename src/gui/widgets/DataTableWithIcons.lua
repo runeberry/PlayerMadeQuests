@@ -3,8 +3,6 @@ local CreateFrame = addon.G.CreateFrame
 
 local widget = addon.CustomWidgets:NewWidget("DataTableWithIcons")
 
-local iconTableSpacing = 4
-
 local function setButtonState(container, row)
   if not container._buttons then return end
 
@@ -48,14 +46,22 @@ function widget:Create(frame, options)
   local container = CreateFrame("Frame", nil, frame)
   container:SetAllPoints(true)
 
-  local buttonWidth = options.buttonWidth or 16
-  local buttonPane = addon.CustomWidgets:CreateWidget("IconButtonPane", container, "TOP", buttonWidth)
+  local buttonPanel = addon.CustomWidgets:CreateWidget("FramePanel", container, {
+    anchor = "LEFT",
+    margin = 4,
+    spacing = 4,
+  })
+  buttonPanel:SetHeight(24)
+  buttonPanel:SetPoint("TOPLEFT", container, "TOPLEFT")
+  buttonPanel:SetPoint("TOPRIGHT", container, "TOPRIGHT")
 
   local tablePane = CreateFrame("Frame", nil, container)
-  tablePane:SetPoint("TOPLEFT", buttonPane, "BOTTOMLEFT", 0, -1 * iconTableSpacing)
-  tablePane:SetPoint("TOPRIGHT", buttonPane, "BOTTOMRIGHT", 0, -1 * iconTableSpacing)
   tablePane:SetPoint("BOTTOMLEFT", container, "BOTTOMLEFT")
   tablePane:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT")
+
+  -- Connect the panel to the table
+  tablePane:SetPoint("TOPLEFT", buttonPanel, "BOTTOMLEFT")
+  tablePane:SetPoint("TOPRIGHT", buttonPanel, "BOTTOMRIGHT")
 
   local dataTable = addon.CustomWidgets:CreateWidget("DataTable", tablePane, options.colInfo, options.dataSource)
   dataTable:OnRowSelected(function(row)
@@ -66,12 +72,13 @@ function widget:Create(frame, options)
   end)
 
   if options.buttons then
-    for _, buttonInfo in ipairs(options.buttons) do
+    for _, b in ipairs(options.buttons) do
       -- Provide the currently selected item (if available) to each button handler
-      buttonInfo.frame = buttonPane:AddButton(buttonInfo)
-      buttonInfo.frame:OnClick(function()
-        if not buttonInfo.handler then return end
-        buttonInfo.handler(dataTable:GetSelectedItem(), dataTable)
+      b.frame = addon.CustomWidgets:CreateWidget("IconButton", container, b)
+      buttonPanel:AddFrame(b.frame, { opposite = b.opposite, size = b.size or 16 })
+      b.frame:OnClick(function()
+        if not b.handler then return end
+        b.handler(dataTable:GetSelectedItem(), dataTable)
       end)
     end
   end
@@ -81,7 +88,7 @@ function widget:Create(frame, options)
   end
 
   container._buttons = options.buttons
-  container._buttonPane = buttonPane
+  container._buttonPanel = buttonPanel
   container._dataTable = dataTable
 
   -- On create, set all buttons to their "default" state (no row selected)

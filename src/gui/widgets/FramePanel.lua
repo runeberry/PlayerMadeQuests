@@ -138,6 +138,8 @@ local methods = {
     local c2, p2, c2x, c2y
 
     if anchorFrame then
+      -- addon.UILogger:Trace("Anchoring to existing frame")
+
       -- The provided frame will be anchored relative to the last frame added to this anchor point
       c1, c2 = ap.corners[1], ap.corners[2]
       local opp = sideProperties[ap.oppositeAnchor]
@@ -159,6 +161,8 @@ local methods = {
       c2x = c2sx.offsetDirection * (padding[c2sx.prop] + xs)
       c2y = c2sy.offsetDirection * (padding[c2sy.prop] + ys)
     else
+      -- addon.UILogger:Trace("Adding first frame to anchor")
+
       -- There is no other frame to anchor to, so position this frame relative to the panel
       anchorFrame = self
       c1, c2 = ap.corners[1], ap.corners[2]
@@ -176,6 +180,9 @@ local methods = {
 
     frame:SetPoint(c1, anchorFrame, p1, c1x, c1y)
     frame:SetPoint(c2, anchorFrame, p2, c2x, c2y)
+
+    -- addon.UILogger:Trace("FramePoint1: %s %s %i %i", c1, p1, c1x, c1y)
+    -- addon.UILogger:Trace("FramePoint2: %s %s %i %i", c2, p2, c2x, c2y)
 
     if options.size then
       if ap.isVertical then
