@@ -10,7 +10,7 @@ local frameOptions = {
     text = "Location Finder"
   },
   resizable = {
-    minWidth = 600,
+    minWidth = 480,
     minHeight = 250,
   },
   position = {
@@ -60,7 +60,8 @@ local options = {
   end,
   buttons = {
     {
-      text = "New",
+      template = "plus",
+      tooltipText = "New",
       enabled = "Always",
       handler = function()
         local location = addon:GetPlayerLocation()
@@ -68,31 +69,37 @@ local options = {
       end,
     },
     {
-      text = "Update",
+      template = "plus",
+      tooltipText = "Update",
       enabled = "Row",
       handler = function(location)
         addon.StaticPopups:Show("UpdateLocation", location)
       end,
     },
     {
-      text = "Rename",
+      template = "plus",
+      tooltipText = "Rename",
       enabled = "Row",
       handler = function(location)
         addon.StaticPopups:Show("RenameLocation", location)
       end,
     },
     {
-      text = "Delete",
-      enabled = "Row",
-      handler = function(location)
-        addon.StaticPopups:Show("DeleteLocation", location)
-      end,
-    },
-    {
-      text = "Delete All",
+      template = "x",
+      tooltipText = "Delete All",
+      opposite = true,
       enabled = "Always",
       handler = function()
         addon.StaticPopups:Show("ResetLocations")
+      end,
+    },
+    {
+      template = "minus",
+      tooltipText = "Delete",
+      opposite = true,
+      enabled = "Row",
+      handler = function(location)
+        addon.StaticPopups:Show("DeleteLocation", location)
       end,
     },
   },
@@ -117,7 +124,7 @@ local function buildLocationFinderFrame()
   playerLocationText:SetText(text)
   playerLocationText:SetPoint("TOPLEFT", contentFrame, "TOPLEFT")
   playerLocationText:SetHeight(30)
-  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", contentFrame, options)
+  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithIcons", contentFrame, options)
   dtwb:ClearAllPoints()
   dtwb:SetPoint("TOPLEFT", playerLocationText, "BOTTOMLEFT")
   dtwb:SetPoint("BOTTOMRIGHT", contentFrame, "BOTTOMRIGHT", 0, 9)

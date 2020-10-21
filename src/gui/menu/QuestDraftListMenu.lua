@@ -32,21 +32,24 @@ local options = {
   end,
   buttons = {
     {
-      text = "New",
+      template = "plus",
+      tooltipText = "New",
       enabled = "Always",
       handler = function()
         addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu")
       end,
     },
     {
-      text = "Edit",
+      template = "plus",
+      tooltipText = "Edit",
       enabled = "Row",
       handler = function(draft)
         addon.MainMenu:ShowMenuScreen("QuestDraftEditMenu", draft.draftId)
       end,
     },
     {
-      text = "Start Quest",
+      template = "!",
+      tooltipText = "Start Quest",
       enabled = "Row",
       handler = function(draft, dataTable)
         addon.QuestDrafts:StartDraft(draft.draftId)
@@ -54,7 +57,8 @@ local options = {
       end,
     },
     {
-      text = "Share Quest",
+      template = "plus",
+      tooltipText = "Share Quest",
       enabled = "Row",
       handler = function(draft)
         local ok, quest = addon.QuestDrafts:TryCompileDraft(draft.draftId)
@@ -66,7 +70,8 @@ local options = {
       end,
     },
     {
-      text = "Clear All",
+      template = "x",
+      tooltipText = "Clear All",
       opposite = true,
       enabled = "Always",
       handler = function()
@@ -74,7 +79,8 @@ local options = {
       end,
     },
     {
-      text = "Delete",
+      template = "x",
+      tooltipText = "Delete",
       opposite = true,
       enabled = "Row",
       handler = function(draft)
@@ -85,7 +91,7 @@ local options = {
 }
 
 function menu:Create(frame)
-  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
+  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithIcons", frame, options)
   local dataTable = dtwb:GetDataTable()
   dataTable:SubscribeMethodToEvents("RefreshData", "DraftUpdated", "DraftDeleted", "DraftDataLoaded", "DraftDataReset")
   dataTable:SubscribeMethodToEvents("ClearSelection", "DraftDataLoaded", "DraftDeleted", "DraftDataReset")

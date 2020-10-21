@@ -34,14 +34,17 @@ local options = {
   end,
   buttons = {
     {
-      text = "Toggle Window",
+      template = "copy",
+      tooltipText = "Quest Log Window",
+      tooltipDescription = "Show or hide the quest log window",
       enabled = "Always",
       handler = function()
         addon.QuestLogFrame:ToggleShown()
       end
     },
     {
-      text = "View Quest Info",
+      template = "!",
+      tooltipText = "View Quest Info",
       enabled = "Row",
       handler = function(quest, dataTable)
         addon.QuestInfoFrame:ShowQuest(quest)
@@ -49,14 +52,16 @@ local options = {
       end,
     },
     {
-      text = "Share Quest",
+      template = "plus",
+      tooltipText = "Share Quest",
       enabled = "Row",
       handler = function(quest)
         addon:ShareQuest(quest)
       end,
     },
     {
-      text = "Abandon Quest",
+      template = "x",
+      tooltipText = "Abandon Quest",
       enabled = "Row",
       condition = function(quest)
         return abandonableStatuses[quest.status]
@@ -66,7 +71,8 @@ local options = {
       end,
     },
     {
-      text = "Clear All",
+      template = "x",
+      tooltipText = "Clear All",
       opposite = true,
       enabled = "Always",
       handler = function(quest)
@@ -74,7 +80,8 @@ local options = {
       end,
     },
     {
-      text = "Delete",
+      template = "x",
+      tooltipText = "Delete",
       opposite = true,
       enabled = "Row",
       handler = function(quest)
@@ -82,7 +89,8 @@ local options = {
       end,
     },
     {
-      text = "Archive Quest",
+      template = "x",
+      tooltipText = "Archive Quest",
       opposite = true,
       enabled = "Row",
       handler = function(quest)
@@ -93,7 +101,7 @@ local options = {
 }
 
 function menu:Create(frame)
-  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithButtons", frame, options)
+  local dtwb = addon.CustomWidgets:CreateWidget("DataTableWithIcons", frame, options)
   local dataTable = dtwb:GetDataTable()
   dataTable:SubscribeMethodToEvents("RefreshData", "QuestDataLoaded", "QuestAdded", "QuestDeleted", "QuestStatusChanged", "QuestDataReset")
   dataTable:SubscribeMethodToEvents("ClearSelection", "QuestDataLoaded", "QuestDeleted", "QuestDataReset")
