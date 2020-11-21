@@ -20,7 +20,7 @@ function addon:ParseQuest(questRaw)
       quest.description = description
     end
     if completion then
-      quest.completion = description
+      quest.completion = completion
     end
   end
 
