@@ -1685,7 +1685,7 @@ addon.EmoteDB = {
     ["command"] = "/wave",
     ["targeted"] = "You wave at %t.",
     ["targeted_objective"] = "Wave at %t",
-    ["untargeted"] = "You beckon everyone over to you.",
+    ["untargeted"] = "You wave.",
     ["untargeted_objective"] = "Wave at anyone",
     ["token"] = "WAVE",
   },
