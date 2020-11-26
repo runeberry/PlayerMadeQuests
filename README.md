@@ -7,8 +7,8 @@
 Create and share your own custom quests in World of Warcraft: Classic!
 
 * Download links:
-  * [**CurseForge**](https://www.curseforge.com/wow/addons/pmq) - Can be installed using the [Twitch app]()
-  * [**Releases**](https://github.com/runeberry/PlayerMadeQuests/releases) - Download and install the .zip file manually.
+  * [**CurseForge**](https://www.curseforge.com/wow/addons/pmq) - Can be installed using the [Curseforge app](https://curseforge.overwolf.com/)
+  * [**Releases**](https://github.com/runeberry/PlayerMadeQuests/releases) - Download and install the PlayerMadeQuests.zip file manually.
 * [**PMQ Wiki**](https://pmq.runeberry.com) - Everything you need to know about writing quests
 * [**Discord**](https://discord.gg/U9cDAQg) - Ask questions, offer suggestions, report bugs, and share quest ideas here
 * [**Contributing Guidelines**](CONTRIBUTING.md) - For developers interesting in helping out with PMQ
