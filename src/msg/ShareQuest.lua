@@ -2,6 +2,7 @@ local _, addon = ...
 local logger = addon.Logger:NewLogger("Share")
 local QuestCatalogStatus, QuestStatus = addon.QuestCatalogStatus, addon.QuestStatus
 local MessageEvents, MessageDistribution = addon.MessageEvents, addon.MessageDistribution
+local IsInParty, IsInRaid = addon.G.IsInParty, addon.G.IsInRaid
 
 local function cleanQuestForSharing(quest)
   quest.status = nil
@@ -58,7 +59,17 @@ function addon:ShareQuest(quest, suppressMetadata)
     quest.metadata.giverGuild = addon:GetPlayerGuildName()
   end
 
-  MessageEvents:Publish("QuestInvite", nil, quest) -- Currently only shares with default channel ("PARTY")
+  local opts = {}
+  if IsInRaid() then
+    opts.distribution = MessageDistribution.Raid
+  elseif IsInGroup() then
+    opts.distribution = MessageDistribution.Party
+  else
+    addon.Logger:Warn("You must be in a party or raid group to share a quest.")
+    return
+  end
+
+  MessageEvents:Publish("QuestInvite", opts, quest)
   addon.Logger:Warn("Sharing quest %s...", quest.name)
 end
 
