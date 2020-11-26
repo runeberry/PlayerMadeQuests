@@ -52,6 +52,7 @@ describe("QuestTracking", function()
   it("can notify quest sharer on status change", function()
     -- First, have another player compile and share a quest
     game:SetPlayerInfo(addon, { name = "AnotherPlayer" })
+    game:SetPlayerGroup(addon, "PARTY")
     local quest = compiler:Compile(goodScript)
     addon:ShareQuest(quest)
     game:ResetEnv(addon)
