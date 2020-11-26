@@ -40,6 +40,7 @@
   <Script file="gui/menu/HelpFaqMenu.lua"/>
   <Script file="gui/menu/LoggingMenu.lua"/>
   <Script file="gui/menu/QuestArchiveMenu.lua"/>
+  <Script file="gui/menu/QuestBuilderMenu.lua"/>
   <Script file="gui/menu/QuestCatalogMenu.lua"/>
   <Script file="gui/menu/QuestDemoListMenu.lua"/>
   <Script file="gui/menu/QuestDemoViewMenu.lua"/>
