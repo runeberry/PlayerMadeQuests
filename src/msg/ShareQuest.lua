@@ -2,7 +2,7 @@ local _, addon = ...
 local logger = addon.Logger:NewLogger("Share")
 local QuestCatalogStatus, QuestStatus = addon.QuestCatalogStatus, addon.QuestStatus
 local MessageEvents, MessageDistribution = addon.MessageEvents, addon.MessageDistribution
-local IsInParty, IsInRaid = addon.G.IsInParty, addon.G.IsInRaid
+local IsInGroup, IsInRaid = addon.G.IsInGroup, addon.G.IsInRaid
 
 local function cleanQuestForSharing(quest)
   quest.status = nil
