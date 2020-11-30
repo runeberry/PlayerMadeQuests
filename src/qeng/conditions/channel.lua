@@ -3,6 +3,7 @@ local _, addon = ...
 local condition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_CHANNEL)
 condition:AllowType("string")
 condition:AllowMultiple(true)
+condition:AllowValues({ "say", "yell", "party", "raid", "guild", "whisper" })
 
 function condition:OnParse(arg)
   if type(arg) == "string" then
