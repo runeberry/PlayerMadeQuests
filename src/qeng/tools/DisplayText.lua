@@ -27,11 +27,14 @@ vars = {
   ----------------
 
   ["a"] = t.PARAM_AURA,
+  ["ch"] = t.PARAM_CHANNEL,
   ["co"] = t.PARAM_COORDS,
   ["e"] = t.PARAM_EQUIP,
   ["em"] = t.PARAM_EMOTE,
   ["i"] = t.PARAM_ITEM,
-  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET },
+  ["lang"] = t.PARAM_LANGUAGE,
+  ["msg"] = t.PARAM_MESSAGE,
+  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_MESSAGETARGET },
   ["sz"] = t.PARAM_SUBZONE,
   ["z"] = t.PARAM_ZONE,
 
