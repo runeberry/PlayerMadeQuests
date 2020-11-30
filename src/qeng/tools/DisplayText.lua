@@ -149,10 +149,12 @@ local function defaultConditionTextHandler(condVal)
     elseif len > 1 then
       local i = 1
       for v in pairs(condVal) do
-        if i == len then
-          return result.." or "..v
+        if i == 1 then
+          result = v
+        elseif i == 2 then
+          result = v.." or "..result
         else
-          result = result..", "..v
+          result = v..", "..result
         end
         i = i + 1
       end
