@@ -243,9 +243,9 @@ describe("Condition", function()
       end)
     end)
   end)
-  ------------------------------------------------
-  -- message, messagetarget, language & channel --
-  ------------------------------------------------
+  --------------------------------------------
+  -- message, recipient, language & channel --
+  --------------------------------------------
   describe("message", function()
     after_each(function()
       addon.LastChatChannel = nil
@@ -322,7 +322,7 @@ describe("Condition", function()
           end)
           it("will pass with a matching language", function()
             addon.LastChatLanguage = "Dwarvish"
-            addon:ForceLogs(function() assertObjectiveDoesUpdate(quest) end)
+            assertObjectiveDoesUpdate(quest)
           end)
           it("will not pass with a different language", function()
             addon.LastChatLanguage = "Gutterspeak"
@@ -350,36 +350,36 @@ describe("Condition", function()
             assertObjectiveDoesNotUpdate(quest)
           end)
         end)
-        describe("a target is specified", function()
+        describe("a recipient is specified", function()
           before_each(function()
-            quest = startQuest("say: { message: hello, target: Sans }")
+            quest = startQuest("say: { message: hello, recipient: Sans }")
           end)
-          it("will pass with a matching target", function()
+          it("will pass with a matching recipient", function()
             addon.LastChatRecipient = "Sans"
             assertObjectiveDoesUpdate(quest)
           end)
-          it("will not pass with a different target", function()
+          it("will not pass with a different recipient", function()
             addon.LastChatRecipient = "Undyne"
             assertObjectiveDoesNotUpdate(quest)
           end)
-          it("will not pass without a target", function()
+          it("will not pass without a recipient", function()
             addon.LastChatRecipient = nil
             assertObjectiveDoesNotUpdate(quest)
           end)
         end)
-        describe("multiple targets are specified", function()
+        describe("multiple recipients are specified", function()
           before_each(function()
-            quest = startQuest("say: { message: hello, target: [ Sans, Papyrus ] }")
+            quest = startQuest("say: { message: hello, recipient: [ Sans, Papyrus ] }")
           end)
-          it("will pass with a matching target", function()
+          it("will pass with a matching recipient", function()
             addon.LastChatRecipient = "Papyrus"
             assertObjectiveDoesUpdate(quest)
           end)
-          it("will not pass with a different target", function()
+          it("will not pass with a different recipient", function()
             addon.LastChatRecipient = "Alphys"
             assertObjectiveDoesNotUpdate(quest)
           end)
-          it("will not pass without a target", function()
+          it("will not pass without a recipient", function()
             addon.LastChatRecipient = nil
             assertObjectiveDoesNotUpdate(quest)
           end)

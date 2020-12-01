@@ -18,7 +18,7 @@ objective:AddParameter(tokens.PARAM_TEXT, {
 objective:AddCondition(tokens.PARAM_MESSAGE, { required = true })
 objective:AddCondition(tokens.PARAM_LANGUAGE)
 objective:AddCondition(tokens.PARAM_CHANNEL)
-objective:AddCondition(tokens.PARAM_MESSAGETARGET, { alias = tokens.PARAM_TARGET })
+objective:AddCondition(tokens.PARAM_RECIPIENT)
 
 objective:AddCondition(tokens.PARAM_AURA)
 objective:AddCondition(tokens.PARAM_EQUIP)

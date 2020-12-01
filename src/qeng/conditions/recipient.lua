@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local condition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_MESSAGETARGET)
+local condition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_RECIPIENT)
 condition:AllowType("string")
 condition:AllowMultiple(true)
 
@@ -19,7 +19,7 @@ function condition:Evaluate(recipients)
   local recipient = addon.LastChatRecipient
 
   if not recipient then
-    self.logger:Fail("Chat message was not a whisper")
+    self.logger:Fail("Chat message had no recipient")
     return false
   end
 

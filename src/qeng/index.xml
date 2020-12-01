@@ -45,7 +45,7 @@
   <Script file="qeng/conditions/language.lua"/>
   <Script file="qeng/conditions/level.lua"/>
   <Script file="qeng/conditions/message.lua"/>
-  <Script file="qeng/conditions/messagetarget.lua"/>
   <Script file="qeng/conditions/position.lua"/>
+  <Script file="qeng/conditions/recipient.lua"/>
   <Script file="qeng/conditions/target.lua"/>
 </Ui>

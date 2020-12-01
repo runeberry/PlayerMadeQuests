@@ -34,7 +34,7 @@ vars = {
   ["i"] = t.PARAM_ITEM,
   ["lang"] = t.PARAM_LANGUAGE,
   ["msg"] = t.PARAM_MESSAGE,
-  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_MESSAGETARGET },
+  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_RECIPIENT },
   ["sz"] = t.PARAM_SUBZONE,
   ["z"] = t.PARAM_ZONE,
 
