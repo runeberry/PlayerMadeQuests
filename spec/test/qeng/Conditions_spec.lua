@@ -243,6 +243,150 @@ describe("Condition", function()
       end)
     end)
   end)
+  ------------------------------------------------
+  -- message, messagetarget, language & channel --
+  ------------------------------------------------
+  describe("message", function()
+    after_each(function()
+      addon.LastChatChannel = nil
+      addon.LastChatMessage = nil
+      addon.LastChatLanguage = nil
+      addon.LastChatRecipient = nil
+    end)
+    describe("when the player says a message", function()
+      local testCases = {
+        { pattern = "something", chat = "This message contains SOMEthing interesting!", pass = true },
+        { pattern = "^exact MATCH$", chat = "EXACT match", pass = true },
+        { pattern = "^exact MATCH$", chat = "EXACT match!", pass = false },
+        { pattern = "^start with", chat = "start with the pattern", pass = true },
+        { pattern = "^start with", chat = "this doesn't start with the pattern", pass = false },
+        { pattern = "end with$", chat = "the pattern it should END with", pass = true },
+        { pattern = "end with$", chat = "this doesn't end with the pattern", pass = false },
+        { pattern = "wildcard %w- words", chat = "this has some wildcard whatever words", pass = true },
+        { pattern = "wildcard %w- words", chat = "this has several wildcard whatever you can think of words", pass = false },
+        { pattern = "wildcard %w- words", chat = "doesn't have any wildcard words", pass = false },
+        { pattern = "wildcard %d- numbers", chat = "have some wildcard 70891 numbers", pass = true },
+        { pattern = "wildcard %d- numbers", chat = "has no wildcard numbers", pass = false },
+      }
+
+      for _, tc in ipairs(testCases) do
+        if tc.pass then
+          it("it matches the pattern", function()
+            local quest = startQuest(string.format("say \"%s\"", tc.pattern))
+            addon.LastChatMessage = tc.chat
+            assertObjectiveDoesUpdate(quest)
+          end)
+        else
+          it("it does not match the pattern", function()
+            local quest = startQuest(string.format("say \"%s\"", tc.pattern))
+            addon.LastChatMessage = tc.chat
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+        end
+      end
+
+      describe("and", function()
+        local quest
+        before_each(function()
+          addon.LastChatMessage = "hello"
+        end)
+        describe("a channel is specified", function()
+          before_each(function()
+            quest = startQuest("say: { message: hello, channel: yell }")
+          end)
+          it("will pass on a matching channel", function()
+            addon.LastChatChannel = "yell"
+            assertObjectiveDoesUpdate(quest)
+          end)
+          it("will not pass on a different channel", function()
+            addon.LastChatChannel = "guild"
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+        end)
+        describe("multiple channels are specified", function()
+          before_each(function()
+            quest = startQuest("say: { message: hello, channel: [ say, yell ] }")
+          end)
+          it("will pass on a matching channel", function()
+            addon.LastChatChannel = "say"
+            assertObjectiveDoesUpdate(quest)
+          end)
+          it("will not pass on a different channel", function()
+            addon.LastChatChannel = "whisper"
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+        end)
+        describe("a language is specified", function()
+          before_each(function()
+            quest = startQuest("say: { message: hello, language: Dwarvish }")
+          end)
+          it("will pass with a matching language", function()
+            addon.LastChatLanguage = "Dwarvish"
+            addon:ForceLogs(function() assertObjectiveDoesUpdate(quest) end)
+          end)
+          it("will not pass with a different language", function()
+            addon.LastChatLanguage = "Gutterspeak"
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+          it("will not pass without a language", function()
+            addon.LastChatLanguage = nil
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+        end)
+        describe("multiple languages are specified", function()
+          before_each(function()
+            quest = startQuest("say: { message: hello, language: [ Dwarvish, Gnomish ] }")
+          end)
+          it("will pass with a matching language", function()
+            addon.LastChatLanguage = "Gnomish"
+            assertObjectiveDoesUpdate(quest)
+          end)
+          it("will not pass with a different language", function()
+            addon.LastChatLanguage = "Gutterspeak"
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+          it("will not pass without a language", function()
+            addon.LastChatLanguage = nil
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+        end)
+        describe("a target is specified", function()
+          before_each(function()
+            quest = startQuest("say: { message: hello, target: Sans }")
+          end)
+          it("will pass with a matching target", function()
+            addon.LastChatRecipient = "Sans"
+            assertObjectiveDoesUpdate(quest)
+          end)
+          it("will not pass with a different target", function()
+            addon.LastChatRecipient = "Undyne"
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+          it("will not pass without a target", function()
+            addon.LastChatRecipient = nil
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+        end)
+        describe("multiple targets are specified", function()
+          before_each(function()
+            quest = startQuest("say: { message: hello, target: [ Sans, Papyrus ] }")
+          end)
+          it("will pass with a matching target", function()
+            addon.LastChatRecipient = "Papyrus"
+            assertObjectiveDoesUpdate(quest)
+          end)
+          it("will not pass with a different target", function()
+            addon.LastChatRecipient = "Alphys"
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+          it("will not pass without a target", function()
+            addon.LastChatRecipient = nil
+            assertObjectiveDoesNotUpdate(quest)
+          end)
+        end)
+      end)
+    end)
+  end)
   ------------
   -- target --
   ------------
