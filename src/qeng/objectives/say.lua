@@ -28,10 +28,6 @@ objective:AddCondition(tokens.PARAM_SUBZONE)
 objective:AddCondition(tokens.PARAM_COORDS)
 
 local function handleChatMsg(channel, message, _, language, _, player)
-  if language then
-    language = language:lower()
-  end
-
   -- Only consider chat messages sent by the player
   if (channel == "whisper") then
     -- CHAT_MSG_WHISPER_INFORM is fired on send, CHAT_MSG_WHISPER is fired on receipt

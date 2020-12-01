@@ -9,13 +9,6 @@ function condition:OnParse(arg)
     arg = { arg }
   end
 
-  -- Lowercase all args for case-insensitive comparison
-  for i, v in ipairs(arg) do
-    if v then
-      arg[i] = v:lower()
-    end
-  end
-
   return addon:DistinctSet(arg)
 end
 
