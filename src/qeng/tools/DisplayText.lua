@@ -27,11 +27,14 @@ vars = {
   ----------------
 
   ["a"] = t.PARAM_AURA,
+  ["ch"] = t.PARAM_CHANNEL,
   ["co"] = t.PARAM_COORDS,
   ["e"] = t.PARAM_EQUIP,
   ["em"] = t.PARAM_EMOTE,
   ["i"] = t.PARAM_ITEM,
-  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET },
+  ["lang"] = t.PARAM_LANGUAGE,
+  ["msg"] = t.PARAM_MESSAGE,
+  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_RECIPIENT },
   ["sz"] = t.PARAM_SUBZONE,
   ["z"] = t.PARAM_ZONE,
 
@@ -149,10 +152,12 @@ local function defaultConditionTextHandler(condVal)
     elseif len > 1 then
       local i = 1
       for v in pairs(condVal) do
-        if i == len then
-          return result.." or "..v
+        if i == 1 then
+          result = v
+        elseif i == 2 then
+          result = v.." or "..result
         else
-          result = result..", "..v
+          result = v..", "..result
         end
         i = i + 1
       end

@@ -30,17 +30,22 @@
   <Script file="qeng/objectives/gain-aura.lua"/>
   <Script file="qeng/objectives/kill.lua"/>
   <Script file="qeng/objectives/loot-item.lua"/>
+  <Script file="qeng/objectives/say.lua"/>
   <Script file="qeng/objectives/talk-to.lua"/>
   <Script file="qeng/objectives/use-emote.lua"/>
 
   <Script file="qeng/conditions/aura.lua"/>
+  <Script file="qeng/conditions/channel.lua"/>
   <Script file="qeng/conditions/class.lua"/>
   <Script file="qeng/conditions/emote.lua"/>
   <Script file="qeng/conditions/equip.lua"/>
   <Script file="qeng/conditions/faction.lua"/>
   <Script file="qeng/conditions/item.lua"/>
   <Script file="qeng/conditions/killtarget.lua"/>
+  <Script file="qeng/conditions/language.lua"/>
   <Script file="qeng/conditions/level.lua"/>
+  <Script file="qeng/conditions/message.lua"/>
   <Script file="qeng/conditions/position.lua"/>
+  <Script file="qeng/conditions/recipient.lua"/>
   <Script file="qeng/conditions/target.lua"/>
 </Ui>

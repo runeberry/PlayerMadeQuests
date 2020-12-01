@@ -1,6 +1,59 @@
 local _, addon = ...
 local assertf, errorf = addon.assertf, addon.errorf
 
+local function validateValue(value, options)
+  -- Then, check the list of allowed types. The user input value should match one of those types.
+  local vtype = type(value)
+
+  if options.type then
+    local isTypeValid
+    for _, t in ipairs(options.type) do
+      if vtype == t then
+        isTypeValid = true
+        break
+      end
+    end
+
+    -- Finally, before failing validation for an invalid type, try to convert the value to an
+    -- allowed type. If this type conversion succeeds, then we'll still allow the value and
+    -- return the converted value from this method.
+    if not isTypeValid and options.type then
+      for _, t in ipairs(options.type) do
+        local ok, converted = pcall(addon.ConvertValue, addon, value, t)
+        if ok then
+          -- Quit attempting after the first successful conversion
+          value = converted
+          isTypeValid = true
+          break
+        end
+      end
+    end
+
+    if not isTypeValid then
+      local expected = table.concat(options.type, "/")
+      return nil, string.format("Value '%s' is not the correct type, must be of type: %s", tostring(value), expected)
+    end
+  end
+
+  if options.values then
+    local isValueValid
+    for _, v in ipairs(options.values) do
+      if value == v then
+        isValueValid = true
+        break
+      end
+    end
+
+    if not isValueValid then
+      local expected = table.concat(options.values, ", ")
+      return nil, string.format("Value '%s' is not allowed, must be one of: %s", tostring(value), expected)
+    end
+  end
+
+  -- Return the value (in case it was converted) and no error message
+  return value, nil
+end
+
 local methods = {
   --- When Validate is run, ensures that the input value matches any one of
   --- these types.
@@ -12,6 +65,10 @@ local methods = {
   ["AllowMultiple"] = function(self, flag)
     if flag == nil then flag = true end
     self.options.multiple = flag
+  end,
+  --- When Validate is run, then only the values in the provided array will be accepted
+  ["AllowValues"] = function(self, values)
+    self.options.values = values;
   end,
   --- When this Parameter is not supplied, use this value
   ["SetDefaultValue"] = function(self, val)
@@ -39,84 +96,57 @@ local methods = {
       return
     end
 
-    local validationError = string.format("Unknown validation error for '%s'", self.name)
-    local isTypeValid = true
+    local validationError
     local traw = type(rawValue)
 
-    -- Then, check the list of allowed types. The user input value should match one of those types.
-    if options.type then
-      isTypeValid = false
-      for _, t in ipairs(options.type) do
-        if traw == t then
-          isTypeValid = true
-          break
-        end
-      end
-      if not isTypeValid then
-        local types = table.concat(options.type, " or ")
-        validationError = string.format("Expected type %s for '%s', but got %s", types, self.name, traw)
-      end
+    local val, err = validateValue(rawValue, options)
+    if err then
+      validationError = err
+    else
+      -- If the value had to be type-converted, then the converted value will be returned.
+      -- If not, but there was no error, then the same value as rawValue will be returned.
+      rawValue = val
     end
 
-    -- If the type check failed, but multiple values are allowed and the received type is a table,
-    -- then the value is still valid if every item in the table matches one of the allowed types.
-    if not isTypeValid and options.multiple and traw == "table" then
+    -- If the value validation failed, but multiple values are allowed and the received type is a table,
+    -- then the value is still valid if every item in the table passes validation.
+    if err and options.multiple and traw == "table" then
+      local convertedArray = {}
       local isWholeArrayValid = true
-      for _, v in ipairs(rawValue) do
-        local isThisItemValid = false
-        for _, t in ipairs(options.type) do
-          if type(v) == t then
-            isThisItemValid = true
-            break
-          end
-        end
-        if not isThisItemValid then
+      for i, v in ipairs(rawValue) do
+        local innerVal, innerErr = validateValue(v, options)
+        if innerErr then
+          validationError = string.format("Value #%i in '%s' is invalid: %s", i, self.name, innerErr)
           isWholeArrayValid = false
           break
+        else
+          convertedArray[i] = innerVal
         end
       end
-      isTypeValid = isWholeArrayValid
-      if not isTypeValid then
-        local types = table.concat(options.type, " or ")
-        validationError = string.format("All items in '%s' must be of type %s", self.name, types)
+      if isWholeArrayValid then
+        validationError = nil
+        rawValue = convertedArray
       end
     end
 
     -- Empty tables are not allowed if the value is required, even if the type check passes.
-    if isTypeValid and traw == "table" and options.required then
+    if not validationError and traw == "table" and options.required then
       if not (addon:tlen(rawValue) > 0) then
-        isTypeValid = false
         validationError = string.format("Required value '%s' must not be empty", self.name)
-      end
-    end
-
-    -- Finally, before failing validation for an invalid type, try to convert the value to an
-    -- allowed type. If this type conversion succeeds, then we'll still allow the value and
-    -- return the converted value from this method.
-    if not isTypeValid and options.type then
-      for _, t in ipairs(options.type) do
-        local ok, converted = pcall(addon.ConvertValue, addon, rawValue, t)
-        if ok then
-          -- Quit attempting after the first successful conversion
-          rawValue = converted
-          isTypeValid = true
-          break
-        end
       end
     end
 
     -- Any parameter can supply additional validation checks in a custom OnValidate method
     -- But these checks are only run if the built-in validation checks have passed, so you can
     -- assume that any rawValue being passed to OnValidate has already been successfully validated
-    if isTypeValid and self.OnValidate then
-      local result, err = self:OnValidate(rawValue, options)
+    if not validationError and self.OnValidate then
+      local result, customErr = self:OnValidate(rawValue, options)
       if not result then
-        isTypeValid = false
-        validationError = err
+        validationError = customErr
       end
     end
 
-    if not isTypeValid then
+    if validationError then
       error(validationError)
     end
 
