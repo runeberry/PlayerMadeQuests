@@ -27,6 +27,7 @@ addon.G = {
   CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo,
   CheckInteractDistance = CheckInteractDistance,
   CreateFrame = CreateFrame,
+  GameTooltip = GameTooltip,
   GetBestMapForUnit = C_Map.GetBestMapForUnit,
   GetBuildInfo = GetBuildInfo,
   GetGuildInfo = GetGuildInfo,

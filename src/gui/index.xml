@@ -4,6 +4,7 @@
   <Script file="gui/StaticPopups.lua"/>
   <Script file="gui/StaticPopupsList.lua"/>
   <Script file="gui/Styles.lua"/>
+  <Script file="gui/Tooltip.lua"/>
 
   <!-- Custom Widgets -->
   <Script file="gui/widgets/PopoutFrame.lua"/>

@@ -142,6 +142,7 @@ function deps:Init(addon)
     CombatLogGetCurrentEventInfo = ret(),
     CheckInteractDistance = ret(),
     CreateFrame = function() return {} end,
+    GameTooltip = {}, -- todo: mock out tooltip methods
     GetBestMapForUnit = ret(),
     GetBuildInfo = ret("1.2.3", "10203", "Jan 1, 2000", 10203),
     GetGuildInfo = ret(),
