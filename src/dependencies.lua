@@ -64,4 +64,17 @@ addon.G = {
   UIErrorsFrame = UIErrorsFrame,
   UIParent = UIParent,
   UISpecialFrames = UISpecialFrames,
+
+  -- Undocumented global functions for working with ItemButtons
+  -- See here: https://github.com/Gethe/wow-ui-source/blob/classic/FrameXML/ItemButtonTemplate.lua
+  SetItemButtonCount = SetItemButtonCount,
+  SetItemButtonStock = SetItemButtonStock,
+  SetItemButtonTexture = SetItemButtonTexture,
+  SetItemButtonTextureVertexColor = SetItemButtonTextureVertexColor,
+  SetItemButtonDesaturated = SetItemButtonDesaturated,
+  SetItemButtonNormalTextureVertexColor = SetItemButtonNormalTextureVertexColor,
+  SetItemButtonNameFrameVertexColor = SetItemButtonNameFrameVertexColor,
+  SetItemButtonSlotVertexColor = SetItemButtonSlotVertexColor,
+  SetItemButtonQuality = SetItemButtonQuality,
+  HandleModifiedItemClick = HandleModifiedItemClick,
 }

@@ -186,6 +186,17 @@ function deps:Init(addon)
     },
     UIParent = {},
     UISpecialFrames = {},
+
+    SetItemButtonCount = ret(),
+    SetItemButtonStock = ret(),
+    SetItemButtonTexture = ret(),
+    SetItemButtonTextureVertexColor = ret(),
+    SetItemButtonDesaturated = ret(),
+    SetItemButtonNormalTextureVertexColor = ret(),
+    SetItemButtonNameFrameVertexColor = ret(),
+    SetItemButtonSlotVertexColor = ret(),
+    SetItemButtonQuality = ret(),
+    HandleModifiedItemClick = ret(),
   })
 end
 
