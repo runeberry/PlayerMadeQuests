@@ -1,7 +1,8 @@
 local _, addon = ...
 local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
+local Anchors = addon.Anchors
 
-local defaultAnchor = "LEFT"
+local defaultAnchor = Anchors.LEFT
 local defaultWidth, defaultHeight = 120, 24
 local defaultButtonText = "Button"
 
@@ -12,20 +13,6 @@ local defaultButtonOptions = {
   width = nil,  -- Will be calculated by spacing & padding
   height = nil, -- Will be calculated by spacing & padding
   template = "UIPanelButtonTemplate",
-}
-
-local oppositeAnchor = {
-  ["LEFT"] = "RIGHT",
-  ["RIGHT"] = "LEFT",
-  ["TOP"] = "BOTTOM",
-  ["BOTTOM"] = "TOP"
-}
-
-local offsetDirection = {
-  ["LEFT"] = 1,
-  ["RIGHT"] = -1,
-  ["TOP"] = -1,
-  ["BOTTOM"] = 1
 }
 
 local widget = addon.CustomWidgets:NewWidget("ButtonPane")
@@ -42,9 +29,9 @@ local function bp_AddButton(self, text, onClick, options)
 
   if not options.anchor then
     if self._isVertical then
-      options.anchor = "TOP"
+      options.anchor = Anchors.TOP
     else
-      options.anchor = "LEFT"
+      options.anchor = Anchors.LEFT
     end
   end
 
@@ -76,12 +63,12 @@ local function bp_AddButton(self, text, onClick, options)
   local parent, pAnchor, offset
   if prevButton then
     parent = prevButton
-    pAnchor = oppositeAnchor[options.anchor]
-    offset = offsetDirection[options.anchor] * options.spacing * 2
+    pAnchor = addon:GetOppositeAnchor(options.anchor)
+    offset = addon:GetOffsetDirection(options.anchor) * options.spacing * 2
   else
     parent = self
     pAnchor = options.anchor
-    offset = offsetDirection[options.anchor] * options.margin * 2
+    offset = addon:GetOffsetDirection(options.anchor) * options.margin * 2
   end
 
   local offx, offy
@@ -107,11 +94,11 @@ function widget:Create(parent, anchor, size)
   frame._anchor = anchor
   frame._buttons = {}
 
-  if anchor == "LEFT" or anchor == "RIGHT" then
+  if anchor == Anchors.LEFT or anchor == Anchors.RIGHT then
     frame._isVertical = true
     frame._size = size or defaultWidth
     frame:SetWidth(frame._size)
-  elseif anchor == "TOP" or anchor == "BOTTOM" then
+  elseif anchor == Anchors.TOP or anchor == Anchors.BOTTOM then
     frame._isVertical = false
     frame._size = size or defaultHeight
     frame:SetHeight(frame._size)
@@ -119,16 +106,16 @@ function widget:Create(parent, anchor, size)
     error("Unrecognized anchor for ButtonPane: "..(anchor or "nil"))
   end
 
-  if anchor == "LEFT" then
+  if anchor == Anchors.LEFT then
     frame:SetPoint("TOPLEFT", parent, "TOPLEFT")
     frame:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT")
-  elseif anchor == "RIGHT" then
+  elseif anchor == Anchors.RIGHT then
     frame:SetPoint("TOPRIGHT", parent, "TOPRIGHT")
     frame:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT")
-  elseif anchor == "TOP" then
+  elseif anchor == Anchors.TOP then
     frame:SetPoint("TOPLEFT", parent, "TOPLEFT")
     frame:SetPoint("TOPRIGHT", parent, "TOPRIGHT")
-  elseif anchor == "BOTTOM" then
+  elseif anchor == Anchors.BOTTOM then
     frame:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT")
     frame:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT")
   end
