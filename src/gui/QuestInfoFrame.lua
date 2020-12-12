@@ -20,16 +20,6 @@ local frameOptions = {
   }
 }
 
-local function getQuestDescription(quest)
-  if not quest.description then return " " end
-  return addon:PopulateText(quest.description, quest)
-end
-
-local function getQuestCompletion(quest)
-  if not quest.completion then return getQuestDescription(quest) end
-  return addon:PopulateText(quest.completion, quest)
-end
-
 local pageStyle = {
   margins = { 8, 8, 10, 0 }, -- bottom spacing doesn't work on a scroll frame
   spacing = 6
@@ -149,6 +139,39 @@ local function setButtonBehavior(btn, behavior, quest)
   btn:Show()
 end
 
+local function drawQuestSections(questInfoFrame, quest, sections)
+  -- Clear the content and remove it from the layout
+  for _, section in pairs(questInfoFrame.sections) do
+    section:Clear()
+    section:Hide()
+    section:ClearAllPoints()
+  end
+
+  local content = questInfoFrame.mainContent
+  local prevSection
+
+  -- Populate and anchor all sections in the order they were received
+  for _, sname in ipairs(sections) do
+    local section = questInfoFrame.sections[sname]
+    assert(section, "QuestInfoFrame - no section exists with name: "..sname)
+
+    section:Populate(quest)
+
+    if not prevSection then
+      -- First section, anchor it to the content frame
+      section:SetPoint("TOPLEFT", content, "TOPLEFT", 8, -10)
+      section:SetPoint("TOPRIGHT", content, "TOPRIGHT", -8, -10)
+    else
+      -- 2nd and later sections, anchor to the previous section
+      section:SetPoint("TOPLEFT", prevSection, "BOTTOMLEFT", 0, -6)
+      section:SetPoint("TOPRIGHT", prevSection, "BOTTOMRIGHT", 0, -6)
+    end
+
+    section:Show()
+    prevSection = section
+  end
+end
+
 -- Various display configurations for this frame, depending on quest status, etc.
 -- Properties:
 --   leftButton/rightButton - the button behaviors of the bottom buttons (or nil to hide)
@@ -171,51 +194,76 @@ frameModes = {
     content = function(frame, quest)
       frame.titleFontString:SetText("[PMQ] Quest Info")
 
-      local fs = frame.article:GetFontStrings()
+      local sections = {}
+      -- local fs = frame.article:GetFontStrings()
 
       -- Quest name & description
-      fs[1]:SetText(quest.name)
-      fs[2]:SetText(getQuestDescription(quest))
+      -- fs[1]:SetText(quest.name)
+      -- fs[2]:SetText(getQuestDescription(quest))
 
-      local index = 3
+      table.insert(sections, "NameHeader")
+      table.insert(sections, "Description")
+
+      -- local index = 3
 
       -- Requirements & recommendations
+      -- if quest.required or quest.recommended then
+      --   fs[index]:SetText("Requirements")
+      --   local recString = ""
+      --   if quest.required and quest.required.conditions then
+      --     for k, v in pairs(quest.required.conditions) do
+      --       recString = string.format("%s* %s: %s\n", recString, k, v)
+      --     end
+      --   end
+      --   if quest.recommended and quest.recommended.conditions then
+      --     for k, v in pairs(quest.recommended.conditions) do
+      --       recString = string.format("%s* %s: %s (Recommended)\n", recString, k, v)
+      --     end
+      --   end
+      --   fs[index+1]:SetText(recString)
+      --   index = index + 2
+      -- end
       if quest.required or quest.recommended then
-        fs[index]:SetText("Requirements")
-        local recString = ""
-        if quest.required and quest.required.conditions then
-          for k, v in pairs(quest.required.conditions) do
-            recString = string.format("%s* %s: %s\n", recString, k, v)
-          end
-        end
-        if quest.recommended and quest.recommended.conditions then
-          for k, v in pairs(quest.recommended.conditions) do
-            recString = string.format("%s* %s: %s (Recommended)\n", recString, k, v)
-          end
-        end
-        fs[index+1]:SetText(recString)
-        index = index + 2
+        table.insert(sections, "RequirementsHeader")
+        table.insert(sections, "Requirements")
       end
 
       -- Starting condition
+      -- if quest.start and quest.start.conditions then
+      --   fs[index]:SetText("Getting Started")
+      --   fs[index+1]:SetText(addon:GetCheckpointDisplayText(quest.start, "quest").."\n")
+      --   index = index + 2
+      -- end
+
       if quest.start and quest.start.conditions then
-        fs[index]:SetText("Getting Started")
-        fs[index+1]:SetText(addon:GetCheckpointDisplayText(quest.start, "quest").."\n")
-        index = index + 2
+        table.insert(sections, "StartObjectiveHeader")
+        table.insert(sections, "StartObjective")
       end
 
       -- Quest objectives
-      fs[index]:SetText("Quest Objectives")
+      -- fs[index]:SetText("Quest Objectives")
+      -- if quest.objectives then
+      --   local objString = ""
+      --   for _, obj in ipairs(quest.objectives) do
+      --     objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
+      --   end
+      --   objString = objString.."\n\n" -- Spacer for bottom margin
+      --   fs[index+1]:SetText(objString)
+      -- else
+      --   fs[index+1]:SetText("\n")
+      -- end
+
       if quest.objectives then
-        local objString = ""
-        for _, obj in ipairs(quest.objectives) do
-          objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
-        end
-        objString = objString.."\n\n" -- Spacer for bottom margin
-        fs[index+1]:SetText(objString)
-      else
-        fs[index+1]:SetText("\n")
+        table.insert(sections, "ObjectivesHeader")
+        table.insert(sections, "Objectives")
       end
+
+      if quest.rewards then
+        table.insert(sections, "RewardsHeader")
+        table.insert(sections, "Rewards")
+      end
+
+      drawQuestSections(frame, quest, sections)
 
       addon:PlaySound("BookWrite")
     end,
@@ -229,17 +277,29 @@ frameModes = {
     content = function(frame, quest)
       frame.titleFontString:SetText("[PMQ] Quest Completion")
 
-      local fs = frame.article:GetFontStrings()
+      -- local fs = frame.article:GetFontStrings()
+
+      local sections = {}
 
       -- Quest name & description
-      fs[1]:SetText(quest.name)
-      fs[2]:SetText(getQuestCompletion(quest))
+      -- fs[1]:SetText(quest.name)
+      -- fs[2]:SetText(getQuestCompletion(quest))
+
+      table.insert(sections, "NameHeader")
+      table.insert(sections, "Completion")
 
       -- Completion objectives
+      -- if quest.complete and quest.complete.conditions then
+      --   fs[3]:SetText("Finishing Up")
+      --   fs[4]:SetText(addon:GetCheckpointDisplayText(quest.complete, "quest").."\n")
+      -- end
+
       if quest.complete and quest.complete.conditions then
-        fs[3]:SetText("Finishing Up")
-        fs[4]:SetText(addon:GetCheckpointDisplayText(quest.complete, "quest").."\n")
+        table.insert(sections, "CompleteObjectiveHeader")
+        table.insert(sections, "CompleteObjective")
       end
+
+      drawQuestSections(frame, quest, sections)
     end,
   },
   ["ActiveQuest"] = {
@@ -251,23 +311,40 @@ frameModes = {
     content = function(frame, quest)
       frame.titleFontString:SetText("[PMQ] Quest Info")
 
-      local fs = frame.article:GetFontStrings()
+      -- local fs = frame.article:GetFontStrings()
+
+      local sections = {}
 
       -- Quest name & objectives
-      fs[1]:SetText(quest.name)
+      -- fs[1]:SetText(quest.name)
+      -- if quest.objectives then
+      --   local objString = ""
+      --   for _, obj in ipairs(quest.objectives) do
+      --     objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
+      --   end
+      --   fs[2]:SetText(objString)
+      -- else
+      --   fs[2]:SetText("\n")
+      -- end
+
+      table.insert(sections, "NameHeader")
+
       if quest.objectives then
-        local objString = ""
-        for _, obj in ipairs(quest.objectives) do
-          objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
-        end
-        fs[2]:SetText(objString)
-      else
-        fs[2]:SetText("\n")
+        table.insert(sections, "Objectives")
       end
 
       -- Quest Description
-      fs[3]:SetText("Description")
-      fs[4]:SetText(getQuestDescription(quest).."\n\n") -- Space for bottom margin
+      -- fs[3]:SetText("Description")
+      -- fs[4]:SetText(getQuestDescription(quest).."\n\n") -- Space for bottom margin
+
+      table.insert(sections, "DescriptionHeader")
+      table.insert(sections, "Description")
+
+      -- todo: temp
+      table.insert(sections, "RewardsHeader")
+      table.insert(sections, "Rewards")
+
+      drawQuestSections(frame, quest, sections)
     end,
   },
   ["TerminatedQuest"] = {
@@ -285,34 +362,36 @@ frameModes = {
 
 local frameMethods = {
   ["ShowQuest"] = function(self, quest, modeName)
-    local mode = frameModes[modeName or statusModeMap[quest.status or "default"]]
+    addon:catch(function()
+      local mode = frameModes[modeName or statusModeMap[quest.status or "default"]]
 
-    if self._shown and mode.busy then
-      -- Another quest is already being interacted with
-      -- If no "busy" function is specified, will proceed to draw content as normal
-      mode.busy(self, quest)
-      return
-    end
+      if self._shown and mode.busy then
+        -- Another quest is already being interacted with
+        -- If no "busy" function is specified, will proceed to draw content as normal
+        mode.busy(self, quest)
+        return
+      end
 
-    self:ClearContent()
+      self:ClearContent()
 
-    mode.content(self, quest)
-    setButtonBehavior(self.leftButton, mode.leftButton, quest)
-    setButtonBehavior(self.rightButton, mode.rightButton, quest)
+      mode.content(self, quest)
+      setButtonBehavior(self.leftButton, mode.leftButton, quest)
+      setButtonBehavior(self.rightButton, mode.rightButton, quest)
 
-    self._quest = quest
-    self._shown = true
+      self._quest = quest
+      self._shown = true
 
-    self:Show()
+      self:Show()
+    end)
   end,
   ["IsShowingQuest"] = function(self, quest)
     return self._shown and self._quest and self._quest.questId == quest.questId and true
   end,
   ["ClearContent"] = function(self)
     self.titleFontString:SetText("")
-    for _, fs in ipairs(self.article:GetFontStrings()) do
-      fs:SetText("")
-    end
+    -- for _, section in ipairs(self.sections) do
+
+    -- end
   end,
   ["RefreshMode"] = function(self)
     local quest = self._quest
@@ -345,6 +424,186 @@ local frameScripts = {
   -- ["OnLoad"] = function() end,
   -- ["OnEvent"] = function() end,
 }
+
+-- Builds a frame with an additional SetText method that can be used to update its underlying FontString
+local function buildFontString(parent, fontTemplate)
+  local fs = parent:CreateFontString(nil, "BACKGROUND", fontTemplate)
+  fs:SetJustifyH("LEFT")
+  return fs
+end
+
+-- Returns a content section with fixed text that does not change
+-- based on the provided quest
+local function buildStaticHeaderContent(text)
+  return {
+    Build = function(self, parent)
+      local frame = buildFontString(parent, "QuestTitleFont")
+      frame:SetText(text)
+      return frame
+    end,
+    Populate = function() end,
+    Clear = function() end
+  }
+end
+
+local frameSections = {
+  ---------------------
+  -- Section Headers --
+  ---------------------
+  ["NameHeader"] = {
+    Build = function(self, parent)
+      return buildFontString(parent, "QuestTitleFont")
+    end,
+    Populate = function(self, quest)
+      self:SetText(quest.name)
+    end,
+    Clear = function(self)
+      self:SetText()
+    end
+  },
+  ["DescriptionHeader"] = buildStaticHeaderContent("Description"),
+  ["ObjectivesHeader"] = buildStaticHeaderContent("Objectives"),
+  ["RequirementsHeader"] = buildStaticHeaderContent("Requirements"),
+  ["RewardsHeader"] = buildStaticHeaderContent("Rewards"),
+  ["StartObjectiveHeader"] = buildStaticHeaderContent("Getting Started"),
+  ["CompleteObjectiveHeader"] = buildStaticHeaderContent("Finishing Up"),
+
+  ---------------------
+  -- Section content --
+  ---------------------
+  ["Description"] = {
+    Build = function(self, parent)
+      return buildFontString(parent, "QuestFont")
+    end,
+    Populate = function(self, quest)
+      local description = quest.description or " "
+      description = addon:PopulateText(description)
+      self:SetText(description)
+    end,
+    Clear = function(self)
+      self:SetText()
+    end
+  },
+  ["Completion"] = {
+    Build = function(self, parent)
+      return buildFontString(parent, "QuestFont")
+    end,
+    Populate = function(self, quest)
+      local completion = quest.completion or quest.description or " "
+      completion = addon:PopulateText(completion)
+      self:SetText(completion)
+    end,
+    Clear = function(self)
+      self:SetText()
+    end
+  },
+  ["Objectives"] = {
+    Build = function(self, parent)
+      return buildFontString(parent, "QuestFont")
+    end,
+    Populate = function(self, quest)
+      if quest.objectives then
+        local objString = ""
+        for _, obj in ipairs(quest.objectives) do
+          objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
+        end
+        -- objString = objString.."\n\n" -- Spacer for bottom margin
+        self:SetText(objString)
+      else
+        self:SetText("\n")
+      end
+    end,
+    Clear = function(self)
+      self:SetText()
+    end
+  },
+  ["Requirements"] = {
+    Build = function(self, parent)
+      return buildFontString(parent, "QuestFont")
+    end,
+    Populate = function(self, quest)
+      local recString = ""
+      if quest.required and quest.required.conditions then
+        for k, v in pairs(quest.required.conditions) do
+          recString = string.format("%s* %s: %s\n", recString, k, v)
+        end
+      end
+      if quest.recommended and quest.recommended.conditions then
+        for k, v in pairs(quest.recommended.conditions) do
+          recString = string.format("%s* %s: %s (Recommended)\n", recString, k, v)
+        end
+      end
+      self:SetText(recString)
+    end,
+    Clear = function(self)
+      self:SetText()
+    end
+  },
+  ["Rewards"] = {
+    Build = function(self, parent)
+      local itemRewardButtonPane = addon.CustomWidgets:CreateWidget("ItemRewardButtonPane", parent)
+
+      -- todo: remove placeholder items
+      itemRewardButtonPane:SetHeight(150)
+      itemRewardButtonPane:SetItems({
+        { itemId = 13444, count = 20 }, -- Major mana potion
+        { itemId = 19019, count = 7, usable = false }, -- Thunderfury
+        { itemId = 19019, count = 7, usable = false }, -- Thunderfury
+        { itemId = 19019, count = 7, usable = false }, -- Thunderfury
+      })
+
+      return itemRewardButtonPane
+    end,
+    Populate = function(self, quest)
+      -- todo
+    end,
+    Clear = function(self)
+      -- todo
+    end
+  },
+  ["StartObjective"] = {
+    Build = function(self, parent)
+      return buildFontString(parent, "QuestFont")
+    end,
+    Populate = function(self, quest)
+      local text = addon:GetCheckpointDisplayText(quest.start, "quest")
+      self:SetText(text.."\n")
+    end,
+    Clear = function(self)
+      self:SetText()
+    end
+  },
+  ["CompleteObjective"] = {
+    Build = function(self, parent)
+      return buildFontString(parent, "QuestFont")
+    end,
+    Populate = function(self, quest)
+      local text = addon:GetCheckpointDisplayText(quest.start, "quest")
+      self:SetText(text.."\n")
+    end,
+    Clear = function(self)
+      self:SetText()
+    end
+  }
+}
+
+--- Builds the content of the quest frame that goes into the scroll frame
+local function buildContentSections(parent)
+  local sections = {}
+
+  for sname, template in pairs(frameSections) do
+    local section = template:Build(parent)
+
+    -- Clone the template methods onto the created frame
+    for fname, fn in pairs(template) do
+      section[fname] = fn
+    end
+
+    sections[sname] = section
+  end
+
+  return sections
+end
 
 local function buildQuestInfoFrame()
   local questFrame = addon.CustomWidgets:CreateWidget("PopoutFrame", "QuestInfoFrame", frameOptions)
@@ -413,37 +672,22 @@ local function buildQuestInfoFrame()
   questDetailScrollChildFrame:SetPoint("TOPLEFT", questFrameDetailPanel, "TOPLEFT")
   questDetailScrollFrame:SetScrollChild(questDetailScrollChildFrame)
 
-  local questDetailInfoFrame = CreateFrame("Frame", nil, questDetailScrollChildFrame)
+  local questDetailInfoFrame = CreateFrame("Frame", "PMQ_QuestInfoFrame_MainContent", questDetailScrollChildFrame)
   questDetailInfoFrame:SetSize(300, 100)
   questDetailInfoFrame:SetAllPoints(true)
 
-  local article = addon.CustomWidgets:CreateWidget("ArticleText", questDetailInfoFrame)
-  article:SetAllPoints(true)
-  article:SetPageStyle(pageStyle)
-  for name, style in pairs(textStyles) do
-    article:SetTextStyle(name, style)
-  end
-
-  -- Placeholder text, the real values get popped in when a quest is received
-  article:AddText("HEADER_1", "header")
-  article:AddText("BODY_1")
-  article:AddText("HEADER_2", "header")
-  article:AddText("BODY_2")
-  article:AddText("HEADER_3", "header")
-  article:AddText("BODY_3")
-  article:AddText("HEADER_4", "header")
-  article:AddText("BODY_4")
-  article:Assemble()
-
   questFrame.scrollFrame = questDetailScrollFrame
   questFrame.titleFontString = questFrameNpcNameText
-  questFrame.article = article
+  questFrame.mainContent = questDetailInfoFrame
   questFrame.leftButton = questFrameLeftButton
   questFrame.rightButton = questFrameRightButton
 
   for name, method in pairs(frameMethods) do
     questFrame[name] = method
   end
+
+  -- Can access individual sections by template name on this property
+  questFrame.sections = buildContentSections(questFrame.mainContent)
 
   return questFrame
 end
