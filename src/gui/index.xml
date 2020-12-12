@@ -19,6 +19,7 @@
   <Script file="gui/widgets/IconList.lua"/>
   <Script file="gui/widgets/ItemRewardButton.lua"/>
   <Script file="gui/widgets/ItemRewardButtonPane.lua"/>
+  <Script file="gui/widgets/Pane.lua"/>
   <Script file="gui/widgets/ScriptEditor.lua"/>
   <Script file="gui/widgets/Sizer.lua"/>
   <Script file="gui/widgets/TextInput.lua"/>
