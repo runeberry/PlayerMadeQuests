@@ -174,6 +174,8 @@ end
 
 -- Various display configurations for this frame, depending on quest status, etc.
 -- Properties:
+--   title - text for the title bar at the top of the frame
+--   sound - sound to play each time the frame is shown in this mode
 --   leftButton/rightButton - the button behaviors of the bottom buttons (or nil to hide)
 --   content - what to draw when the frame is shown in this mode
 --   busy - what to draw when a request is recieved to show the frame, but it's already shown
@@ -181,6 +183,8 @@ end
 local frameModes
 frameModes = {
   ["NewQuest"] = {
+    title = "[PMQ] Quest Info",
+    sound = "BookWrite",
     leftButton = buttons.Accept,
     rightButton = buttons.Decline,
     busy = function(frame, quest)
@@ -192,66 +196,20 @@ frameModes = {
       end
     end,
     content = function(frame, quest)
-      frame.titleFontString:SetText("[PMQ] Quest Info")
-
       local sections = {}
-      -- local fs = frame.article:GetFontStrings()
-
-      -- Quest name & description
-      -- fs[1]:SetText(quest.name)
-      -- fs[2]:SetText(getQuestDescription(quest))
 
       table.insert(sections, "NameHeader")
       table.insert(sections, "Description")
 
-      -- local index = 3
-
-      -- Requirements & recommendations
-      -- if quest.required or quest.recommended then
-      --   fs[index]:SetText("Requirements")
-      --   local recString = ""
-      --   if quest.required and quest.required.conditions then
-      --     for k, v in pairs(quest.required.conditions) do
-      --       recString = string.format("%s* %s: %s\n", recString, k, v)
-      --     end
-      --   end
-      --   if quest.recommended and quest.recommended.conditions then
-      --     for k, v in pairs(quest.recommended.conditions) do
-      --       recString = string.format("%s* %s: %s (Recommended)\n", recString, k, v)
-      --     end
-      --   end
-      --   fs[index+1]:SetText(recString)
-      --   index = index + 2
-      -- end
       if quest.required or quest.recommended then
         table.insert(sections, "RequirementsHeader")
         table.insert(sections, "Requirements")
       end
 
-      -- Starting condition
-      -- if quest.start and quest.start.conditions then
-      --   fs[index]:SetText("Getting Started")
-      --   fs[index+1]:SetText(addon:GetCheckpointDisplayText(quest.start, "quest").."\n")
-      --   index = index + 2
-      -- end
-
       if quest.start and quest.start.conditions then
         table.insert(sections, "StartObjectiveHeader")
         table.insert(sections, "StartObjective")
       end
-
-      -- Quest objectives
-      -- fs[index]:SetText("Quest Objectives")
-      -- if quest.objectives then
-      --   local objString = ""
-      --   for _, obj in ipairs(quest.objectives) do
-      --     objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
-      --   end
-      --   objString = objString.."\n\n" -- Spacer for bottom margin
-      --   fs[index+1]:SetText(objString)
-      -- else
-      --   fs[index+1]:SetText("\n")
-      -- end
 
       if quest.objectives then
         table.insert(sections, "ObjectivesHeader")
@@ -264,35 +222,20 @@ frameModes = {
       end
 
       drawQuestSections(frame, quest, sections)
-
-      addon:PlaySound("BookWrite")
     end,
   },
   ["FinishedQuest"] = {
+    title = "[PMQ] Quest Completion",
     leftButton = buttons.Empty,
     rightButton = buttons.Complete, -- todo: incorporate "Abandon" into this mode
     busy = function(frame, quest)
 
     end,
     content = function(frame, quest)
-      frame.titleFontString:SetText("[PMQ] Quest Completion")
-
-      -- local fs = frame.article:GetFontStrings()
-
       local sections = {}
-
-      -- Quest name & description
-      -- fs[1]:SetText(quest.name)
-      -- fs[2]:SetText(getQuestCompletion(quest))
 
       table.insert(sections, "NameHeader")
       table.insert(sections, "Completion")
-
-      -- Completion objectives
-      -- if quest.complete and quest.complete.conditions then
-      --   fs[3]:SetText("Finishing Up")
-      --   fs[4]:SetText(addon:GetCheckpointDisplayText(quest.complete, "quest").."\n")
-      -- end
 
       if quest.complete and quest.complete.conditions then
         table.insert(sections, "CompleteObjectiveHeader")
@@ -303,39 +246,20 @@ frameModes = {
     end,
   },
   ["ActiveQuest"] = {
+    title = "[PMQ] Quest Info",
     leftButton = buttons.Share,
     rightButton = buttons.Abandon,
     busy = function(frame, quest)
 
     end,
     content = function(frame, quest)
-      frame.titleFontString:SetText("[PMQ] Quest Info")
-
-      -- local fs = frame.article:GetFontStrings()
-
       local sections = {}
-
-      -- Quest name & objectives
-      -- fs[1]:SetText(quest.name)
-      -- if quest.objectives then
-      --   local objString = ""
-      --   for _, obj in ipairs(quest.objectives) do
-      --     objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
-      --   end
-      --   fs[2]:SetText(objString)
-      -- else
-      --   fs[2]:SetText("\n")
-      -- end
 
       table.insert(sections, "NameHeader")
 
       if quest.objectives then
         table.insert(sections, "Objectives")
       end
-
-      -- Quest Description
-      -- fs[3]:SetText("Description")
-      -- fs[4]:SetText(getQuestDescription(quest).."\n\n") -- Space for bottom margin
 
       table.insert(sections, "DescriptionHeader")
       table.insert(sections, "Description")
@@ -348,6 +272,7 @@ frameModes = {
     end,
   },
   ["TerminatedQuest"] = {
+    title = "[PMQ] Quest Info",
     leftButton = buttons.Share,
     rightButton = buttons.Restart,
     busy = function(frame, quest)
@@ -374,12 +299,19 @@ local frameMethods = {
 
       self:ClearContent()
 
+      local title = mode.title or ""
+      self.titleFontString:SetText(title)
+
       mode.content(self, quest)
       setButtonBehavior(self.leftButton, mode.leftButton, quest)
       setButtonBehavior(self.rightButton, mode.rightButton, quest)
 
       self._quest = quest
       self._shown = true
+
+      if mode.sound then
+        addon:PlaySound(mode.sound)
+      end
 
       self:Show()
     end)
