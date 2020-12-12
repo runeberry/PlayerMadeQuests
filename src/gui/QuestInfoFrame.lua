@@ -7,6 +7,13 @@ addon.QuestInfoFrame = nil -- Defined during lifecycle event
 local pollTimers = {}
 local pollingTimerInterval = 0.5 -- interval to poll for start/complete condition satisfaction, in seconds
 
+local questContentStyle = {
+  marginTop = -10,
+  marginLeft = 8,
+  marginRight = -8,
+  spacing = -12,
+}
+
 local frameOptions = {
   movable = true,
   escapable = true,
@@ -17,22 +24,6 @@ local frameOptions = {
     y = -104,
     w = 384,
     h = 512,
-  }
-}
-
-local pageStyle = {
-  margins = { 8, 8, 10, 0 }, -- bottom spacing doesn't work on a scroll frame
-  spacing = 6
-}
-
-local textStyles = {
-  ["header"] = {
-    inheritsFrom = "QuestTitleFont",
-    justifyH = "LEFT",
-  },
-  ["default"] = {
-    inheritsFrom = "QuestFont",
-    justifyH = "LEFT",
   }
 }
 
@@ -148,6 +139,7 @@ local function drawQuestSections(questInfoFrame, quest, sections)
   end
 
   local content = questInfoFrame.mainContent
+  local style = questContentStyle
   local prevSection
 
   -- Populate and anchor all sections in the order they were received
@@ -159,12 +151,12 @@ local function drawQuestSections(questInfoFrame, quest, sections)
 
     if not prevSection then
       -- First section, anchor it to the content frame
-      section:SetPoint("TOPLEFT", content, "TOPLEFT", 8, -10)
-      section:SetPoint("TOPRIGHT", content, "TOPRIGHT", -8, -10)
+      section:SetPoint("TOPLEFT", content, "TOPLEFT", style.marginLeft, style.marginTop)
+      section:SetPoint("TOPRIGHT", content, "TOPRIGHT", style.marginRight, style.marginTop)
     else
       -- 2nd and later sections, anchor to the previous section
-      section:SetPoint("TOPLEFT", prevSection, "BOTTOMLEFT", 0, -6)
-      section:SetPoint("TOPRIGHT", prevSection, "BOTTOMRIGHT", 0, -6)
+      section:SetPoint("TOPLEFT", prevSection, "BOTTOMLEFT", 0, style.spacing)
+      section:SetPoint("TOPRIGHT", prevSection, "BOTTOMRIGHT", 0, style.spacing)
     end
 
     section:Show()
