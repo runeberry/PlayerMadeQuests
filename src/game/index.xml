@@ -2,6 +2,7 @@
   <Script file="game/Auras.lua"/>
   <Script file="game/Images.lua"/>
   <Script file="game/Inventory.lua"/>
+  <Script file="game/Items.lua"/>
   <Script file="game/Location.lua"/>
   <Script file="game/Player.lua"/>
   <Script file="game/Sounds.lua"/>
