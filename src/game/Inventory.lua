@@ -1,5 +1,5 @@
 local _, addon = ...
-local logger = addon.Logger:NewLogger("Items")
+local logger = addon.Logger:NewLogger("Inventory")
 
 local GetItemInfo = addon.G.GetItemInfo
 local GetContainerItemInfo = addon.G.GetContainerItemInfo
