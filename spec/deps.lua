@@ -145,6 +145,7 @@ function deps:Init(addon)
     GameTooltip = {}, -- todo: mock out tooltip methods
     GetBestMapForUnit = ret(),
     GetBuildInfo = ret("1.2.3", "10203", "Jan 1, 2000", 10203),
+    GetCoinTextureString = ret("money"),
     GetGuildInfo = ret(),
     GetMapInfo = ret(),
     GetPlayerMapPosition = ret(),

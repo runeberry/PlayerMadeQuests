@@ -30,6 +30,7 @@ addon.G = {
   GameTooltip = GameTooltip,
   GetBestMapForUnit = C_Map.GetBestMapForUnit,
   GetBuildInfo = GetBuildInfo,
+  GetCoinTextureString = GetCoinTextureString,
   GetGuildInfo = GetGuildInfo,
   GetMapInfo = C_Map.GetMapInfo,
   GetPlayerMapPosition = C_Map.GetPlayerMapPosition,
