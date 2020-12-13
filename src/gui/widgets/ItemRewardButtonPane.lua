@@ -43,6 +43,8 @@ local methods = {
       irb:Hide()
     end
 
+    local height = 0
+
     for i, item in ipairs(items) do
       local irb = self._itemRewardButtons[i]
 
@@ -59,7 +61,14 @@ local methods = {
       if item.usable ~= nil then
         irb:SetItemUsable(item.usable)
       end
+
+      if i % 2 ~= 0 then
+        -- Accumulate total pane height for each new row that's created
+        height = height + irb:GetHeight()
+      end
     end
+
+    self:SetHeight(height)
   end,
 }
 
