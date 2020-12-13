@@ -20,19 +20,15 @@ local defaultOptions = {
 
 local methods = {
   ["SetItem"] = function(self, itemId)
-    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-    itemEquipLoc, itemIcon, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID,
-    isCraftingReagent = addon.G.GetItemInfo(itemId)
+    local item = addon:LookupItem(itemId)
 
-    -- local _, itemType, itemSubType, itemEquipLoc, itemIcon, itemClassID, itemSubClassID = GetItemInfoInstant(itemId)
-
-    SetItemButtonTexture(self, itemIcon)
-    SetItemButtonQuality(self, itemRarity, itemId)
+    SetItemButtonTexture(self, item.icon)
+    SetItemButtonQuality(self, item.rarity, item.id)
 
     -- Name is provided by the *ItemButtonTemplate
-    self.Name:SetText(itemName)
+    self.Name:SetText(item.name)
 
-    self:SetTooltipContent({ itemId = itemId })
+    self:SetTooltipContent({ itemId = item.id })
   end,
   ["SetItemCount"] = function(self, count)
     SetItemButtonCount(self, count, false)
