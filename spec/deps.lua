@@ -160,6 +160,7 @@ function deps:Init(addon)
     GetMinimapZoneText = ret(),
     GetZoneText = ret(),
     GetItemInfo = ret(),
+    GetItemInfoInstant = ret(),
     GetContainerItemInfo = ret(),
     GetInventorySlotInfo = ret(),
     GetInventoryItemID = ret(),

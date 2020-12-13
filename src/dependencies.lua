@@ -40,6 +40,7 @@ addon.G = {
   GetMinimapZoneText = GetMinimapZoneText,
   GetZoneText = GetZoneText,
   GetItemInfo = GetItemInfo,
+  GetItemInfoInstant = GetItemInfoInstant,
   GetContainerItemInfo = GetContainerItemInfo,
   GetInventorySlotInfo = GetInventorySlotInfo,
   GetInventoryItemID = GetInventoryItemID,
