@@ -98,14 +98,22 @@ end
 --- Gets all known info about this item id, name, or link.
 --- If some data is missing, a server request will be initiated to get the remainder.
 --- If this is not a valid item id, name, or link, an error will be thrown.
---- @param id string (or number) the item id, name, or link
-function addon:LookupItem(id)
-  assert(type(id) == "string" or type(id) == "number", "itemId must be a number or string")
+--- @param idOrName string (or number) the item id, name, or link
+function addon:LookupItem(idOrName)
+  assert(type(idOrName) == "string" or type(idOrName) == "number", "idOrName must be a number or string")
 
-  local item = getItem(id)
-  assert(item, "Unknown item: "..id)
+  local item = getItem(idOrName)
+  assert(item, "Unknown item: "..idOrName)
 
   return item
+end
+
+--- Same as LookupItem, but will return nil instead of throwing an error if the item was not found.
+--- @param idOrName string (or number) the item id, name, or link
+function addon:LookupItemSafe(idOrName)
+  assert(idOrName ~= nil, "idOrName must not be nil")
+  assert(type(idOrName) == "string" or type(idOrName) == "number", "itemId must be a number or string")
+  return getItem(idOrName)
 end
 
 --- Performs an async item lookup.

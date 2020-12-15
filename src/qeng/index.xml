@@ -20,9 +20,13 @@
   <Script file="qeng/QuestScriptCompiler.lua"/>
 
   <Script file="qeng/parameters/goal.lua"/>
+  <Script file="qeng/parameters/player.lua"/>
+  <Script file="qeng/parameters/rewarditem.lua"/>
+  <Script file="qeng/parameters/rewardmoney.lua"/>
   <Script file="qeng/parameters/text.lua"/>
 
   <Script file="qeng/checkpoints/recreq.lua"/>
+  <Script file="qeng/checkpoints/rewards.lua"/>
   <Script file="qeng/checkpoints/startcomplete.lua"/>
 
   <Script file="qeng/objectives/equip-item.lua"/>

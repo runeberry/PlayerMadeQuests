@@ -57,6 +57,9 @@ function addon:ParseQuest(questRaw)
   if questRaw[tokens.CMD_REC] then
     quest.recommended = checkpoints["recommended"]:Parse(questRaw[tokens.CMD_REC])
   end
+  if questRaw[tokens.CMD_REWARDS] then
+    quest.rewards = checkpoints["rewards"]:Parse(questRaw[tokens.CMD_REWARDS])
+  end
 
   return quest
 end
