@@ -14,7 +14,7 @@ checkpoint:AddParameter(tokens.PARAM_TEXT, {
   defaultValue = {
     -- log = "",
     -- progress = "",
-    quest = "Trade with %player to received your reward.",
-    full = "Trade with %player to received your reward."
+    quest = "Trade with %player to receive your reward.",
+    full = "Trade with %player to receive your reward."
   },
 })
