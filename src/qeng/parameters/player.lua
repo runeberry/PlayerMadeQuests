@@ -37,5 +37,5 @@ function parameter:OnParse(arg)
     arg = { arg }
   end
 
-  return arg
+  return addon:DistinctSet(arg)
 end

@@ -9,3 +9,12 @@ local checkpoint = addon.QuestEngine:NewCheckpoint("rewards")
 checkpoint:AddParameter(tokens.PARAM_PLAYER, { required = true })
 checkpoint:AddParameter(tokens.PARAM_REWARDMONEY, { alias = tokens.PARAM_MONEY })
 checkpoint:AddParameter(tokens.PARAM_REWARDITEM, { alias = tokens.PARAM_ITEM })
+
+checkpoint:AddParameter(tokens.PARAM_TEXT, {
+  defaultValue = {
+    -- log = "",
+    -- progress = "",
+    quest = "Trade with %player to received your reward.",
+    full = "Trade with %player to received your reward."
+  },
+})
