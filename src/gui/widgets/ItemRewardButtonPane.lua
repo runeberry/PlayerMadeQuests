@@ -36,12 +36,15 @@ local methods = {
   -- count - number, optional
   -- usable - boolean, optional
   ["SetItems"] = function(self, items)
-    assert(type(items) == "table", "SetItems - an array of items is required")
-
     -- Hide all currently shown rewards
     for _, irb in ipairs(self._itemRewardButtons) do
       irb:Hide()
     end
+
+    -- No items are specified, simply hide all items and return
+    if not items then return end
+
+    assert(type(items) == "table", "SetItems - a table of items must be provided")
 
     local height = 0
 
@@ -66,6 +69,8 @@ local methods = {
         -- Accumulate total pane height for each new row that's created
         height = height + irb:GetHeight()
       end
+
+      irb:Show()
     end
 
     self:SetHeight(height)
