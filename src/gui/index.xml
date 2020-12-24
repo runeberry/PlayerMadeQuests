@@ -22,6 +22,7 @@
   <Script file="gui/widgets/Pane.lua"/>
   <Script file="gui/widgets/ScriptEditor.lua"/>
   <Script file="gui/widgets/Sizer.lua"/>
+  <Script file="gui/widgets/TableLayout.lua"/>
   <Script file="gui/widgets/TextInput.lua"/>
   <Script file="gui/widgets/TextInputScrolling.lua"/>
   <Script file="gui/widgets/TitleBar.lua"/>
