@@ -208,6 +208,45 @@ describe("Tables", function()
     end)
   end)
 
+  describe("MergeOptionsTable", function()
+    it("can merge custom options", function()
+      local defaultOptions = {
+        v1 = "v1",
+        v2 = "v2",
+      }
+      local customOptions = {
+        v2 = "custom-v2",
+        v3 = "custom-v3",
+      }
+
+      local merged = addon:MergeOptionsTable(defaultOptions, customOptions)
+
+      assert.equals(defaultOptions.v1, merged.v1)
+      assert.equals(customOptions.v2, merged.v2)
+      assert.equals(customOptions.v3, merged.v3)
+    end)
+    it("can copy default options if no custom options provided", function()
+      local defaultOptions = {
+        v1 = "v1",
+        v2 = "v2",
+      }
+
+      local merged = addon:MergeOptionsTable(defaultOptions, nil)
+
+      assert.equals(defaultOptions.v1, merged.v1)
+      assert.equals(defaultOptions.v2, merged.v2)
+    end)
+    it("cannot merge nil default options", function()
+      assert.has_error(function() addon:MergeOptionsTable(nil, {}) end)
+    end)
+    it("cannot merge non-table default options", function()
+      assert.has_error(function() addon:MergeOptionsTable("non-table", {}) end)
+    end)
+    it("cannot merge non-table custom options", function()
+      assert.has_error(function() addon:MergeOptionsTable({}, "non-table") end)
+    end)
+  end)
+
   describe("DistinctSet", function()
     it("can create a set from a table", function()
       local expected = {

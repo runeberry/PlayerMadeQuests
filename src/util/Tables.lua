@@ -99,6 +99,20 @@ function addon:MergeTable(t1, t2, circ)
   return merged
 end
 
+--- Extension of MergeOptions that will return a copy of defaultOptions
+--- if the provided customOptions is nil
+function addon:MergeOptionsTable(defaultOptions, customOptions)
+  assert(defaultOptions ~= nil, "MergeOptionsTable: defaultOptions cannot be nil")
+  assert(type(defaultOptions) == "table", "MergeOptionsTable: defaultOptions must be a table, got type "..type(defaultOptions))
+
+  if customOptions then
+    assert(type(customOptions) == "table", "MergeOptionsTable: customOptions must be a table, got type "..type(customOptions))
+    return addon:MergeTable(defaultOptions, customOptions)
+  else
+    return addon:CopyTable(defaultOptions)
+  end
+end
+
 function addon:DistinctSet(t)
   if t == nil then error("Cannot create a set from a nil table") end
   local set, i = {}, 0
