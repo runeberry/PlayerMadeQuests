@@ -62,6 +62,8 @@ local function parseInstantInfo(id, item)
 end
 
 local function getItem(id)
+  -- todo: item lookups by name are very inconsistent
+  -- seems like you need to have encountered an item before a name lookup will work
   local cached = cache[id]
   if cached and cached.full then
     -- Full item info is available, return now
