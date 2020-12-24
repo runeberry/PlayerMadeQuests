@@ -247,6 +247,47 @@ describe("Tables", function()
     end)
   end)
 
+  describe("ApplyMethods", function()
+    it("can apply methods to an object", function()
+      local obj = {
+        Value = 1,
+      }
+      local methods = {
+        Property = 3,
+        ["DoThing"] = function() end,
+        ["DoOtherThing"] = function() end,
+      }
+
+      addon:ApplyMethods(obj, methods)
+
+      assert.equals(methods.DoThing, obj.DoThing)
+      assert.equals(methods.DoOtherThing, obj.DoOtherThing)
+      assert.is_nil(obj.Property)
+    end)
+    it("cannot overwrite methods on an object without force", function()
+      local obj = {
+        ["DoThing"] = function() end,
+      }
+      local methods = {
+        ["DoThing"] = function() end,
+      }
+
+      assert.has_error(function() addon:ApplyMethods(obj, methods) end)
+    end)
+    it("can overwrite methods on an object with force", function()
+      local obj = {
+        ["DoThing"] = function() end,
+      }
+      local methods = {
+        ["DoThing"] = function() end,
+      }
+
+      addon:ApplyMethods(obj, methods, true)
+
+      assert.equals(methods.DoThing, obj.DoThing)
+    end)
+  end)
+
   describe("DistinctSet", function()
     it("can create a set from a table", function()
       local expected = {
