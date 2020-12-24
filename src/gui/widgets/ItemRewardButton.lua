@@ -74,9 +74,7 @@ function widget:Create(parent, options)
   -- This will add tooltip methods and scripts to the frame
   addon:AttachTooltip(frame)
 
-  for fname, fn in pairs(methods) do
-    frame[fname] = fn
-  end
+  addon:ApplyMethods(frame, methods)
 
   return frame
 end

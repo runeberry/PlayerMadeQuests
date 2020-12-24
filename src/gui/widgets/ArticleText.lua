@@ -102,9 +102,7 @@ function widget:Create(parent, textinfo)
   frame.textStyles = {}
   frame.text = {}
 
-  for name, method in pairs(methods) do
-    frame[name] = method
-  end
+  addon:ApplyMethods(frame, methods)
 
   frame:SetTextStyle("default")
   frame:SetPageStyle()

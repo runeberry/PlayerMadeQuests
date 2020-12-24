@@ -104,9 +104,7 @@ local attachScripts = {
 function addon:AttachTooltip(frame)
   assert(type(frame) == "table", "A frame must be defined when attaching a tooltip")
 
-  for fname, fn in pairs(methods) do
-    frame[fname] = fn
-  end
+  addon:ApplyMethods(frame, methods)
 
   frame:EnableMouse(true)
   for event, fn in pairs(attachScripts) do

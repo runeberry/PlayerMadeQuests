@@ -263,9 +263,7 @@ function widget:Create(parent, colInfo, datasource)
   frame._subscriptions = {}
   frame._scrollingTable = st
 
-  for name, method in pairs(methods) do
-    frame[name] = method
-  end
+  addon:ApplyMethods(frame, methods)
 
   local resize = function() frame:RefreshColumns() end
   frame:SetScript("OnShow", resize)

@@ -80,9 +80,7 @@ local methods = {
 function widget:Create(parent)
   local frame = CreateFrame("Frame", nil, parent)
 
-  for fname, fn in pairs(methods) do
-    frame[fname] = fn
-  end
+  addon:ApplyMethods(frame, methods)
 
   frame._itemRewardButtons = {}
 

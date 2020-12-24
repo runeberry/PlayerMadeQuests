@@ -201,9 +201,7 @@ function addon.QuestEngine:NewCheckpoint(name)
     conditions = {},
   }
 
-  for fname, fn in pairs(methods) do
-    checkpoint[fname] = fn
-  end
+  addon:ApplyMethods(checkpoint, methods)
 
   addon.QuestEngine:AddDefinition("checkpoints", name, checkpoint)
   return checkpoint

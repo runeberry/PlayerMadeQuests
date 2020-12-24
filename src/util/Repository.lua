@@ -598,9 +598,7 @@ function addon:NewRepository(name, pkey)
     }
   }
 
-  for methodName, func in pairs(methods) do
-    repo[methodName] = func
-  end
+  addon:ApplyMethods(repo, methods)
 
   repo:AddIndex(repo.pkey, {
     unique = true,

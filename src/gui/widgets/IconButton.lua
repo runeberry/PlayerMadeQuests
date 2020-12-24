@@ -111,9 +111,7 @@ function widget:Create(parent, options)
   button._options = options
   button:SetSize(options.width, options.height)
 
-  for fname, fn in pairs(methods) do
-    button[fname] = fn
-  end
+  addon:ApplyMethods(button, methods)
 
   for fname, fn in pairs(scripts) do
     button:SetScript(fname, fn)

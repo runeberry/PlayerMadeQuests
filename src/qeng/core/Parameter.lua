@@ -186,9 +186,7 @@ function addon.QuestEngine:NewParameter(name)
     options = {},
   }
 
-  for fname, fn in pairs(methods) do
-    parameter[fname] = fn
-  end
+  addon:ApplyMethods(parameter, methods)
 
   addon.QuestEngine:AddDefinition("parameters", name, parameter)
   return parameter

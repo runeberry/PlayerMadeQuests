@@ -78,9 +78,7 @@ function widget:Create(parent, options)
   frame._frames = {}
   frame._options = options
 
-  for fname, fn in pairs(methods) do
-    frame[fname] = fn
-  end
+  addon:ApplyMethods(frame, methods)
 
   return frame
 end

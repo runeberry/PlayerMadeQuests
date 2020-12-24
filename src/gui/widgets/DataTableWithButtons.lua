@@ -74,9 +74,7 @@ function widget:Create(frame, options)
     end
   end
 
-  for fname, fn in pairs(methods) do
-    container[fname] = fn
-  end
+  addon:ApplyMethods(container, methods)
 
   container._buttons = options.buttons
   container._buttonPane = buttonPane

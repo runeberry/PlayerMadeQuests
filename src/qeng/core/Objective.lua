@@ -129,9 +129,8 @@ function addon.QuestEngine:NewObjective(name)
   objective.events = {}
   objective.onQuestStart = false
 
-  for fname, fn in pairs(methods) do
-    objective[fname] = fn
-  end
+  -- OK to overwrite base methods
+  addon:ApplyMethods(objective, methods, true)
 
   addon.QuestEngine:AddDefinition("objectives", name, objective)
   return objective

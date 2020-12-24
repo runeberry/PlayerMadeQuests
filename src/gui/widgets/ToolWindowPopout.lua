@@ -51,9 +51,8 @@ function widget:Create(frameName, options)
 
   addon:SetBorderBoxTexture(frame)
 
-  for fname, fn in pairs(methods) do
-    frame[fname] = fn
-  end
+  -- OK to overwrite base methods here
+  addon:ApplyMethods(frame, methods, true)
 
   return frame
 end
