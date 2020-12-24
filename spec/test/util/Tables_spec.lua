@@ -272,7 +272,9 @@ describe("Tables", function()
         ["DoThing"] = function() end,
       }
 
-      assert.has_error(function() addon:ApplyMethods(obj, methods) end)
+      addon:ApplyMethods(obj, methods)
+
+      assert.not_equals(methods.DoThing, obj.DoThing)
     end)
     it("can overwrite methods on an object with force", function()
       local obj = {
