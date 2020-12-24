@@ -100,17 +100,24 @@ function addon:MergeTable(t1, t2, circ)
 end
 
 --- Extension of MergeOptions that will return a copy of defaultOptions
---- if the provided customOptions is nil
-function addon:MergeOptionsTable(defaultOptions, customOptions)
+--- if there are no custom options provided.
+function addon:MergeOptionsTable(defaultOptions, ...)
   assert(defaultOptions ~= nil, "MergeOptionsTable: defaultOptions cannot be nil")
   assert(type(defaultOptions) == "table", "MergeOptionsTable: defaultOptions must be a table, got type "..type(defaultOptions))
 
-  if customOptions then
-    assert(type(customOptions) == "table", "MergeOptionsTable: customOptions must be a table, got type "..type(customOptions))
-    return addon:MergeTable(defaultOptions, customOptions)
+  local customOptionsTables = { ... }
+  local merged = defaultOptions
+
+  if #customOptionsTables == 0 then
+    merged = addon:CopyTable(defaultOptions)
   else
-    return addon:CopyTable(defaultOptions)
+    for _, customOptions in ipairs(customOptionsTables) do
+      assert(type(customOptions) == "table", "MergeOptionsTable: customOptions must be a table, got type "..type(customOptions))
+      merged = addon:MergeTable(merged, customOptions)
+    end
   end
+
+  return merged
 end
 
 --- Copies a table of methods to an object

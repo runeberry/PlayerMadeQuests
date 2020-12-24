@@ -225,6 +225,27 @@ describe("Tables", function()
       assert.equals(customOptions.v2, merged.v2)
       assert.equals(customOptions.v3, merged.v3)
     end)
+    it("can merge multiple options tables", function()
+      local defaultOptions = {
+        v1 = "v1",
+        v2 = "v2",
+      }
+      local customOptions1 = {
+        v2 = "custom-v2",
+        v3 = "custom-v3",
+      }
+      local customOptions2 = {
+        v3 = "super-custom-v3",
+        v4 = "super-custom-v4",
+      }
+
+      local merged = addon:MergeOptionsTable(defaultOptions, customOptions1, customOptions2)
+
+      assert.equals(defaultOptions.v1, merged.v1)
+      assert.equals(customOptions1.v2, merged.v2)
+      assert.equals(customOptions2.v3, merged.v3)
+      assert.equals(customOptions2.v4, merged.v4)
+    end)
     it("can copy default options if no custom options provided", function()
       local defaultOptions = {
         v1 = "v1",
