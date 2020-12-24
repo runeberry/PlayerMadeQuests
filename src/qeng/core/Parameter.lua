@@ -81,11 +81,7 @@ local methods = {
   --- @param options table - options specific to this Parameter
   ["Validate"] = function(self, rawValue, options)
     -- Values on options take priority over values on self
-    if options then
-      options = addon:MergeTable(self.options, options)
-    else
-      options = self.options
-    end
+    options = addon:MergeOptionsTable(self.options, options)
 
     -- First, check if the value is nil. If the value is not required, we can safely return now, there is nothing to validate.
     -- But if the value is required, then nil is immediately invalid.

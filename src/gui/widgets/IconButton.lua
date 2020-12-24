@@ -101,11 +101,7 @@ local scripts = {
 }
 
 function widget:Create(parent, options)
-  if options then
-    options = addon:MergeTable(defaultOptions, options)
-  else
-    options = addon:CopyTable(defaultOptions)
-  end
+  options = addon:MergeOptionsTable(defaultOptions, options)
 
   local button = CreateFrame("Button", nil, parent)
   button._options = options

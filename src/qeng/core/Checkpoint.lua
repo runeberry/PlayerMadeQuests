@@ -76,11 +76,7 @@ local methods = {
   --- Adds a parameter that can be used with any instance of this checkpoint.
   --- For example: "goal" or "text".
   ["AddParameter"] = function(self, name, options)
-    if options then
-      options = addon:MergeTable(defaultParameterOptions, options)
-    else
-      options = addon:CopyTable(defaultParameterOptions)
-    end
+    options = addon:MergeOptionsTable(defaultParameterOptions, options)
     options.name = name
     self.parameters[name] = options
   end,

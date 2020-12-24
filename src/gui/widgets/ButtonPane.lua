@@ -21,11 +21,7 @@ local function bp_AddButton(self, text, onClick, options)
   text = text or defaultButtonText
   onClick = onClick or function() end
 
-  if options then
-    options = addon:MergeTable(defaultButtonOptions, options)
-  else
-    options = defaultButtonOptions
-  end
+  options = addon:MergeOptionsTable(defaultButtonOptions, options)
 
   if not options.anchor then
     if self._isVertical then
