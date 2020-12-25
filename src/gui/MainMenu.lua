@@ -39,7 +39,7 @@ addon.MainMenu:SetScript("OnShow", function()
 end)
 
 -- Make closable with ESC
-local mmfGlobalName = "PMQ_MainMenuFrame"
+local mmfGlobalName = addon:CreateGlobalName("MainMenuFrame")
 _G[mmfGlobalName] = addon.MainMenu
 table.insert(UISpecialFrames, mmfGlobalName)
 

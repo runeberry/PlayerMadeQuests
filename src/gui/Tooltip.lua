@@ -9,7 +9,7 @@ local tooltipCancelToken
 
 addon:OnGuiReady(function()
   tooltip = GameTooltip
-  -- tooltip = CreateFrame("GameTooltip", "PMQ_CustomTooltip", nil, "GameTooltipTemplate")
+  -- tooltip = CreateFrame("GameTooltip", addon:CreateGlobalName("CustomTooltip"), nil, "GameTooltipTemplate")
 end)
 
 local methods = {

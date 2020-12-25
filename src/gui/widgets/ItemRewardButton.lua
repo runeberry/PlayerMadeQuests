@@ -54,7 +54,7 @@ function widget:Create(parent, options)
   end
 
   -- Frame name is required for tooltips (I think)
-  local name = addon:CreateID("PMQ_ItemRewardButton_%i")
+  local name = addon:CreateGlobalName("ItemRewardButton_%i")
   local frame = CreateFrame("Button", name, parent, template)
 
   -- IconBorder and IconOverlay are unfortunately required by the Set* global functions

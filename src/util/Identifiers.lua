@@ -15,7 +15,7 @@ end
 local globalNames = {}
 --- Creates a unique, incrementing global variable name given a partial name
 function addon:CreateGlobalName(str)
-  assert(type(str) == "string", "CreateFrameName: a string name must be provided")
+  assert(type(str) == "string", "CreateGlobalName: a string name must be provided")
 
   local count = (globalNames[str] or 0) + 1
   globalNames[str] = count

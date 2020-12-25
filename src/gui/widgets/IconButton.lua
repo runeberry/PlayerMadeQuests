@@ -7,7 +7,8 @@ local tooltip
 local tooltipDelay = 0.5
 local tooltipCancelToken
 addon:OnGuiReady(function()
-  tooltip = CreateFrame("GameTooltip", "PMQ_MenuIconTooltip", nil, "GameTooltipTemplate")
+  -- todo: this shouldn't be using a custom tooltip, see ItemRewardButton for better approach
+  tooltip = CreateFrame("GameTooltip", addon:CreateGlobalName("MenuIconTooltip"), nil, "GameTooltipTemplate")
 end)
 
 local tileTextureName = "MenuIcons"

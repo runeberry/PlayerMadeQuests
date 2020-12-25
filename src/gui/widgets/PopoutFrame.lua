@@ -112,9 +112,7 @@ local methods = {
 }
 
 function widget:Create(frameName, options)
-  assert(type(frameName) == "string", "Failed to create PopoutFrame: name is required")
-
-  frameName = "PMQ_"..frameName -- Add prefix to avoid global collisions
+  frameName = addon:CreateGlobalName(frameName or "PopoutFrame_%i")
   options = options or {}
 
   local style = options.style or "default"

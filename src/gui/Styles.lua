@@ -53,7 +53,7 @@ function addon:ApplyBackgroundStyle(frame)
 end
 
 function addon:CreateScrollFrame(parent)
-  local sfid = addon:CreateID("PMQ_ScrollFrame%i")
+  local sfid = addon:CreateGlobalName("ScrollFrame")
   local scrollFrame = CreateFrame("ScrollFrame", sfid, parent, "UIPanelScrollFrameTemplate")
   local scrollBar = _G[sfid.."ScrollBar"]
   local scrollBarFrame = CreateFrame("Frame", nil, parent)
