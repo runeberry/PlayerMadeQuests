@@ -1,6 +1,6 @@
 local _, addon = ...
-local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
-local strsplit, strjoin = addon.G.strsplit, addon.G.strjoin
+local CreateFrame = addon.G.CreateFrame
+local asserttype = addon.asserttype
 
 local backdrop = {
 	bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
@@ -133,4 +133,62 @@ function addon:SetBorderBoxTexture(frame)
   right:SetTexCoord(0.1171875, 0.2421875, 0, 1)
 
   return frame
+end
+
+--[[
+  Schema: (all fields are optional and operate independently)
+    width: number
+    minWidth: number
+    maxWidth: number
+    height: number
+    minHeight: number
+    maxHeight: number
+--]]
+--- Resizes the frame to the provided boundaries
+function addon:ResizeFrame(frame, options)
+  asserttype(frame, "table", "frame", "ResizeFrame")
+  asserttype(options, "table", "options", "ResizeFrame")
+
+  local width, height = frame:GetWidth(), frame:GetHeight()
+
+  if options.width then
+    asserttype(options.width, "number", "options.width", "ResizeFrame")
+    width = options.width
+  end
+
+  if options.minWidth then
+    asserttype(options.minWidth, "number", "options.minWidth", "ResizeFrame")
+    if width < options.minWidth then
+      width = options.minWidth
+    end
+  end
+
+  if options.maxWidth then
+    asserttype(options.maxWidth, "number", "options.maxWidth", "ResizeFrame")
+    if width > options.maxWidth then
+      width = options.maxWidth
+    end
+  end
+
+  if options.height then
+    asserttype(options.height, "number", "options.height", "ResizeFrame")
+    height = options.height
+  end
+
+  if options.minHeight then
+    asserttype(options.minHeight, "number", "options.minHeight", "ResizeFrame")
+    if height < options.minHeight then
+      height = options.minHeight
+    end
+  end
+
+  if options.maxHeight then
+    asserttype(options.maxHeight, "number", "options.maxHeight", "ResizeFrame")
+    if height > options.maxHeight then
+      height = options.maxHeight
+    end
+  end
+
+  frame:SetSize(width, height)
+  addon.UILogger:Trace("ResizeFrame: %i x %i", width, height)
 end
