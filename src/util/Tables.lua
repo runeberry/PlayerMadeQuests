@@ -130,7 +130,7 @@ function addon:ApplyMethods(obj, methods, force)
   for fname, fn in pairs(methods) do
     if type(fname) == "string" and type(fn) == "function" then
       if not force and obj[fname] ~= nil then
-        addon.Logger:Error("ApplyMethods: method name '%s' is already taken on this object", fname)
+        addon.Logger:Error("ApplyMethods: '%s' is already a method on this object", fname)
       else
         obj[fname] = fn
       end
