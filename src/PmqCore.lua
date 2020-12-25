@@ -34,3 +34,18 @@ end
 function addon.assertf(bool, msg, ...)
   assert(bool, string.format(msg, ...))
 end
+
+--- Asserts that the provided value is of the specified type
+function addon.asserttype(value, vartype, varname, fname)
+  if type(value) ~= vartype then
+    local message
+    if value == nil then
+      message = string.format("%s: %s must not be nil",
+        fname or "Function", varname or "value")
+    else
+      message = string.format("%s: expected %s to be type %s, but got type %s",
+        fname or "Function", varname or "value", vartype, type(value))
+    end
+    error(message, 2)
+  end
+end
