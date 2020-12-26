@@ -55,7 +55,7 @@ local methods = {
       self:Hide()
     end
 
-    addon.UILogger:Trace("Set %s state: %s %s (%.2f, %.2f) %ix%i (%s)", self:GetName(), pos.p1, pos.p2, pos.x, pos.y, pos.w, pos.h, pos.shown)
+    addon.UILogger:Trace("Set %s state: %s %s (%.2f, %.2f) %ix%i (%s)", self:GetName(), pos.p1, pos.p2, pos.x, pos.y, pos.w, pos.h, tostring(pos.shown))
   end,
   ["ResetWindowState"] = function(self)
     if self._options.position then
