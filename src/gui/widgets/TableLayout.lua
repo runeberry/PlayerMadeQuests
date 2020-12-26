@@ -3,18 +3,38 @@ local CreateFrame = addon.G.CreateFrame
 
 local widget = addon.CustomWidgets:NewWidget("TableLayout")
 
+--[[
+  Resizing rules: (these were just random thoughts, they are not actually implemented)
+    1. A TableLayout (+ margins) must not exceed the height or width of its parent container.
+       RESOLVE: Shrink the TableLayout to fit inside the parent container.
+
+    2. A Row must not exceed the height or width of the TableLayout (- margins).
+       RESOLVE: Shrink the Row to fit inside the TableLayout.
+    3. The sum of all Rows (+ spacing) must not exceed the height of the TableLayout (- margins).
+       RESOLVE: Truncate overflow
+          3.1. Set the height of all Rows to (minHeight). Remaining space (RS) = TableLayout height - (Row minHeight * #Rows) - (y-spacing * (#Rows - 1))
+          3.2. Set the height of a Row to the height of its tallest Frame. RS = RS - Row height
+          3.3. While RS > 0, repeat Step 3.2 with the next Row.
+
+    4. The sum of all Frames in a Row (+ spacing) must not exceed the width of the TableLayout.
+       RESOLVE: Truncate overflow
+          4.1. Set the width of all Frames to (minWidth). Remaining space (RS) = TableLayout width - (Frame minWidth * #Frames) - (x-spacing * (#Frames - 1))
+          4.2. Set the width of a Frame
+--]]
+
 local defaultOptions = {
-  margins = 0, -- Format: number or { l, r, t, b }
-  spacing = 0, -- Format: number or { x, y }
-  -- Unless overridden, a table will automatically resize to fit its content
-  width = "auto",
-  height = "auto",
+  margins = 0,        -- number or { l, r, t, b }
+  spacing = 0,        -- number or { x, y }
+  width = "auto",     -- number or "auto" (width of widest row)
+  height = "auto",    -- number or "auto" (height of all rows)
 }
 
+-- Overrides table-level width/height options, but can be overridden by row-specific options
 local defaultRowOptions = {
-  -- Overrides table-level width/height options, but can be overridden by row-specific options
-  width = "auto",
-  height = "auto",
+  margins = nil,      -- inherit, N/A to rows
+  spacing = nil,      -- inherit
+  width = "auto",     -- number or "auto" (width of all items)
+  height = "auto",    -- number or "auto" (height of tallest item)
 }
 
 local rowMethods = {
@@ -48,46 +68,68 @@ local rowMethods = {
     assert(frame, "GetFrame: no frame at index: "..tostring(index))
     return frame
   end,
+  ["ClearAllFrames"] = function(self)
+    for _, frame in ipairs(self._frames) do
+      frame:ClearAllPoints(true)
+    end
+    self._frames = {}
+  end,
   --- Resizes the row to fit its current content
   ["Refresh"] = function(self)
+
     local options = self._options
 
-    local sx, sy = addon:UnpackXY(options.spacing)
-
-    if options.width == "auto" then
-      -- Set the row width to the combined width of all frames
-      local width = 0
-      for _, frame in ipairs(self._frames) do
-        width = width + frame:GetWidth()
-      end
-      -- Account for horizontal spacing between frames
-      width = width + sx
-      self:SetWidth(width)
-    elseif type(options.width) == "number" then
-      -- Width can be set to a static numeric value
-      self:SetWidth(options.width)
-    end
+    local targetHeight
 
     if options.height == "auto" then
       -- Set the row height to the height of the tallest frame
-      local height = 0
+      targetHeight = 0
       for _, frame in ipairs(self._frames) do
-        height = math.max(height, frame:GetHeight())
+        targetHeight = math.max(targetHeight, frame:GetHeight())
       end
-      self:SetHeight(height)
     elseif type(options.height) == "number" then
       -- Height can be set to a static numeric value
-      self:SetHeight(options.height)
+      targetHeight = options.height
     end
+
+    local resizeOptions = {
+      width = self._container:GetWidth(),
+      height = targetHeight,
+    }
+
+    addon:ResizeFrame(self, resizeOptions)
   end
 }
+
+local rowFrameCache = {}
+local function getOrCreateRowFrame(tableFrame, index)
+  local rowName = string.format("%s_Row_%i", tableFrame:GetName(), index)
+  local row = rowFrameCache[rowName]
+
+  if not row then
+    row = CreateFrame("Frame", rowName, tableFrame)
+
+    addon:ApplyMethods(row, rowMethods)
+
+    row._frames = {}
+    row._table = tableFrame
+    row._container = tableFrame._container
+
+    rowFrameCache[rowName] = row
+  end
+
+  return row
+end
 
 local methods = {
   ["AddRow"] = function(self, options)
     options = addon:MergeOptionsTable(self._options, defaultRowOptions, options)
 
-    local row = CreateFrame("Frame", nil, self)
     local rowIndex = #self._rows+1
+    local row = getOrCreateRowFrame(self, rowIndex)
+    row:SetWidth(self:GetWidth()) -- Row always fills the width of its table
+    row._options = options
+
     self._rows[rowIndex] = row
 
     -- Table grows from TOPLEFT to BOTTOMRIGHT
@@ -104,12 +146,6 @@ local methods = {
       row:SetPoint("TOPRIGHT", prev, "BOTTOMRIGHT", 0, -1*y)
     end
 
-    row._options = options
-    row._frames = {}
-    row._table = self
-
-    addon:ApplyMethods(row, rowMethods)
-
     return row
   end,
   ["GetRow"] = function(self, index)
@@ -117,55 +153,71 @@ local methods = {
     assert(row, "GetRow: no row at index "..tostring(index))
     return row
   end,
+  ["ClearAllRows"] = function(self)
+    for _, row in ipairs(self._rows) do
+      row:ClearAllFrames()
+      row:Refresh()
+      row:ClearAllPoints(true)
+    end
+    self._rows = {}
+  end,
   --- Resizes the frame to fit its current content
   ["Refresh"] = function(self)
-    local options = self._options
-
     -- Start by refreshing the size of all rows
     for _, row in ipairs(self._rows) do
       row:Refresh()
     end
 
+    local options = self._options
     local ml, mr, mt, mb = addon:UnpackLRTB(options.margins)
     local sx, sy = addon:UnpackXY(options.spacing)
+    local targetWidth, targetHeight
 
     if options.width == "auto" then
       -- Set the table width to the width of the widest row
-      local width = 0
+      targetWidth = 0
       for _, row in ipairs(self._rows) do
-        width = math.max(width, row:GetWidth())
+        targetWidth = math.max(targetWidth, row:GetWidth())
       end
       -- Account for left/right margins
-      width = width + ml + mr
-      self:SetWidth(width)
+      targetWidth = targetWidth + ml + mr
     elseif type(options.width) == "number" then
       -- Width can be set to a static numeric value
-      self:SetWidth(options.width)
+      targetWidth = options.width
     end
 
     if options.height == "auto" then
       -- Set the height to combined height of all rows
-      local height = 0
+      targetHeight = 0
       for _, row in ipairs(self._rows) do
-        height = height + row:GetHeight()
+        targetHeight = targetHeight + row:GetHeight()
       end
       -- Account for row spacing and top/bottom margins
-      height = height + mt + mb + (math.max(0, #self._rows-1) * sy)
-      self:SetHeight(height)
+      targetHeight = targetHeight + mt + mb + (math.max(0, #self._rows-1) * sy)
     elseif type(options.height) == "number" then
       -- Height can be set to a static numeric value
-      self:SetHeight(options.height)
+      targetHeight = options.height
     end
+
+    local resizeOptions = {
+      width = targetWidth,
+      height = targetHeight,
+      maxWidth = self._container:GetWidth(),
+      maxHeight = self._container:GetHeight(),
+    }
+
+    addon:ResizeFrame(self, resizeOptions)
   end,
 }
 
 function widget:Create(parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
 
-  local frame = CreateFrame("Frame", nil, parent)
+  local frame = CreateFrame("Frame", addon:CreateGlobalName("TableLayout_%i"), parent)
 
   frame._options = options
   frame._rows = {}
+  frame._container = parent -- Dimensions of the layout will be bounded to this frame
 
   addon:ApplyMethods(frame, methods)
 
