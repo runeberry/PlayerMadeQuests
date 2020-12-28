@@ -143,7 +143,7 @@ local methods = {
     end
 
     if validationError then
-      error(validationError)
+      error(validationError, 0)
     end
 
     return rawValue
