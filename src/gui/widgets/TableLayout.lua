@@ -215,6 +215,12 @@ local methods = {
   end,
 }
 
+local scripts = {
+  ["OnShow"] = function(self)
+    self:Refresh()
+  end,
+}
+
 function widget:Create(parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
 
@@ -225,6 +231,10 @@ function widget:Create(parent, options)
   frame._container = parent -- Dimensions of the layout will be bounded to this frame
 
   addon:ApplyMethods(frame, methods)
+
+  for event, handler in pairs(scripts) do
+    frame:SetScript(event, handler)
+  end
 
   return frame
 end
