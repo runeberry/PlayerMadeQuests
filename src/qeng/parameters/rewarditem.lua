@@ -11,7 +11,22 @@ local parameter = addon.QuestEngine:NewParameter(addon.QuestScriptTokens.PARAM_R
 parameter:AllowType("number", "string", "table")
 parameter:AllowMultiple(true)
 
+local function extractQuantity(idOrName, quantity)
+  if type(idOrName) == "string" and not quantity then
+    -- Check if the first word is a number, and treat it as a quantity
+    local words = addon:SplitWords(idOrName)
+    quantity = tonumber(words[1])
+    if quantity then
+      table.remove(words, 1)
+      idOrName = table.concat(words, " ")
+    end
+  end
+  return idOrName, quantity
+end
+
 local function validateItem(idOrName)
+  idOrName = extractQuantity(idOrName)
+
   if not idOrName then
     return false, "Reward item id or name must be specified"
   end
@@ -25,6 +40,8 @@ local function validateItem(idOrName)
 end
 
 local function parseItem(idOrName, quantity)
+  idOrName, quantity = extractQuantity(idOrName, quantity)
+
   local item = addon:LookupItem(idOrName)
 
   return {
