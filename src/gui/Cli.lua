@@ -127,7 +127,7 @@ handlers = {
     local item = addon:LookupItemSafe(idOrName)
 
     if item then
-      addon.Logger:Warn("Item found: %s (%i)", item.link or item.name, item.id)
+      addon.Logger:Warn("Item found: %s (%s)", tostring(item.link or item.name), tostring(item.id))
     else
       addon.Logger:Warn("No item found with id or name: %s", idOrName)
     end
