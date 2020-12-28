@@ -51,7 +51,7 @@ local contentSectionTemplates = {
     Populate = nil,
     Clear = nil,
   },
-  ["FontString"] = {
+  ["Text"] = {
     Build = function(self, parent)
       local fs = parent:CreateFontString(addon:CreateGlobalName("QuestInfoFrame_"..self.Name.."_Text"), "BACKGROUND", self.Font)
       fs:SetJustifyH("LEFT")
@@ -77,7 +77,7 @@ local contentSectionTemplates = {
     Text = nil,
   },
   ["Header"] = {
-    Template = "FontString",
+    Template = "Text",
     Font = "QuestTitleFont",
   },
 
@@ -95,13 +95,13 @@ local contentSectionTemplates = {
     Text = "Description",
   },
   ["Description"] = {
-    Template = "FontString",
+    Template = "Text",
     Text = function(self, quest)
       return addon:PopulateText(quest.description or " ")
     end,
   },
   ["Completion"] = {
-    Template = "FontString",
+    Template = "Text",
     Text = function(self, quest)
       return addon:PopulateText(quest.completion or quest.description or " ")
     end,
@@ -111,7 +111,7 @@ local contentSectionTemplates = {
     Text = "Objectives",
   },
   ["Objectives"] = {
-    Template = "FontString",
+    Template = "Text",
     Text = function(self, quest)
       local objString = ""
       for _, obj in ipairs(quest.objectives) do
@@ -128,7 +128,7 @@ local contentSectionTemplates = {
     Text = "Requirements",
   },
   ["Requirements"] = {
-    Template = "FontString",
+    Template = "Text",
     Text = function(self, quest)
       local recString = ""
       if quest.required and quest.required.conditions then
@@ -152,7 +152,7 @@ local contentSectionTemplates = {
     Text = "Rewards",
   },
   ["RewardGiver"] = {
-    Template = "FontString",
+    Template = "Text",
     Text = function(self, quest)
       return addon:GetCheckpointDisplayText(quest.rewards, "quest")
     end,
@@ -161,7 +161,7 @@ local contentSectionTemplates = {
     end,
   },
   ["RewardMoney"] = {
-    Template = "FontString",
+    Template = "Text",
     Text = function(self, quest)
       local coinText = GetCoinTextureString(quest.rewards.parameters.rewardmoney)
       return "You will receive: "..coinText
@@ -198,7 +198,7 @@ local contentSectionTemplates = {
     Text = "Getting Started",
   },
   ["StartCondition"] = {
-    Template = "FontString",
+    Template = "Text",
     Text = function(self, quest)
       return addon:GetCheckpointDisplayText(quest.start, "quest").."\n"
     end,
@@ -211,7 +211,7 @@ local contentSectionTemplates = {
     Text = "Finishing Up",
   },
   ["CompleteCondition"] = {
-    Template = "FontString",
+    Template = "Text",
     Text = function(self, quest)
       return addon:GetCheckpointDisplayText(quest.complete, "quest").."\n"
     end,
