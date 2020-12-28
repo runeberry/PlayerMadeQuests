@@ -190,5 +190,5 @@ function addon:ResizeFrame(frame, options)
   end
 
   frame:SetSize(width, height)
-  addon.UILogger:Trace("ResizeFrame: %i x %i", width, height)
+  -- addon.UILogger:Trace("ResizeFrame: %i x %i", width, height)
 end
