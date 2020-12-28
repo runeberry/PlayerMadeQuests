@@ -133,4 +133,10 @@ handlers = {
       addon.Logger:Warn("No item found with id or name: %s", idOrName)
     end
   end,
+  ["scan-items"] = function(min, max)
+    addon:ScanItems(min, max)
+  end,
+  ["clear-items"] = function()
+    addon:ClearItemCache()
+  end,
 }

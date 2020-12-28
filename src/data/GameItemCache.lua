@@ -5,7 +5,8 @@ local asserttype = addon.asserttype
 addon.GameItemCache = addon:NewRepository("GameItem", "name")
 addon.GameItemCache:SetSaveDataSource("GameItemCache")
 addon.GameItemCache:EnableWrite(true)
-addon.GameItemCache:EnableCompression(true)
+addon.GameItemCache:EnableDirectRead(true)
+addon.GameItemCache:EnableCompression(false)
 addon.GameItemCache:EnableGlobalSaveData(true)
 
 function addon.GameItemCache:FindItemID(itemName)

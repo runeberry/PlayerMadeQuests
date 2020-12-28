@@ -3,8 +3,7 @@ local logger = addon.Logger:NewLogger("Items")
 local GameItemCache = addon.GameItemCache
 local GetItemInfo, GetItemInfoInstant = addon.G.GetItemInfo, addon.G.GetItemInfoInstant
 
--- Keep a cache of all known item information as it's requested
-local cache = {}
+-- Keep track of every handler that's waiting on item info to be available
 local itemInfoSubscribers = {}
 
 --- Returns either the itemId as a number, or the all-lowercase item name
@@ -90,13 +89,6 @@ local function getItem(idOrName)
     itemId = GameItemCache:FindItemID(itemName)
   end
 
-  local cached = cache[itemId]
-  if cached and cached.full then
-    -- Full item info is available, return now
-    addon.AppEvents:Publish("ItemInfoAvailable", cached)
-    return cached
-  end
-
   local item = {}
 
   local instant = parseInstantInfo(itemId or itemName, item)
@@ -104,10 +96,6 @@ local function getItem(idOrName)
 
   local full = parseFullInfo(itemId or itemName, item)
   if full then
-    -- Full item info is available, cache the response
-    cache[item.id] = item
-
-    logger:Trace("Item cached: %s (%i)", item.name, item.id)
     addon.AppEvents:Publish("ItemInfoAvailable", item)
   end
 
@@ -116,7 +104,6 @@ end
 
 --- Empties all cached items from this session
 function addon:ClearItemCache()
-  cache = {}
   GameItemCache:DeleteAll()
   logger:Debug("Item cache cleared")
 end
@@ -168,6 +155,88 @@ function addon:LookupItemAsync(idOrName, handler)
   end
 
   return item
+end
+
+local scanData
+
+--- Scans for ALL items by ID by simply starting at ID 1 and counting up.
+--- Performs only request one item at a time - doesn't start looking up the next item
+--- until the current async request has finished.
+function addon:ScanItems(min, max)
+  if scanData then
+    addon.Logger:Warn("Scan already in progress: currently on %i (%i items found)", scanData.id, scanData.total)
+    return
+  end
+
+  -- This default max is based on a query from: https://wow-query.dev/
+  -- The actual max for classic seems to be somewhere around 25000
+  local maxPossibleItemId = 184843
+
+  min = addon:ConvertValue(min or 1, "number")
+  max = addon:ConvertValue(max or maxPossibleItemId, "number")
+  assert(min and max, "A valid min and max value must be provided")
+
+  scanData = {
+    total = 0,
+    timeoutTotal = 0,
+    min = min,
+    max = max,
+    id = min - 1,
+  }
+
+  addon.Logger:Warn("Beginning item scan - /reload to cancel...")
+
+  local lookupNextItem
+  local timeoutHandlerId
+  local logInterval = addon.Config:GetValue("ITEM_SCAN_LOG_INTERVAL")
+  local asyncTimeout = addon.Config:GetValue("ITEM_SCAN_TIMEOUT")
+
+  if logInterval < 1 then logInterval = maxPossibleItemId end
+
+  local function handleItem(item)
+    -- Cancel any timeout handlers because... it didn't timeout!
+    addon.Ace:CancelTimer(timeoutHandlerId)
+    timeoutHandlerId = nil
+
+    -- Resume scanning now that we're positive the item has been fully defined (and therefore cached)
+    scanData.total = scanData.total + 1
+    if scanData.total % logInterval == 0 then
+      addon.Logger:Warn("Scanning items, %i found...", scanData.total, scanData.timeoutTotal)
+    end
+    lookupNextItem(item.id)
+  end
+
+  lookupNextItem = function(id)
+    if not id then
+      addon.Logger:Warn("Stopping scan: itemId is nil")
+    else
+      while id < scanData.max do
+        id = id + 1
+        scanData.id = id -- for logging only
+        if addon:LookupItemAsync(id, handleItem) then
+          -- Found a real item (stub), stop scanning until it's fully available
+          logger:Trace("Scanning for item: %i", id)
+          timeoutHandlerId = addon.Ace:ScheduleTimer(function()
+            logger:Trace("Item lookup timed out: %i", id)
+            timeoutHandlerId = nil
+            scanData.timeoutTotal = scanData.timeoutTotal + 1
+
+            -- If the item timed out, remove the subscriber from memory...
+            itemInfoSubscribers[id] = nil
+            -- ...and move on to the next item
+            lookupNextItem(id)
+          end, asyncTimeout)
+          return
+        end
+      end
+    end
+
+    addon.Logger:Warn("Item scan finished: %i items found (%i timed out).", scanData.total, scanData.timeoutTotal)
+    scanData = nil
+  end
+
+  -- Kick off the scan!
+  lookupNextItem(scanData.id)
 end
 
 addon.GameEvents:Subscribe("GET_ITEM_INFO_RECEIVED", function(itemId, success)
