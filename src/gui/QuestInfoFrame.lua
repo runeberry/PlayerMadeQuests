@@ -208,7 +208,7 @@ local frameMethods = {
         addon:PlaySound(mode.sound)
       end
 
-      self:Show()
+      -- self:Show() -- moved to subscriber below
     end)
   end,
   ["IsShowingQuest"] = function(self, quest)
@@ -316,11 +316,6 @@ local function buildQuestInfoFrame()
   questDetailScrollChildFrame:SetPoint("TOPLEFT", questFrameDetailPanel, "TOPLEFT")
   questDetailScrollFrame:SetScrollChild(questDetailScrollChildFrame)
 
-  -- local questDetailInfoFrame = addon.CustomWidgets:CreateWidget("TableLayout", questDetailScrollChildFrame)
-  -- local questDetailInfoFrame = CreateFrame("Frame", "PMQ_QuestInfoFrame_MainContent", questDetailScrollChildFrame)
-  -- questDetailInfoFrame:SetSize(300, 100)
-  -- questDetailInfoFrame:SetAllPoints(true)
-
   -- The contents of the main reading frame are pretty complex so the code
   -- for that was moved to a separate widget
   local questContent = addon.CustomWidgets:CreateWidget("QuestContent", questDetailScrollChildFrame)
@@ -335,8 +330,6 @@ local function buildQuestInfoFrame()
   for name, method in pairs(frameMethods) do
     frame[name] = method
   end
-
-
 
   return frame
 end
@@ -354,4 +347,8 @@ addon:OnGuiStart(function()
   addon.AppEvents:Subscribe("QuestAbandoned", hide)
   addon.AppEvents:Subscribe("QuestDeclined", hide)
   addon.AppEvents:Subscribe("QuestCompleted", hide)
+end)
+
+addon.AppEvents:Subscribe("QuestContentReady", function(quest)
+  addon.QuestInfoFrame:Show()
 end)

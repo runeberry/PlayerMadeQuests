@@ -17,7 +17,8 @@ local function validateItem(idOrName)
   end
 
   if not addon:LookupItemSafe(idOrName) then
-    return false, string.format("No item exists with id or name: %s", tostring(idOrName))
+    return false, string.format("No item exists with id or name: %s.\nTry using the item's ID or scanning with %s",
+      tostring(idOrName), addon:Colorize("orange", "/pmq scan-items"))
   end
 
   return true
@@ -39,7 +40,7 @@ function parameter:OnValidate(rawValue)
       for i, innerValue in ipairs(rawValue) do
         local result, err = self:OnValidate(innerValue)
         if not result then
-          return result, string.format("Reward #%i is invalid: %s", i, err)
+          return result, string.format("Reward #%i is invalid:\n%s", i, err)
         end
       end
     else

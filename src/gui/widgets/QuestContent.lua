@@ -31,6 +31,10 @@ local styles = {
   },
 }
 
+-- Track any data concerns that need to be resolved asynchronously
+-- Format: { ["key1"] = anything, ["key2"] = nil }
+local asyncConcerns = {}
+
 local contentSectionTemplates = {
   -----------------------
   -- Template Sections --
@@ -183,8 +187,20 @@ local contentSectionTemplates = {
           count = item.quantity,
           -- usable = true -- todo: determine whether player can use this item?
         }
+
+        -- Mark for concern: don't show content until all item names can be resolved
+        local concern = string.format("Can't resolve name for item: %i", item.id)
+        asyncConcerns[concern] = true
+        addon:LookupItemAsync(item.id, function(i)
+          asyncConcerns[concern] = nil -- Remove the concern once we can verify the item's name
+
+          -- todo: this should be handled differently, will be a problem if other async concerns are added
+          if addon:tlen(asyncConcerns) == 0 then
+            self:SetItems(itemButtons)
+            addon.AppEvents:Publish("QuestContentReady", quest)
+          end
+        end)
       end
-      self:SetItems(itemButtons)
     end,
     Condition = function(self, quest)
       return quest.rewards and quest.rewards.parameters and quest.rewards.parameters.rewarditem
@@ -418,7 +434,9 @@ local methods = {
     -- populateSections(self, self.questContentFrame, quest, layout.Sections)
     populateContentTable(self, quest, layoutName)
 
-    self:Refresh()
+    if addon:tlen(asyncConcerns) == 0 then
+      addon.AppEvents:Publish("QuestContentReady", quest)
+    end
   end,
   ["ClearQuestContent"] = function(self)
     for _, section in ipairs(self.questContentSections) do
