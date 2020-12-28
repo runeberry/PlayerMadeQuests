@@ -104,8 +104,9 @@ end
 
 --- Empties all cached items from this session
 function addon:ClearItemCache()
+  local items = GameItemCache:FindAll()
   GameItemCache:DeleteAll()
-  logger:Debug("Item cache cleared")
+  addon.Logger:Warn("Item cache cleared (%i items removed)", #items)
 end
 
 --- Gets all known info about this item id, name, or link.
