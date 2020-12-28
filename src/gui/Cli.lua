@@ -124,11 +124,12 @@ handlers = {
   end,
   ["lookup-item"] = function(...)
     local idOrName = strjoin(" ", ...)
-    local item = addon:LookupItemSafe(idOrName)
 
-    if item then
+    local itemStub = addon:LookupItemAsync(idOrName, function(item)
       addon.Logger:Warn("Item found: %s (%s)", tostring(item.link or item.name), tostring(item.id))
-    else
+    end)
+
+    if not itemStub then
       addon.Logger:Warn("No item found with id or name: %s", idOrName)
     end
   end,

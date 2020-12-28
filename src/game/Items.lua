@@ -1,16 +1,37 @@
 local _, addon = ...
 local logger = addon.Logger:NewLogger("Items")
-
+local GameItemCache = addon.GameItemCache
 local GetItemInfo, GetItemInfoInstant = addon.G.GetItemInfo, addon.G.GetItemInfoInstant
 
 -- Keep a cache of all known item information as it's requested
 local cache = {}
 local itemInfoSubscribers = {}
 
+--- Returns either the itemId as a number, or the all-lowercase item name
+local function parseIdOrName(idOrName)
+  local itemId, itemName
+
+  if type(idOrName) == "number" then
+    itemId = idOrName
+  elseif type(idOrName) == "string" then
+    itemId = tonumber(idOrName)
+    if not itemId then
+      itemName = idOrName:lower()
+    end
+  else
+    if idOrName == nil then
+      error("Item idOrName must not be nil", 2)
+    end
+    error("Item idOrName must be a number or string", 2)
+  end
+
+  return itemId, itemName
+end
+
 -- Based on: https://wow.gamepedia.com/API_GetItemInfo
-local function parseFullInfo(id, item)
+local function parseFullInfo(idOrName, item)
   item = item or {}
-  local full = { GetItemInfo(id) }
+  local full = { GetItemInfo(idOrName) }
 
   if not full[1] then
     -- Info not yet available on client, but will come back from server
@@ -41,9 +62,9 @@ local function parseFullInfo(id, item)
 end
 
 -- Based on: https://wow.gamepedia.com/API_GetItemInfoInstant
-local function parseInstantInfo(id, item)
+local function parseInstantInfo(idOrName, item)
   item = item or {}
-  local instant = { GetItemInfoInstant(id) }
+  local instant = { GetItemInfoInstant(idOrName) }
 
   if not instant[1] then
     -- Item not found, presumably?
@@ -61,10 +82,15 @@ local function parseInstantInfo(id, item)
   return item
 end
 
-local function getItem(id)
-  -- todo: item lookups by name are very inconsistent
-  -- seems like you need to have encountered an item before a name lookup will work
-  local cached = cache[id]
+local function getItem(idOrName)
+  local itemId, itemName = parseIdOrName(idOrName)
+
+  if not itemId and itemName then
+    -- If given a name, prefer the id if we have it cached
+    itemId = GameItemCache:FindItemID(itemName)
+  end
+
+  local cached = cache[itemId]
   if cached and cached.full then
     -- Full item info is available, return now
     addon.AppEvents:Publish("ItemInfoAvailable", cached)
@@ -73,16 +99,13 @@ local function getItem(id)
 
   local item = {}
 
-  local instant = parseInstantInfo(id, item)
+  local instant = parseInstantInfo(itemId or itemName, item)
   if not instant then return end -- item not found
 
-  local full = parseFullInfo(id, item)
+  local full = parseFullInfo(itemId or itemName, item)
   if full then
     -- Full item info is available, cache the response
-    cache[id] = item
     cache[item.id] = item
-    cache[item.name] = item
-    cache[item.link] = item
 
     logger:Trace("Item cached: %s (%i)", item.name, item.id)
     addon.AppEvents:Publish("ItemInfoAvailable", item)
@@ -93,8 +116,9 @@ end
 
 --- Empties all cached items from this session
 function addon:ClearItemCache()
-  logger:Debug("Item cache cleared")
   cache = {}
+  GameItemCache:DeleteAll()
+  logger:Debug("Item cache cleared")
 end
 
 --- Gets all known info about this item id, name, or link.
@@ -102,7 +126,7 @@ end
 --- If this is not a valid item id, name, or link, an error will be thrown.
 --- @param idOrName string (or number) the item id, name, or link
 function addon:LookupItem(idOrName)
-  assert(type(idOrName) == "string" or type(idOrName) == "number", "idOrName must be a number or string")
+  parseIdOrName(idOrName)
 
   local item = getItem(idOrName)
   assert(item, "Unknown item: "..idOrName)
@@ -113,45 +137,56 @@ end
 --- Same as LookupItem, but will return nil instead of throwing an error if the item was not found.
 --- @param idOrName string (or number) the item id, name, or link
 function addon:LookupItemSafe(idOrName)
-  assert(idOrName ~= nil, "idOrName must not be nil")
-  assert(type(idOrName) == "string" or type(idOrName) == "number", "itemId must be a number or string")
+  parseIdOrName(idOrName)
   return getItem(idOrName)
 end
 
---- Performs an async item lookup.
---- @param id string (or number) the item id, name, or link
+--- Performs an async item lookup that will only resolve if or when the full item info is available.
+--- @param idOrName string (or number) the item id or name
 --- @param handler function function to handle an item (info) object
-function addon:OnItemInfoAvailable(id, handler)
+--- @return table the currently available item info, or nil if not found
+function addon:LookupItemAsync(idOrName, handler)
+  local itemId, itemName = parseIdOrName(idOrName)
+
+  local handlerKey = itemId or itemName
+  local handlers = itemInfoSubscribers[handlerKey]
+  if not handlers then
+    handlers = {}
+    itemInfoSubscribers[handlerKey] = handlers
+  end
+
+  handlers[#handlers+1] = handler
+
   local item
   addon:catch(function()
-    item = addon:LookupItem(id)
+    item = getItem(idOrName)
   end)
 
-  if item then
-    -- This only works if AppEvents is async, since the event is published in code
-    -- before this subscriber is added to the list
-    itemInfoSubscribers[id] = handler
+  if not item then
+    -- If not even a stub item could be found, then remove the handlers, because it will never be resolved
+    handlers[#handlers] = nil
   end
+
+  return item
 end
 
 addon.GameEvents:Subscribe("GET_ITEM_INFO_RECEIVED", function(itemId, success)
   if success then
-    local item = getItem(itemId)
-    addon.AppEvents:Publish("ItemInfoAvailable", item)
+    getItem(itemId) -- this will trigger ItemInfoAvailable to be published
   end
 end)
 
-addon.AppEvents:Subscribe("ItemInfoAvailable", function(item)
-  local rem = {}
-
-  for id, handler in pairs(itemInfoSubscribers) do
-    if item.id == id or item.name == id or item.link == id then
+local function handleSubscribers(key, item)
+  local handlers = itemInfoSubscribers[key]
+  if handlers then
+    for _, handler in ipairs(handlers) do
       handler(item)
-      rem[id] = handler
     end
+    itemInfoSubscribers[key] = nil
   end
+end
 
-  for id, handler in pairs(rem) do
-    itemInfoSubscribers[id] = nil
-  end
+addon.AppEvents:Subscribe("ItemInfoAvailable", function(item)
+  handleSubscribers(item.id, item)
+  handleSubscribers(item.name:lower(), item)
 end)
