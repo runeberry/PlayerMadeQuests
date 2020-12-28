@@ -2,6 +2,8 @@ local _, addon = ...
 
 local textureBasePath = [[Interface\AddOns\PlayerMadeQuests\assets\img\]]
 
+-- todo: interface/icons/inv_misc_questionmark.blp
+
 local textures = {
   ["Logo"] = {
     filename = "Logo.tga",
