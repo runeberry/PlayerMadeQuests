@@ -62,6 +62,8 @@ local rowMethods = {
       frame:SetPoint("TOPLEFT", prev, "TOPRIGHT", x, 0)
       frame:SetPoint("BOTTOMLEFT", prev, "BOTTOMRIGHT", x, 0)
     end
+
+    frame:Show()
   end,
   ["GetFrame"] = function(self, index)
     local frame = self._frames[index]
@@ -71,6 +73,7 @@ local rowMethods = {
   ["ClearAllFrames"] = function(self)
     for _, frame in ipairs(self._frames) do
       frame:ClearAllPoints(true)
+      frame:Hide()
     end
     self._frames = {}
   end,
@@ -146,6 +149,7 @@ local methods = {
       row:SetPoint("TOPRIGHT", prev, "BOTTOMRIGHT", 0, -1*y)
     end
 
+    row:Show()
     return row
   end,
   ["GetRow"] = function(self, index)
@@ -158,6 +162,7 @@ local methods = {
       row:ClearAllFrames()
       row:Refresh()
       row:ClearAllPoints(true)
+      row:Hide()
     end
     self._rows = {}
   end,
