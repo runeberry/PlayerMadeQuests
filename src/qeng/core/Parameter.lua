@@ -156,7 +156,7 @@ local methods = {
     return result
   end,
   ["Parse"] = function(self, rawValue, options)
-    if rawValue == nil and self.defaultValue then
+    if rawValue == nil and self.defaultValue ~= nil then
       -- If the default value is used, bypass validate and parse
       rawValue = self.defaultValue
     else

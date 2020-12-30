@@ -31,6 +31,7 @@ addon.QuestScriptTokens = {
   -- PARAM_REPUTATION_NAME = "name",
   -- PARAM_REPUTATION_LEVEL = "level",
   PARAM_RECIPIENT = "recipient",
+  PARAM_REWARDCHOICE = "choose",
   PARAM_REWARDITEM = "rewarditem",
   PARAM_REWARDMONEY = "rewardmoney",
   PARAM_SUBZONE = "subzone",

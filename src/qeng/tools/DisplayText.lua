@@ -40,6 +40,7 @@ vars = {
   ["lang"] = t.PARAM_LANGUAGE,
   ["msg"] = t.PARAM_MESSAGE,
   ["player"] = t.PARAM_PLAYER,
+  ["rc"] = t.PARAM_REWARDCHOICE,
   ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_RECIPIENT },
   ["sz"] = t.PARAM_SUBZONE,
   ["z"] = t.PARAM_ZONE,
