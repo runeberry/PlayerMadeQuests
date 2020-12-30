@@ -1,5 +1,5 @@
 local _, addon = ...
-local QuestRewards = addon.QuestRewards
+local QuestRewards, QuestRewardStatus = addon.QuestRewards, addon.QuestRewardStatus
 local QuestLog, QuestArchive = addon.QuestLog, addon.QuestArchive
 local StaticPopups = addon.StaticPopups
 local CreateFrame = addon.G.CreateFrame
@@ -8,6 +8,14 @@ local GetCoinTextureString = addon.G.GetCoinTextureString
 local rewardRows = {}
 
 local menu = addon.MainMenu:NewMenuScreen("QuestRewardsMenu")
+
+local rewardStatusText = {
+  [QuestRewardStatus.Unclaimed] = addon:Colorize("red", "No"),
+  [QuestRewardStatus.MailSent] = addon:Colorize("yellow", "Sent"),
+  [QuestRewardStatus.MailReceived] = addon:Colorize("green", "Mail"),
+  [QuestRewardStatus.Traded] = addon:Colorize("green", "Trade"),
+  [QuestRewardStatus.Claimed] = addon:Colorize("green", "Yes"),
+}
 
 local options = {
   colInfo = {
@@ -23,7 +31,7 @@ local options = {
       align = "LEFT",
     },
     {
-      name = "Claimed",
+      name = "Status",
       width = 50,
       align = "CENTER"
     },
@@ -62,17 +70,15 @@ local options = {
         givers = string.format("%s (+%i more)", reward.givers[1], #reward.givers - 1)
       end
 
-      local claimed = ""
-      if reward.claimed then
-        claimed = addon:Colorize("green", "Yes")
-      else
-        claimed = addon:Colorize("red", "No")
+      local status = ""
+      if reward.status then
+        status = rewardStatusText[reward.status] or "???"
       end
 
       local row = {
         rewardText,
         givers,
-        claimed,
+        status,
         -- Hidden cols
         reward.rewardId,
       }
@@ -100,24 +106,14 @@ local options = {
       end,
     },
     {
-      text = "Notify Giver",
+      text = "Mark Claimed",
       anchor = "TOP",
       enabled = "Row",
-      handler = function(reward, dataTable)
-        -- todo: add this
-        addon.Logger:Warn("Function not yet implemented")
+      condition = function(reward)
+        return reward.status ~= QuestRewardStatus.Claimed
       end,
-    },
-    {
-      text = "Toggle Claimed",
-      anchor = "TOP",
-      enabled = "Row",
       handler = function(reward, dataTable)
-        if reward.claimed then
-          reward.claimed = false
-        else
-          reward.claimed = true
-        end
+        reward.status = QuestRewardStatus.Claimed
         QuestRewards:Save(reward)
       end,
     },
@@ -130,13 +126,22 @@ local options = {
       end,
     },
     {
+      text = "Clear Claimed",
+      anchor = "BOTTOM",
+      enabled = false,
+      handler = function()
+        -- todo: add this
+        addon.Logger:Warn("Function not yet implemented")
+      end,
+    },
+    {
       text = "Delete",
       anchor = "BOTTOM",
       enabled = "Row",
       handler = function(reward)
         StaticPopups:Show("DeleteReward", reward)
       end,
-    }
+    },
   }
 }
 

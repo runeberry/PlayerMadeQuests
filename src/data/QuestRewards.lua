@@ -6,6 +6,15 @@ addon.QuestRewards:EnableWrite(true)
 addon.QuestRewards:EnableCompression(true)
 addon.QuestRewards:EnableTimestamps(true)
 
+addon.QuestRewardStatus = {
+  Unclaimed = "Unclaimed",
+  MailSent = "MailSent",
+  MailReceived = "MailReceived",
+  Traded = "Traded",
+  Claimed = "Claimed",
+}
+local status = addon.QuestRewardStatus
+
 local function buildRewardId(quest, identifier)
   return string.format("reward-%s-%s", quest.questId, tostring(identifier))
 end
@@ -27,6 +36,7 @@ local function buildItemReward(quest, itemId, quantity)
   return {
     rewardId = buildRewardId(quest, itemId),
     questId = quest.questId,
+    status = status.Unclaimed,
     givers = getRewardGivers(quest),
     itemId = itemId,
     itemName = item.name,
@@ -39,6 +49,7 @@ local function buildMoneyReward(quest, money)
   return {
     rewardId = buildRewardId(quest, "money"),
     questId = quest.questId,
+    status = status.Unclaimed,
     givers = getRewardGivers(quest),
     money = money,
   }
