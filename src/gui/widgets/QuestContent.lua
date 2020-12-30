@@ -1,4 +1,5 @@
 local _, addon = ...
+local QuestStatus = addon.QuestStatus
 local CreateFrame = addon.G.CreateFrame
 local GetCoinTextureString = addon.G.GetCoinTextureString
 local asserttype = addon.asserttype
@@ -180,6 +181,19 @@ local contentSectionTemplates = {
       return addon.CustomWidgets:CreateWidget("ItemRewardButtonPane", parent)
     end,
     Populate = function(self, quest)
+      -- Enable item selection only if:
+      --  1. The quest indicates that a reward should be selected, and
+      --  2. The quest is in "Finished" status (as in, ready to turn in)
+      if quest.rewards.parameters.choose and quest.status == QuestStatus.Finished then
+        quest.rewards.selectedIndex = nil -- Clear any existing selection
+        self:EnableSelection(true)
+        self:OnSelectionChanged(function(index)
+          quest.rewards.selectedIndex = index
+        end)
+      else
+        self:EnableSelection(false)
+      end
+
       local itemButtons = {}
       for _, item in ipairs(quest.rewards.parameters.rewarditem) do
         itemButtons[#itemButtons+1] = {
