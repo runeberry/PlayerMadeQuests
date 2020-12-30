@@ -1,6 +1,5 @@
 local _, addon = ...
 
-
 addon.QuestRewards = addon:NewRepository("Reward", "rewardId")
 addon.QuestRewards:SetSaveDataSource("QuestRewards")
 addon.QuestRewards:EnableWrite(true)
@@ -15,7 +14,7 @@ local function getRewardGivers(quest)
   local givers = {}
   for playerName in pairs(quest.rewards.parameters.player) do
     -- map from DistinctSet to simple array of names
-    givers[#givers+1] = playerName
+    givers[#givers+1] = addon:PopulateText(playerName, quest)
   end
   return givers
 end

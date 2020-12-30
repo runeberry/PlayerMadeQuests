@@ -159,7 +159,12 @@ local contentSectionTemplates = {
   ["RewardGiver"] = {
     Template = "Text",
     Text = function(self, quest)
-      return addon:GetCheckpointDisplayText(quest.rewards, "quest")
+      -- This is pretty hacky, but here goes:
+      -- First, get the display text in the context of the rewards checkpoint
+      local text = addon:GetCheckpointDisplayText(quest.rewards, "quest")
+      -- ...but the %author and %giver values can only be populated in the context of the whole quest
+      text = addon:PopulateText(text, quest)
+      return text
     end,
     Condition = function(self, quest)
       return quest.rewards

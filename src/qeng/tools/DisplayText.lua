@@ -129,9 +129,24 @@ vars = {
   --------------------
 
   -- Inserts the name of the player who wrote the quest
-  ["author"] = function(quest) return quest.metadata.authorName end,
-  -- Inserts the name of the player who shared the quest, or the player's name if not found
-  ["giver"] = function(quest) return quest.metadata.giverName or addon:GetPlayerName() end,
+  ["author"] = function(quest)
+    if quest.metadata then
+      return quest.metadata.authorName
+    else
+      -- In case we arrived here from a non-quest context
+      return "%author"
+    end
+  end,
+  -- Inserts the name of the player who shared the quest
+  ["giver"] = function(quest)
+    if quest.metadata then
+      -- Use player name if there was no giver
+      return quest.metadata.giverName or addon:GetPlayerName()
+    else
+      -- In case we arrived here from a non-quest context
+      return "%giver"
+    end
+  end,
 
   ----------------
   -- Formatting --
@@ -206,9 +221,18 @@ end
 
 local function populateDisplayText(text, obj)
   logger:Trace("=> received: %s", text)
-  for _, mod in ipairs(rules.standard) do
-    text = addon:strmod(text, mod.pattern, mod.fn, obj)
+
+  local i, prevText = 0, nil
+  while prevText ~= text and i < 9 do
+    -- Apply all substitution rules to the text until it no longer changes
+    -- Failsafe: avoid inf loop by capping at 9 iterations
+    i = i + 1
+    prevText = text
+    for _, mod in ipairs(rules.standard) do
+      text = addon:strmod(text, mod.pattern, mod.fn, obj)
+    end
   end
+
   logger:Trace("<= resolved: %s", text)
   return text
 end
