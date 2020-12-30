@@ -1,12 +1,25 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 local Anchors = addon.Anchors
+local asserttype = addon.asserttype
 
 local widget = addon.CustomWidgets:NewWidget("ItemRewardButtonPane")
 
 local itemRewardButtonOptions = {
   large = true
 }
+
+local function buildSelectionHandler(self, index)
+  return function(selection)
+    if selection then
+      -- An item was selected
+      self:SetSelectedIndex(index)
+    else
+      -- An item was deselected
+      self:ClearSelection()
+    end
+  end
+end
 
 local function createNextButton(self)
   local irb = addon.CustomWidgets:CreateWidget("ItemRewardButton", self, itemRewardButtonOptions)
@@ -25,6 +38,11 @@ local function createNextButton(self)
     local prevButton = self._itemRewardButtons[irbIndex - 2]
     irb:SetPoint(Anchors.TOPLEFT, prevButton, Anchors.BOTTOMLEFT)
   end
+
+  if self._selectable then
+    irb:EnableSelection(true)
+  end
+  irb:OnSetSelected(buildSelectionHandler(self, irbIndex))
 
   table.insert(self._itemRewardButtons, irb)
   return irb
@@ -74,6 +92,64 @@ local methods = {
     end
 
     self:SetHeight(height)
+  end,
+
+  --- Allows for the selection (highlight) of ONE item within the pane
+  ["EnableSelection"] = function(self, flag)
+    if flag == nil then flag = true end
+    self._selectable = flag
+
+    -- Update selection flag for already existing buttons
+    for _, button in ipairs(self._itemRewardButtons) do
+      button:EnableSelection(flag)
+    end
+  end,
+  ["GetSelectedIndex"] = function(self)
+    return self._selected
+  end,
+  ["GetSelectedButton"] = function(self)
+    local index = self:GetSelectedIndex()
+    if not index then return nil end
+
+    return self._itemRewardButtons[index]
+  end,
+  ["GetSelectedItem"] = function(self)
+    local button = self:GetSelectedButton()
+    if not button then return nil end
+
+    return button:GetItem()
+  end,
+  ["SetSelectedIndex"] = function(self, index)
+    if self._selected == index then return end -- Index is already selected
+
+    self._selected = nil
+
+    local button = self:GetSelectedButton()
+    if button then
+      button:SetSelected(false)
+    end
+
+    -- Setting to nil index simply clears the selection
+    if index ~= nil then
+      asserttype(index, "number", "index", "SetSelectedIndex")
+
+      button = self._itemRewardButtons[index]
+      if button then
+        button:SetSelected(true)
+        self._selected = index
+      end
+    end
+
+    if self._onSelectionChanged then
+      self._onSelectionChanged(index)
+    end
+  end,
+  ["ClearSelection"] = function(self)
+    self:SetSelectedIndex()
+  end,
+  ["OnSelectionChanged"] = function(self, handler)
+    asserttype(handler, "function", "handler", "OnSelectionChanged")
+    self._onSelectionChanged = handler
   end,
 }
 
