@@ -19,9 +19,9 @@ local function parseIdOrName(idOrName)
     end
   else
     if idOrName == nil then
-      error("Item idOrName must not be nil", 2)
+      error("Item idOrName must not be nil", 3)
     end
-    error("Item idOrName must be a number or string", 2)
+    error("Item idOrName must be a number or string", 3)
   end
 
   return itemId, itemName
@@ -70,7 +70,7 @@ local function parseInstantInfo(idOrName, item)
     return
   end
 
-  item.id = instant[1] -- not returned on full info, suprisingly
+  item.itemId = instant[1] -- not returned on full info, suprisingly
   item.type = instant[2]
   item.subType = instant[3]
   item.equipLoc = instant[4]
@@ -204,7 +204,7 @@ function addon:ScanItems(min, max)
     if scanData.total % logInterval == 0 then
       addon.Logger:Warn("Scanning items, %i found...", scanData.total, scanData.timeoutTotal)
     end
-    lookupNextItem(item.id)
+    lookupNextItem(item.itemId)
   end
 
   lookupNextItem = function(id)
@@ -257,6 +257,6 @@ local function handleSubscribers(key, item)
 end
 
 addon.AppEvents:Subscribe("ItemInfoAvailable", function(item)
-  handleSubscribers(item.id, item)
+  handleSubscribers(item.itemId, item)
   handleSubscribers(item.name:lower(), item)
 end)

@@ -45,7 +45,7 @@ local function parseItem(idOrName, quantity)
   local item = addon:LookupItem(idOrName)
 
   return {
-    id = item.id,
+    itemId = item.itemId,
     quantity = quantity,
   }
 end

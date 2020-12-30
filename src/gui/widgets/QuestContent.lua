@@ -183,15 +183,15 @@ local contentSectionTemplates = {
       local itemButtons = {}
       for _, item in ipairs(quest.rewards.parameters.rewarditem) do
         itemButtons[#itemButtons+1] = {
-          itemId = item.id,
+          itemId = item.itemId,
           count = item.quantity,
           -- usable = true -- todo: determine whether player can use this item?
         }
 
         -- Mark for concern: don't show content until all item names can be resolved
-        local concern = string.format("Can't resolve name for item: %i", item.id)
+        local concern = string.format("Can't resolve name for item: %i", item.itemId)
         asyncConcerns[concern] = true
-        addon:LookupItemAsync(item.id, function(i)
+        addon:LookupItemAsync(item.itemId, function(i)
           asyncConcerns[concern] = nil -- Remove the concern once we can verify the item's name
 
           -- todo: this should be handled differently, will be a problem if other async concerns are added

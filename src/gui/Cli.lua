@@ -126,7 +126,7 @@ handlers = {
     local idOrName = strjoin(" ", ...)
 
     local itemStub = addon:LookupItemAsync(idOrName, function(item)
-      addon.Logger:Warn("Item found: %s (%s)", tostring(item.link or item.name), tostring(item.id))
+      addon.Logger:Warn("Item found: %s (%s)", tostring(item.link or item.name), tostring(item.itemId))
     end)
 
     if not itemStub then

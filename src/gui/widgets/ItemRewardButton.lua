@@ -41,12 +41,12 @@ local methods = {
     self._itemId = itemId
 
     SetItemButtonTexture(self, item.icon)
-    SetItemButtonQuality(self, item.rarity, item.id)
+    SetItemButtonQuality(self, item.rarity, item.itemId)
 
     -- Name is provided by the *ItemButtonTemplate
     self.Name:SetText(item.name)
 
-    self:SetTooltipContent({ itemId = item.id })
+    self:SetTooltipContent({ itemId = item.itemId })
   end,
   ["SetItemCount"] = function(self, count)
     SetItemButtonCount(self, count, false)

@@ -31,5 +31,5 @@ function addon.GameItemCache:SaveItemID(itemName, itemId)
 end
 
 addon.AppEvents:Subscribe("ItemInfoAvailable", function(item)
-  addon.GameItemCache:SaveItemID(item.name, item.id)
+  addon.GameItemCache:SaveItemID(item.name, item.itemId)
 end)
