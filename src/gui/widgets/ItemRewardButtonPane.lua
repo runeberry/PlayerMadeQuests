@@ -122,11 +122,10 @@ local methods = {
   ["SetSelectedIndex"] = function(self, index)
     if self._selected == index then return end -- Index is already selected
 
-    self._selected = nil
-
     local button = self:GetSelectedButton()
     if button then
       button:SetSelected(false)
+      self._selected = nil
     end
 
     -- Setting to nil index simply clears the selection
