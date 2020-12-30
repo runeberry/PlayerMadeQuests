@@ -15,6 +15,7 @@ addon.MainMenu:SetMenuTree({ -- value == menuId
       { value = "QuestDemoListMenu", text = "Demo Quests" },
       { value = "QuestDraftListMenu", text = "My Drafts" },
       { value = "QuestLogMenu", text = "My Quest Log" },
+      { value = "QuestRewardsMenu", text = "Quest Rewards" },
       { value = "QuestArchiveMenu", text = "Quest Archive" },
     }
   },

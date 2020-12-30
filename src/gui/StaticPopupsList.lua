@@ -278,4 +278,24 @@ addon.StaticPopupsList = {
       end
     end,
   },
+  ["DeleteReward"] = {
+    message = function(reward)
+      return string.format("Remove rewards for\n\"%s\"?", reward.questName)
+    end,
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function(reward)
+      addon.QuestRewards:Delete(reward.questId)
+      addon.Logger:Warn("Quest rewards removed for \"%s\"", reward.questName)
+    end,
+  },
+  ["ResetRewards"] = {
+    message = "Clear your history of all quest rewards?",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function()
+      addon.QuestRewards:DeleteAll()
+      addon.Logger:Warn("Quest rewards cleared")
+    end,
+  },
 }
