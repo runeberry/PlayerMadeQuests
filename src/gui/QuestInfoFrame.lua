@@ -219,8 +219,8 @@ local frameMethods = {
   end,
   ["RefreshMode"] = function(self)
     local quest = self._quest
-    addon.QuestInfoFrame:Hide()
-    addon.QuestInfoFrame:ShowQuest(quest)
+    self:Hide()
+    self:ShowQuest(quest)
   end
 }
 
