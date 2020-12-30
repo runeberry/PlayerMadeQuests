@@ -301,7 +301,7 @@ local contentSectionTemplates = {
     Sections = {
       "NameHeader",
       "Completion",
-      "QuestCompletion",
+      "QuestComplete",
       "QuestRewards",
     },
   },
