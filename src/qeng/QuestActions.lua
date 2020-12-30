@@ -24,11 +24,7 @@ local function startQuest(quest)
   end
 
   -- Clean quest progress on fresh accept, just in case
-  if quest.objectives then
-    for _, obj in pairs(quest.objectives) do
-      obj.progress = 0
-    end
-  end
+  addon:CleanQuest(quest)
 
   QuestLog:SaveWithStatus(quest, QuestStatus.Active)
   QuestEngine:StartTracking(quest)
@@ -50,6 +46,24 @@ end
 --------------------
 -- Public methods --
 --------------------
+
+--- Removes any user-specific information that may have been added to the quest
+function addon:CleanQuest(quest)
+  -- Quests have no status until they're placed into the log
+  quest.status = nil
+
+  -- Reset progress on all objectives
+  if quest.objectives then
+    for _, obj in pairs(quest.objectives) do
+      obj.progress = 0
+    end
+  end
+
+  -- Remove any selected quest rewards
+  if quest.rewards then
+    quest.rewards.selection = nil
+  end
+end
 
 function addon:AcceptQuest(quest, suppressPopup)
   if not QuestEngine:EvaluateRequirements(quest) then
