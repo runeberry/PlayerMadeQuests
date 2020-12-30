@@ -74,10 +74,7 @@ local methods = {
       end
 
       irb:SetItem(item.itemId)
-
-      if item.count then
-        irb:SetItemCount(item.count)
-      end
+      irb:SetItemCount(item.count) -- OK to set count to nil
 
       if item.usable ~= nil then
         irb:SetItemUsable(item.usable)
