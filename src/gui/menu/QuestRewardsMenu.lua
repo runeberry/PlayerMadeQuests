@@ -3,19 +3,23 @@ local QuestRewards, QuestRewardStatus = addon.QuestRewards, addon.QuestRewardSta
 local QuestLog, QuestArchive = addon.QuestLog, addon.QuestArchive
 local StaticPopups = addon.StaticPopups
 local CreateFrame = addon.G.CreateFrame
-local GetCoinTextureString = addon.G.GetCoinTextureString
 
 local rewardRows = {}
 
 local menu = addon.MainMenu:NewMenuScreen("QuestRewardsMenu")
 
-local rewardStatusText = {
-  [QuestRewardStatus.Unclaimed] = addon:Colorize("red", "No"),
-  [QuestRewardStatus.MailSent] = addon:Colorize("yellow", "Sent"),
-  [QuestRewardStatus.MailReceived] = addon:Colorize("green", "Mail"),
-  [QuestRewardStatus.Traded] = addon:Colorize("green", "Trade"),
-  [QuestRewardStatus.Claimed] = addon:Colorize("green", "Yes"),
-}
+local rewardStatusText = {}
+
+addon:OnGuiStart(function()
+  -- Delayed because colors aren't available when the file is loaded
+  rewardStatusText = {
+    [QuestRewardStatus.Unclaimed] = addon:Colorize("red", "No"),
+    [QuestRewardStatus.MailSent] = addon:Colorize("yellow", "Sent"),
+    [QuestRewardStatus.MailReceived] = addon:Colorize("green", "Mail"),
+    [QuestRewardStatus.Traded] = addon:Colorize("green", "Trade"),
+    [QuestRewardStatus.Claimed] = addon:Colorize("green", "Yes"),
+  }
+end)
 
 local options = {
   colInfo = {
@@ -42,26 +46,7 @@ local options = {
     table.sort(rewards, function(a, b) return a.rewardId < b.rewardId end)
 
     for _, reward in ipairs(rewards) do
-      local rewardText = "???"
-      if reward.itemId then
-        rewardText = reward.itemLink or reward.itemName
-        if not rewardText then
-          -- If the item link/name are somehow unavailable, try looking up the item now
-          local item = addon:LookupItem(reward.itemId)
-          if item then
-            rewardText = item.link or item.name
-          end
-          if not rewardText then
-            rewardText = string.format("(Item #%i)", reward.itemId)
-          end
-        end
-
-        if reward.itemQuantity and reward.itemQuantity > 0 then
-          rewardText = string.format("%ix %s", reward.itemQuantity, rewardText)
-        end
-      elseif reward.money then
-        rewardText = GetCoinTextureString(reward.money)
-      end
+      local rewardText = addon.QuestRewards:GetRewardName(reward)
 
       local givers = ""
       if #reward.givers == 1 then
@@ -72,7 +57,7 @@ local options = {
 
       local status = ""
       if reward.status then
-        status = rewardStatusText[reward.status] or "???"
+        status = rewardStatusText[reward.status] or reward.status
       end
 
       local row = {
@@ -128,10 +113,12 @@ local options = {
     {
       text = "Clear Claimed",
       anchor = "BOTTOM",
-      enabled = false,
+      enabled = "Conditional",
+      condition = function()
+        return #QuestRewards:FindClaimedRewards() > 0
+      end,
       handler = function()
-        -- todo: add this
-        addon.Logger:Warn("Function not yet implemented")
+        StaticPopups:Show("DeleteClaimedRewards")
       end,
     },
     {

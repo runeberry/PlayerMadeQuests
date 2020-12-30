@@ -1,4 +1,5 @@
 local _, addon = ...
+local GetCoinTextureString = addon.G.GetCoinTextureString
 
 addon.QuestRewards = addon:NewRepository("Reward", "rewardId")
 addon.QuestRewards:SetSaveDataSource("QuestRewards")
@@ -14,6 +15,12 @@ addon.QuestRewardStatus = {
   Claimed = "Claimed",
 }
 local status = addon.QuestRewardStatus
+
+local claimedStatuses = {
+  [status.MailReceived] = true,
+  [status.Traded] = true,
+  [status.Claimed] = true,
+}
 
 local function buildRewardId(quest, identifier)
   return string.format("reward-%s-%s", quest.questId, tostring(identifier))
@@ -64,6 +71,12 @@ local function saveReward(self, reward, force)
   self:Save(reward)
 end
 
+function addon.QuestRewards:FindClaimedRewards()
+  return self:FindByQuery(function(reward)
+    return reward.status and claimedStatuses[reward.status]
+  end)
+end
+
 function addon.QuestRewards:SaveQuestRewards(quest, force)
   if not quest.rewards or not quest.rewards.parameters or not quest.rewards.parameters.player then return end
 
@@ -96,6 +109,33 @@ function addon.QuestRewards:SaveQuestRewards(quest, force)
   for _, reward in ipairs(rewards) do
     saveReward(self, reward, force)
   end
+end
+
+--- Gets a UI-friendly name for the provided quest reward
+function addon.QuestRewards:GetRewardName(reward)
+  local rewardText = "???"
+
+  if reward.itemId then
+    rewardText = reward.itemLink or reward.itemName
+    if not rewardText then
+      -- If the item link/name are somehow unavailable, try looking up the item now
+      local item = addon:LookupItem(reward.itemId)
+      if item then
+        rewardText = item.link or item.name
+      end
+      if not rewardText then
+        rewardText = string.format("(Item #%i)", reward.itemId)
+      end
+    end
+
+    if reward.itemQuantity and reward.itemQuantity > 0 then
+      rewardText = string.format("%ix %s", reward.itemQuantity, rewardText)
+    end
+  elseif reward.money then
+    rewardText = GetCoinTextureString(reward.money)
+  end
+
+  return rewardText
 end
 
 addon.AppEvents:Subscribe("QuestCompleted", function(quest)
