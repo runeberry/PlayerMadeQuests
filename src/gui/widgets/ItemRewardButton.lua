@@ -62,6 +62,8 @@ local methods = {
     end
   end,
 
+  -- Allows the button to by selected by a user clicking on it
+  -- Does not affect programmatic selection through SetSelected
   ["EnableSelection"] = function(self, flag)
     if flag == nil then flag = true end
     self._selectable = flag
@@ -70,7 +72,6 @@ local methods = {
     return (self._selected and true) or false
   end,
   ["SetSelected"] = function(self, flag)
-    if not self._selectable then return end
     if flag == nil then flag = true end
     self._selected = flag
     self.Highlight:SetShown(self._selected)
@@ -81,7 +82,6 @@ local methods = {
     end
   end,
   ["ToggleSelected"] = function(self)
-    if not self._selectable then return end
     self:SetSelected(not self:GetSelected())
   end,
   ["OnSetSelected"] = function(self, handler)
@@ -92,6 +92,7 @@ local methods = {
 
 local scripts = {
   ["OnClick"] = function(self)
+    if not self._selectable then return end
     self:ToggleSelected()
   end
 }

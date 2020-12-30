@@ -186,11 +186,14 @@ local contentSectionTemplates = {
       return addon.CustomWidgets:CreateWidget("ItemRewardButtonPane", parent)
     end,
     Populate = function(self, quest)
+      -- Always clear any existing selection on populate
+      quest.rewards.selectedIndex = nil
+      self:SetSelectedIndex() -- todo: Doesn't seem to work on Clear()?
+
       -- Enable item selection only if:
       --  1. The quest indicates that a reward should be selected, and
       --  2. The quest is in "Finished" status (as in, ready to turn in)
       if quest.rewards.parameters.choose and quest.status == QuestStatus.Finished then
-        quest.rewards.selectedIndex = nil -- Clear any existing selection
         self:EnableSelection(true)
         self:OnSelectionChanged(function(index)
           quest.rewards.selectedIndex = index
@@ -226,6 +229,7 @@ local contentSectionTemplates = {
     end,
     Clear = function(self)
       self:SetItems()
+      self:SetSelectedIndex()
     end,
   },
   ["StartConditionHeader"] = {
