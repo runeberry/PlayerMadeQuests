@@ -63,11 +63,8 @@ local function buildMoneyReward(quest, money)
 end
 
 local function saveReward(self, reward, force)
-  if not force then
-    -- Unless force is enabled, don't overwrite existing reward entries
-    if self:FindByID(reward) then return end
-  end
-
+  -- Unless force is enabled, don't overwrite existing reward entries
+  if not force and self:FindByID(reward.rewardId) then return end
   self:Save(reward)
 end
 
