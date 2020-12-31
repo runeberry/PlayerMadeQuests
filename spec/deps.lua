@@ -166,6 +166,7 @@ function deps:Init(addon)
     GetInventoryItemID = ret(),
     IsEquippedItem = ret(),
     IsInGroup = ret(),
+    IsInGuild = ret(),
     IsInRaid = ret(),
     PlaySoundFile = ret(),
     ReloadUI = ret(),

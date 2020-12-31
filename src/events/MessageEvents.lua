@@ -2,9 +2,10 @@ local _, addon = ...
 local Ace, unpack = addon.Ace, addon.G.unpack
 local encoder = addon.LibCompress:GetAddonEncodeTable()
 local AddMessageEventFilter = addon.G.AddMessageEventFilter
+local IsInGroup, IsInRaid, IsInGuild = addon.G.IsInGroup, addon.G.IsInRaid, addon.G.IsInGuild
 
 --- Values defined here: https://wow.gamepedia.com/API_C_ChatInfo.SendAddonMessage
-MessageDistribution = {
+local MessageDistribution = {
   Party = "PARTY",
   Raid = "RAID",
   Instance = "INSTANCE_CHAT",
@@ -20,7 +21,7 @@ addon.MessageDistribution = MessageDistribution
 local mdValidate = addon:InvertTable(MessageDistribution)
 
 --- Values defined here: https://wow.gamepedia.com/ChatThrottleLib
-MessagePriority = {
+local MessagePriority = {
   Normal = "NORMAL",
   Bulk = "BULK",
   Alert = "ALERT",
@@ -86,6 +87,26 @@ local function broker_publishMessage(self, event, details, ...)
     onCommReceived(PMQ_MESSAGE_PREFIX, encoded, details.distribution, "*yourself*")
     return
   end
+
+  -- Validate certain message distributions before sending real messages
+  -- This helps avoid chat spam like "You are not in a guild."
+  if details.distribution == MessageDistribution.Party then
+    if not IsInGroup() then
+      addon.Logger:Trace("Suppressed message for %s: player is not in a party", details.distribution)
+      return
+    end
+  elseif details.distribution == MessageDistribution.Raid then
+    if not IsInRaid() then
+      addon.Logger:Trace("Suppressed message for %s: player is not in a raid group", details.distribution)
+      return
+    end
+  elseif details.distribution == MessageDistribution.Guild then
+    if not IsInGuild() then
+      addon.Logger:Trace("Suppressed message for %s: player is not a guild", details.distribution)
+      return
+    end
+  end
+
   Ace:SendCommMessage(PMQ_MESSAGE_PREFIX, encoded, details.distribution, details.target, details.priority)
 end
 

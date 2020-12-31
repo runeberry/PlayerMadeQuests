@@ -46,6 +46,7 @@ addon.G = {
   GetInventoryItemID = GetInventoryItemID,
   IsEquippedItem = IsEquippedItem,
   IsInGroup = IsInGroup,
+  IsInGuild = IsInGuild,
   IsInRaid = IsInRaid,
   PlaySoundFile = PlaySoundFile,
   ReloadUI = ReloadUI,
