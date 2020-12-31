@@ -13,11 +13,11 @@ local rewardStatusText = {}
 addon:OnGuiStart(function()
   -- Delayed because colors aren't available when the file is loaded
   rewardStatusText = {
-    [QuestRewardStatus.Unclaimed] = addon:Colorize("red", "No"),
+    [QuestRewardStatus.Unclaimed] = addon:Colorize("red", "Unclaimed"),
     [QuestRewardStatus.MailSent] = addon:Colorize("yellow", "Sent"),
     [QuestRewardStatus.MailReceived] = addon:Colorize("green", "Mail"),
     [QuestRewardStatus.Traded] = addon:Colorize("green", "Trade"),
-    [QuestRewardStatus.Claimed] = addon:Colorize("green", "Yes"),
+    [QuestRewardStatus.Claimed] = addon:Colorize("green", "Claimed"),
   }
 end)
 
@@ -36,7 +36,7 @@ local options = {
     },
     {
       name = "Status",
-      width = 50,
+      width = 65,
       align = "CENTER"
     },
   },
