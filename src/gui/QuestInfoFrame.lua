@@ -1,6 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 local QuestStatus = addon.QuestStatus
+local UIErrorsFrame = addon.G.UIErrorsFrame
 
 addon.QuestInfoFrame = nil -- Defined during lifecycle event
 
@@ -48,7 +49,7 @@ local buttons = {
       -- If applicable, player must select a reward before completing the quest
       if quest.rewards and quest.rewards.choice then
         if quest.rewards.selectedIndex == nil then
-          addon.Logger:Error("You must choose a reward.")
+          UIErrorsFrame:AddMessage("You must choose a reward.", 1.0, 0, 0)
           addon:PlaySound("QuestAbandoned")
           return
         end
