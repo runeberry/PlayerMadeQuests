@@ -52,7 +52,7 @@ end
 
 function parameter:OnValidate(rawValue)
   if type(rawValue) == "table" then
-    if #rawValue > 1 then
+    if #rawValue > 0 then
       -- Parameter is an array of items, validate each item within
       for i, innerValue in ipairs(rawValue) do
         local result, err = self:OnValidate(innerValue)
@@ -88,7 +88,7 @@ function parameter:OnParse(arg)
   local items
 
   if type(arg) == "table" then
-    if #arg > 1 then
+    if #arg > 0 then
       -- Parameter is an array of items...
       items = {}
       for _, innerValue in ipairs(arg) do

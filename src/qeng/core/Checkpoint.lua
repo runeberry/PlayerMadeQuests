@@ -145,6 +145,11 @@ local methods = {
       end
     end
 
+    if self.OnParse then
+      -- Optional hook to further modify the checkpoint after conditions/parameters have been assigned
+      self:OnParse(cp)
+    end
+
     -- If there are any values left unassigned in the rawValue, then some unexpected values are present
     for k, _ in pairs(rawValue) do
       errorf("'%s' is not a supported parameter on checkpoint '%s'", k, self.name)

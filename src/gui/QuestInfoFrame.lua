@@ -46,7 +46,7 @@ local buttons = {
     enableIf = function(quest) return addon.QuestEngine:EvaluateComplete(quest) end,
     action = function(quest)
       -- If applicable, player must select a reward before completing the quest
-      if quest.rewards and quest.rewards.parameters and quest.rewards.parameters.choose then
+      if quest.rewards and quest.rewards.choice then
         if quest.rewards.selectedIndex == nil then
           addon.Logger:Error("You must choose a reward.")
           addon:PlaySound("QuestAbandoned")

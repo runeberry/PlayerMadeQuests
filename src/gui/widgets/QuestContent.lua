@@ -173,11 +173,11 @@ local contentSectionTemplates = {
   ["RewardMoney"] = {
     Template = "Text",
     Text = function(self, quest)
-      local coinText = GetCoinTextureString(quest.rewards.parameters.rewardmoney)
+      local coinText = GetCoinTextureString(quest.rewards.money)
       return "You will receive: "..coinText
     end,
     Condition = function(self, quest)
-      return quest.rewards and quest.rewards.parameters and quest.rewards.parameters.rewardmoney
+      return quest.rewards and quest.rewards.money
     end,
   },
   ["RewardItems"] = {
@@ -193,7 +193,7 @@ local contentSectionTemplates = {
       -- Enable item selection only if:
       --  1. The quest indicates that a reward should be selected, and
       --  2. The quest is in "Finished" status (as in, ready to turn in)
-      if quest.rewards.parameters.choose and quest.status == QuestStatus.Finished then
+      if quest.rewards.choice and quest.status == QuestStatus.Finished then
         self:EnableSelection(true)
         self:OnSelectionChanged(function(index)
           quest.rewards.selectedIndex = index
@@ -203,7 +203,7 @@ local contentSectionTemplates = {
       end
 
       local itemButtons = {}
-      for _, item in ipairs(quest.rewards.parameters.rewarditem) do
+      for _, item in ipairs(quest.rewards.items) do
         itemButtons[#itemButtons+1] = {
           itemId = item.itemId,
           count = item.quantity,
@@ -225,7 +225,7 @@ local contentSectionTemplates = {
       end
     end,
     Condition = function(self, quest)
-      return quest.rewards and quest.rewards.parameters and quest.rewards.parameters.rewarditem
+      return quest.rewards and quest.rewards.items
     end,
     Clear = function(self)
       self:SetItems()

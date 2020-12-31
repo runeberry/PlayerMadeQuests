@@ -28,8 +28,8 @@ end
 
 local function getRewardGivers(quest)
   local givers = {}
-  for playerName in pairs(quest.rewards.parameters.player) do
-    -- map from DistinctSet to simple array of names
+  for _, playerName in ipairs(quest.rewards.givers) do
+    -- Make sure to populate %author and %giver with actual names
     givers[#givers+1] = addon:PopulateText(playerName, quest)
   end
   return givers
@@ -75,15 +75,15 @@ function addon.QuestRewards:FindClaimedRewards()
 end
 
 function addon.QuestRewards:SaveQuestRewards(quest, force)
-  if not quest.rewards or not quest.rewards.parameters or not quest.rewards.parameters.player then return end
+  if not quest.rewards then return end
 
   local rewards = {}
 
-  if quest.rewards.parameters.rewarditem then
-    if quest.rewards.parameters.choose then
+  if quest.rewards.items then
+    if quest.rewards.choice then
       if quest.rewards.selectedIndex then
         -- One item is rewarded as chosen by the player
-        local item = quest.rewards.parameters.rewarditem[quest.rewards.selectedIndex]
+        local item = quest.rewards.items[quest.rewards.selectedIndex]
         if item then
           rewards[#rewards+1] = buildItemReward(quest, item.itemId, item.quantity)
         end
@@ -93,14 +93,14 @@ function addon.QuestRewards:SaveQuestRewards(quest, force)
       end
     else
       -- All items are rewarded to the player
-      for _, item in ipairs(quest.rewards.parameters.rewarditem) do
+      for _, item in ipairs(quest.rewards.items) do
         rewards[#rewards+1] = buildItemReward(quest, item.itemId, item.quantity)
       end
     end
   end
 
-  if quest.rewards.parameters.rewardmoney and quest.rewards.parameters.rewardmoney > 0 then
-    rewards[#rewards+1] = buildMoneyReward(quest, quest.rewards.parameters.rewardmoney)
+  if quest.rewards.money and quest.rewards.money > 0 then
+    rewards[#rewards+1] = buildMoneyReward(quest, quest.rewards.money)
   end
 
   for _, reward in ipairs(rewards) do
