@@ -40,15 +40,6 @@ local contentSectionTemplates = {
   -----------------------
   -- Template Sections --
   -----------------------
-  ["Base"] = {
-    Build = function(self, parent)
-      return CreateFrame("Frame", addon:CreateGlobalName("QuestInfoFrame_"..self.Name), parent)
-    end,
-    Sections = nil,
-    Condition = nil,
-    Populate = nil,
-    Clear = nil,
-  },
   ["Layout"] = {
     Build = nil,
     Sections = nil,
@@ -84,6 +75,29 @@ local contentSectionTemplates = {
   ["Header"] = {
     Template = "Text",
     Font = "QuestTitleFont",
+  },
+  ["Button"] = {
+    Build = function(self, parent)
+      local button = CreateFrame("Button", addon:CreateGlobalName("QuestInfoFrame_"..self.Name.."_Button"), parent, "UIPanelButtonTemplate")
+      button:SetScript("OnClick", function()
+        button:Handler(button._quest) -- quest must be assigned in populate method
+      end)
+      button:SetText(self.Text)
+      -- button:SetWidth(self.Width) -- todo: can't set width because of automatic anchor, oh well
+
+      return button
+    end,
+    Populate = function(self, quest)
+      self._quest = quest
+    end,
+    Clear = function(self)
+      self._quest = nil
+    end,
+    Text = "",
+    -- Width = 80,
+    Handler = function(self, quest)
+      addon.Logger:Warn("No handler has been assigned to this button")
+    end,
   },
 
   --------------------
@@ -181,7 +195,6 @@ local contentSectionTemplates = {
     end,
   },
   ["RewardItems"] = {
-    Template = "Base",
     Build = function(self, parent)
       return addon.CustomWidgets:CreateWidget("ItemRewardButtonPane", parent)
     end,
@@ -258,6 +271,30 @@ local contentSectionTemplates = {
       return quest.complete and quest.complete.conditions
     end,
   },
+  ["TargetVerificationText"] = {
+    Template = "Text",
+    Text = "Check to see if the player you're targeting has completed this quest.",
+  },
+  ["TargetVerificationButton"] = {
+    Template = "Button",
+    Text = "Check Target Player",
+  },
+  ["PartyVerificationText"] = {
+    Template = "Text",
+    Text = "Check to see if your party members have completed this quest.",
+  },
+  ["PartyVerificationButton"] = {
+    Template = "Button",
+    Text = "Check Party",
+  },
+  ["RaidVerificationText"] = {
+    Template = "Text",
+    Text = "Check to see if your raid members have completed this quest.",
+  },
+  ["RaidVerificationButton"] = {
+    Template = "Button",
+    Text = "Check Raid",
+  },
 
   -----------------------
   -- Compound Sections --
@@ -304,6 +341,17 @@ local contentSectionTemplates = {
       "RewardItems",
     },
   },
+  ["QuestVerification"] = {
+    Template = "Layout",
+    Sections = {
+      "TargetVerificationText",
+      "TargetVerificationButton",
+      "PartyVerificationText",
+      "PartyVerificationButton",
+      "RaidVerificationText",
+      "RaidVerificationButton",
+    },
+  },
 
   ------------------
   -- Mode layouts --
@@ -337,7 +385,15 @@ local contentSectionTemplates = {
       "Description",
       "QuestRewards",
     },
-  }
+  },
+  ["VerificationCheck"] = {
+    Template = "Layout",
+    Sections = {
+      "NameHeader",
+      "QuestVerification",
+      "QuestRewards",
+    },
+  },
 }
 
 --- Recursively builds the section template with the specified name

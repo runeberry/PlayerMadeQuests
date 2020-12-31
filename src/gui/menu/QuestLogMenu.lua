@@ -71,6 +71,14 @@ local options = {
       end,
     },
     {
+      text = "Verify Others",
+      anchor = "TOP",
+      enabled = "Row",
+      handler = function(quest)
+        addon.QuestInfoFrame:ShowQuest(quest, "VerificationCheck")
+      end,
+    },
+    {
       text = "Abandon Quest",
       anchor = "TOP",
       enabled = "Row",

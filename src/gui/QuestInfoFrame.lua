@@ -185,7 +185,16 @@ frameModes = {
     busy = function(frame, quest)
 
     end,
-  }
+  },
+  ["VerificationCheck"] = {
+    title = "[PMQ] Quest Verification",
+    layout = "VerificationCheck",
+    leftButton = buttons.Share,
+    rightButton = buttons.Empty,
+    busy = function(frame, quest)
+
+    end,
+  },
 }
 
 local frameMethods = {
