@@ -81,6 +81,7 @@ local buttons = {
   ["Empty"] = {
     text = "",
     width = 78,
+    enableIf = function() return false end,
     action = function() end
   }
 }
