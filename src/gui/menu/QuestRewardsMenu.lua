@@ -15,8 +15,8 @@ addon:OnGuiStart(function()
   rewardStatusText = {
     [QuestRewardStatus.Unclaimed] = addon:Colorize("red", "Unclaimed"),
     [QuestRewardStatus.MailSent] = addon:Colorize("yellow", "Sent"),
-    [QuestRewardStatus.MailReceived] = addon:Colorize("green", "Mail"),
-    [QuestRewardStatus.Traded] = addon:Colorize("green", "Trade"),
+    [QuestRewardStatus.MailReceived] = addon:Colorize("green", "Received"),
+    [QuestRewardStatus.Traded] = addon:Colorize("green", "Traded"),
     [QuestRewardStatus.Claimed] = addon:Colorize("green", "Claimed"),
   }
 end)

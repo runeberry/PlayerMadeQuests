@@ -290,7 +290,7 @@ addon.StaticPopupsList = {
     end,
   },
   ["DeleteClaimedRewards"] = {
-    message = "Remove all quest rewards that have been claimed?",
+    message = "Remove all quest rewards that have been claimed?\nThis includes all rewards you have received in trades.",
     yesText = "OK",
     noText = "Cancel",
     yesHandler = function()

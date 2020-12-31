@@ -47,4 +47,8 @@ function checkpoint:OnParse(rewards)
   if rewards.parameters[tokens.PARAM_REWARDMONEY] then
     rewards.money = rewards.parameters[tokens.PARAM_REWARDMONEY]
   end
+
+  if not rewards.items and not rewards.money then
+    error("You must specify either money or items in your quest reward", 0)
+  end
 end

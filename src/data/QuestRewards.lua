@@ -1,5 +1,6 @@
 local _, addon = ...
 local GetCoinTextureString = addon.G.GetCoinTextureString
+local asserttype = addon.asserttype
 
 addon.QuestRewards = addon:NewRepository("Reward", "rewardId")
 addon.QuestRewards:SetSaveDataSource("QuestRewards")
@@ -68,9 +69,49 @@ local function saveReward(self, reward, force)
   self:Save(reward)
 end
 
+local function canClaimTradeReward(reward, trade)
+  if claimedStatuses[reward.status] then
+    -- Reward has already been claimed in some way, don't modify it
+    return false
+  end
+
+  -- Currently this automatic trade update does not check the quantity
+  -- of money or items traded against the reward quantities.
+
+  if reward.money then
+    if trade.targetMoney and trade.targetMoney > 0 then
+      -- The reward giver traded some amount of money to the player
+      return true
+    end
+  elseif reward.itemId then
+    if trade.targetItems and #trade.targetItems > 0 then
+      -- The reward giver traded some items to the player
+      for _, tradeItem in ipairs(trade.targetItems) do
+        if tradeItem.itemId == reward.itemId then
+          -- The reward giver traded this specific reward item to the player
+          return true
+        end
+      end
+    end
+  end
+end
+
 function addon.QuestRewards:FindClaimedRewards()
   return self:FindByQuery(function(reward)
     return reward.status and claimedStatuses[reward.status]
+  end)
+end
+
+--- Find all rewards where this player is listed as a reward giver
+function addon.QuestRewards:FindRewardsByGiver(playerName)
+  asserttype(playerName, "string", "playerName", "FindRewardsByGiver")
+
+  return self:FindByQuery(function(reward)
+    if reward.givers then
+      for _, giver in ipairs(reward.givers) do
+        if giver == playerName then return true end
+      end
+    end
   end)
 end
 
@@ -137,4 +178,18 @@ end
 
 addon.AppEvents:Subscribe("QuestCompleted", function(quest)
   addon.QuestRewards:SaveQuestRewards(quest)
+end)
+
+addon.AppEvents:Subscribe("PlayerTraded", function(trade)
+  if not trade.targetName then return end
+
+  local rewards = addon.QuestRewards:FindRewardsByGiver(trade.targetName)
+  if #rewards == 0 then return end
+
+  for _, reward in ipairs(rewards) do
+    if canClaimTradeReward(reward, trade) then
+      reward.status = status.Traded
+      addon.QuestRewards:Save(reward)
+    end
+  end
 end)
