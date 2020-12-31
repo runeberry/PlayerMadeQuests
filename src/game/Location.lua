@@ -28,7 +28,10 @@ function addon:GetPlayerLocation()
   local x, y = 0, 0
   if map then
     local position = GetPlayerMapPosition(map, "player")
-    x, y = position:GetXY()
+    if position then
+      x, y = position:GetXY()
+    end
+    -- If you can't get the map position, then player is just assumed to be at 0,0
   end
 
   -- Reuse the same table for tracking player info, since this is called frequently
