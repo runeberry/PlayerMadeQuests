@@ -99,6 +99,45 @@ function addon:MergeTable(t1, t2, circ)
   return merged
 end
 
+--- Extension of MergeOptions that will return a copy of defaultOptions
+--- if there are no custom options provided.
+function addon:MergeOptionsTable(defaultOptions, ...)
+  assert(defaultOptions ~= nil, "MergeOptionsTable: defaultOptions cannot be nil")
+  assert(type(defaultOptions) == "table", "MergeOptionsTable: defaultOptions must be a table, got type "..type(defaultOptions))
+
+  local customOptionsTables = { ... }
+  local merged = defaultOptions
+
+  if #customOptionsTables == 0 then
+    merged = addon:CopyTable(defaultOptions)
+  else
+    for _, customOptions in ipairs(customOptionsTables) do
+      assert(type(customOptions) == "table", "MergeOptionsTable: customOptions must be a table, got type "..type(customOptions))
+      merged = addon:MergeTable(merged, customOptions)
+    end
+  end
+
+  return merged
+end
+
+--- Copies a table of methods to an object
+function addon:ApplyMethods(obj, methods, force)
+  assert(obj ~= nil, "ApplyMethods: cannot apply methods to a nil object")
+  assert(type(obj) == "table", "ApplyMethods: object must be a table, got type: "..type(obj))
+  assert(methods ~= nil, "ApplyMethods: cannot apply nil method table to an object")
+  assert(type(methods) == "table", "ApplyMethods: methods must be a table, got type: "..type(methods))
+
+  for fname, fn in pairs(methods) do
+    if type(fname) == "string" and type(fn) == "function" then
+      if not force and obj[fname] ~= nil then
+        addon.Logger:Error("ApplyMethods: '%s' is already a method on this object", fname)
+      else
+        obj[fname] = fn
+      end
+    end
+  end
+end
+
 function addon:DistinctSet(t)
   if t == nil then error("Cannot create a set from a nil table") end
   local set, i = {}, 0
@@ -183,32 +222,35 @@ end
 function addon:UnpackRGBA(t)
   if not t then
     return 0.0, 0.0, 0.0, 1.0
-  end
-  if t.r or t.g or t.b or t.a then
+  elseif type(t) == "number" then
+    return t, t, t, 1.0
+  elseif t.r or t.g or t.b or t.a then
     return t.r or 0.0, t.g or 0.0, t.b or 0.0, t.a or 1.0
   else
     return t[1] or 0.0, t[2] or 0.0, t[3] or 0.0, t[4] or 1.0
   end
 end
 
--- Unpacks either format { x = x, y = y } or { x, y }
+-- Unpacks either format { l = l, r = r, t = t, b = b } or { l, r, t, b }
 function addon:UnpackLRTB(t)
   if not t then
     return 0, 0, 0, 0
-  end
-  if t.l or t.r or t.t or t.b then
+  elseif type(t) == "number" then
+    return t, t, t, t
+  elseif t.l or t.r or t.t or t.b then
     return t.l or 0, t.r or 0, t.t or 0, t.b or 0
   else
     return t[1] or 0, t[2] or 0, t[3] or 0, t[4] or 0
   end
 end
 
--- Unpacks either format { l = l, r = r, t = t, b = b } or { l, r, t, b }
+-- Unpacks either format { x = x, y = y } or { x, y }
 function addon:UnpackXY(t)
   if not t then
     return 0.0, 0.0
-  end
-  if t.x or t.y then
+  elseif type(t) == "number" then
+    return t, t
+  elseif t.x or t.y then
     return t.x or 0.0, t.y or 0.0
   else
     return t[1] or 0.0, t[2] or 0.0

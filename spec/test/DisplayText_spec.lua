@@ -213,73 +213,73 @@ describe("DisplayText", function()
       {
         start = "{ zone: Elwynn Forest }",
         expected = {
-          log = "Go to Elwynn Forest",
-          quest = "Go to Elwynn Forest",
-          full = "Go to Elwynn Forest",
+          log = "Go to Elwynn Forest.",
+          quest = "Go to Elwynn Forest.",
+          full = "Go to Elwynn Forest.",
         }
       },
       {
         start = "{ zone: Elwynn Forest, subzone: Goldshire }",
         expected = {
-          log = "Go to Goldshire",
-          quest = "Go to Goldshire in Elwynn Forest",
-          full = "Go to Goldshire in Elwynn Forest",
+          log = "Go to Goldshire.",
+          quest = "Go to Goldshire in Elwynn Forest.",
+          full = "Go to Goldshire in Elwynn Forest.",
         }
       },
       {
         start = "{ zone: Elwynn Forest, coords: '22,15.1,0.4' }",
         expected = {
-          log = "Go to Elwynn Forest",
-          quest = "Go to (22, 15.1) in Elwynn Forest",
-          full = "Go to (22, 15.1) +/- 0.4 in Elwynn Forest",
+          log = "Go to Elwynn Forest.",
+          quest = "Go to (22, 15.1) in Elwynn Forest.",
+          full = "Go to (22, 15.1) +/- 0.4 in Elwynn Forest.",
         }
       },
       {
         start = "{ zone: Elwynn Forest, subzone: Goldshire, coords: '22,15.1,0.4' }",
         expected = {
-          log = "Go to Goldshire",
-          quest = "Go to (22, 15.1) in Goldshire in Elwynn Forest",
-          full = "Go to (22, 15.1) +/- 0.4 in Goldshire in Elwynn Forest",
+          log = "Go to Goldshire.",
+          quest = "Go to (22, 15.1) in Goldshire in Elwynn Forest.",
+          full = "Go to (22, 15.1) +/- 0.4 in Goldshire in Elwynn Forest.",
         }
       },
       {
         start = "{ target: Innkeeper Farley }",
         expected = {
-          log = "Go to Innkeeper Farley",
-          quest = "Go to Innkeeper Farley",
-          full = "Go to Innkeeper Farley",
+          log = "Target Innkeeper Farley.",
+          quest = "Target Innkeeper Farley.",
+          full = "Target Innkeeper Farley.",
         }
       },
       {
         start = "{ target: Bob, zone: Durotar }",
         expected = {
-          log = "Go to Bob in Durotar",
-          quest = "Go to Bob in Durotar",
-          full = "Go to Bob in Durotar",
+          log = "Target Bob in Durotar.",
+          quest = "Target Bob in Durotar.",
+          full = "Target Bob in Durotar.",
         }
       },
       {
         start = "{ target: Bob, zone: Durotar, subzone: Jaggedswine Farm }",
         expected = {
-          log = "Go to Bob at Jaggedswine Farm",
-          quest = "Go to Bob at Jaggedswine Farm in Durotar",
-          full = "Go to Bob at Jaggedswine Farm in Durotar",
+          log = "Target Bob at Jaggedswine Farm.",
+          quest = "Target Bob at Jaggedswine Farm in Durotar.",
+          full = "Target Bob at Jaggedswine Farm in Durotar.",
         }
       },
       {
         start = "{ target: Bob, zone: Durotar, coords: '13.81,71,1.3' }",
         expected = {
-          log = "Go to Bob in Durotar",
-          quest = "Go to Bob at (13.81, 71) in Durotar",
-          full = "Go to Bob at (13.81, 71) +/- 1.3 in Durotar",
+          log = "Target Bob in Durotar.",
+          quest = "Target Bob at (13.81, 71) in Durotar.",
+          full = "Target Bob at (13.81, 71) +/- 1.3 in Durotar.",
         }
       },
       {
         start = "{ target: Bob, zone: Durotar, subzone: Jaggedswine Farm, coords: '13.81,71,1.3' }",
         expected = {
-          log = "Go to Bob at Jaggedswine Farm",
-          quest = "Go to Bob at (13.81, 71) in Jaggedswine Farm in Durotar",
-          full = "Go to Bob at (13.81, 71) +/- 1.3 in Jaggedswine Farm in Durotar",
+          log = "Target Bob at Jaggedswine Farm.",
+          quest = "Target Bob at (13.81, 71) in Jaggedswine Farm in Durotar.",
+          full = "Target Bob at (13.81, 71) +/- 1.3 in Jaggedswine Farm in Durotar.",
         }
       },
     }

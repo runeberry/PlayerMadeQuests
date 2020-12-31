@@ -2,7 +2,7 @@ local _, addon = ...
 local time, strsplit = addon.G.time, addon.G.strsplit
 
 local idCounter = 0
--- Returns a string ID based on an incrementing counter and the current time
+--- Returns a string ID based on an incrementing counter and the current time
 function addon:CreateID(str)
   idCounter = idCounter + 1
   local id = time().."-"..idCounter
@@ -12,8 +12,24 @@ function addon:CreateID(str)
   return id
 end
 
--- Parses a GUID string into a table with named properties
--- Parsed based on this information: https://wow.gamepedia.com/GUID
+local globalNames = {}
+--- Creates a unique, incrementing global variable name given a partial name
+function addon:CreateGlobalName(str)
+  assert(type(str) == "string", "CreateGlobalName: a string name must be provided")
+
+  local count = (globalNames[str] or 0) + 1
+  globalNames[str] = count
+
+  -- Add a prefix to avoid global collisions
+  str = "PMQ_"..str
+  -- If %i is specified, sub this with an incrementing counter for this name
+  str = str:gsub("%%i", tostring(count))
+
+  return str
+end
+
+--- Parses a GUID string into a table with named properties
+--- Parsed based on this information: https://wow.gamepedia.com/GUID
 function addon:ParseGUID(guid)
   local parsed = {
     GUID = guid

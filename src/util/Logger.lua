@@ -216,9 +216,7 @@ local function logger_NewLogger(self, name, min)
     NewLogger = logger_NewLogger,
   }
 
-  for fname, method in pairs(methods) do
-    logger[fname] = method
-  end
+  addon:ApplyMethods(logger, methods)
 
   if not min then
     min = ll.info

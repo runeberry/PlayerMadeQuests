@@ -4,14 +4,6 @@ local QuestCatalogStatus, QuestStatus = addon.QuestCatalogStatus, addon.QuestSta
 local MessageEvents, MessageDistribution = addon.MessageEvents, addon.MessageDistribution
 local IsInGroup, IsInRaid = addon.G.IsInGroup, addon.G.IsInRaid
 
-local function cleanQuestForSharing(quest)
-  quest.status = nil
-
-  for _, obj in pairs(quest.objectives) do
-    obj.progress = 0
-  end
-end
-
 local function getNewerQuest(q1, s1, q2, s2)
   if (not q1 or not q1.metadata) and (not q2 or not q2.metadata) then
     error("Cannot determine newer question version - neither quest contains version information")
@@ -50,7 +42,7 @@ function addon:ShareQuest(quest, suppressMetadata)
 
   -- Make a copy for sharing, and clean the current player's status/progress from it
   quest = addon:CopyTable(quest)
-  cleanQuestForSharing(quest)
+  addon:CleanQuest(quest)
   addon.QuestEngine:Validate(quest) -- Sanity check, don't want to send players broken quests
 
   if not suppressMetadata then
@@ -99,7 +91,7 @@ addon:OnBackendStart(function()
     -- Need to determine the most recent known version of this quest from all possible sources
     local source
     quest, source = findNewestQuestVersion(quest)
-    cleanQuestForSharing(quest) -- Failsafe: erase any previous progress from quest, in case it got sent over
+    addon:CleanQuest(quest) -- Failsafe: erase any previous progress from quest, in case it got sent over
     addon.QuestEngine:Validate(quest) -- Sanity check: ensure quest is playable before proceeding
 
     -- Once we've found the most recent one, perform any migrations (if necessary) to bring the quest up to the current addon version

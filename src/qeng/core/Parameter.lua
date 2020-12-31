@@ -81,11 +81,7 @@ local methods = {
   --- @param options table - options specific to this Parameter
   ["Validate"] = function(self, rawValue, options)
     -- Values on options take priority over values on self
-    if options then
-      options = addon:MergeTable(self.options, options)
-    else
-      options = self.options
-    end
+    options = addon:MergeOptionsTable(self.options, options)
 
     -- First, check if the value is nil. If the value is not required, we can safely return now, there is nothing to validate.
     -- But if the value is required, then nil is immediately invalid.
@@ -147,7 +143,7 @@ local methods = {
     end
 
     if validationError then
-      error(validationError)
+      error(validationError, 0)
     end
 
     return rawValue
@@ -160,7 +156,7 @@ local methods = {
     return result
   end,
   ["Parse"] = function(self, rawValue, options)
-    if rawValue == nil and self.defaultValue then
+    if rawValue == nil and self.defaultValue ~= nil then
       -- If the default value is used, bypass validate and parse
       rawValue = self.defaultValue
     else
@@ -186,9 +182,7 @@ function addon.QuestEngine:NewParameter(name)
     options = {},
   }
 
-  for fname, fn in pairs(methods) do
-    parameter[fname] = fn
-  end
+  addon:ApplyMethods(parameter, methods)
 
   addon.QuestEngine:AddDefinition("parameters", name, parameter)
   return parameter

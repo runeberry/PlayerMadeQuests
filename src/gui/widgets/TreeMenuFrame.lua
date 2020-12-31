@@ -195,9 +195,7 @@ function widget:Create()
   -- Give OnGroupSelect a quick way to access the top-level frame
   contentContainer._treeMenuFrame = frame
 
-  for name, method in pairs(methods) do
-    frame[name] = method
-  end
+  addon:ApplyMethods(frame, methods)
 
   frame:Hide()
   return frame

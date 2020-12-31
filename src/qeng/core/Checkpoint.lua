@@ -76,11 +76,7 @@ local methods = {
   --- Adds a parameter that can be used with any instance of this checkpoint.
   --- For example: "goal" or "text".
   ["AddParameter"] = function(self, name, options)
-    if options then
-      options = addon:MergeTable(defaultParameterOptions, options)
-    else
-      options = addon:CopyTable(defaultParameterOptions)
-    end
+    options = addon:MergeOptionsTable(defaultParameterOptions, options)
     options.name = name
     self.parameters[name] = options
   end,
@@ -149,6 +145,11 @@ local methods = {
       end
     end
 
+    if self.OnParse then
+      -- Optional hook to further modify the checkpoint after conditions/parameters have been assigned
+      self:OnParse(cp)
+    end
+
     -- If there are any values left unassigned in the rawValue, then some unexpected values are present
     for k, _ in pairs(rawValue) do
       errorf("'%s' is not a supported parameter on checkpoint '%s'", k, self.name)
@@ -201,9 +202,7 @@ function addon.QuestEngine:NewCheckpoint(name)
     conditions = {},
   }
 
-  for fname, fn in pairs(methods) do
-    checkpoint[fname] = fn
-  end
+  addon:ApplyMethods(checkpoint, methods)
 
   addon.QuestEngine:AddDefinition("checkpoints", name, checkpoint)
   return checkpoint

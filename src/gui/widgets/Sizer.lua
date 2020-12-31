@@ -79,9 +79,7 @@ function widget:Create(frame)
   frame:EnableMouse(true)
   frame:SetResizable(true)
 
-  for fname, fn in pairs(methods) do
-    frame[fname] = fn
-  end
+  addon:ApplyMethods(frame, methods)
 
   -- The sizer itself is not contained within a frame, but rather applied
   -- to the parent frame. So there isn't really a valid "widget" to return

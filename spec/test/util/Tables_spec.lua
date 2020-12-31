@@ -208,6 +208,109 @@ describe("Tables", function()
     end)
   end)
 
+  describe("MergeOptionsTable", function()
+    it("can merge custom options", function()
+      local defaultOptions = {
+        v1 = "v1",
+        v2 = "v2",
+      }
+      local customOptions = {
+        v2 = "custom-v2",
+        v3 = "custom-v3",
+      }
+
+      local merged = addon:MergeOptionsTable(defaultOptions, customOptions)
+
+      assert.equals(defaultOptions.v1, merged.v1)
+      assert.equals(customOptions.v2, merged.v2)
+      assert.equals(customOptions.v3, merged.v3)
+    end)
+    it("can merge multiple options tables", function()
+      local defaultOptions = {
+        v1 = "v1",
+        v2 = "v2",
+      }
+      local customOptions1 = {
+        v2 = "custom-v2",
+        v3 = "custom-v3",
+      }
+      local customOptions2 = {
+        v3 = "super-custom-v3",
+        v4 = "super-custom-v4",
+      }
+
+      local merged = addon:MergeOptionsTable(defaultOptions, customOptions1, customOptions2)
+
+      assert.equals(defaultOptions.v1, merged.v1)
+      assert.equals(customOptions1.v2, merged.v2)
+      assert.equals(customOptions2.v3, merged.v3)
+      assert.equals(customOptions2.v4, merged.v4)
+    end)
+    it("can copy default options if no custom options provided", function()
+      local defaultOptions = {
+        v1 = "v1",
+        v2 = "v2",
+      }
+
+      local merged = addon:MergeOptionsTable(defaultOptions, nil)
+
+      assert.equals(defaultOptions.v1, merged.v1)
+      assert.equals(defaultOptions.v2, merged.v2)
+    end)
+    it("cannot merge nil default options", function()
+      assert.has_error(function() addon:MergeOptionsTable(nil, {}) end)
+    end)
+    it("cannot merge non-table default options", function()
+      assert.has_error(function() addon:MergeOptionsTable("non-table", {}) end)
+    end)
+    it("cannot merge non-table custom options", function()
+      assert.has_error(function() addon:MergeOptionsTable({}, "non-table") end)
+    end)
+  end)
+
+  describe("ApplyMethods", function()
+    it("can apply methods to an object", function()
+      local obj = {
+        Value = 1,
+      }
+      local methods = {
+        Property = 3,
+        ["DoThing"] = function() end,
+        ["DoOtherThing"] = function() end,
+      }
+
+      addon:ApplyMethods(obj, methods)
+
+      assert.equals(methods.DoThing, obj.DoThing)
+      assert.equals(methods.DoOtherThing, obj.DoOtherThing)
+      assert.is_nil(obj.Property)
+    end)
+    it("cannot overwrite methods on an object without force", function()
+      local obj = {
+        ["DoThing"] = function() end,
+      }
+      local methods = {
+        ["DoThing"] = function() end,
+      }
+
+      addon:ApplyMethods(obj, methods)
+
+      assert.not_equals(methods.DoThing, obj.DoThing)
+    end)
+    it("can overwrite methods on an object with force", function()
+      local obj = {
+        ["DoThing"] = function() end,
+      }
+      local methods = {
+        ["DoThing"] = function() end,
+      }
+
+      addon:ApplyMethods(obj, methods, true)
+
+      assert.equals(methods.DoThing, obj.DoThing)
+    end)
+  end)
+
   describe("DistinctSet", function()
     it("can create a set from a table", function()
       local expected = {
@@ -407,6 +510,13 @@ describe("Unpack", function()
       assert.equals(0.0, b)
       assert.equals(1.0, a)
     end)
+    it("can unpack a number", function()
+      local r, g, b, a = addon:UnpackRGBA(5)
+      assert.equals(5, r)
+      assert.equals(5, g)
+      assert.equals(5, b)
+      assert.equals(1.0, a)
+    end)
     it("can unpack nil", function()
       local r, g, b, a = addon:UnpackRGBA()
       assert.equals(0.0, r)
@@ -449,6 +559,13 @@ describe("Unpack", function()
       assert.equals(0, t)
       assert.equals(0, b)
     end)
+    it("can unpack a number", function()
+      local l, r, t, b = addon:UnpackLRTB(5)
+      assert.equals(5, l)
+      assert.equals(5, r)
+      assert.equals(5, t)
+      assert.equals(5, b)
+    end)
     it("can unpack nil", function()
       local l, r, t, b = addon:UnpackLRTB()
       assert.equals(0, l)
@@ -482,6 +599,11 @@ describe("Unpack", function()
       local x, y = addon:UnpackXY(xy)
       assert.equals(xy[1], x)
       assert.equals(0.0, y)
+    end)
+    it("can unpack a number", function()
+      local x, y = addon:UnpackXY(5)
+      assert.equals(5, x)
+      assert.equals(5, y)
     end)
     it("can unpack nil", function()
       local x, y = addon:UnpackXY()

@@ -15,6 +15,7 @@ addon.MainMenu:SetMenuTree({ -- value == menuId
       { value = "QuestDemoListMenu", text = "Demo Quests" },
       { value = "QuestDraftListMenu", text = "My Drafts" },
       { value = "QuestLogMenu", text = "My Quest Log" },
+      { value = "QuestRewardsMenu", text = "Quest Rewards" },
       { value = "QuestArchiveMenu", text = "Quest Archive" },
     }
   },
@@ -39,7 +40,7 @@ addon.MainMenu:SetScript("OnShow", function()
 end)
 
 -- Make closable with ESC
-local mmfGlobalName = "PMQ_MainMenuFrame"
+local mmfGlobalName = addon:CreateGlobalName("MainMenuFrame")
 _G[mmfGlobalName] = addon.MainMenu
 table.insert(UISpecialFrames, mmfGlobalName)
 

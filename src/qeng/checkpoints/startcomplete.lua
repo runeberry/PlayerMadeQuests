@@ -4,9 +4,9 @@ local tokens = addon.QuestScriptTokens
 local function setup(checkpoint)
   checkpoint:AddParameter(tokens.PARAM_TEXT, {
     defaultValue = {
-      log = "Go to %t[%sz:[%t: at] %sz|[%z:[%t: in] %z]]",
-      quest = "Go to [%t ][%atin ]%xyz[%a: while having %a]",
-      full = "Go to [%t ][%atin ]%xyrz[%a: while having %a]"
+      log = "[%t:Target %t|[%z2:Go to]][%sz:[%t: at] %sz|[%z:[%t: in] %z]].",
+      quest = "[%t:Target %t[ %atin]|[%z2:Go to]][ %xyz][%a: while having %a].",
+      full = "[%t:Target %t[ %atin]|[%z2:Go to]][ %xyrz][%a: while having %a]."
     },
   })
 

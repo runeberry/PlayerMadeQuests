@@ -1,5 +1,5 @@
 local _, addon = ...
-local frame = addon.G.UIErrorsFrame
+local UIErrorsFrame = addon.G.UIErrorsFrame
 
 local progressCache = {}
 
@@ -19,7 +19,7 @@ addon.AppEvents:Subscribe("ObjectiveUpdated", function(obj)
     msg = msg.." (Complete)"
   end
 
-  frame:AddMessage(msg, 1.0, 1.0, 0.1)
+  UIErrorsFrame:AddMessage(msg, 1.0, 1.0, 0.1)
 end)
 
 addon.AppEvents:Subscribe("ObjectiveCompleted", function(obj)

@@ -278,4 +278,38 @@ addon.StaticPopupsList = {
       end
     end,
   },
+  ["DeleteReward"] = {
+    message = function(reward)
+      return string.format("Remove the following reward?\n%s", addon.QuestRewards:GetRewardName(reward))
+    end,
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function(reward)
+      addon.QuestRewards:Delete(reward)
+      addon.Logger:Warn("Quest reward removed: %s", addon.QuestRewards:GetRewardName(reward))
+    end,
+  },
+  ["DeleteClaimedRewards"] = {
+    message = "Remove all quest rewards that have been claimed?\nThis includes all rewards you have received in trades.",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function()
+      local rewards = addon.QuestRewards:FindClaimedRewards()
+      if #rewards > 0 then
+        for _, reward in ipairs(rewards) do
+          addon.QuestRewards:Delete(reward)
+        end
+        addon.Logger:Warn("Removed %i claimed quest reward(s)", #rewards)
+      end
+    end,
+  },
+  ["ResetRewards"] = {
+    message = "Clear your history of all quest rewards?",
+    yesText = "OK",
+    noText = "Cancel",
+    yesHandler = function()
+      addon.QuestRewards:DeleteAll()
+      addon.Logger:Warn("Removed all quest rewards")
+    end,
+  },
 }

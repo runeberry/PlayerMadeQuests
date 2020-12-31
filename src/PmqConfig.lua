@@ -26,6 +26,11 @@ addon.defaultSettings = {
   NOTIFY_COMPLETE_SHARER = true,
   NOTIFY_COMPLETE_BULK = true,
   NOTIFY_VERSION_UPDATE = true,
+  --- How often (# of items) a progress log should be printed when scanning for items.
+  ITEM_SCAN_LOG_INTERVAL = 500,
+  --- The amount of time in seconds to wait to see if an item comes back
+  --- from GetItemInfo()
+  ITEM_SCAN_TIMEOUT = 1,
   --- The amount of time in seconds between checks for the player's location
   --- when location polling is enabled.
   PLAYER_LOCATION_INTERVAL = 1.0,

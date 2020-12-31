@@ -141,9 +141,7 @@ local function buildQuestLogFrame()
   scroller:AddChild(questList)
   frame._questList = questList
 
-  for fname, fn in pairs(methods) do
-    frame[fname] = fn
-  end
+  addon:ApplyMethods(frame, methods)
 
   frame._subscriptions = {}
   local refresher = function() frame:Refresh() end

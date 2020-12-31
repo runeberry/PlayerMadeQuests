@@ -1,253 +1,262 @@
 local _, addon = ...
 local logger = addon.Logger:NewLogger("Items")
+local GameItemCache = addon.GameItemCache
+local GetItemInfo, GetItemInfoInstant = addon.G.GetItemInfo, addon.G.GetItemInfoInstant
 
-local GetItemInfo = addon.G.GetItemInfo
-local GetContainerItemInfo = addon.G.GetContainerItemInfo
+-- Keep track of every handler that's waiting on item info to be available
+local itemInfoSubscribers = {}
 
--- Note on bagIds:
--- Bag -2 is supposed to be the keyring according to: https://wow.gamepedia.com/BagID
--- But I was getting weird results like "Light Leather" when scanning that bag.
--- What is the actual keyring id? Idk...
-local bagIds = { 0, 1, 2, 3, 4 } -- All the bags to scan for player inventory
-local maxBagSlots = 20
-local didJustLoot = false -- Keeps track of when an inventory change is due to looting a mob
+--- Returns either the itemId as a number, or the all-lowercase item name
+local function parseIdOrName(idOrName)
+  local itemId, itemName
 
---- Represents the player's inventory in the order that it appears in the player's bags
---- The current and previous copies are kept so the delta can be calculated
-local playerInventory
-local inventorySnapshots = {}
-
-local function buildInventory()
-  return {
-    -- Items are grouped per bag slot, as ordered in the player's inventory.
-    -- Empty slots are not accounted for.
-    bySlot = {
-      -- Hash will change if the order of any items changes
-      hash = 0,
-      list = {},
-    },
-    -- Items are grouped by name and associated quantity
-    byName = {
-      -- use byId's hash
-      list = {},
-    },
-    -- Items are grouped by id and associated quantity
-    byId = {
-      -- Hash will change only if an item is added or removed from the inventory
-      hash = 0,
-      list = {},
-    },
-  }
-end
-
--- https://wow.gamepedia.com/API_GetContainerItemInfo
-local function getContainerItem(bagId, slot)
-  local v1, v2, v3, v4, v5, v6, v7, v8, v9, v10 = GetContainerItemInfo(bagId, slot)
-  if not v10 then return end -- Nothing in that slot
-  local itemName = GetItemInfo(v10)
-
-  local itemInfo = {
-    bagId = bagId,
-    slot = slot,
-    order = (bagId * maxBagSlots) + slot,
-
-    icon = v1,        -- fileID (number)
-    itemCount = v2,   -- (number)
-    locked = v3,      -- true if file is locked by the server (boolean)
-    quality = v4,     -- maps to common, rare, epic, etc (number)
-    readable = v5,    -- can the item be read, like a book? (boolean)
-    lootable = v6,    -- can the item be looted, like a lockbox? (boolean)
-    itemLink = v7,    -- (string)
-    isFiltered = v8,  -- is the item greyed out because of an inventory search? (boolean)
-    noValue = v9,     -- true if the item has no gold value (boolean)
-    itemId = v10,     -- (number)
-
-    itemName = itemName,  -- Localized item name (string)
-  }
-
-  return itemInfo
-end
-
-local function invSort(a, b) return a.order < b.order end
-local function contSort(a, b) return a.itemId < b.itemId end
-local function updatePlayerInventory()
-  playerInventory = buildInventory()
-
-  local slotList = playerInventory.bySlot.list
-  local idList = playerInventory.byId.list
-  local nameList = playerInventory.byName.list
-
-  for _, bagId in ipairs(bagIds) do
-    for slot = 0, maxBagSlots do
-      local itemInfo = getContainerItem(bagId, slot)
-      if itemInfo then
-        -- Index by container slot, no additional grouping necessary
-        slotList[#slotList+1] = itemInfo
-
-        -- Check if this item is indexed by id, if not then initialize all indexes
-        local existing = idList[itemInfo.itemId]
-        if not existing then
-          existing = {
-            itemId = itemInfo.itemId,
-            itemName = itemInfo.itemName,
-            itemCount = 0,
-          }
-          -- Use the same table ref for both name and id indexes
-          idList[itemInfo.itemId] = existing
-          nameList[itemInfo.itemName] = existing
-        end
-
-        existing.itemCount = existing.itemCount + itemInfo.itemCount
-      end
+  if type(idOrName) == "number" then
+    itemId = idOrName
+  elseif type(idOrName) == "string" then
+    itemId = tonumber(idOrName)
+    if not itemId then
+      itemName = idOrName:lower()
     end
-  end
-
-  -- Sort the player's inventory by its "absolute" bag slot
-  table.sort(playerInventory, invSort)
-  playerInventory.bySlot.hash = addon:GetTableHash(playerInventory)
-
-  -- Sort the inventory's contents by its itemId
-  -- Needs to be sorted consistently in order for hash values to be consistent
-  -- So put the items in an array then sort by id
-  local hashable = {}
-  for _, item in pairs(idList) do
-    hashable[#hashable+1] = item
-  end
-  table.sort(hashable, contSort)
-  playerInventory.byId.hash = addon:GetTableHash(hashable)
-end
-
---- Gets the player's inventory sorted by how it appears in their bags.
---- @return table array of items
-function addon:GetPlayerInventory()
-  assert(playerInventory, "Failed to GetPlayerInventory: player inventory is not loaded")
-  return playerInventory.bySlot.list
-end
-
---- Gets a table of the different items in the player's bags and the quantities of each.
---- Items that span across multiple bag slots will be grouped together and counted.
---- @return table { ['Hearthstone'] = 1, ['Linen Cloth'] = 120, ... }
-function addon:GetPlayerInventoryContents()
-  assert(playerInventory, "Failed to GetPlayerInventoryContents: player inventory is not loaded")
-  return playerInventory.byId.list
-end
-
---- Returns the number of this specific item in the player's inventory.
---- @param itemNameOrId string or number, the item to search for
---- @return number the number of that item the player has
-function addon:GetPlayerItemQuantity(itemNameOrId)
-  assert(playerInventory, "Failed to GetPlayerItemQuantity: player inventory is not loaded")
-  assert(itemNameOrId, "Failed to GetPlayerItemQuantity: itemNameOrId is required")
-
-  local item = playerInventory.byId.list[itemNameOrId] or playerInventory.byName.list[itemNameOrId]
-  if not item then
-    return 0 -- Item not found
-  end
-
-  return item.itemCount
-end
-
---- Creates a copy of the player's current inventory contents that can be referenced later.
---- @param name string - the name of the snapshot
-function addon:CreateInventorySnapshot(name)
-  assert(playerInventory, "Failed to CreateInventorySnapshot: player inventory is not loaded")
-  assert(type(name) == "string", "Failed to CreateInventorySnapshot: a snapshot name must be provided")
-
-  local currentInventory = addon:CopyTable(playerInventory)
-  inventorySnapshots[name] = currentInventory
-  logger:Trace("Saved inventory snapshot: %s", name)
-end
-
---- Removes a saved copy of the player's inventory contents
---- @param name string - the name of the snapshot
-function addon:ClearInventorySnapshot(name)
-  assert(playerInventory, "Failed to ClearInventorySnapshot: player inventory is not loaded")
-  assert(type(name) == "string", "Failed to ClearInventorySnapshot: a snapshot name must be provided")
-
-  local snapshot = inventorySnapshots[name]
-  inventorySnapshots[name] = nil
-  if snapshot then
-    logger:Trace("Cleared inventory snapshot: %s", name)
   else
-    logger:Trace("No inventory snapshot to clear with name: %s", name)
+    if idOrName == nil then
+      error("Item idOrName must not be nil", 3)
+    end
+    error("Item idOrName must be a number or string", 3)
+  end
+
+  return itemId, itemName
+end
+
+-- Based on: https://wow.gamepedia.com/API_GetItemInfo
+local function parseFullInfo(idOrName, item)
+  item = item or {}
+  local full = { GetItemInfo(idOrName) }
+
+  if not full[1] then
+    -- Info not yet available on client, but will come back from server
+    return
+  end
+
+  item.full = true -- Mark that this object contains the complete item info
+
+  item.name = full[1]
+  item.link = full[2]
+  item.rarity = full[3]
+  item.level = full[4]
+  item.minLevel = full[5]
+  item.type = full[6] -- instant
+  item.subType = full[7] -- instant
+  item.stackCount = full[8]
+  item.equipLoc = full[9] -- instant
+  item.icon = full[10] -- instant
+  item.sellPrice = full[11]
+  item.classId = full[12] -- instant
+  item.subClassId = full[13] -- instant
+  item.bindType = full[14]
+  item.expacId = full[15]
+  item.itemSetId = full[16]
+  item.isCraftingReagent = full[17]
+
+  return item
+end
+
+-- Based on: https://wow.gamepedia.com/API_GetItemInfoInstant
+local function parseInstantInfo(idOrName, item)
+  item = item or {}
+  local instant = { GetItemInfoInstant(idOrName) }
+
+  if not instant[1] then
+    -- Item not found, presumably?
+    return
+  end
+
+  item.itemId = instant[1] -- not returned on full info, suprisingly
+  item.type = instant[2]
+  item.subType = instant[3]
+  item.equipLoc = instant[4]
+  item.icon = instant[5]
+  item.classId = instant[6]
+  item.subClassId = instant[7]
+
+  return item
+end
+
+local function getItem(idOrName)
+  local itemId, itemName = parseIdOrName(idOrName)
+
+  if not itemId and itemName then
+    -- If given a name, prefer the id if we have it cached
+    itemId = GameItemCache:FindItemID(itemName)
+  end
+
+  local item = {}
+
+  local instant = parseInstantInfo(itemId or itemName, item)
+  if not instant then return end -- item not found
+
+  local full = parseFullInfo(itemId or itemName, item)
+  if full then
+    addon.AppEvents:Publish("ItemInfoAvailable", item)
+  end
+
+  return item
+end
+
+--- Empties all cached items from this session
+function addon:ClearItemCache()
+  local items = GameItemCache:FindAll()
+  GameItemCache:DeleteAll()
+  addon.Logger:Warn("Item cache cleared (%i items removed)", #items)
+end
+
+--- Gets all known info about this item id, name, or link.
+--- If some data is missing, a server request will be initiated to get the remainder.
+--- If this is not a valid item id, name, or link, an error will be thrown.
+--- @param idOrName string (or number) the item id, name, or link
+function addon:LookupItem(idOrName)
+  parseIdOrName(idOrName)
+
+  local item = getItem(idOrName)
+  assert(item, "Unknown item: "..idOrName)
+
+  return item
+end
+
+--- Same as LookupItem, but will return nil instead of throwing an error if the item was not found.
+--- @param idOrName string (or number) the item id, name, or link
+function addon:LookupItemSafe(idOrName)
+  parseIdOrName(idOrName)
+  return getItem(idOrName)
+end
+
+--- Performs an async item lookup that will only resolve if or when the full item info is available.
+--- @param idOrName string (or number) the item id or name
+--- @param handler function function to handle an item (info) object
+--- @return table the currently available item info, or nil if not found
+function addon:LookupItemAsync(idOrName, handler)
+  local itemId, itemName = parseIdOrName(idOrName)
+
+  local handlerKey = itemId or itemName
+  local handlers = itemInfoSubscribers[handlerKey]
+  if not handlers then
+    handlers = {}
+    itemInfoSubscribers[handlerKey] = handlers
+  end
+
+  handlers[#handlers+1] = handler
+
+  local item
+  addon:catch(function()
+    item = getItem(idOrName)
+  end)
+
+  if not item then
+    -- If not even a stub item could be found, then remove the handlers, because it will never be resolved
+    handlers[#handlers] = nil
+  end
+
+  return item
+end
+
+local scanData
+
+--- Scans for ALL items by ID by simply starting at ID 1 and counting up.
+--- Performs only request one item at a time - doesn't start looking up the next item
+--- until the current async request has finished.
+function addon:ScanItems(min, max)
+  if scanData then
+    addon.Logger:Warn("Scan already in progress: currently on %i (%i items found)", scanData.id, scanData.total)
+    return
+  end
+
+  -- This default max is based on a query from: https://wow-query.dev/
+  -- The actual max for classic seems to be somewhere around 25000
+  local maxPossibleItemId = 184843
+
+  min = addon:ConvertValue(min or 1, "number")
+  max = addon:ConvertValue(max or maxPossibleItemId, "number")
+  assert(min and max, "A valid min and max value must be provided")
+
+  scanData = {
+    total = 0,
+    timeoutTotal = 0,
+    min = min,
+    max = max,
+    id = min - 1,
+  }
+
+  addon.Logger:Warn("Beginning item scan - /reload to cancel...")
+
+  local lookupNextItem
+  local timeoutHandlerId
+  local logInterval = addon.Config:GetValue("ITEM_SCAN_LOG_INTERVAL")
+  local asyncTimeout = addon.Config:GetValue("ITEM_SCAN_TIMEOUT")
+
+  if logInterval < 1 then logInterval = maxPossibleItemId end
+
+  local function handleItem(item)
+    -- Cancel any timeout handlers because... it didn't timeout!
+    addon.Ace:CancelTimer(timeoutHandlerId)
+    timeoutHandlerId = nil
+
+    -- Resume scanning now that we're positive the item has been fully defined (and therefore cached)
+    scanData.total = scanData.total + 1
+    if scanData.total % logInterval == 0 then
+      addon.Logger:Warn("Scanning items, %i found...", scanData.total, scanData.timeoutTotal)
+    end
+    lookupNextItem(item.itemId)
+  end
+
+  lookupNextItem = function(id)
+    if not id then
+      addon.Logger:Warn("Stopping scan: itemId is nil")
+    else
+      while id < scanData.max do
+        id = id + 1
+        scanData.id = id -- for logging only
+        if addon:LookupItemAsync(id, handleItem) then
+          -- Found a real item (stub), stop scanning until it's fully available
+          logger:Trace("Scanning for item: %i", id)
+          timeoutHandlerId = addon.Ace:ScheduleTimer(function()
+            logger:Trace("Item lookup timed out: %i", id)
+            timeoutHandlerId = nil
+            scanData.timeoutTotal = scanData.timeoutTotal + 1
+
+            -- If the item timed out, remove the subscriber from memory...
+            itemInfoSubscribers[id] = nil
+            -- ...and move on to the next item
+            lookupNextItem(id)
+          end, asyncTimeout)
+          return
+        end
+      end
+    end
+
+    addon.Logger:Warn("Item scan finished: %i items found (%i timed out).", scanData.total, scanData.timeoutTotal)
+    scanData = nil
+  end
+
+  -- Kick off the scan!
+  lookupNextItem(scanData.id)
+end
+
+addon.GameEvents:Subscribe("GET_ITEM_INFO_RECEIVED", function(itemId, success)
+  if success then
+    getItem(itemId) -- this will trigger ItemInfoAvailable to be published
+  end
+end)
+
+local function handleSubscribers(key, item)
+  local handlers = itemInfoSubscribers[key]
+  if handlers then
+    for _, handler in ipairs(handlers) do
+      handler(item)
+    end
+    itemInfoSubscribers[key] = nil
   end
 end
 
---- Calculates what items the player has lost or gained since the specified inventory snapshot
---- @param name string - the name of the snapshot
---- @return table - { ["item name"] = 1, ["other item name"] = -1 }
-function addon:GetInventorySnapshotDelta(name)
-  assert(playerInventory, "Failed to GetInventorySnapshotDelta: player inventory is not loaded")
-  assert(type(name) == "string", "Failed to GetInventorySnapshotDelta: a snapshot name must be provided")
-  local snapshot = inventorySnapshots[name]
-
-  if not snapshot then
-    logger:Trace("GetInventorySnapshotDelta: no snapshot exists with name '%s'", name)
-    return {}
-  end
-
-  if playerInventory.byId.hash == snapshot.byId.hash then
-    logger:Trace("GetInventorySnapshotDelta: no inventory change detected")
-    return {}
-  end
-
-  local currentList = playerInventory.byName.list
-  local prevList = snapshot.byName.list
-
-  local delta = {}
-
-  for itemName, curInfo in pairs(currentList) do
-    local prevInfo = prevList[itemName]
-    if not curInfo and not prevInfo then
-      -- noop: Player does not have this item and didn't have it during the snapshot
-    elseif not prevInfo then
-      -- Player has this item now, but didn't have it during the snapshot
-      delta[itemName] = curInfo.itemCount
-    elseif not curInfo then
-      -- Player had this item during the snapshot, but doesn't have it now
-      delta[itemName] = -1 * prevInfo.itemCount
-    else
-      -- Player has this item now as well as during the snapshot
-      local diff = curInfo.itemCount - prevInfo.itemCount
-      if diff ~= 0 then
-        -- Only add it to the delta if the quantity changed
-        delta[itemName] = diff
-      end
-    end
-  end
-
-  local logMsg = {}
-  for itemName, itemCount in pairs(delta) do
-    logMsg[#logMsg+1] = string.format("%ix %s", itemCount, itemName)
-  end
-  logger:Trace("GetInventorySnapshotDelta: %s", table.concat(logMsg, ", "))
-  return delta
-end
-
--- Build the player's inventory when the addon first loads
-addon:OnBackendStart(function()
-  updatePlayerInventory()
-
-  -- Then on every update, scan the inventory again and check if its contents changed
-  addon.GameEvents:Subscribe("BAG_UPDATE_DELAYED", function()
-    local prevHash = playerInventory.byId.hash
-    updatePlayerInventory()
-    local newHash = playerInventory.byId.hash
-    if prevHash ~= newHash then
-      logger:Trace("Player inventory contents changed (hash: %.0f)", newHash)
-      addon.AppEvents:Publish("PlayerInventoryChanged")
-      if didJustLoot then
-        didJustLoot = false
-        local delta = addon:GetInventorySnapshotDelta("before-player-loot")
-        addon:ClearInventorySnapshot("before-player-loot")
-        addon.AppEvents:Publish("PlayerLootedItem", delta)
-      end
-    else
-      logger:Trace("Player inventory updated, but no change (hash: %.0f)", newHash)
-    end
-  end)
-  addon.GameEvents:Subscribe("CHAT_MSG_LOOT", function()
-    addon:CreateInventorySnapshot("before-player-loot")
-    didJustLoot = true
-  end)
+addon.AppEvents:Subscribe("ItemInfoAvailable", function(item)
+  handleSubscribers(item.itemId, item)
+  handleSubscribers(item.name:lower(), item)
 end)

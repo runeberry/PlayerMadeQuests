@@ -56,9 +56,7 @@ function widget:Create(frame, options)
 
   titleBar._fontString = titletext
 
-  for fname, fn in pairs(methods) do
-    frame[fname] = fn
-  end
+  addon:ApplyMethods(frame, methods)
 
   return titleBar
 end

@@ -1,6 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 local QuestStatus = addon.QuestStatus
+local UIErrorsFrame = addon.G.UIErrorsFrame
 
 addon.QuestInfoFrame = nil -- Defined during lifecycle event
 
@@ -17,32 +18,6 @@ local frameOptions = {
     y = -104,
     w = 384,
     h = 512,
-  }
-}
-
-local function getQuestDescription(quest)
-  if not quest.description then return " " end
-  return addon:PopulateText(quest.description, quest)
-end
-
-local function getQuestCompletion(quest)
-  if not quest.completion then return getQuestDescription(quest) end
-  return addon:PopulateText(quest.completion, quest)
-end
-
-local pageStyle = {
-  margins = { 8, 8, 10, 0 }, -- bottom spacing doesn't work on a scroll frame
-  spacing = 6
-}
-
-local textStyles = {
-  ["header"] = {
-    inheritsFrom = "QuestTitleFont",
-    justifyH = "LEFT",
-  },
-  ["default"] = {
-    inheritsFrom = "QuestFont",
-    justifyH = "LEFT",
   }
 }
 
@@ -71,6 +46,15 @@ local buttons = {
     pollIf = function(quest) return quest.complete end,
     enableIf = function(quest) return addon.QuestEngine:EvaluateComplete(quest) end,
     action = function(quest)
+      -- If applicable, player must select a reward before completing the quest
+      if quest.rewards and quest.rewards.choice then
+        if quest.rewards.selectedIndex == nil then
+          UIErrorsFrame:AddMessage("You must choose a reward.", 1.0, 0, 0)
+          addon:PlaySound("QuestAbandoned")
+          return
+        end
+      end
+
       addon:CompleteQuest(quest)
     end
   },
@@ -98,6 +82,7 @@ local buttons = {
   ["Empty"] = {
     text = "",
     width = 78,
+    enableIf = function() return false end,
     action = function() end
   }
 }
@@ -151,13 +136,19 @@ end
 
 -- Various display configurations for this frame, depending on quest status, etc.
 -- Properties:
+--   title - text for the title bar at the top of the frame
+--   sound - sound to play each time the frame is shown in this mode
 --   leftButton/rightButton - the button behaviors of the bottom buttons (or nil to hide)
+--   layout - quest content layout names in the order that they should be displayed
 --   content - what to draw when the frame is shown in this mode
 --   busy - what to draw when a request is recieved to show the frame, but it's already shown
 --   clean - how to clean up the frame and leave an empty canvas for the next draw
 local frameModes
 frameModes = {
   ["NewQuest"] = {
+    title = "[PMQ] Quest Info",
+    layout = "NewQuest",
+    sound = "BookWrite",
     leftButton = buttons.Accept,
     rightButton = buttons.Decline,
     busy = function(frame, quest)
@@ -168,156 +159,88 @@ frameModes = {
         addon.Logger:Warn("Close this window before trying to view another quest.")
       end
     end,
-    content = function(frame, quest)
-      frame.titleFontString:SetText("[PMQ] Quest Info")
-
-      local fs = frame.article:GetFontStrings()
-
-      -- Quest name & description
-      fs[1]:SetText(quest.name)
-      fs[2]:SetText(getQuestDescription(quest))
-
-      local index = 3
-
-      -- Requirements & recommendations
-      if quest.required or quest.recommended then
-        fs[index]:SetText("Requirements")
-        local recString = ""
-        if quest.required and quest.required.conditions then
-          for k, v in pairs(quest.required.conditions) do
-            recString = string.format("%s* %s: %s\n", recString, k, v)
-          end
-        end
-        if quest.recommended and quest.recommended.conditions then
-          for k, v in pairs(quest.recommended.conditions) do
-            recString = string.format("%s* %s: %s (Recommended)\n", recString, k, v)
-          end
-        end
-        fs[index+1]:SetText(recString)
-        index = index + 2
-      end
-
-      -- Starting condition
-      if quest.start and quest.start.conditions then
-        fs[index]:SetText("Getting Started")
-        fs[index+1]:SetText(addon:GetCheckpointDisplayText(quest.start, "quest").."\n")
-        index = index + 2
-      end
-
-      -- Quest objectives
-      fs[index]:SetText("Quest Objectives")
-      if quest.objectives then
-        local objString = ""
-        for _, obj in ipairs(quest.objectives) do
-          objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
-        end
-        objString = objString.."\n\n" -- Spacer for bottom margin
-        fs[index+1]:SetText(objString)
-      else
-        fs[index+1]:SetText("\n")
-      end
-
-      addon:PlaySound("BookWrite")
-    end,
   },
   ["FinishedQuest"] = {
+    title = "[PMQ] Quest Completion",
+    layout = "FinishedQuest",
     leftButton = buttons.Empty,
     rightButton = buttons.Complete, -- todo: incorporate "Abandon" into this mode
     busy = function(frame, quest)
 
     end,
-    content = function(frame, quest)
-      frame.titleFontString:SetText("[PMQ] Quest Completion")
-
-      local fs = frame.article:GetFontStrings()
-
-      -- Quest name & description
-      fs[1]:SetText(quest.name)
-      fs[2]:SetText(getQuestCompletion(quest))
-
-      -- Completion objectives
-      if quest.complete and quest.complete.conditions then
-        fs[3]:SetText("Finishing Up")
-        fs[4]:SetText(addon:GetCheckpointDisplayText(quest.complete, "quest").."\n")
-      end
-    end,
   },
   ["ActiveQuest"] = {
+    title = "[PMQ] Quest Info",
+    layout = "ActiveQuest",
     leftButton = buttons.Share,
     rightButton = buttons.Abandon,
     busy = function(frame, quest)
 
     end,
-    content = function(frame, quest)
-      frame.titleFontString:SetText("[PMQ] Quest Info")
-
-      local fs = frame.article:GetFontStrings()
-
-      -- Quest name & objectives
-      fs[1]:SetText(quest.name)
-      if quest.objectives then
-        local objString = ""
-        for _, obj in ipairs(quest.objectives) do
-          objString = string.format("%s* %s\n", objString, addon:GetCheckpointDisplayText(obj, "quest"))
-        end
-        fs[2]:SetText(objString)
-      else
-        fs[2]:SetText("\n")
-      end
-
-      -- Quest Description
-      fs[3]:SetText("Description")
-      fs[4]:SetText(getQuestDescription(quest).."\n\n") -- Space for bottom margin
-    end,
   },
   ["TerminatedQuest"] = {
+    title = "[PMQ] Quest Info",
+    layout = "NewQuest",
     leftButton = buttons.Share,
     rightButton = buttons.Restart,
     busy = function(frame, quest)
 
     end,
-    content = function(frame, quest)
-      -- Using the same frame as NewQuest for now, may update this later
-      frameModes["NewQuest"].content(frame, quest)
+  },
+  ["VerificationCheck"] = {
+    title = "[PMQ] Quest Verification",
+    layout = "VerificationCheck",
+    leftButton = buttons.Share,
+    rightButton = buttons.Empty,
+    busy = function(frame, quest)
+
     end,
-  }
+  },
 }
 
 local frameMethods = {
   ["ShowQuest"] = function(self, quest, modeName)
-    local mode = frameModes[modeName or statusModeMap[quest.status or "default"]]
+    addon:catch(function()
+      local mode = frameModes[modeName or statusModeMap[quest.status or "default"]]
 
-    if self._shown and mode.busy then
-      -- Another quest is already being interacted with
-      -- If no "busy" function is specified, will proceed to draw content as normal
-      mode.busy(self, quest)
-      return
-    end
+      if self._shown and mode.busy then
+        -- Another quest is already being interacted with
+        -- If no "busy" function is specified, will proceed to draw content as normal
+        mode.busy(self, quest)
+        return
+      end
 
-    self:ClearContent()
+      self:ClearContent()
 
-    mode.content(self, quest)
-    setButtonBehavior(self.leftButton, mode.leftButton, quest)
-    setButtonBehavior(self.rightButton, mode.rightButton, quest)
+      local title = mode.title or ""
+      self.titleFontString:SetText(title)
 
-    self._quest = quest
-    self._shown = true
+      -- See QuestInfoFrameContent.lua for details
+      self.questContent:SetQuestContent(quest, mode.layout)
 
-    self:Show()
+      setButtonBehavior(self.leftButton, mode.leftButton, quest)
+      setButtonBehavior(self.rightButton, mode.rightButton, quest)
+
+      self._quest = quest
+      self._shown = true
+
+      if mode.sound then
+        addon:PlaySound(mode.sound)
+      end
+
+      -- self:Show() -- moved to subscriber below
+    end)
   end,
   ["IsShowingQuest"] = function(self, quest)
     return self._shown and self._quest and self._quest.questId == quest.questId and true
   end,
   ["ClearContent"] = function(self)
     self.titleFontString:SetText("")
-    for _, fs in ipairs(self.article:GetFontStrings()) do
-      fs:SetText("")
-    end
   end,
   ["RefreshMode"] = function(self)
     local quest = self._quest
-    addon.QuestInfoFrame:Hide()
-    addon.QuestInfoFrame:ShowQuest(quest)
+    self:Hide()
+    self:ShowQuest(quest)
   end
 }
 
@@ -347,32 +270,32 @@ local frameScripts = {
 }
 
 local function buildQuestInfoFrame()
-  local questFrame = addon.CustomWidgets:CreateWidget("PopoutFrame", "QuestInfoFrame", frameOptions)
+  local frame = addon.CustomWidgets:CreateWidget("PopoutFrame", "QuestInfoFrame", frameOptions)
   --questFrame:SetTopLevel(true)
 
-  questFrame:SetHitRectInsets(0, 30, 0, 70)
+  frame:SetHitRectInsets(0, 30, 0, 70)
   for event, handler in pairs(frameScripts) do
-    questFrame:SetScript(event, handler)
+    frame:SetScript(event, handler)
   end
 
-  local questFramePortrait = questFrame:CreateTexture(nil, "ARTWORK")
+  local questFramePortrait = frame:CreateTexture(nil, "ARTWORK")
   questFramePortrait:SetSize(60, 60)
-  questFramePortrait:SetPoint("TOPLEFT", questFrame, "TOPLEFT", 7, -6)
+  questFramePortrait:SetPoint("TOPLEFT", frame, "TOPLEFT", 7, -6)
   questFramePortrait:SetTexture("Interface\\QuestFrame\\UI-QuestLog-BookIcon")
 
-  local questNpcNameFrame = CreateFrame("Frame", nil, questFrame)
+  local questNpcNameFrame = CreateFrame("Frame", nil, frame)
   questNpcNameFrame:SetSize(300, 14)
-  questNpcNameFrame:SetPoint("TOP", questFrame, "TOP", 0, -23)
+  questNpcNameFrame:SetPoint("TOP", frame, "TOP", 0, -23)
   questNpcNameFrame:SetScript("OnLoad", function() end)
 
   local questFrameNpcNameText = questNpcNameFrame:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
   questFrameNpcNameText:SetSize(235, 20)
   questFrameNpcNameText:SetPoint("CENTER", questNpcNameFrame, "CENTER")
 
-  local questFrameCloseButton = CreateFrame("Button", nil, questFrame, "UIPanelCloseButton")
-  questFrameCloseButton:SetPoint("CENTER", questFrame, "TOPRIGHT", -42, -31)
+  local questFrameCloseButton = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
+  questFrameCloseButton:SetPoint("CENTER", frame, "TOPRIGHT", -42, -31)
 
-  local questFrameDetailPanel = CreateFrame("Frame", nil, questFrame, "QuestFramePanelTemplate")
+  local questFrameDetailPanel = CreateFrame("Frame", nil, frame, "QuestFramePanelTemplate")
   questFrameDetailPanel:SetScript("OnShow", function() end)
   questFrameDetailPanel:SetScript("OnHide", function() end)
   questFrameDetailPanel:SetScript("OnUpdate", function() end)
@@ -381,11 +304,11 @@ local function buildQuestInfoFrame()
   local questFrameRightButton = CreateFrame("Button", nil, questFrameDetailPanel, "UIPanelButtonTemplate")
   questFrameRightButton:SetText("RIGHT_BTN") -- PLaceholder text
   questFrameRightButton:SetSize(1, 22) -- Placeholder width
-  questFrameRightButton:SetPoint("BOTTOMRIGHT", questFrame, "BOTTOMRIGHT", -39, 72)
+  questFrameRightButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -39, 72)
   questFrameRightButton:SetScript("OnClick", function()
     if questFrameRightButton._action then
       addon:catch(function()
-        questFrameRightButton._action(questFrame._quest)
+        questFrameRightButton._action(frame._quest)
       end)
     else
       addon.UILogger:Warn("No action assigned to questFrameRightButton")
@@ -395,11 +318,11 @@ local function buildQuestInfoFrame()
   local questFrameLeftButton = CreateFrame("Button", nil, questFrameDetailPanel, "UIPanelButtonTemplate")
   questFrameLeftButton:SetText("LEFT_BTN") -- Placeholder text
   questFrameLeftButton:SetSize(1, 22) -- Placeholder width
-  questFrameLeftButton:SetPoint("BOTTOMLEFT", questFrame, "BOTTOMLEFT", 23, 72)
+  questFrameLeftButton:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 23, 72)
   questFrameLeftButton:SetScript("OnClick", function()
     if questFrameLeftButton._action then
       addon:catch(function()
-        questFrameLeftButton._action(questFrame._quest)
+        questFrameLeftButton._action(frame._quest)
       end)
     else
       addon.UILogger:Warn("No action assigned to questFrameLeftButton")
@@ -413,39 +336,22 @@ local function buildQuestInfoFrame()
   questDetailScrollChildFrame:SetPoint("TOPLEFT", questFrameDetailPanel, "TOPLEFT")
   questDetailScrollFrame:SetScrollChild(questDetailScrollChildFrame)
 
-  local questDetailInfoFrame = CreateFrame("Frame", nil, questDetailScrollChildFrame)
-  questDetailInfoFrame:SetSize(300, 100)
-  questDetailInfoFrame:SetAllPoints(true)
+  -- The contents of the main reading frame are pretty complex so the code
+  -- for that was moved to a separate widget
+  local questContent = addon.CustomWidgets:CreateWidget("QuestContent", questDetailScrollChildFrame)
+  questContent:SetAllPoints(true)
 
-  local article = addon.CustomWidgets:CreateWidget("ArticleText", questDetailInfoFrame)
-  article:SetAllPoints(true)
-  article:SetPageStyle(pageStyle)
-  for name, style in pairs(textStyles) do
-    article:SetTextStyle(name, style)
-  end
-
-  -- Placeholder text, the real values get popped in when a quest is received
-  article:AddText("HEADER_1", "header")
-  article:AddText("BODY_1")
-  article:AddText("HEADER_2", "header")
-  article:AddText("BODY_2")
-  article:AddText("HEADER_3", "header")
-  article:AddText("BODY_3")
-  article:AddText("HEADER_4", "header")
-  article:AddText("BODY_4")
-  article:Assemble()
-
-  questFrame.scrollFrame = questDetailScrollFrame
-  questFrame.titleFontString = questFrameNpcNameText
-  questFrame.article = article
-  questFrame.leftButton = questFrameLeftButton
-  questFrame.rightButton = questFrameRightButton
+  frame.scrollFrame = questDetailScrollFrame
+  frame.titleFontString = questFrameNpcNameText
+  frame.leftButton = questFrameLeftButton
+  frame.rightButton = questFrameRightButton
+  frame.questContent = questContent
 
   for name, method in pairs(frameMethods) do
-    questFrame[name] = method
+    frame[name] = method
   end
 
-  return questFrame
+  return frame
 end
 
 addon:OnGuiStart(function()
@@ -461,4 +367,8 @@ addon:OnGuiStart(function()
   addon.AppEvents:Subscribe("QuestAbandoned", hide)
   addon.AppEvents:Subscribe("QuestDeclined", hide)
   addon.AppEvents:Subscribe("QuestCompleted", hide)
+end)
+
+addon.AppEvents:Subscribe("QuestContentReady", function(quest)
+  addon.QuestInfoFrame:Show()
 end)

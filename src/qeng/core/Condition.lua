@@ -11,9 +11,8 @@ local methods = {
 function addon.QuestEngine:NewCondition(name)
   local condition = self:NewParameter(name)
 
-  for fname, fn in pairs(methods) do
-    condition[fname] = fn
-  end
+  -- OK to overwrite base methods
+  addon:ApplyMethods(condition, methods, true)
 
   addon.QuestEngine:AddDefinition("conditions", name, condition)
   return condition

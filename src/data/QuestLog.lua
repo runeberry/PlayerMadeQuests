@@ -25,6 +25,20 @@ local _, addon = ...
           target = { "val2": true, "val3": true },
         }
       }
+    },
+    rewards = {
+      parameters = {
+        player = {                -- distinct set of player names
+          "Playername" = true,
+        },
+        rewardmoney = 0,          -- an amount of money in copper
+        rewarditem = {
+          {
+            id = 0,                   -- the itemId
+            quantity = 0,             -- the quantity of the item
+          }
+        },
+      }
     }
   }
 --]]

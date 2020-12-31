@@ -1,5 +1,6 @@
 local _, addon = ...
 local SlashCmdList, unpack = addon.G.SlashCmdList, addon.G.unpack
+local strjoin = addon.G.strjoin
 
 local handlers
 
@@ -55,7 +56,8 @@ handlers = {
   ["log"] = function()
     addon.QuestLogFrame:ToggleShown()
   end,
-  ["run"] = function(script)
+  ["run"] = function(...)
+    local script = strjoin(" ", ...)
     local ok, ret = tryRunScript(script)
     if not ok then return end
 
@@ -119,5 +121,22 @@ handlers = {
   end,
   ["update"] = function()
     addon:CheckForUpdates()
+  end,
+  ["lookup-item"] = function(...)
+    local idOrName = strjoin(" ", ...)
+
+    local itemStub = addon:LookupItemAsync(idOrName, function(item)
+      addon.Logger:Warn("Item found: %s (%s)", tostring(item.link or item.name), tostring(item.itemId))
+    end)
+
+    if not itemStub then
+      addon.Logger:Warn("No item found with id or name: %s", idOrName)
+    end
+  end,
+  ["scan-items"] = function(min, max)
+    addon:ScanItems(min, max)
+  end,
+  ["clear-items"] = function()
+    addon:ClearItemCache()
   end,
 }

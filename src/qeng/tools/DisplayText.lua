@@ -11,10 +11,15 @@ local rules
 local bracketRule
 local vars
 
+--- Gets the value at the associated condition/parameter name
+local function getParamVal(cp, name)
+  return (cp.conditions and cp.conditions[name]) or (cp.parameters and cp.parameters[name])
+end
+
 --- Wraps the handler in a check for the specified parameter
-local function ifCond(name, fn)
+local function ifParam(name, fn)
   return function(cp)
-    local param = cp.conditions and cp.conditions[name]
+    local param = getParamVal(cp, name)
     if param then
       return fn(param, cp)
     end
@@ -34,6 +39,8 @@ vars = {
   ["i"] = t.PARAM_ITEM,
   ["lang"] = t.PARAM_LANGUAGE,
   ["msg"] = t.PARAM_MESSAGE,
+  ["player"] = t.PARAM_PLAYER,
+  ["rc"] = t.PARAM_REWARDCHOICE,
   ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_RECIPIENT },
   ["sz"] = t.PARAM_SUBZONE,
   ["z"] = t.PARAM_ZONE,
@@ -56,13 +63,13 @@ vars = {
     end
   end,
   --- radius of coords
-  ["r"] = ifCond(t.PARAM_COORDS, function(coords) return coords.radius end),
+  ["r"] = ifParam(t.PARAM_COORDS, function(coords) return coords.radius end),
   --- x of coords
-  ["x"] = ifCond(t.PARAM_COORDS, function(coords) return coords.x end),
+  ["x"] = ifParam(t.PARAM_COORDS, function(coords) return coords.x end),
   --- (x, y)
-  ["xy"] = ifCond(t.PARAM_COORDS, function(coords) return addon:PrettyCoords(coords.x, coords.y) end),
+  ["xy"] = ifParam(t.PARAM_COORDS, function(coords) return addon:PrettyCoords(coords.x, coords.y) end),
   --- (x, y) +/- r
-  ["xyr"] = ifCond(t.PARAM_COORDS, function(coords) return addon:PrettyCoords(coords.x, coords.y, coords.radius) end),
+  ["xyr"] = ifParam(t.PARAM_COORDS, function(coords) return addon:PrettyCoords(coords.x, coords.y, coords.radius) end),
   --- (x, y) +/- r in zone
   ["xyrz"] = function(cp)
     local zone = vars["z2"](cp) or ""
@@ -84,7 +91,7 @@ vars = {
     return coords.." in "..zone
   end,
   --- y of coords
-  ["y"] = ifCond(t.PARAM_COORDS, function(coords) return coords.y end),
+  ["y"] = ifParam(t.PARAM_COORDS, function(coords) return coords.y end),
   --- zone in subzone
   ["z2"] = function(cp)
     local zone = cp.conditions[t.PARAM_ZONE]
@@ -122,9 +129,24 @@ vars = {
   --------------------
 
   -- Inserts the name of the player who wrote the quest
-  ["author"] = function(quest) return quest.metadata.authorName end,
-  -- Inserts the name of the player who shared the quest, or the player's name if not found
-  ["giver"] = function(quest) return quest.metadata.giverName or addon:GetPlayerName() end,
+  ["author"] = function(quest)
+    if quest.metadata then
+      return quest.metadata.authorName
+    else
+      -- In case we arrived here from a non-quest context
+      return "%author"
+    end
+  end,
+  -- Inserts the name of the player who shared the quest
+  ["giver"] = function(quest)
+    if quest.metadata then
+      -- Use player name if there was no giver
+      return quest.metadata.giverName or addon:GetPlayerName()
+    else
+      -- In case we arrived here from a non-quest context
+      return "%giver"
+    end
+  end,
 
   ----------------
   -- Formatting --
@@ -171,13 +193,13 @@ local function defaultConditionTextHandler(condVal)
   return condVal
 end
 
-local function parseConditionValueText(cp, handlerArg, handlerFn)
+local function parseParamValueText(cp, handlerArg, handlerFn)
   local arg
   if handlerArg then
-    arg = cp.conditions[handlerArg]
+    arg = getParamVal(cp, handlerArg)
     -- If objective doesn't have a value for this condition, simply return nothing
     if not arg then
-      logger:Trace("     ^ No value for condition: %s", handlerArg)
+      logger:Trace("     ^ No value for parameter: %s", handlerArg)
       return
     end
   else
@@ -199,9 +221,18 @@ end
 
 local function populateDisplayText(text, obj)
   logger:Trace("=> received: %s", text)
-  for _, mod in ipairs(rules.standard) do
-    text = addon:strmod(text, mod.pattern, mod.fn, obj)
+
+  local i, prevText = 0, nil
+  while prevText ~= text and i < 9 do
+    -- Apply all substitution rules to the text until it no longer changes
+    -- Failsafe: avoid inf loop by capping at 9 iterations
+    i = i + 1
+    prevText = text
+    for _, mod in ipairs(rules.standard) do
+      text = addon:strmod(text, mod.pattern, mod.fn, obj)
+    end
   end
+
   logger:Trace("<= resolved: %s", text)
   return text
 end
@@ -273,7 +304,7 @@ rules = {
           -- Consider replacing this with a method to allow the objective to override its default var
           -- definitions with ones of its own.
           for _, var in ipairs(handler) do
-            result = parseConditionValueText(obj, var, nil)
+            result = parseParamValueText(obj, var, nil)
             if result and result ~= "" then
               logger:Trace("   ^ handler: string (%s = %s)", pctstr, var)
               break
@@ -281,13 +312,13 @@ rules = {
           end
         elseif type(handler) == "table" then
           logger:Trace("   ^ handler: table (%s = %s)", pctstr, handler.arg)
-          result = parseConditionValueText(obj, handler.arg, handler.fn)
+          result = parseParamValueText(obj, handler.arg, handler.fn)
         elseif type(handler) == "string" then
           logger:Trace("   ^ handler: string (%s = %s)", pctstr, handler)
-          result = parseConditionValueText(obj, handler, nil)
+          result = parseParamValueText(obj, handler, nil)
         elseif type(handler) == "function" then
           logger:Trace("   ^ handler: function (%s)", pctstr)
-          result = parseConditionValueText(obj, nil, handler)
+          result = parseParamValueText(obj, nil, handler)
         else
           logger:Trace("   ^ handler: not found (%s)", pctstr)
           result = pctstr

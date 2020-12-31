@@ -1,9 +1,11 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="gui/Anchors.lua"/>
   <Script file="gui/Cli.lua"/>
   <Script file="gui/CustomWidgets.lua"/>
   <Script file="gui/StaticPopups.lua"/>
   <Script file="gui/StaticPopupsList.lua"/>
   <Script file="gui/Styles.lua"/>
+  <Script file="gui/Tooltip.lua"/>
 
   <!-- Custom Widgets -->
   <Script file="gui/widgets/PopoutFrame.lua"/>
@@ -15,8 +17,13 @@
   <Script file="gui/widgets/Heading.lua"/>
   <Script file="gui/widgets/IconButton.lua"/>
   <Script file="gui/widgets/IconList.lua"/>
+  <Script file="gui/widgets/ItemRewardButton.lua"/>
+  <Script file="gui/widgets/ItemRewardButtonPane.lua"/>
+  <Script file="gui/widgets/Pane.lua"/>
+  <Script file="gui/widgets/QuestContent.lua"/>
   <Script file="gui/widgets/ScriptEditor.lua"/>
   <Script file="gui/widgets/Sizer.lua"/>
+  <Script file="gui/widgets/TableLayout.lua"/>
   <Script file="gui/widgets/TextInput.lua"/>
   <Script file="gui/widgets/TextInputScrolling.lua"/>
   <Script file="gui/widgets/TitleBar.lua"/>
@@ -46,5 +53,6 @@
   <Script file="gui/menu/QuestDraftEditMenu.lua"/>
   <Script file="gui/menu/QuestDraftListMenu.lua"/>
   <Script file="gui/menu/QuestLogMenu.lua"/>
+  <Script file="gui/menu/QuestRewardsMenu.lua"/>
   <Script file="gui/menu/SettingsMenu.lua"/>
 </Ui>

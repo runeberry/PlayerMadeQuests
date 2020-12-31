@@ -55,7 +55,7 @@ local methods = {
       self:Hide()
     end
 
-    addon.UILogger:Trace("Set %s state: %s %s (%.2f, %.2f) %ix%i (%s)", self:GetName(), pos.p1, pos.p2, pos.x, pos.y, pos.w, pos.h, pos.shown)
+    addon.UILogger:Trace("Set %s state: %s %s (%.2f, %.2f) %ix%i (%s)", self:GetName(), pos.p1, pos.p2, pos.x, pos.y, pos.w, pos.h, tostring(pos.shown))
   end,
   ["ResetWindowState"] = function(self)
     if self._options.position then
@@ -112,9 +112,7 @@ local methods = {
 }
 
 function widget:Create(frameName, options)
-  assert(type(frameName) == "string", "Failed to create PopoutFrame: name is required")
-
-  frameName = "PMQ_"..frameName -- Add prefix to avoid global collisions
+  frameName = addon:CreateGlobalName(frameName or "PopoutFrame_%i")
   options = options or {}
 
   local style = options.style or "default"
