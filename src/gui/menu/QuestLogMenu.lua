@@ -11,6 +11,17 @@ local abandonableStatuses = {
   [QuestStatus.Finished] = true,
 }
 
+local questStatusText = {}
+addon:OnGuiStart(function()
+  questStatusText = {
+    [QuestStatus.Active] = addon:Colorize("yellow", "Active"),
+    [QuestStatus.Failed] = addon:Colorize("red", "Failed"),
+    [QuestStatus.Abandoned] = addon:Colorize("red", "Abandoned"),
+    [QuestStatus.Finished] = addon:Colorize("yellow", "Finished"),
+    [QuestStatus.Completed] = addon:Colorize("green", "Completed"),
+  }
+end)
+
 local options = {
   colInfo = {
     {
@@ -27,7 +38,8 @@ local options = {
     local quests = QuestLog:FindAll()
     table.sort(quests, function(a, b) return a.questId < b.questId end)
     for _, quest in pairs(quests) do
-      local row = { quest.name, quest.status, quest.questId }
+      local status = (quest.status and questStatusText[quest.status]) or quest.status or ""
+      local row = { quest.name, status, quest.questId }
       table.insert(questLogRows, row)
     end
     return questLogRows
