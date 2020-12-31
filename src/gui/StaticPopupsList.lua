@@ -299,7 +299,7 @@ addon.StaticPopupsList = {
         for _, reward in ipairs(rewards) do
           addon.QuestRewards:Delete(reward)
         end
-        addon.Logger:Warn("Removed %i claimed quest rewards", #rewards)
+        addon.Logger:Warn("Removed %i claimed quest reward(s)", #rewards)
       end
     end,
   },

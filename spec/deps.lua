@@ -180,6 +180,7 @@ function deps:Init(addon)
     UnitFullName = ret("PlayerName", "PlayerRealm"),
     UnitGUID = ret(),
     UnitIsFriend = ret(),
+    UnitIsPlayer = ret(),
     UnitLevel = ret(),
     UnitRace = ret(),
     UnitSex = ret(),

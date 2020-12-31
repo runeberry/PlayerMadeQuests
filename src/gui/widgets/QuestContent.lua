@@ -278,6 +278,9 @@ local contentSectionTemplates = {
   ["TargetVerificationButton"] = {
     Template = "Button",
     Text = "Check Target Player",
+    Handler = function(self, quest)
+      addon:RequestTargetQuestStatus(quest)
+    end,
   },
   ["PartyVerificationText"] = {
     Template = "Text",
@@ -286,6 +289,9 @@ local contentSectionTemplates = {
   ["PartyVerificationButton"] = {
     Template = "Button",
     Text = "Check Party",
+    Handler = function(self, quest)
+      addon:RequestPartyQuestStatus(quest)
+    end,
   },
   ["RaidVerificationText"] = {
     Template = "Text",
@@ -294,6 +300,9 @@ local contentSectionTemplates = {
   ["RaidVerificationButton"] = {
     Template = "Button",
     Text = "Check Raid",
+    Handler = function(self, quest)
+      addon:RequestRaidQuestStatus(quest)
+    end,
   },
 
   -----------------------

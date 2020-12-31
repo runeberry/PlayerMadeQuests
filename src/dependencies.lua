@@ -60,6 +60,7 @@ addon.G = {
   UnitFullName = UnitFullName,
   UnitGUID = UnitGUID,
   UnitIsFriend = UnitIsFriend,
+  UnitIsPlayer = UnitIsPlayer,
   UnitLevel = UnitLevel,
   UnitRace = UnitRace,
   UnitSex = UnitSex,
