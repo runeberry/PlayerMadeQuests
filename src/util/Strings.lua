@@ -203,6 +203,28 @@ function addon:PrettyCoords(x, y, radius)
   return coords
 end
 
+--- Returns either (number, nil) or (nil, string) depending on the value provided.
+--- @return number, string
+function addon:ParseIdOrName(idOrName)
+  local id, name
+
+  if type(idOrName) == "number" then
+    id = idOrName
+  elseif type(idOrName) == "string" then
+    id = tonumber(idOrName)
+    if not id then
+      name = idOrName
+    end
+  else
+    if idOrName == nil then
+      error("idOrName must not be nil", 2)
+    end
+    error("idOrName must be a number or string", 2)
+  end
+
+  return id, name
+end
+
 -- Long text to use for display testing
 addon.LOREM_IPSUM = [[Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Elementum curabitur vitae nunc sed. Purus ut faucibus pulvinar elementum integer enim neque volutpat. Venenatis tellus in metus vulputate. Porta non pulvinar neque laoreet suspendisse interdum. Nulla aliquet porttitor lacus luctus accumsan tortor posuere. Consequat nisl vel pretium lectus quam id leo. Egestas purus viverra accumsan in nisl nisi scelerisque eu ultrices. Odio aenean sed adipiscing diam. Viverra orci sagittis eu volutpat odio facilisis mauris.
 
