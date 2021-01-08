@@ -36,6 +36,7 @@ addon.G = {
   GetPlayerMapPosition = C_Map.GetPlayerMapPosition,
   GetUnitName = GetUnitName,
   GetRealZoneText = GetRealZoneText,
+  GetSpellInfo = GetSpellInfo,
   GetSubZoneText = GetSubZoneText,
   GetMinimapZoneText = GetMinimapZoneText,
   GetZoneText = GetZoneText,
