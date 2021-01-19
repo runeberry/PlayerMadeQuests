@@ -6,6 +6,7 @@
   <Script file="game/Location.lua"/>
   <Script file="game/Player.lua"/>
   <Script file="game/Sounds.lua"/>
+  <Script file="game/Spells.lua"/>
   <Script file="game/Targets.lua"/>
   <Script file="game/Trades.lua"/>
 </Ui>
