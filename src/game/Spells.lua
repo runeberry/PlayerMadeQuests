@@ -21,6 +21,9 @@ local function parseSpellInfo(idOrName, spell)
   spell.maxRange = info[6]
   spell.spellId = info[7]
 
+  -- note: I wanted to include spell links but GetSpellLink
+  -- does not actually return links in classic, only the name
+
   return spell
 end
 
