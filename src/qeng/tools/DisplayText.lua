@@ -10,6 +10,7 @@ local checkpoints = addon.QuestEngine.definitions.checkpoints
 local rules
 local bracketRule
 local vars
+local defaultConditionTextHandler
 
 --- Gets the value at the associated condition/parameter name
 local function getParamVal(cp, name)
@@ -41,8 +42,7 @@ vars = {
   ["msg"] = t.PARAM_MESSAGE,
   ["player"] = t.PARAM_PLAYER,
   ["rc"] = t.PARAM_REWARDCHOICE,
-  ["s"] = t.PARAM_SPELL,
-  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_RECIPIENT },
+  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_SPELLTARGET, t.PARAM_RECIPIENT },
   ["sz"] = t.PARAM_SUBZONE,
   ["z"] = t.PARAM_ZONE,
 
@@ -105,6 +105,19 @@ vars = {
       return subzone
     end
   end,
+  ["s"] = function(cp)
+    local spell = cp.conditions[t.PARAM_SPELL]
+    if not spell then return "[spell]" end
+
+    local spellNames = {}
+    for spellId in pairs(spell) do
+      local spellInfo = addon:LookupSpellSafe(spellId)
+      local spellName = (spellInfo and spellInfo.name) or string.format("[Spell: %i]", spellId)
+      spellNames[spellName] = true
+    end
+
+    return defaultConditionTextHandler(spellNames)
+  end,
 
   ------------------------
   -- Objective-specific --
@@ -159,7 +172,7 @@ vars = {
 
 -- If the condition value is a table of values, then returns each value in that table
 -- in a reader-friendly comma-separated string, with the last two items separated by "or"
-local function defaultConditionTextHandler(condVal)
+defaultConditionTextHandler = function(condVal)
   if condVal == nil then
     logger:Trace("     ^ condition: value is nil")
     return

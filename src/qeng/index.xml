@@ -30,6 +30,7 @@
   <Script file="qeng/checkpoints/rewards.lua"/>
   <Script file="qeng/checkpoints/startcomplete.lua"/>
 
+  <Script file="qeng/objectives/cast-spell.lua"/>
   <Script file="qeng/objectives/equip-item.lua"/>
   <Script file="qeng/objectives/explore.lua"/>
   <Script file="qeng/objectives/gain-aura.lua"/>
@@ -52,5 +53,7 @@
   <Script file="qeng/conditions/message.lua"/>
   <Script file="qeng/conditions/position.lua"/>
   <Script file="qeng/conditions/recipient.lua"/>
+  <Script file="qeng/conditions/spell.lua"/>
+  <Script file="qeng/conditions/spelltarget.lua"/>
   <Script file="qeng/conditions/target.lua"/>
 </Ui>
