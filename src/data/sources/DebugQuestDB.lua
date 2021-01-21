@@ -200,7 +200,27 @@ objectives:
   [14] = [[
 objectives:
   - loot-item 'Linen Cloth'
-  - loot-item 3 'Light Leather']]
+  - loot-item 3 'Light Leather']],
+  [15] = [[
+objectives:
+  - cast-spell:
+      spell: Fire Blast
+  - cast-spell:
+      spell: Fireball
+      goal: 3
+  - cast-spell:
+      spell: Frostbolt
+      goal: 5
+      target: Stonetusk Boar
+  - cast-spell:
+      spell: Fireball
+      goal: 3
+      target: Stonetusk Boar]],
+  [16] = [[
+objectives:
+  - cast-spell "Fire Blast"
+  - cast-spell 3 Fireball
+  - cast-spell 5 Frostbolt "Stonetusk Boar"]],
 }
 
 addon.DebugQuestDB = {
@@ -259,7 +279,15 @@ addon.DebugQuestDB = {
   {
     name = "Objective: loot-item (shorthand)",
     script = scripts[14],
-  }
+  },
+  {
+    name = "Objective: cast-spell",
+    script = scripts[15],
+  },
+  {
+    name = "Objective: cast-spell (shorthand)",
+    script = scripts[16],
+  },
 }
 
 for i, quest in ipairs(addon.DebugQuestDB) do
