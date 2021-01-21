@@ -47,3 +47,143 @@ function addon:LookupSpellSafe(idOrName)
   addon:ParseIdOrName(idOrName)
   return getSpell(idOrName)
 end
+
+------------------------
+-- SPELLCAST TRACKING --
+------------------------
+
+--[[
+  Here are the steps for building the PlayerCastSpell event:
+  1. When a spellcast begins, cache the spellId and the name of the spell's target.
+  2. When a spellcast ends, set a short timer after which it will be "resolved".
+  3. Gather information about the spell from game and CL events.
+  4. When the timer is up, look at all info about the spellcast and determine if it was successful.
+
+  When a spell is confirmed successful, fire a PlayerCastSpell event.
+--]]
+
+local spellcasts = {} --- Active spellcasts indexed by castId
+local spellcastTargets = {} -- The guid of the most recent target of a spell, indexed by spellName
+local spellcastResolveDelay = 0.2 -- Time (in seconds) to wait for a combat log event before resolving a spellcast
+local spellcastResolveTimers = {} -- Timers set to resolve spellcasts by castId
+
+local function setSpellcastInfo(castId, spellId)
+  local spellcast = spellcasts[castId]
+  if not spellcast then
+    local spellInfo = addon:LookupSpell(spellId)
+
+    spellcast = {
+      castId = castId,
+      spellId = spellId,
+      name = spellInfo.name,
+    }
+
+    spellcasts[castId] = spellcast
+  end
+
+  -- can add more info to the cast after it's returned
+  return spellcast
+end
+
+local function resolveSpellcast(castId)
+  -- Check if spell already has a resolve timer, don't try to resolve twice
+  if spellcastResolveTimers[castId] then return end
+
+  logger:Trace("Starting spellcast resolve timer...")
+  spellcastResolveTimers[castId] = addon.Ace:ScheduleTimer(function()
+    -- Step 4
+    spellcastResolveTimers[castId] = nil
+    local spellcast = spellcasts[castId]
+    spellcasts[castId] = nil
+
+    if not spellcast then
+      logger:Debug("Spellcast resolved: FAIL for %s (%i) - spell was not cached", spellcast.name, spellcast.spellId)
+      return
+    end
+
+    if not spellcast.success then
+      local reason
+      if spellcast.interrupted then
+        reason = "spell was interrupted"
+      elseif spellcast.failed then
+        reason = "spell cast failed"
+      elseif not spellcast.success then
+        reason = "spell status unknown"
+      end
+
+      logger:Debug("Spellcast resolved: FAIL for %s (%i) - %s", spellcast.name, spellcast.spellId, reason)
+      return
+    end
+
+    -- The most recent target GUID of this spell should have been indexed by the combat log event
+    spellcast.targetGuid = spellcastTargets[spellcast.name]
+
+    logger:Debug("Spellcast resolved: SUCCESS for %s (%i)", spellcast.name, spellcast.spellId)
+    addon.AppEvents:Publish("PlayerCastSpell", spellcast)
+  end, spellcastResolveDelay)
+end
+
+-- Step 1
+addon.GameEvents:Subscribe("UNIT_SPELLCAST_SENT", function(unitId, targetName, castId, spellId)
+  if unitId ~= "player" or not castId or not spellId then return end
+
+  local spellcast = setSpellcastInfo(castId, spellId)
+  spellcast.targetName = targetName
+
+  logger:Trace("UNIT_SPELLCAST_SENT - %s (%i)", spellcast.name, spellcast.spellId)
+end)
+
+-- Step 2
+addon.GameEvents:Subscribe("UNIT_SPELLCAST_STOP", function(unitId, castId, spellId)
+  if unitId ~= "player" or not castId or not spellId then return end
+
+  local spellcast = setSpellcastInfo(castId, spellId)
+  resolveSpellcast(castId)
+
+  logger:Trace("UNIT_SPELLCAST_STOP - %s (%i)", spellcast.name, spellcast.spellId)
+end)
+
+-- Step 3 - the following subscriptions gather information about the spellcast
+addon.GameEvents:Subscribe("UNIT_SPELLCAST_INTERRUPTED", function(unitId, castId, spellId)
+  if unitId ~= "player" or not castId or not spellId then return end
+
+  local spellcast = setSpellcastInfo(castId, spellId)
+  spellcast.interrupted = true
+  resolveSpellcast(castId)
+
+  logger:Trace("UNIT_SPELLCAST_INTERRUPTED - %s (%i)", spellcast.name, spellcast.spellId)
+end)
+
+addon.GameEvents:Subscribe("UNIT_SPELLCAST_SUCCEEDED", function(unitId, castId, spellId)
+  if unitId ~= "player" or not castId or not spellId then return end
+
+  local spellcast = setSpellcastInfo(castId, spellId)
+  spellcast.success = true
+  resolveSpellcast(castId)
+
+  logger:Trace("UNIT_SPELLCAST_SUCCEEDED - %s (%i)", spellcast.name, spellcast.spellId)
+end)
+
+addon.GameEvents:Subscribe("UNIT_SPELLCAST_FAILED", function(unitId, castId, spellId)
+  if unitId ~= "player" or not castId or not spellId then return end
+  logger:Trace("UNIT_SPELLCAST_FAILED")
+
+  local spellcast = setSpellcastInfo(castId, spellId)
+  spellcast.failed = true
+  resolveSpellcast(castId)
+
+  logger:Trace("UNIT_SPELLCAST_FAILED - %s (%i)", spellcast.name, spellcast.spellId)
+end)
+
+-- The cast target's GUID is not available from spellcast events, only from the combat log
+-- And the combat log is not aware of the spellId, much less the castId
+-- So the best we can do is remember the last GUID that a spell (by name) was successful on
+addon.CombatLogEvents:Subscribe("SPELL_CAST_SUCCESS", function(cl)
+  if cl.sourceName ~= addon:GetPlayerName() then return end
+  logger:Trace("SPELL_CAST_SUCCESS")
+
+  local spellName = cl.raw[13]
+  if not spellName then return end
+
+  spellcastTargets[spellName] = cl.destGuid
+end)
