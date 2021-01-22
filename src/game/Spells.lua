@@ -187,3 +187,28 @@ addon.CombatLogEvents:Subscribe("SPELL_CAST_SUCCESS", function(cl)
 
   spellcastTargets[spellName] = cl.destGuid
 end)
+
+--------------------
+-- SPELL WATCHING --
+--------------------
+
+local spellWatchSubKey
+
+local function onSpellCast(spellcast)
+  local targetMessage = ""
+  if spellcast.targetName then
+    targetMessage = " on "..spellcast.targetName
+  end
+  addon.Logger:Warn("Spell cast: %s (%i)%s", spellcast.name, spellcast.spellId, targetMessage)
+end
+
+function addon:ToggleSpellWatch()
+  if spellWatchSubKey then
+    addon.AppEvents:Unsubscribe("PlayerCastSpell", spellWatchSubKey)
+    spellWatchSubKey = nil
+    addon.Logger:Warn("No longer watching spell casts.")
+  else
+    spellWatchSubKey = addon.AppEvents:Subscribe("PlayerCastSpell", onSpellCast)
+    addon.Logger:Warn("Watching for spell casts...")
+  end
+end
