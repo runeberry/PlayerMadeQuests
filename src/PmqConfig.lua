@@ -36,6 +36,11 @@ addon.defaultSettings = {
   PLAYER_LOCATION_INTERVAL = 1.0,
   --- The amount of time in seconds that a player's location should be cached.
   PLAYER_LOCATION_TTL = 0.5,
+  --- How many spells should be scanned each interval when scanning for spells?
+  --- Higher number scans faster, but impacts performance.
+  SPELL_SCAN_INTENSITY = 5,
+  --- How often (# of spells) a progress log should be printed when scanning for spells.
+  SPELL_SCAN_LOG_INTERVAL = 5000,
   --- Show this MainMenu screen immediately when the addon loads.
   --- Set to an empty string to not show any menu on startup.
   START_MENU = "",

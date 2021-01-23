@@ -139,4 +139,24 @@ handlers = {
   ["clear-items"] = function()
     addon:ClearItemCache()
   end,
+  ["lookup-spell"] = function(...)
+    local idOrName = strjoin(" ", ...)
+
+    local spell = addon:LookupSpellSafe(idOrName)
+
+    if spell then
+      addon.Logger:Warn("Spell found: %s (%i)", spell.name, spell.spellId)
+    else
+      addon.Logger:Warn("No spell found with id or name: %s", idOrName)
+    end
+  end,
+  ["scan-spells"] = function(min, max)
+    addon:ScanSpells(min, max)
+  end,
+  ["clear-spells"] = function()
+    addon:ClearSpellCache()
+  end,
+  ["watch-spells"] = function()
+    addon:ToggleSpellWatch()
+  end,
 }

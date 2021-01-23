@@ -196,4 +196,15 @@ function game:SetPlayerGroup(addon, groupType)
   mocks[#mocks+1] = addon.G.IsInGroup
 end
 
+function game:SetSpellName(addon, spellId, spellName)
+  assert(type(spellId) == "number", "SetSpellInfo must receive a spellId")
+  assert(type(spellName) == "string", "SetSpellInfo must receive a spellName")
+
+  mock:GetFunctionMock(addon.G.GetSpellInfo):SetReturnsWhen(
+    function(arg) return arg == spellId or arg == spellName end,
+    spellName, nil, nil, nil, nil, nil, spellId)
+
+  mocks[#mocks+1] = addon.G.GetSpellInfo
+end
+
 return game

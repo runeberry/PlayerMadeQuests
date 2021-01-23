@@ -16,6 +16,8 @@ describe("DisplayText", function()
   setup(function()
     addon:Init()
     addon:Advance()
+
+    game:SetSpellName(addon, 123, "Fire Blast")
   end)
   describe("objective displaytext parser", function()
     local testCases = {
@@ -134,6 +136,62 @@ describe("DisplayText", function()
           progress = "Talk to Stormwind Guard: 0/2",
           quest = "Talk to 2 Stormwind Guard",
           full = "Talk to 2 Stormwind Guard"
+        }
+      },
+      {
+        objective = "cast-spell 'Fire Blast'",
+        expected = {
+          log = "Fire Blast 0/1",
+          progress = "Cast Fire Blast: 0/1",
+          quest = "Cast Fire Blast",
+          full = "Cast Fire Blast"
+        }
+      },
+      {
+        objective = "cast-spell 5 123",
+        expected = {
+          log = "Fire Blast 0/5",
+          progress = "Cast Fire Blast: 0/5",
+          quest = "Cast Fire Blast 5 times",
+          full = "Cast Fire Blast 5 times"
+        }
+      },
+      {
+        -- The goal of 1 here is necessary so it's not ambiguous w/ spellId
+        objective = "cast-spell 1 123 'Stonetusk Boar'",
+        expected = {
+          log = "Fire Blast on Stonetusk Boar 0/1",
+          progress = "Cast Fire Blast on Stonetusk Boar: 0/1",
+          quest = "Cast Fire Blast on Stonetusk Boar",
+          full = "Cast Fire Blast on Stonetusk Boar"
+        }
+      },
+      {
+        objective = "cast-spell 6 'Fire Blast' Rexxar",
+        expected = {
+          log = "Fire Blast on Rexxar 0/6",
+          progress = "Cast Fire Blast on Rexxar: 0/6",
+          quest = "Cast Fire Blast on 6 different Rexxar",
+          full = "Cast Fire Blast on 6 different Rexxar"
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', goal : 6, target: Rexxar, sametarget: true }",
+        expected = {
+          log = "Fire Blast on Rexxar 0/6",
+          progress = "Cast Fire Blast on Rexxar: 0/6",
+          quest = "Cast Fire Blast on Rexxar 6 times",
+          full = "Cast Fire Blast on Rexxar 6 times"
+        }
+      },
+      {
+        -- Sametarget should have no effect if goal == 1
+        objective = "cast-spell: { spell: 'Fire Blast', target: Stonetusk Boar, sametarget: true }",
+        expected = {
+          log = "Fire Blast on Stonetusk Boar 0/1",
+          progress = "Cast Fire Blast on Stonetusk Boar: 0/1",
+          quest = "Cast Fire Blast on Stonetusk Boar",
+          full = "Cast Fire Blast on Stonetusk Boar"
         }
       },
     }

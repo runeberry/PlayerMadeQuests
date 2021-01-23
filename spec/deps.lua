@@ -165,6 +165,7 @@ function deps:Init(addon)
     GetInventorySlotInfo = ret(),
     GetInventoryItemID = ret(),
     GetPlayerTradeMoney = ret(),
+    GetSpellInfo = ret(),
     GetTradePlayerItemInfo = ret(),
     GetTargetTradeMoney = ret(),
     GetTradeTargetItemInfo = ret(),

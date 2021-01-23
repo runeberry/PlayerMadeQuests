@@ -6,27 +6,6 @@ local GetItemInfo, GetItemInfoInstant = addon.G.GetItemInfo, addon.G.GetItemInfo
 -- Keep track of every handler that's waiting on item info to be available
 local itemInfoSubscribers = {}
 
---- Returns either the itemId as a number, or the all-lowercase item name
-local function parseIdOrName(idOrName)
-  local itemId, itemName
-
-  if type(idOrName) == "number" then
-    itemId = idOrName
-  elseif type(idOrName) == "string" then
-    itemId = tonumber(idOrName)
-    if not itemId then
-      itemName = idOrName:lower()
-    end
-  else
-    if idOrName == nil then
-      error("Item idOrName must not be nil", 3)
-    end
-    error("Item idOrName must be a number or string", 3)
-  end
-
-  return itemId, itemName
-end
-
 -- Based on: https://wow.gamepedia.com/API_GetItemInfo
 local function parseFullInfo(idOrName, item)
   item = item or {}
@@ -82,7 +61,7 @@ local function parseInstantInfo(idOrName, item)
 end
 
 local function getItem(idOrName)
-  local itemId, itemName = parseIdOrName(idOrName)
+  local itemId, itemName = addon:ParseIdOrName(idOrName)
 
   if not itemId and itemName then
     -- If given a name, prefer the id if we have it cached
@@ -114,7 +93,7 @@ end
 --- If this is not a valid item id, name, or link, an error will be thrown.
 --- @param idOrName string (or number) the item id, name, or link
 function addon:LookupItem(idOrName)
-  parseIdOrName(idOrName)
+  addon:ParseIdOrName(idOrName)
 
   local item = getItem(idOrName)
   assert(item, "Unknown item: "..idOrName)
@@ -125,7 +104,7 @@ end
 --- Same as LookupItem, but will return nil instead of throwing an error if the item was not found.
 --- @param idOrName string (or number) the item id, name, or link
 function addon:LookupItemSafe(idOrName)
-  parseIdOrName(idOrName)
+  addon:ParseIdOrName(idOrName)
   return getItem(idOrName)
 end
 
@@ -134,9 +113,9 @@ end
 --- @param handler function function to handle an item (info) object
 --- @return table the currently available item info, or nil if not found
 function addon:LookupItemAsync(idOrName, handler)
-  local itemId, itemName = parseIdOrName(idOrName)
+  local itemId, itemName = addon:ParseIdOrName(idOrName)
 
-  local handlerKey = itemId or itemName
+  local handlerKey = itemId or itemName:lower()
   local handlers = itemInfoSubscribers[handlerKey]
   if not handlers then
     handlers = {}
@@ -202,7 +181,7 @@ function addon:ScanItems(min, max)
     -- Resume scanning now that we're positive the item has been fully defined (and therefore cached)
     scanData.total = scanData.total + 1
     if scanData.total % logInterval == 0 then
-      addon.Logger:Warn("Scanning items, %i found...", scanData.total, scanData.timeoutTotal)
+      addon.Logger:Warn("Scanning items, %i found...", scanData.total)
     end
     lookupNextItem(item.itemId)
   end

@@ -1,4 +1,5 @@
 local addon = require("spec/addon-builder"):Build()
+local game = require("spec/game-env")
 local QuestDemos = addon.QuestDemos
 local DebugQuests = addon.DebugQuests
 
@@ -16,6 +17,13 @@ describe("QuestDemos", function()
 end)
 
 describe("DebugQuests", function()
+  setup(function()
+    game:SetSpellName(addon, 1, "Fire Blast")
+    game:SetSpellName(addon, 2, "Frostbolt")
+    game:SetSpellName(addon, 3, "Arcane Intellect")
+    game:SetSpellName(addon, 4, "Frost Armor")
+    game:SetSpellName(addon, 5, "Fireball")
+  end)
   local dqs = DebugQuests:FindAll()
   for _, dq in ipairs(dqs) do
     it(string.format("can compile debug quest %s (%s)", dq.name, dq.questId), function()

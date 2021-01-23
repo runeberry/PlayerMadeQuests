@@ -15,6 +15,8 @@ return {
   NOTIFY_VERSION_UPDATE = true,
   PLAYER_LOCATION_INTERVAL = 1.0,
   PLAYER_LOCATION_TTL = 0,
+  SPELL_SCAN_INTENSITY = 5,
+  SPELL_SCAN_LOG_INTERVAL = 5000,
   URL_DISCORD = "https://discord.gg/abcdefg",
   URL_GITHUB = "https://github.com/runeberry/PlayerMadeQuests",
   URL_WIKI = "https://pmq.runeberry.com",
