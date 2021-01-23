@@ -215,7 +215,21 @@ objectives:
   - cast-spell:
       spell: Fireball
       goal: 3
-      target: Stonetusk Boar]],
+      target: Stonetusk Boar
+  - cast-spell:
+      spell: Arcane Intellect
+      zone: Elwynn Forest
+      subzone: Goldshire
+      coords: 42.41, 64.46, 0.1
+  - cast-spell:
+      spell: Frost Armor
+      equip: Apprentice's Robe
+  - cast-spell:
+      spell: Frost Armor
+      item: Linen Bandage
+  - cast-spell:
+      spell: Frost Armor
+      aura: Arcane Intellect]],
   [16] = [[
 objectives:
   - cast-spell "Fire Blast"
