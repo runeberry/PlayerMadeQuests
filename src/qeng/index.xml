@@ -24,6 +24,7 @@
   <Script file="qeng/parameters/rewardchoice.lua"/>
   <Script file="qeng/parameters/rewarditem.lua"/>
   <Script file="qeng/parameters/rewardmoney.lua"/>
+  <Script file="qeng/parameters/sametarget.lua"/>
   <Script file="qeng/parameters/text.lua"/>
 
   <Script file="qeng/checkpoints/recreq.lua"/>

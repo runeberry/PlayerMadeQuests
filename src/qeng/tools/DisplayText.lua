@@ -43,6 +43,7 @@ vars = {
   ["player"] = t.PARAM_PLAYER,
   ["rc"] = t.PARAM_REWARDCHOICE,
   ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_SPELLTARGET, t.PARAM_RECIPIENT },
+  ["st"] = t.PARAM_SAMETARGET,
   ["sz"] = t.PARAM_SUBZONE,
   ["z"] = t.PARAM_ZONE,
 

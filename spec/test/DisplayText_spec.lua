@@ -171,8 +171,27 @@ describe("DisplayText", function()
         expected = {
           log = "Fire Blast on Rexxar 0/6",
           progress = "Cast Fire Blast on Rexxar: 0/6",
-          quest = "Cast Fire Blast 6 times on Rexxar",
-          full = "Cast Fire Blast 6 times on Rexxar"
+          quest = "Cast Fire Blast on 6 different Rexxar",
+          full = "Cast Fire Blast on 6 different Rexxar"
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', goal : 6, target: Rexxar, sametarget: true }",
+        expected = {
+          log = "Fire Blast on Rexxar 0/6",
+          progress = "Cast Fire Blast on Rexxar: 0/6",
+          quest = "Cast Fire Blast on Rexxar 6 times",
+          full = "Cast Fire Blast on Rexxar 6 times"
+        }
+      },
+      {
+        -- Sametarget should have no effect if goal == 1
+        objective = "cast-spell: { spell: 'Fire Blast', target: Stonetusk Boar, sametarget: true }",
+        expected = {
+          log = "Fire Blast on Stonetusk Boar 0/1",
+          progress = "Cast Fire Blast on Stonetusk Boar: 0/1",
+          quest = "Cast Fire Blast on Stonetusk Boar",
+          full = "Cast Fire Blast on Stonetusk Boar"
         }
       },
     }

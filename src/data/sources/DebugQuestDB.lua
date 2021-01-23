@@ -213,6 +213,11 @@ objectives:
       goal: 5
       target: Stonetusk Boar
   - cast-spell:
+      spell: Frostbolt
+      target: Stonetusk Boar
+      goal: 10
+      sametarget: true
+  - cast-spell:
       spell: Fireball
       goal: 3
       target: Stonetusk Boar

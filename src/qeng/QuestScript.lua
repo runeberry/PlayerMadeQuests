@@ -34,6 +34,7 @@ addon.QuestScriptTokens = {
   PARAM_REWARDCHOICE = "choose",
   PARAM_REWARDITEM = "rewarditem",
   PARAM_REWARDMONEY = "rewardmoney",
+  PARAM_SAMETARGET = "sametarget",
   PARAM_SPELL = "spell",
   PARAM_SPELLTARGET = "spelltarget",
   PARAM_SUBZONE = "subzone",
