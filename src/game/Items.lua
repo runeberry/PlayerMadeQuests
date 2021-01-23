@@ -181,7 +181,7 @@ function addon:ScanItems(min, max)
     -- Resume scanning now that we're positive the item has been fully defined (and therefore cached)
     scanData.total = scanData.total + 1
     if scanData.total % logInterval == 0 then
-      addon.Logger:Warn("Scanning items, %i found...", scanData.total, scanData.timeoutTotal)
+      addon.Logger:Warn("Scanning items, %i found...", scanData.total)
     end
     lookupNextItem(item.itemId)
   end
