@@ -150,6 +150,12 @@ handlers = {
       addon.Logger:Warn("No spell found with id or name: %s", idOrName)
     end
   end,
+  ["scan-spells"] = function(min, max)
+    addon:ScanSpells(min, max)
+  end,
+  ["clear-spells"] = function()
+    addon:ClearSpellCache()
+  end,
   ["watch-spells"] = function()
     addon:ToggleSpellWatch()
   end,

@@ -1,5 +1,6 @@
 local _, addon = ...
 local GetSpellInfo = addon.G.GetSpellInfo
+local GameSpellCache = addon.GameSpellCache
 local logger = addon.Logger:NewLogger("Spells")
 
 ------------------
@@ -28,7 +29,24 @@ local function parseSpellInfo(idOrName, spell)
 end
 
 local function getSpell(idOrName)
-  return parseSpellInfo(idOrName)
+  local spellInfo = parseSpellInfo(idOrName)
+
+  if not spellInfo then
+    local spellId, spellName = addon:ParseIdOrName(idOrName)
+    if spellName then
+      -- See if the cache has a spellId associated with this name
+      spellId = GameSpellCache:FindSpellID(spellName)
+      if spellId then
+        spellInfo = parseSpellInfo(spellId)
+      end
+    end
+  end
+
+  if spellInfo then
+    GameSpellCache:SaveSpellID(spellInfo.name, spellInfo.spellId)
+  end
+
+  return spellInfo
 end
 
 --- Looks up a spell by name or spellId.
@@ -211,4 +229,73 @@ function addon:ToggleSpellWatch()
     spellWatchSubKey = addon.AppEvents:Subscribe("PlayerCastSpell", onSpellCast)
     addon.Logger:Warn("Watching for spell casts...")
   end
+end
+
+-------------------------
+-- SPELL DATA SCANNING --
+-------------------------
+
+local scanData
+local scanFrame
+
+local function spellScanThrottled()
+  if not scanData then return end
+
+  local id = scanData.id
+  local target = math.min(id + scanData.intensity, scanData.max)
+
+  while id <= target do
+    id = id + 1
+    if getSpell(id) then -- calling this will trigger a save to cache
+      scanData.total = scanData.total + 1
+      if scanData.total % scanData.logInterval == 0 then
+        addon.Logger:Warn("Scanning spells, %i found...", scanData.total)
+      end
+    end
+  end
+
+  scanData.id = id
+
+  if target == scanData.max then
+    addon.Logger:Warn("Spell scan finished: %i spells found.", scanData.total)
+    scanData = nil
+  end
+end
+
+addon:OnGuiStart(function()
+  scanFrame = addon.G.CreateFrame("Frame")
+  scanFrame:SetScript("OnUpdate", spellScanThrottled)
+end)
+
+function addon:ScanSpells(min, max)
+  if scanData then
+    addon.Logger:Warn("Scan already in progress: currently on %i (%i spells found)", scanData.id, scanData.total)
+    return
+  end
+
+  -- This default max is 348409 based on a query from: https://wow-query.dev/
+  -- But the highest max in classic appears to be much lower
+  local maxPossibleSpellId = 50000
+
+  min = addon:ConvertValue(min or 1, "number")
+  max = addon:ConvertValue(max or maxPossibleSpellId, "number")
+  assert(min and max, "A valid min and max value must be provided")
+
+  -- Creating this object will trigger the scanning OnUpdate script
+  scanData = {
+    total = 0,
+    min = min,
+    max = max,
+    id = min - 1,
+    intensity = addon.Config:GetValue("SPELL_SCAN_INTENSITY"),
+    logInterval = addon.Config:GetValue("SPELL_SCAN_LOG_INTERVAL"),
+  }
+
+  addon.Logger:Warn("Beginning spell scan - /reload to cancel...")
+end
+
+function addon:ClearSpellCache()
+  local spells = GameSpellCache:FindAll()
+  GameSpellCache:DeleteAll()
+  addon.Logger:Warn("Item cache cleared (%i items removed)", #spells)
 end
