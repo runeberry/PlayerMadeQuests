@@ -11,5 +11,6 @@
         "before_each",
         "after_each",
         "spy"
-    ]
+    ],
+    "editor.tabSize": 2
 }
