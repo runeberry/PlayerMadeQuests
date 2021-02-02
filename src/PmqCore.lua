@@ -27,12 +27,14 @@ end
 
 --- Wrapper for error() that uses string.format for error messages
 function addon.errorf(msg, ...)
-  error(string.format(msg, ...))
+  error(string.format(msg, ...), 2)
 end
 
 --- Wrapper for assert() that uses string.format for error messages
 function addon.assertf(bool, msg, ...)
-  assert(bool, string.format(msg, ...))
+  if not bool then
+    error(string.format(msg, ...), 2)
+  end
 end
 
 --- Asserts that the provided value is of the specified type
