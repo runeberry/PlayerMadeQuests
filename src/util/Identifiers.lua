@@ -1,4 +1,5 @@
 local _, addon = ...
+local asserttype = addon.asserttype
 local time, strsplit = addon.G.time, addon.G.strsplit
 
 local idCounter = 0
@@ -14,23 +15,25 @@ end
 
 local globalNames = {}
 --- Creates a unique, incrementing global variable name given a partial name
-function addon:CreateGlobalName(str)
-  assert(type(str) == "string", "CreateGlobalName: a string name must be provided")
+function addon:CreateGlobalName(pattern)
+  asserttype(pattern, "string", "pattern", "CreateGlobalName")
 
-  local count = (globalNames[str] or 0) + 1
-  globalNames[str] = count
+  local count = (globalNames[pattern] or 0) + 1
+  globalNames[pattern] = count
 
   -- Add a prefix to avoid global collisions
-  str = "PMQ_"..str
+  pattern = "PMQ_"..pattern
   -- If %i is specified, sub this with an incrementing counter for this name
-  str = str:gsub("%%i", tostring(count))
+  pattern = pattern:gsub("%%i", tostring(count))
 
-  return str
+  return pattern
 end
 
 --- Parses a GUID string into a table with named properties
 --- Parsed based on this information: https://wow.gamepedia.com/GUID
 function addon:ParseGUID(guid)
+  asserttype(guid, "string", "guid", "ParseGUID")
+
   local parsed = {
     GUID = guid
   }
