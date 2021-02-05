@@ -7,7 +7,7 @@ local widget = addon:NewWidget("DataCheckbox")
 local defaultOptions = {
   text = "",                -- [string] Text to display to the right of the checkbox
   spacing = 2,              -- [number] Spacing between the checkbox and its text
-  get = nil,                -- [function()] Getter to load the value
+  get = nil,                -- [function() -> boolean] Getter to load the value
   set = nil,                -- [function(boolean)] Setter to save the value
 }
 
@@ -38,14 +38,11 @@ function widget:Create(frameName, parent, options)
   button:SetNormalFontObject("GameFontNormal")
   button:SetDisabledFontObject("GameFontDisable")
 
-  -- local fontString = button:CreateFontString(frameName.."_Label", "BACKGROUND", "GameFontNormal")
   local fontString = button:GetFontString()
   fontString:ClearAllPoints()
   fontString:SetPoint("LEFT", button, "RIGHT", options.spacing, 0)
-  -- fontString:SetText(options.text)
 
   button._options = options
-  -- button._fontString = fontString
 
   addon:ApplyMethods(button, methods)
   addon:ApplyScripts(button, scripts)
