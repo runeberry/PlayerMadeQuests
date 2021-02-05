@@ -46,7 +46,7 @@ function addon:CreateWidget(widgetType, frameName, parent, ...)
   assertf(template, "CreateWidget: %s is not a recognized widgetType", widgetType)
 
   -- Generate a unique global name for this frame
-  frameName = frameName or widgetType.."_%i"
+  frameName = frameName or widgetType.."%i"
   frameName = addon:CreateGlobalName(frameName)
   assertf(not widgets[frameName], "CreateWidget: the frame name \"%s\" is already in use", frameName)
 
