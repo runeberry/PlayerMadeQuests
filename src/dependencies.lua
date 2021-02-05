@@ -86,4 +86,12 @@ addon.G = {
   SetItemButtonSlotVertexColor = SetItemButtonSlotVertexColor,
   SetItemButtonQuality = SetItemButtonQuality,
   HandleModifiedItemClick = HandleModifiedItemClick,
+
+  -- Global functions for managing dropdown menus
+  UIDropDownMenu_Initialize = UIDropDownMenu_Initialize,
+  UIDropDownMenu_SetWidth = UIDropDownMenu_SetWidth,
+  UIDropDownMenu_SetText = UIDropDownMenu_SetText,
+  UIDropDownMenu_CreateInfo = UIDropDownMenu_CreateInfo,
+  UIDropDownMenu_SetSelectedValue = UIDropDownMenu_SetSelectedValue,
+  UIDropDownMenu_AddButton = UIDropDownMenu_AddButton,
 }
