@@ -56,3 +56,11 @@ function addon:CreateWidget(widgetType, frameName, parent, ...)
   widgets[frameName] = true
   return frame
 end
+
+function addon:ApplyScripts(frame, scripts)
+  assertIsFrame(frame)
+
+  for eventName, handler in pairs(scripts) do
+    frame:SetScript(eventName, handler)
+  end
+end
