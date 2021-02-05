@@ -31,6 +31,8 @@
   <Script file="gui/widgets/ToolWindowPopout.lua"/>
   <Script file="gui/widgets/TreeMenuFrame.lua"/>
 
+  <Script file="gui/widgets-v2/DataCheckbox.lua"/>
+
   <!-- Top-level frames -->
   <Script file="gui/MainMenu.lua"/>
   <Script file="gui/QuestInfoFrame.lua"/>
