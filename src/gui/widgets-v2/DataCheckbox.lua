@@ -30,6 +30,9 @@ local scripts = {
   ["OnClick"] = function(self, mouseButton, isDown)
     self:SetValue(self:GetChecked())
   end,
+  ["OnShow"] = function(self)
+    self:Refresh()
+  end,
 }
 
 function widget:Create(frameName, parent, options)
