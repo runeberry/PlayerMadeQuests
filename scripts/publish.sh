@@ -38,7 +38,11 @@ echo "Compressing files..."
 rm -rf $ADDON_NAME
 cp -r $ADDON_DIR $ADDON_NAME
 OUTFILE="${ADDON_NAME}_v${VERSION_STRING}.zip"
-rm $OUTFILE # Clean up old copy in case it already exists
+
+# Clean up old copy in case it already exists
+rm -f $OUTFILE
+
+# You must have 7zip in your PATH for this to work
 7z -bso0 -bsp0 a $OUTFILE $ADDON_NAME
 rm -rf $ADDON_NAME
 
