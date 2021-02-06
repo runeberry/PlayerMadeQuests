@@ -74,6 +74,12 @@ function addon:EvaluateUniqueTargetForObjective(objective, obj, targetGuid)
     return false
   end
 
+  local parsed = addon:ParseGUID(targetGuid)
+  if parsed.type == "Player" then
+    objective.logger:Pass("Target is a player, will not be excluded")
+    return true
+  end
+
   if addon:IsTargetExcluded(obj.id, targetGuid) then
     -- Target has already been used for this objective, don't count it again
     objective.logger:Fail("Target has already been used for this objective")
