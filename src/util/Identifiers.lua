@@ -22,7 +22,10 @@ function addon:CreateGlobalName(pattern)
   globalNames[pattern] = count
 
   -- Add a prefix to avoid global collisions
-  pattern = "PMQ_"..pattern
+  if not pattern:match("^PMQ_") then
+    pattern = "PMQ_"..pattern
+  end
+
   -- If %i is specified, sub this with an incrementing counter for this name
   pattern = pattern:gsub("%%i", tostring(count))
 
