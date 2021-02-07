@@ -1,7 +1,7 @@
 local _, addon = ...
 local asserttype = addon.asserttype
 
-local widget = addon:NewFrame("DataCheckbox")
+local template = addon:NewFrame("DataCheckbox")
 
 local defaultOptions = {
   text = "",                -- [string] Text to display to the right of the checkbox
@@ -12,7 +12,7 @@ local defaultOptions = {
   set = nil,                -- [function(boolean)] Setter to save the value
 }
 
-local methods = {
+template:AddMethods({
   ["Refresh"] = function(self)
     self:SetChecked(self:GetValue())
   end,
@@ -23,18 +23,18 @@ local methods = {
     value = value and true -- coerce value to boolean
     self._options.set(value)
   end,
-}
+})
 
-local scripts = {
+template:AddScripts({
   ["OnClick"] = function(self, mouseButton, isDown)
     self:SetValue(self:GetChecked())
   end,
   ["OnShow"] = function(self)
     self:Refresh()
   end,
-}
+})
 
-function widget:Create(frameName, parent, options)
+function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
   asserttype(options.get, "function", "options.get", "DataCheckbox:Create")
   asserttype(options.set, "function", "options.set", "DataCheckbox:Create")
@@ -51,12 +51,11 @@ function widget:Create(frameName, parent, options)
 
   button._options = options
 
-  addon:ApplyMethods(button, methods)
-  addon:ApplyScripts(button, scripts)
+  return button
+end
 
-  if options.autoLoad then
+function template:AfterCreate(button)
+  if button._options.autoLoad then
     button:Refresh()
   end
-
-  return button
 end

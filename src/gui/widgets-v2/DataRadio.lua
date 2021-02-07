@@ -1,7 +1,7 @@
 local _, addon = ...
 
-local widget = addon:NewFrame("DataRadio")
+local template = addon:NewFrame("DataRadio")
 
-function widget:Create(frameName, parent, options)
+function template:Create(frameName, parent, options)
 
 end

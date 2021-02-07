@@ -8,7 +8,7 @@ local UIDropDownMenu_SetText = addon.G.UIDropDownMenu_SetText
 local UIDropDownMenu_SetSelectedValue = addon.G.UIDropDownMenu_SetSelectedValue
 local UIDropDownMenu_AddButton = addon.G.UIDropDownMenu_AddButton
 
-local widget = addon:NewFrame("DataDropdown")
+local template = addon:NewFrame("DataDropdown")
 
 local defaultOptions = {
   text = "",        -- [string] Text to set above the dropdown
@@ -92,7 +92,7 @@ local function getValidatedChoice(dropdown, index)
   return choice
 end
 
-local methods = {
+template:AddMethods({
   ["Refresh"] = function(self)
     refreshChoices(self)
     refreshDropdownWidth(self)
@@ -131,15 +131,15 @@ local methods = {
   ["ClearChoices"] = function(self)
     self._options.choices = {}
   end,
-}
+})
 
-local scripts = {
+template:AddScripts({
   ["OnShow"] = function(self)
     self:Refresh()
   end,
-}
+})
 
-function widget:Create(frameName, parent, options)
+function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
   asserttype(options.get, "function", "options.get", "DataDropdown:Create")
   asserttype(options.set, "function", "options.set", "DataDropdown:Create")
@@ -153,15 +153,14 @@ function widget:Create(frameName, parent, options)
   dropdown._options = options
   dropdown._label = label
 
-  addon:ApplyMethods(dropdown, methods)
-  addon:ApplyScripts(dropdown, scripts)
+  return dropdown
+end
 
+function template:AfterCreate(dropdown)
   -- Run through SetChoices to perform validation on the list
-  dropdown:SetChoices(options.choices)
+  dropdown:SetChoices(dropdown._options.choices)
 
-  if options.autoLoad then
+  if dropdown._options.autoLoad then
     dropdown:Refresh()
   end
-
-  return dropdown
 end

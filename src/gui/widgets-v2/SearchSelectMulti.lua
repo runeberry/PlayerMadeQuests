@@ -1,7 +1,7 @@
 local _, addon = ...
 
-local widget = addon:NewFrame("SearchSelectMulti")
+local template = addon:NewFrame("SearchSelectMulti")
 
-function widget:Create(frameName, parent, options)
+function template:Create(frameName, parent, options)
 
 end

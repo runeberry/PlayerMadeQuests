@@ -1,7 +1,7 @@
 local _, addon = ...
 
-local widget = addon:NewFrame("FormLabel")
+local template = addon:NewFrame("FormLabel")
 
-function widget:Create(frameName, parent, options)
+function template:Create(frameName, parent, options)
 
 end
