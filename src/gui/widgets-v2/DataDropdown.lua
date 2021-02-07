@@ -1,5 +1,4 @@
 local _, addon = ...
-local CreateFrame = addon.G.CreateFrame
 local asserttype, assertf = addon.asserttype, addon.assertf
 
 local UIDropDownMenu_Initialize = addon.G.UIDropDownMenu_Initialize
@@ -9,7 +8,7 @@ local UIDropDownMenu_SetText = addon.G.UIDropDownMenu_SetText
 local UIDropDownMenu_SetSelectedValue = addon.G.UIDropDownMenu_SetSelectedValue
 local UIDropDownMenu_AddButton = addon.G.UIDropDownMenu_AddButton
 
-local widget = addon:NewWidget("DataDropdown")
+local widget = addon:NewFrame("DataDropdown")
 
 local defaultOptions = {
   text = "",        -- [string] Text to set above the dropdown
@@ -145,7 +144,7 @@ function widget:Create(frameName, parent, options)
   asserttype(options.get, "function", "options.get", "DataDropdown:Create")
   asserttype(options.set, "function", "options.set", "DataDropdown:Create")
 
-  local dropdown = CreateFrame("Frame", frameName, parent, "UIDropDownMenuTemplate")
+  local dropdown = addon:CreateFrame("Frame", frameName, parent, "UIDropDownMenuTemplate")
 
   local label = dropdown:CreateFontString(dropdown, "BACKGROUND", "GameFontNormalSmall")
   label:SetPoint("BOTTOMLEFT", dropdown, "TOPLEFT", 20, 2)

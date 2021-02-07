@@ -1,8 +1,7 @@
 local _, addon = ...
-local CreateFrame = addon.G.CreateFrame
 local asserttype = addon.asserttype
 
-local widget = addon:NewWidget("DataCheckbox")
+local widget = addon:NewFrame("DataCheckbox")
 
 local defaultOptions = {
   text = "",                -- [string] Text to display to the right of the checkbox
@@ -40,7 +39,7 @@ function widget:Create(frameName, parent, options)
   asserttype(options.get, "function", "options.get", "DataCheckbox:Create")
   asserttype(options.set, "function", "options.set", "DataCheckbox:Create")
 
-  local button = CreateFrame("CheckButton", frameName, parent, "UICheckButtonTemplate")
+  local button = addon:CreateFrame("CheckButton", frameName, parent, "UICheckButtonTemplate")
   button:SetText(options.text)
   button:SetPushedTextOffset(0, 0)
   button:SetNormalFontObject("GameFontNormal")

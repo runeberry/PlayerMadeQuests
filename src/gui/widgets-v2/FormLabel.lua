@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local widget = addon:NewWidget("FormLabel")
+local widget = addon:NewFrame("FormLabel")
 
 function widget:Create(frameName, parent, options)
 

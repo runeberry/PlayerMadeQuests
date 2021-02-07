@@ -1,9 +1,11 @@
 local _, addon = ...
+local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
 local assertf, asserttype = addon.assertf, addon.asserttype
 
-local widgetTemplates = {} -- Widget creation instructions, indexed by widgetType
-local widgets = {} -- Instances of created widgets, indexed by frameName
+local frameTemplates = {} -- Widget creation instructions, indexed by widgetType
+local frames = {} -- Instances of created frames, indexed by frameName
 
+--- Default methods to be applied to every widget template (not instance) when it's created.
 local templateMethods = {
   ["Create"] = function()
     -- All templates should override this method
@@ -11,6 +13,7 @@ local templateMethods = {
   end
 }
 
+--- Throws an error if the provided arg is not recognized as a UI frame.
 local function assertIsFrame(frame)
   asserttype(frame, "table", "frame", "assertIsFrame", 2)
   if type(frame.RegisterEvent) ~= "function" then
@@ -18,45 +21,69 @@ local function assertIsFrame(frame)
   end
 end
 
-function addon:NewWidget(widgetType)
-  local widgetTemplate = {}
-  addon:ApplyMethods(widgetTemplate, templateMethods)
+--- Registers a new type of UI frame for PMQ.
+--- @param frameType string A unique type name for the frame
+function addon:NewFrame(frameType)
+  local frameTemplate = {}
+  addon:ApplyMethods(frameTemplate, templateMethods)
 
   -- Always return the template even if validation fails, so we don't get null refs during file load
-  if type(widgetType) ~= "string" then
-    addon.UILogger:Error("Failed to create NewWidget: widgetType is required")
-    return widgetTemplate
+  if type(frameType) ~= "string" then
+    addon.UILogger:Error("Failed to create NewFrame: frameType is required")
+    return frameTemplate
   end
-  if widgetTemplates[widgetType] then
-    addon.UILogger:Error("Failed to create NewWidget: widgetType \"%s\" already exists", widgetType)
-    return widgetTemplate
+  if frameTemplates[frameType] then
+    addon.UILogger:Error("Failed to create NewFrame: frameType \"%s\" already exists", frameType)
+    return frameTemplate
   end
 
-  -- But only register the widget if validation was successful
-  widgetTemplates[widgetType] = widgetTemplate
-  return widgetTemplate
+  -- But only register the frame if validation was successful
+  frameTemplates[frameType] = frameTemplate
+  return frameTemplate
 end
 
-function addon:CreateWidget(widgetType, frameName, parent, ...)
-  asserttype(widgetType, "string", "widgetType", "CreateWidget")
-  asserttype(frameName or "", "string", "frameName", "CreateWidget")
-  assertIsFrame(parent)
+--- Creates a new instance of a UI frame. Checks if this is custom PMQ frame first,
+--- otherwise tries to make a standard Blizzard UI frame.
+--- @param frameType string The type of frame to create
+--- @param frameName string The unique global name (or name pattern) for this instance of the widget
+--- @param parent table A UI frame to act as the created frame's parent
+--- Additional args will be passed to the frame template's "Create" function, or "CreateFrame" for Blizzard frames
+function addon:CreateFrame(frameType, frameName, parent, ...)
+  asserttype(frameType, "string", "widgetType", "CreateFrame")
+  asserttype(frameName or "", "string", "frameName", "CreateFrame")
 
-  local template = widgetTemplates[widgetType]
-  assertf(template, "CreateWidget: %s is not a recognized widgetType", widgetType)
+  -- Set the default parent if one was not provided
+  if not parent then
+    parent = UIParent
+  else
+    assertIsFrame(parent)
+  end
 
   -- Generate a unique global name for this frame
-  frameName = frameName or widgetType.."%i"
+  frameName = frameName or frameType.."%i"
   frameName = addon:CreateGlobalName(frameName)
-  assertf(not widgets[frameName], "CreateWidget: the frame name \"%s\" is already in use", frameName)
+  assertf(not frames[frameName], "CreateFrame: the frame name \"%s\" is already in use", frameName)
 
-  local frame = template:Create(frameName, parent, ...)
-  assertIsFrame(frame)
+  -- First, check to see if this is a custom PMQ widget
+  local frame
+  local template = frameTemplates[frameType]
+  if template then
+    -- If this type was registered with NewWidget, then create it using the custom method
+    frame = template:Create(frameName, parent, ...)
+    assertIsFrame(frame)
+  else
+    -- Otherwise, assume this is a standard Blizzard UI frame type
+    frame = CreateFrame(frameType, frameName, parent, ...)
+  end
 
-  widgets[frameName] = true
+  -- Index this frame by name for future reference
+  frames[frameName] = frame
   return frame
 end
 
+--- Applies a table of scripts to the provided frame.
+--- @param frame table A UI frame
+--- @param scripts table A table of eventName:handlerFunc
 function addon:ApplyScripts(frame, scripts)
   assertIsFrame(frame)
 

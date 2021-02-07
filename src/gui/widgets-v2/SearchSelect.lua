@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local widget = addon:NewWidget("SearchSelect")
+local widget = addon:NewFrame("SearchSelect")
 
 function widget:Create(frameName, parent, options)
 
