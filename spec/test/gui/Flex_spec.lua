@@ -78,7 +78,7 @@ describe("Flex", function()
 
   for i, tc in ipairs(testCases) do
     it(tc.testName, function()
-      local results = addon:CalculateFlex(tc.flexParams, tc.flexSpace or defaultFlexSpace)
+      local results = addon:CalculateFlex(tc.flexSpace or defaultFlexSpace, tc.flexParams)
       assert.same(tc.expected, results)
     end)
   end

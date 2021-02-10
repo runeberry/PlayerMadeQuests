@@ -1,4 +1,5 @@
 local _, addon = ...
+local asserttype = addon.asserttype
 local flexLogger = addon.Logger:NewLogger("Flex")
 
 --[[
@@ -73,7 +74,7 @@ local function calcFlexRatios(flexParams, flexResults)
   end
 end
 
-local function calcFlexInternal(flexParams, flexSpace, flexResults)
+local function calcFlexInternal(flexSpace, flexParams, flexResults)
   local preWidths = {}
   flexLog("Available flex space: %.2f", flexSpace)
 
@@ -102,7 +103,7 @@ local function calcFlexInternal(flexParams, flexSpace, flexResults)
         -- Rerun the calcs with this width already assigned (will be excluded from recalc)
         flexResults[i] = width
         flexLog("Col #%i: assigned absolute width %.2f, recalculating...", i, width)
-        calcFlexInternal(flexParams, flexSpace - width, flexResults)
+        calcFlexInternal(flexSpace - width, flexParams, flexResults)
       else
         -- Don't assign width directly yet, in case we need to recalc based a min-max resize
         preWidths[i] = width
@@ -126,14 +127,16 @@ local function calcFlexInternal(flexParams, flexSpace, flexResults)
 end
 
 --- Calculates the flex widths for an array of width information
---- @param flexParams table an array of flex width objects
 --- @param flexSpace number the number of px available for distributing flex widths
+--- @param flexParams table an array of flex width objects
 --- @return table table an array of numbers representing absolute sizes
-function addon:CalculateFlex(flexParams, flexSpace)
-  if not flexParams or #flexParams == 0 then return {} end
+function addon:CalculateFlex(flexSpace, flexParams)
+  asserttype(flexSpace, "number", "flexSpace", "CalculateFlex")
+  asserttype(flexParams, "table", "flexParams", "CalculateFlex")
+  assert(flexParams[1], "CalculateFlex: at least one parameter is required")
 
   local flexResults = {}
-  calcFlexInternal(flexParams, flexSpace, flexResults)
+  calcFlexInternal(flexSpace, flexParams, flexResults)
 
   return flexResults
 end
