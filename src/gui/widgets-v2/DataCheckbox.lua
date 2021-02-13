@@ -4,7 +4,7 @@ local asserttype = addon.asserttype
 local template = addon:NewFrame("DataCheckbox")
 
 local defaultOptions = {
-  text = "",                -- [string] Text to display to the right of the checkbox
+  label = "",               -- [string] Text to display to the right of the checkbox
   spacing = 2,              -- [number] Spacing between the checkbox and its text
 
   autoLoad = true,          -- [boolean] If true, the widget will be refreshed immediately
@@ -40,7 +40,7 @@ function template:Create(frameName, parent, options)
   asserttype(options.set, "function", "options.set", "DataCheckbox:Create")
 
   local button = addon:CreateFrame("CheckButton", frameName, parent, "UICheckButtonTemplate")
-  button:SetText(options.text)
+  button:SetText(options.label)
   button:SetPushedTextOffset(0, 0)
   button:SetNormalFontObject("GameFontNormal")
   button:SetDisabledFontObject("GameFontDisable")

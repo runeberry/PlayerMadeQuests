@@ -11,7 +11,7 @@ local UIDropDownMenu_AddButton = addon.G.UIDropDownMenu_AddButton
 local template = addon:NewFrame("DataDropdown")
 
 local defaultOptions = {
-  text = "",        -- [string] Text to set above the dropdown
+  label = "",       -- [string] Text to set above the dropdown
   width = nil,      -- [number] Manual width of the dropdown's text region
   maxWidth = nil,   -- [number] Maximum allowed width of the dropdown's text region
   choices = {},     -- [table] Array of choices
@@ -40,7 +40,7 @@ local function refreshDropdownWidth(dropdown)
       end
     end
     -- Done measuring, put the label text back
-    label:SetText(options.text)
+    label:SetText(options.label)
   end
 
   if options.maxWidth then
@@ -148,7 +148,7 @@ function template:Create(frameName, parent, options)
 
   local label = dropdown:CreateFontString(dropdown, "BACKGROUND", "GameFontNormalSmall")
   label:SetPoint("BOTTOMLEFT", dropdown, "TOPLEFT", 20, 2)
-  label:SetText(options.text)
+  label:SetText(options.label)
 
   dropdown._options = options
   dropdown._label = label
