@@ -1,315 +1,424 @@
 local _, addon = ...
-local LibScrollingTable = addon.LibScrollingTable
 local asserttype = addon.asserttype
 
 local template = addon:NewFrame("DataTable")
-template:RegisterCustomScriptEvent("OnRowSelectionChanged")
 
-local flexLogEnabled = false -- Enable if troubleshooting flex sizing
-local flexLogger
+template:RegisterCustomScriptEvent("OnHeaderClicked")     -- When any header Button is clicked
+template:RegisterCustomScriptEvent("OnCellClicked")       -- When any non-header cell is clicked
+template:RegisterCustomScriptEvent("OnSelectionChanged")  -- When the currently selected cell changes
 
 local defaultOptions = {
-  colInfo = nil,          -- [table] Array of column info objects passed to LibScrollingTable
-  sortCol = nil,          -- [number] Sort table data by this column by default
-  rowHeight = 15,         -- [number] The height of each row in the table
-  highlightColor = {      -- [rgba] The highlight color when a row is selected
-    r = 0.8,
-    g = 0.7,
-    b = 0,
-    a = 0.5
-  },
+  columns = nil,          -- [table] An array of column info objects
+  rowHeight = 12,         -- [number] Height of each row
+  tablePadding = 8,       -- [LRTB] Padding on each side of the whole table
+  hoverColor = { 0.5, 0.5, 0.1, 0.5 },  -- [RGBA] Color when hovering over a table row
+  selectColor = { 0.5, 0.5, 0.1, 1 },   -- [RGBA] Color when a table row is selected
 
-  get = nil,              -- [function() -> table] Getter to load all values for the table
-  getItem = nil,          -- [function(row, index) -> any] Getter to convert an ST row into another object for GetSelectedItem
+  frameTemplate = "TooltipBorderedFrameTemplate",
+  fontTemplate = "GameFontHighlightSmall",
+  headerFontTemplate = "GameFontNormalSmall",
+
+  get = nil,              -- [function() -> table] Get all rows to display in the table
+  getItem = nil,          -- [function(row, index) -> any] Getter to convert a row into another object for GetSelectedItem
 }
 
-local function flexLog(...)
-  if not flexLogEnabled then return end
-  flexLogger = flexLogger or addon.Logger:NewLogger("DataTableFlex")
-  flexLogger:Debug(...)
+local defaultColumnOptions  = {
+  text = nil,             -- [string] The text for
+  width = { flex = 1 },
+  justifyH = "LEFT",
+  sortable = false,
+}
+
+local function forCell(dataTable, r, c, action)
+  action(dataTable._cells[r][c])
 end
 
-local function wrapEventSubscription(dt, methodName)
-  return function(...)
-    if dt._enableUpdates then
-      dt[methodName](dt, ...)
+local function forRowCells(dataTable, r, action)
+  for c, tableCell in ipairs(dataTable._cells[r]) do
+    action(tableCell, c)
+  end
+end
+
+local function forAllCells(dataTable, action)
+  for r, tableRows in ipairs(dataTable._cells) do
+    for c, tableCell in ipairs(tableRows) do
+      action(tableCell, r, c)
     end
   end
 end
 
--- Ensure each colInfo object has a valid _widthInfo property
-local function setWidthInfo(colInfo)
-  for i, ci in ipairs(colInfo) do
-    if ci._widthInfo then
-      -- noop
-    elseif type(ci.width) == "table" then
-      ci._widthInfo = ci.width
-      ci.width = 1
-    elseif type(ci.width) == "number" then
-      ci._widthInfo = { px = ci.width }
-      ci.width = 1
-    else
-      ci._widthInfo = { min = 50 }
-      ci.width = 1
+local function isCellSelected(dataTable, r, c)
+  local selRow, selCol = dataTable:GetSelection()
+  local scrollOffset = dataTable:GetScrollPosition() - 1
+
+  if selRow and r and selRow == r + scrollOffset then
+    -- This cell is in the selected row
+    if not selCol then
+      -- No col is specified, so the whole row is selected
+      return true
+    elseif selCol and selCol == c then
+      -- This cell is also in the selected column
+      return true
     end
-  end
-end
-
-local function isBetween(val, min, max)
-  min = min or 1
-  max = max or 999999
-
-  if val < min then
-    return false, min
-  elseif val > max then
-    return false, max
-  end
-
-  return true, val
-end
-
-local function getBetween(val, min, max)
-  local ok, val2 = isBetween(val, min, max)
-  return val2
-end
-
-local function calcFlexRatios(colInfo)
-  local flexSum = 0
-  for i, ci in ipairs(colInfo) do
-    local wi = ci._widthInfo
-    if ci.width then
-      -- Col is already sized, does not contributed to flex width
-    elseif type(wi.flexSize) == "number" then
-      flexSum = flexSum + wi.flexSize
-    else
-      wi.flexSize = 1
-      flexSum = flexSum + wi.flexSize
+  elseif selCol and selCol == c then
+    -- This cell is in the selected column, but not the selected row
+    if not selRow then
+      -- No row is specified, so the whole column is selected
+      return true
     end
   end
 
-  -- No flex containers to size, everything is already sized
-  if flexSum == 0 then return end
-
-  for i, ci in ipairs(colInfo) do
-    local wi = ci._widthInfo
-    if wi.flexSize then
-      wi.flexRatio = wi.flexSize / flexSum
-    end
-  end
+  return false
 end
 
-local function calcFlexWidths(colInfo, flexSpace)
-  if #colInfo == 0 then return end
-  local preWidths = {}
-  flexLog("Available flex space: %.2f", flexSpace)
-
-  -- Ratios change based on how many columns are being considered for flex
-  calcFlexRatios(colInfo)
-
-  for i, ci in ipairs(colInfo) do
-    if not ci.width then
-      local wi = ci._widthInfo
-      local recalc, width
-
-      if wi.px then
-        width = getBetween(wi.px, wi.min, wi.max)
-        recalc = true -- Always recalc when an absolute width is assigned
-      elseif wi.flexRatio then
-        local flexWidth = wi.flexRatio * flexSpace
-        recalc, width = isBetween(flexWidth, wi.min, wi.max)
-        recalc = not recalc -- actually want to recalc if isBetween returns false
-      end
-      flexLog("Col #%i: %s < %.2f < %s", i, tostring(wi.min), width, tostring(wi.max))
-
-      if recalc then
-        -- This col's width had to be assigned outside of the standard flex algorithm because:
-        -- * it was outside its min-max range, or
-        -- * it was assigned an absolute (non-flex) width
-        -- Rerun the calcs with this width already assigned (will be excluded from recalc)
-        ci.width = width
-        flexLog("Col #%i: assigned absolute width %.2f, recalculating...", i, width)
-        calcFlexWidths(colInfo, flexSpace - width)
-      else
-        -- Don't assign width directly yet, in case we need to recalc based a min-max resize
-        preWidths[i] = width
-      end
+local tableCellMethods = {
+  ["SetBackgroundColor"] = function(self, r, g, b, a)
+    if type(r) == "table" then
+      -- Can pass individual numbers or a whole rgba table
+      r, g, b, a = addon:UnpackRGBA(r)
     end
-  end
 
-  for i, ci in ipairs(colInfo) do
-    -- For any cols that have not been given width
-    -- (should happen at the innermost recursion of this fn)
-    if not ci.width then
-      if preWidths[i] then
-        flexLog("Col #%i: assigned flex width %.2f", i, preWidths[i])
-        ci.width = preWidths[i]
-      else
-        flexLog("Failed to calculate flex width for column #%i", i)
-        ci.width = 1
-      end
+    self._backgroundTexture:SetColorTexture(r, g, b, a)
+  end,
+  ["ClearBackgroundColor"] = function(self)
+    self._backgroundTexture:SetColorTexture(0, 0, 0, 0)
+  end,
+
+  ["SetContent"] = function(self, text)
+    if text == nil then
+      self:ClearContent()
+      return
     end
-  end
-end
 
-local function initScrollingTable(dataTable)
-  if dataTable._scrollingTable then return end -- Already initialized
+    self:SetText(tostring(text))
+    self._hasContent = true
+  end,
+  ["ClearContent"] = function(self)
+    self:SetText()
+    self._hasContent = false
+  end,
+}
+
+local tableCellScripts = {
+  ["OnClick"] = function(self)
+    if self._r == 0 then
+      self._dataTable:FireCustomScriptEvent("OnHeaderClicked", self._c)
+    elseif self._hasContent then
+      self._dataTable:FireCustomScriptEvent("OnCellClicked", self._r, self._c)
+    end
+  end,
+  ["OnEnter"] = function(self)
+    if self._r == 0 then return end -- Don't highlight header cells
+    if not self._hasContent then return end -- Don't highlight cells with no content
+    if isCellSelected(self._dataTable, self._r, self._c) then return end -- Don't change highlight if the cell is selected
+
+    local hoverColor = self._dataTable._options.hoverColor
+    forRowCells(self._dataTable, self._r, function(cell, c)
+      cell:SetBackgroundColor(hoverColor)
+    end)
+  end,
+  ["OnLeave"] = function(self)
+    if self._r == 0 then return end -- Don't highlight header cells
+    if not self._hasContent then return end -- Don't highlight cells with no content
+    if isCellSelected(self._dataTable, self._r, self._c) then return end -- Don't change highlight if the cell is selected
+
+    forRowCells(self._dataTable, self._r, function(cell, c)
+      cell:ClearBackgroundColor()
+    end)
+  end,
+}
+
+local function createTableCell(dataTable, r, c)
   local options = dataTable._options
 
-  setWidthInfo(options.colInfo)
+  local name = string.format("%sCell_R%iC%i", dataTable:GetName(), r, c)
+  local button = addon:CreateFrame("Button", name, dataTable)
+  button:SetHeight(options.rowHeight)
+  button:SetPushedTextOffset(0, 0)
 
-  -- Show however many rows it takes to fill out the parent frame
-  local frameHeight = dataTable:GetHeight()
-  local numRows = math.floor(frameHeight / options.rowHeight) - 1 -- Leave off a row to account for header
-  numRows = math.max(numRows, 1) -- Must try to display at least one row
+  local fontTemplate = options.fontTemplate
+  if r == 0 then fontTemplate = options.headerFontTemplate end
+  local fontString = button:CreateFontString(name.."_FS", "BACKGROUND", fontTemplate)
+  button:SetFontString(fontString)
 
-  local st = LibScrollingTable:CreateST(options.colInfo, numRows, options.rowHeight, options.highlightColor, dataTable)
-  st.frame:SetPoint("TOPLEFT", dataTable, "TOPLEFT", 0, -12)
-  st.frame:SetPoint("BOTTOMRIGHT", dataTable, "BOTTOMRIGHT")
-  st:EnableSelection(true)
-  addon:ApplyBackgroundStyle(st.frame)
-
-  -- In order to detect row selection, wrap the base SetSelected in this custom function
-  local origSetSelection = st.SetSelection
-  st.SetSelection = function(self, row)
-    origSetSelection(self, row)
-    dataTable:FireCustomScriptEvent("OnRowSelectionChanged")
+  local justifyH = options.columns[c].justifyH
+  if justifyH == "LEFT"  or justifyH == "RIGHT" then
+    -- Setting justify alone doesn't seem to work in a Button. Re-anchor it.
+    fontString:SetJustifyH(justifyH)
+    fontString:ClearAllPoints()
+    fontString:SetPoint(justifyH, button, justifyH)
   end
 
-  dataTable._scrollingTable = st
+  local backgroundTexture = button:CreateTexture(name.."_TX", "ARTWORK")
+  backgroundTexture:SetAllPoints(true)
+
+  addon:ApplyMethods(button, tableCellMethods)
+  addon:ApplyScripts(button, tableCellScripts)
+
+  button._dataTable = dataTable
+  button._backgroundTexture = backgroundTexture
+  button._r = r
+  button._c = c
+
+  return button
+end
+
+local function initHeaders(dataTable)
+  local columns = dataTable._options.columns
+  local numCols = #columns
+  local headerRow = dataTable._cells[0]
+
+  -- Header can only be initialized once
+  if headerRow then return end
+
+  headerRow = {}
+  dataTable._cells[0] = headerRow
+
+  for c = 1, numCols do
+    local headerCell = createTableCell(dataTable, 0, c)
+
+    if c > 1 then
+      -- Anchor to the cell in the previous column
+      headerCell:SetPoint("TOPLEFT", headerRow[c-1], "TOPRIGHT")
+    else
+      -- Anchor the first column header to the corner of the header frame
+      local padL, padR, padT, padB = addon:UnpackLRTB(dataTable._options.tablePadding)
+      headerCell:SetPoint("TOPLEFT", dataTable._headerFrame, "TOPLEFT", padL, 0)
+    end
+
+    headerCell:SetText(columns[c].header)
+    headerRow[c] = headerCell
+  end
+end
+
+local function initCells(dataTable)
+  local numRows = dataTable:GetNumVisibleRows()
+  local numCols = #dataTable._options.columns
+  local tableRows = dataTable._cells
+
+  if #tableRows < numRows then
+    for r = #tableRows + 1, numRows do
+      tableRows[r] = {}
+    end
+  end
+
+  for r, tableRow in ipairs(tableRows) do
+    if #tableRow < numCols then
+      for c = #tableRow + 1, numCols do
+
+        local tableCell = createTableCell(dataTable, r, c)
+
+        if c > 1 then
+          -- Anchor to the cell in the previous column
+          tableCell:SetPoint("TOPLEFT", tableRow[c-1], "TOPRIGHT")
+        elseif r > 1 then
+          -- Anchor to the cell in col 1 of the previous row
+          tableCell:SetPoint("TOPLEFT", tableRows[r-1][1], "BOTTOMLEFT")
+        else
+          -- Anchor the first cell to the corner of the table frame
+          local padL, padR, padT, padB = addon:UnpackLRTB(dataTable._options.tablePadding)
+          tableCell:SetPoint("TOPLEFT", dataTable._tableFrame, "TOPLEFT", padL, -1*padT)
+        end
+
+        tableRow[c] = tableCell
+      end
+    end
+  end
 end
 
 template:AddMethods({
+  --------------------------
+  -- View refresh methods --
+  --------------------------
   ["Refresh"] = function(self)
     self:RefreshData()
     self:RefreshDisplay()
   end,
   ["RefreshData"] = function(self)
-    initScrollingTable(self)
-
-    local data = self._options.get() or {}
-
-    local sortCol = self._options.sortCol
-    if sortCol then
-      table.sort(data, function(a, b) return a[sortCol] < b[sortCol] end)
-    end
-
-    self._scrollingTable:SetData(data, true) -- Only supporting minimal data format for now
-
-    for _, filter in pairs(self._filters) do
-      self._scrollingTable:SetFilter(filter)
-    end
+    self._data = self._options.get() or {}
   end,
   ["RefreshDisplay"] = function(self)
-    initScrollingTable(self)
+    local options = self._options
 
-    local frameWidth = self._scrollingTable.frame:GetWidth() - 35 -- approx. account for edge inset and scrollbar
-    flexLog("Total width of DataTable: %.2f", frameWidth)
+    initHeaders(self)
+    initCells(self)
 
-    -- Setup: Clear all width values
-    for i, ci in ipairs(self._options.colInfo) do
-      ci.width = nil
+    local flexParams = {}
+    for i, column in ipairs(options.columns) do
+      flexParams[i] = column.width
     end
 
-    -- Calculate flex and absolute widths based on the available space
-    calcFlexWidths(self._options.colInfo, frameWidth)
+    local padL, padR, padT, padB = addon:UnpackLRTB(self._options.tablePadding)
+    local usableWidth = self._tableFrame:GetWidth() - padL - padR
+    local widths = addon:CalculateFlex(usableWidth, flexParams)
 
-    -- Teardown: as a failsafe, assign any remaining columns a width of 1px
-    for i, ci in ipairs(self._options.colInfo) do
-      if not ci.width or ci.width < 1 then
-        flexLog("!!! Unresolved width for column #%i", i)
-        ci.width = 1
+    local scrollOffset = self:GetScrollPosition() - 1
+
+    forRowCells(self, 0, function(cell, c) -- Header row
+      cell:SetWidth(widths[c])
+    end)
+    forAllCells(self, function(cell, r, c)
+      cell:SetWidth(widths[c])
+
+      -- Set cell content from the dataset
+      cell:ClearContent()
+      local rowData = self._data[r + scrollOffset]
+      if rowData then
+        cell:SetContent(rowData[c])
       end
+
+      -- Highlight the cell if it's selected
+      if isCellSelected(self, r, c) then
+        cell:SetBackgroundColor(options.selectColor)
+      else
+        cell:ClearBackgroundColor()
+      end
+    end)
+  end,
+
+  ----------------------------
+  -- Cell selection methods --
+  ----------------------------
+  ["GetSelection"] = function(self)
+    return self._selectedRow, self._selectedCol
+  end,
+  ["SetSelection"] = function(self, rowIndex, colIndex)
+    local r1, c1 = self:GetSelection()
+    if rowIndex == r1 and colIndex == c1 then
+      -- Same selection, make no changes
+      return
     end
 
-    -- Pass the updated colInfo down into the base library
-    self._scrollingTable:SetDisplayCols(self._options.colInfo)
-  end,
+    self._selectedRow = rowIndex
+    self._selectedCol = colIndex
 
-  ["GetSelectedIndex"] = function(self)
-    if not self._scrollingTable then return end
-    return self._scrollingTable:GetSelection()
-  end,
-  ["GetSelectedRow"] = function(self)
-    local index = self:GetSelectedIndex()
-    if not index then return end
-    return self._scrollingTable:GetRow(index)
-  end,
-  ["GetSelectedItem"] = function(self)
-    local row = self:GetSelectedRow()
-    if not row then return end
-    if self._options.getItem then
-      local ok = addon:catch(function()
-        row = self._options.getItem(row, self:GetSelectedIndex())
-      end)
-      if not ok then return end
-    end
-    return row
+    self:FireCustomScriptEvent("OnSelectionChanged", rowIndex, colIndex)
   end,
   ["ClearSelection"] = function(self)
-    return self._scrollingTable:ClearSelection()
+    self:SetSelection(nil, nil)
   end,
 
-  ["AddFilter"] = function(self, fnFilter)
-    self._filters[#self._filters+1] = fnFilter
+  -----------------------------
+  -- Scroll & paging methods --
+  -----------------------------
+  ["GetNumVisibleRows"] = function(self)
+    local options = self._options
+
+    -- Show however many rows it takes to fill out the parent frame
+    local frameHeight = self._tableFrame:GetHeight()
+    local numRows = math.floor(frameHeight / options.rowHeight) - 1 -- Leave off a row to account for header
+    numRows = math.max(numRows, 1) -- Must try to display at least one row
+
+    return numRows
   end,
-  ["ClearFilters"] = function(self)
-    self._filters = {}
+  -- Guaranteed to always be a value from 1 - #rows
+  ["GetScrollPosition"] = function(self)
+    return self._scrollPos
   end,
+  -- +1 to scroll down, -1 to scroll up
+  ["ScrollByRow"] = function(self, numRows)
+    asserttype(numRows, "number", "numRows", "DataTable:ScrollByRow")
 
-  -- Run the specified method on this DataTable whenever these events occur
-  -- The subscriptions will only be run if updates are enabled on this DataTable
-  ["SubscribeMethodToEvents"] = function(self, methodName, ...)
-    asserttype(methodName, "string", "methodName", "DataTable:SubscribeMethodToEvents")
-    asserttype(self[methodName], "function", "DataTable[methodName]", "DataTable:SubscribeMethodToEvents")
-
-    local subs = self._subscriptions[methodName]
-    if not subs then
-      subs = {}
-      self._subscriptions[methodName] = subs
-    end
-
-    -- Wrap the method call so that it only runs if updates are enabled
-    local wrappedSubscription = wrapEventSubscription(self, methodName)
-
-    for _, appEvent in pairs({ ... }) do
-      if subs[appEvent] then
-        -- DataTable is already subscribed to perform this method on this AppEvent
-      else
-        subs[appEvent] = addon.AppEvents:Subscribe(appEvent, wrappedSubscription)
-      end
-    end
+    local scrollPos = self:GetScrollPosition()
+    -- Don't try to scroll above the 1st row
+    scrollPos = math.max(scrollPos + numRows, 1)
+    self:ScrollToRow(scrollPos)
   end,
-  ["EnableUpdates"] = function(self, flag)
-    if flag == nil then flag = true end
-    self._enableUpdates = flag and true
+  -- +1 to scroll down, -1 to scroll up
+  ["ScrollByPage"] = function(self, numPages)
+    asserttype(numPages, "number", "numPages", "DataTable:ScrollByPage")
+
+    local pageSize = self:GetNumVisibleRows()
+    self:ScrollByRow(numPages * pageSize)
+  end,
+  ["ScrollToRow"] = function(self, rowIndex)
+    -- Above the 1st row, don't try to scroll
+    if not rowIndex or rowIndex < 1 then return end
+
+    -- The farthest you can scroll down is "#rows - pageSize"
+    local pageSize = self:GetNumVisibleRows()
+    rowIndex = math.min(rowIndex, math.max(#self._data - pageSize, 1))
+
+    -- Same scroll position, don't change anything
+    if self._scrollPos == rowIndex then return end
+
+    self._scrollPos = rowIndex
+    self:RefreshDisplay()
   end,
 })
 
 template:AddScripts({
-  ["OnShow"] = function(self)
-    self:EnableUpdates(true)
-    self:RefreshDisplay()
+  ["OnMouseWheel"] = function(self, delta)
+    -- Delta will either be +1 (scroll up) or -1 (scroll down)
+    self:ScrollByRow(-1*delta)
   end,
-  ["OnHide"] = function(self)
-    self:EnableUpdates(false)
+  ["OnHeaderClicked"] = function(self, c)
+    local colOptions = self._options.columns[c]
+
+    if colOptions.sortable then
+      forCell(self, 0, c, function(cell)
+        -- todo: all this
+      end)
+    end
   end,
-  ["OnSizeChanged"] = function(self)
+  ["OnCellClicked"] = function(self, r, c)
+    local selectedRow = self:GetSelection()
+    local clickedRow = r + (self:GetScrollPosition() - 1)
+
+    if selectedRow == clickedRow then
+      -- Deselect a row when it's already selected and clicked again
+      self:ClearSelection()
+    else
+      self:SetSelection(clickedRow)
+    end
+  end,
+  ["OnSelectionChanged"] = function(self, r, c)
+    addon.UILogger:Trace("Set DataTable selection: %s, %s", tostring(r), tostring(c))
     self:RefreshDisplay()
   end,
 })
 
 function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
-  asserttype(options.colInfo, "table", "options.colInfo", "DataTable:Create")
+  asserttype(options.columns, "table", "options.columns", "DataTable:Create")
+  assert(options.columns[1], "DataTable: at least one column is required")
   asserttype(options.get, "function", "options.get", "DataTable:Create")
 
+  for c, column in ipairs(options.columns) do
+    if type(column) == "string" then
+      -- If just a string is provided, treat it as the header text w/ default options
+      column = { header = column }
+    end
+
+    column = addon:MergeOptionsTable(defaultColumnOptions, column)
+    options.columns[c] = column
+
+    local paramName = string.format("options.columns[%i]", c)
+    asserttype(column, "table", paramName, "DataTable:Create")
+    asserttype(column.header, "string", paramName..".header", "DataTable:Create")
+  end
+
   local dataTable = addon:CreateFrame("Frame", frameName, parent)
+  dataTable:EnableMouse(true)
 
+  local headerFrame = addon:CreateFrame("Frame", frameName.."Header", dataTable)
+  headerFrame:SetHeight(options.rowHeight)
+  headerFrame:SetPoint("TOPLEFT", dataTable, "TOPLEFT")
+  headerFrame:SetPoint("TOPRIGHT", dataTable, "TOPRIGHT")
+
+  local tableFrame = addon:CreateFrame("Frame", frameName.."Table", dataTable, options.frameTemplate)
+  tableFrame:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT")
+  tableFrame:SetPoint("TOPRIGHT", headerFrame, "BOTTOMRIGHT")
+  tableFrame:SetPoint("BOTTOMLEFT", dataTable, "BOTTOMLEFT")
+  tableFrame:SetPoint("BOTTOMRIGHT", dataTable, "BOTTOMRIGHT")
+
+  dataTable._headerFrame = headerFrame
+  dataTable._tableFrame = tableFrame
   dataTable._options = options
-  dataTable._enableUpdates = true
-  dataTable._filters = {}
-  dataTable._subscriptions = {}
 
-  -- The table itself isn't created until Refresh() is called
+  dataTable._scrollPos = 1
+  dataTable._data = {}
+  dataTable._cells = {}
+
   return dataTable
 end
