@@ -252,7 +252,7 @@ template:AddMethods({
     local usableWidth = self._tableFrame:GetWidth() - padL - padR
     local widths = addon:CalculateFlex(usableWidth, flexParams)
 
-    local scrollOffset = self:GetScrollPosition() - 1
+    local visibleData = self:GetVisibleData()
 
     forRowCells(self, 0, function(cell, c) -- Header row
       cell:SetWidth(widths[c])
@@ -262,9 +262,8 @@ template:AddMethods({
 
       -- Set cell content from the dataset
       cell:ClearContent()
-      local rowData = self._data[r + scrollOffset]
-      if rowData then
-        cell:SetContent(rowData[c])
+      if visibleData[r] then
+        cell:SetContent(visibleData[r][c])
       end
 
       -- Highlight the cell if it's selected
@@ -274,6 +273,28 @@ template:AddMethods({
         cell:ClearBackgroundColor()
       end
     end)
+  end,
+
+  ------------------
+  -- Data methods --
+  ------------------
+  ["GetAllData"] = function(self)
+    return self._data
+  end,
+  ["GetVisibleData"] = function(self)
+    local data = self:GetAllData()
+    local scrollOffset = self:GetScrollPosition() - 1
+    local pageSize = self:GetNumVisibleRows()
+
+    local results = {}
+    for i = 1, pageSize do
+      local row = data[i + scrollOffset]
+      if row then
+        results[#results+1] = row
+      end
+    end
+
+    return results
   end,
 
   ----------------------------
@@ -344,6 +365,18 @@ template:AddMethods({
 
     self._scrollPos = rowIndex
     self:RefreshDisplay()
+  end,
+
+  ---------------------------
+  -- Sort & filter methods --
+  ---------------------------
+  ["GetSort"] = function(self)
+
+  end,
+  ["SetSortColumn"] = function(self, colIndex, descending)
+    asserttype(colIndex, "number", "colIndex", "DataTable:SetSortColumn")
+
+
   end,
 })
 
@@ -419,6 +452,7 @@ function template:Create(frameName, parent, options)
   dataTable._scrollPos = 1
   dataTable._data = {}
   dataTable._cells = {}
+  dataTable._sort = {}
 
   return dataTable
 end
