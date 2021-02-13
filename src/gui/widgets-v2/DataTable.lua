@@ -1,5 +1,5 @@
 local _, addon = ...
-local asserttype = addon.asserttype
+local asserttype, assertf = addon.asserttype, addon.assertf
 
 local template = addon:NewFrame("DataTable")
 
@@ -226,6 +226,15 @@ local function initCells(dataTable)
   end
 end
 
+local function setSortColumnToDefault(dataTable)
+  for c, column in ipairs(dataTable._options.columns) do
+    if column.defaultSort then
+      dataTable:SetSortColumn(c, column.defaultSort)
+      break
+    end
+  end
+end
+
 template:AddMethods({
   --------------------------
   -- View refresh methods --
@@ -235,7 +244,18 @@ template:AddMethods({
     self:RefreshDisplay()
   end,
   ["RefreshData"] = function(self)
-    self._data = self._options.get() or {}
+    local data = self._options.get() or {}
+
+    local sortCol, sortOrder = self:GetSortColumn()
+    if sortCol then
+      if sortOrder == "DESC" then
+        table.sort(data, function(a, b) return a[sortCol] > b[sortCol] end)
+      else
+        table.sort(data, function(a, b) return a[sortCol] < b[sortCol] end)
+      end
+    end
+
+    self._data = data
   end,
   ["RefreshDisplay"] = function(self)
     local options = self._options
@@ -313,6 +333,7 @@ template:AddMethods({
     self._selectedRow = rowIndex
     self._selectedCol = colIndex
 
+    self:RefreshDisplay()
     self:FireCustomScriptEvent("OnSelectionChanged", rowIndex, colIndex)
   end,
   ["ClearSelection"] = function(self)
@@ -370,13 +391,40 @@ template:AddMethods({
   ---------------------------
   -- Sort & filter methods --
   ---------------------------
-  ["GetSort"] = function(self)
-
+  ["GetSortColumn"] = function(self)
+    return self._sortColIndex, self._sortColOrder
   end,
-  ["SetSortColumn"] = function(self, colIndex, descending)
+  -- order: "ASC" or "DESC"
+  ["SetSortColumn"] = function(self, colIndex, order)
     asserttype(colIndex, "number", "colIndex", "DataTable:SetSortColumn")
+    assertf(colIndex > 0 and colIndex <= #self._options.columns,
+      "DataTable:SetSortColumn - colIndex must be 1 - %i", #self._options.columns)
 
+    if order ~= "DESC" then
+      -- All values other than "DESC" will default to "ASC"
+      order = "ASC"
+    end
 
+    if self._sortColIndex == colIndex and self._sortColOrder == order then
+      -- Same sort, make no changes
+      return
+    end
+
+    self._sortColIndex = colIndex
+    self._sortColOrder = order
+
+    self:Refresh()
+  end,
+  ["ClearSortColumn"] = function(self)
+    if not self._sortColIndex then return end -- No sort currently applied, make no changes
+
+    self._sortColIndex = nil
+    self._sortColOrder = nil
+
+    -- Restore default column sort even if all sorts are cleared
+    setSortColumnToDefault(self)
+
+    self:Refresh()
   end,
 })
 
@@ -389,9 +437,19 @@ template:AddScripts({
     local colOptions = self._options.columns[c]
 
     if colOptions.sortable then
-      forCell(self, 0, c, function(cell)
-        -- todo: all this
-      end)
+      local sortCol, sortOrder = self:GetSortColumn()
+      if sortCol == c then
+        if sortOrder == "ASC" then
+          sortOrder = "DESC"
+        else
+          sortOrder = "ASC"
+        end
+      else
+        sortOrder = "ASC"
+      end
+
+      self:SetSortColumn(c, sortOrder)
+      addon.UILogger:Trace("Set DataTable sort: %s %s", tostring(c), tostring(sortOrder))
     end
   end,
   ["OnCellClicked"] = function(self, r, c)
@@ -407,7 +465,6 @@ template:AddScripts({
   end,
   ["OnSelectionChanged"] = function(self, r, c)
     addon.UILogger:Trace("Set DataTable selection: %s, %s", tostring(r), tostring(c))
-    self:RefreshDisplay()
   end,
 })
 
@@ -417,18 +474,23 @@ function template:Create(frameName, parent, options)
   assert(options.columns[1], "DataTable: at least one column is required")
   asserttype(options.get, "function", "options.get", "DataTable:Create")
 
+  local defaultSort
   for c, column in ipairs(options.columns) do
-    if type(column) == "string" then
-      -- If just a string is provided, treat it as the header text w/ default options
-      column = { header = column }
-    end
+    local paramName = string.format("options.columns[%i]", c)
+    asserttype(column, "table", paramName, "DataTable:Create")
 
     column = addon:MergeOptionsTable(defaultColumnOptions, column)
     options.columns[c] = column
 
-    local paramName = string.format("options.columns[%i]", c)
-    asserttype(column, "table", paramName, "DataTable:Create")
     asserttype(column.header, "string", paramName..".header", "DataTable:Create")
+
+    if column.defaultSort then
+      if defaultSort then
+        error("DataTable:Create - only one column may specify defaultSort")
+      end
+      asserttype(column.defaultSort, "string", paramName..".defaultSort", "DataTable:Create")
+      defaultSort = c
+    end
   end
 
   local dataTable = addon:CreateFrame("Frame", frameName, parent)
@@ -452,7 +514,10 @@ function template:Create(frameName, parent, options)
   dataTable._scrollPos = 1
   dataTable._data = {}
   dataTable._cells = {}
-  dataTable._sort = {}
 
   return dataTable
+end
+
+function template:AfterCreate(dataTable)
+  setSortColumnToDefault(dataTable)
 end
