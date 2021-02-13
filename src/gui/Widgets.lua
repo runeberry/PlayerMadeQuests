@@ -84,7 +84,7 @@ local function assertIsFrame(frame)
 end
 
 --- Applies a table of scripts to the provided frame.
-local function applyScripts(frame, template)
+local function applyTemplateScripts(frame, template)
   assertIsFrame(frame)
 
   -- Create tables to hold any custom script handlers for this frame,
@@ -94,17 +94,7 @@ local function applyScripts(frame, template)
     frame._customScripts[customScriptType] = {}
   end
 
-  for scriptType, handler in pairs(template._scripts) do
-    local customScripts = frame._customScripts[scriptType]
-    if frame:HasCustomScript(scriptType) then
-      -- If this is a handler for a registered custom event, store it to be called
-      -- when that event is triggered with FireCustomScriptEvent
-      frame:SetCustomScript(scriptType, handler)
-    else
-      -- Otherwise, assume this is a standard Blizzard UI script event
-      frame:SetScript(scriptType, handler)
-    end
-  end
+  addon:ApplyScripts(frame, template._scripts)
 end
 
 --- Registers a new type of UI frame for PMQ.
@@ -165,7 +155,7 @@ function addon:CreateFrame(frameType, frameName, parent, ...)
     -- Apply any custom methods and scripts registered for this template
     addon:ApplyMethods(frame, frameMethods)
     addon:ApplyMethods(frame, template._methods)
-    applyScripts(frame, template)
+    applyTemplateScripts(frame, template)
 
     -- Finally, the frame is fully formed, finish it up
     template:AfterCreate(frame)
@@ -177,4 +167,25 @@ function addon:CreateFrame(frameType, frameName, parent, ...)
   -- Index this frame by name for future reference
   frames[frameName] = frame
   return frame
+end
+
+--- Applies a table of scripts to the provided frame, where key = ScriptType
+--- like "OnShow", and value is a function to handle that event. Can accept
+--- custom script events register on PMQ widget templates or basic Blizzard events.
+--- @param frame table A UI frame to set scripts on
+--- @param scripts table A table of scripts
+function addon:ApplyScripts(frame, scripts)
+  assertIsFrame(frame)
+  asserttype(scripts, "table", "scripts", "ApplyScripts")
+
+  for scriptType, handler in pairs(scripts) do
+    if frame.HasCustomScript and frame:HasCustomScript(scriptType) then
+      -- If this is a handler for a registered custom event, store it to be called
+      -- when that event is triggered with FireCustomScriptEvent
+      frame:SetCustomScript(scriptType, handler)
+    else
+      -- Otherwise, assume this is a standard Blizzard UI script event
+      frame:SetScript(scriptType, handler)
+    end
+  end
 end
