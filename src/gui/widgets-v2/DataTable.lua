@@ -3,9 +3,9 @@ local asserttype, assertf = addon.asserttype, addon.assertf
 
 local template = addon:NewFrame("DataTable")
 
-template:RegisterCustomScriptEvent("OnHeaderClicked")     -- When any header Button is clicked
-template:RegisterCustomScriptEvent("OnCellClicked")       -- When any non-header cell is clicked
-template:RegisterCustomScriptEvent("OnSelectionChanged")  -- When the currently selected cell changes
+template:RegisterCustomScriptEvent("OnHeaderClick")       -- When any header Button is clicked
+template:RegisterCustomScriptEvent("OnCellClick")         -- When any non-header cell is clicked
+template:RegisterCustomScriptEvent("OnSelectionChange")   -- When the currently selected cell changes
 
 local defaultOptions = {
   columns = nil,          -- [table] An array of column info objects
@@ -102,9 +102,9 @@ local tableCellMethods = {
 local tableCellScripts = {
   ["OnClick"] = function(self)
     if self._r == 0 then
-      self._dataTable:FireCustomScriptEvent("OnHeaderClicked", self._c)
+      self._dataTable:FireCustomScriptEvent("OnHeaderClick", self._c)
     elseif self._hasContent then
-      self._dataTable:FireCustomScriptEvent("OnCellClicked", self._r, self._c)
+      self._dataTable:FireCustomScriptEvent("OnCellClick", self._r, self._c)
     end
   end,
   ["OnEnter"] = function(self)
@@ -334,7 +334,7 @@ template:AddMethods({
     self._selectedCol = colIndex
 
     self:RefreshDisplay()
-    self:FireCustomScriptEvent("OnSelectionChanged", rowIndex, colIndex)
+    self:FireCustomScriptEvent("OnSelectionChange", rowIndex, colIndex)
   end,
   ["ClearSelection"] = function(self)
     self:SetSelection(nil, nil)
@@ -433,7 +433,7 @@ template:AddScripts({
     -- Delta will either be +1 (scroll up) or -1 (scroll down)
     self:ScrollByRow(-1*delta)
   end,
-  ["OnHeaderClicked"] = function(self, c)
+  ["OnHeaderClick"] = function(self, c)
     local colOptions = self._options.columns[c]
 
     if colOptions.sortable then
@@ -452,7 +452,7 @@ template:AddScripts({
       addon.UILogger:Trace("Set DataTable sort: %s %s", tostring(c), tostring(sortOrder))
     end
   end,
-  ["OnCellClicked"] = function(self, r, c)
+  ["OnCellClick"] = function(self, r, c)
     local selectedRow = self:GetSelection()
     local clickedRow = r + (self:GetScrollPosition() - 1)
 
@@ -463,7 +463,7 @@ template:AddScripts({
       self:SetSelection(clickedRow)
     end
   end,
-  ["OnSelectionChanged"] = function(self, r, c)
+  ["OnSelectionChange"] = function(self, r, c)
     addon.UILogger:Trace("Set DataTable selection: %s, %s", tostring(r), tostring(c))
   end,
 })
