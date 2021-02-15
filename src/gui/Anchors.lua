@@ -32,6 +32,18 @@ local direction = {
   BOTTOM = 1,
 }
 
+local offsetDirection = {
+  LEFT = { 1, 0 },
+  RIGHT = { -1, 0 },
+  TOP = { 0, -1 },
+  BOTTOM = { 0, 1 },
+  TOPLEFT = { 1, -1 },
+  TOPRIGHT = { -1, -1 },
+  BOTTOMLEFT = { 1, 1 },
+  BOTTOMRIGHT = { 1, -1 },
+  CENTER = { 0, 0 },
+}
+
 local sides = {
   TOPLEFT = { "TOP", "LEFT" },
   TOPRIGHT = { "TOP", "RIGHT" },
@@ -87,6 +99,16 @@ function addon:GetOffsetDirection(anchor, opp)
 
   assert(direction[anchor], "Unable to determine offset direction for anchor "..anchor)
   return direction[anchor]
+end
+
+--- Returns the x,y values needed to "push away" from the specified anchor.
+--- @param anchor string the side to push away from
+--- @param padding number the magnitude to push away with (number of px)
+function addon:GetOffsetsFromPadding(anchor, padding)
+  local opp = addon:GetOppositeAnchor(anchor) -- Use opposite to "push away"
+  local offsets = offsetDirection[opp]
+
+  return opp, offsets[1]*padding, offsets[2]*padding
 end
 
 --- Returns the two side anchors associated with a corner anchor
