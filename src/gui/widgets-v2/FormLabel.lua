@@ -6,46 +6,63 @@ local template = addon:NewFrame("FormLabel")
 local defaultOptions = {
   text = "",              -- [string] The text of the label
   anchor = "LEFT",        -- [string] The anchor of the parent frame to hook the fontString to
-  padding = 2,            -- [number] Number of px to offset the font from its parent in the anchor direction
-  offset = 0,             -- [XY] Additional position correction for fontString
   layer = "BACKGROUND",   -- [string] The drawing layer for the fontString
   clickable = false,      -- [boolean] True to enable mouse script events
 
-  fontTemplate = nil,     -- [string] Set manually to override automatic behavior
+  -- Specify the following settings only if you want to override anchor-specific options
+  fontTemplate = nil,     -- [string]
+  offsetX = nil,          -- [number]
+  offsetY = nil,          -- [number]
 }
 
 local anchorOptions = {
   LEFT = {
     fontTemplate = "GameFontNormal",
     anchorHook = "RIGHT",
+    offsetX = -2,
+    offsetY = 0,
   },
   RIGHT = {
     fontTemplate = "GameFontNormal",
     anchorHook = "LEFT",
+    offsetX = 2,
+    offsetY = 0,
   },
   TOP = {
     fontTemplate = "GameFontNormalSmall",
     anchorHook = "BOTTOM",
+    offsetX = 0,
+    offsetY = 2,
   },
   BOTTOM = {
     fontTemplate = "GameFontNormalSmall",
     anchorHook = "TOP",
+    offsetX = 0,
+    offsetY = -2,
   },
   TOPLEFT = {
     fontTemplate = "GameFontNormalSmall",
     anchorHook = "BOTTOMLEFT",
+    offsetX = 0,
+    offsetY = 2,
   },
   TOPRIGHT = {
     fontTemplate = "GameFontNormalSmall",
     anchorHook = "BOTTOMRIGHT",
+    offsetX = 0,
+    offsetY = 2,
   },
   BOTTOMLEFT = {
     fontTemplate = "GameFontNormalSmall",
     anchorHook = "TOPLEFT",
+    offsetX = 0,
+    offsetY = -2,
   },
   BOTTOMRIGHT = {
     fontTemplate = "GameFontNormalSmall",
     anchorHook = "TOPRIGHT",
+    offsetX = 0,
+    offsetY = -2,
   },
   CENTER = nil, -- Not supported
 }
@@ -78,9 +95,7 @@ function template:Create(frameName, parent, options)
     container:EnableMouse(true)
   end
 
-  local _, padX, padY = addon:GetOffsetsFromPadding(options.anchor, options.padding)
-  local offX, offY = addon:UnpackXY(options.offset)
-  container:SetPoint(options.anchorHook, parent, options.anchor, padX + offX, padY + offY)
+  container:SetPoint(options.anchorHook, parent, options.anchor, options.offsetX, options.offsetY)
 
   local fontString = container:CreateFontString(frameName.."_FS", options.layer, options.fontTemplate)
   fontString:SetText(options.text)

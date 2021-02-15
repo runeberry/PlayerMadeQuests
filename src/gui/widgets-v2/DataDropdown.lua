@@ -11,15 +11,53 @@ local UIDropDownMenu_AddButton = addon.G.UIDropDownMenu_AddButton
 local template = addon:NewFrame("DataDropdown")
 
 local defaultOptions = {
-  label = "",       -- [string] Text to set above the dropdown
-  width = nil,      -- [number] Manual width of the dropdown's text region
-  maxWidth = nil,   -- [number] Maximum allowed width of the dropdown's text region
-  choices = {},     -- [table] Array of choices
-  allowNil = false, -- [boolean] Allows the selection of a nil (empty) option from the dropdown
+  label = "",             -- [string] Text to set above the dropdown
+  labelAnchor = "LEFT",   -- [string] Where to anchor the label to the dropdown
+  width = nil,            -- [number] Manual width of the dropdown's text region
+  maxWidth = nil,         -- [number] Maximum allowed width of the dropdown's text region
+  choices = {},           -- [table] Array of choices
+  allowNil = false,       -- [boolean] Allows the selection of a nil (empty) option from the dropdown
 
-  autoLoad = true,  -- [boolean] If true, the widget will be refreshed immediately
-  get = nil,        -- [function() -> number] Getter to load the value
-  set = nil,        -- [function(number, string)] Setter to save the value
+  autoLoad = true,        -- [boolean] If true, the widget will be refreshed immediately
+  get = nil,              -- [function() -> number] Getter to load the value
+  set = nil,              -- [function(number, string)] Setter to save the value
+}
+
+-- Adjustments to make the label look better in each anchored position
+local labelAnchorOptions = {
+  LEFT = {
+    offsetX = 14,
+    offsetY = 2,
+  },
+  RIGHT = {
+    offsetX = -12,
+    offsetY = 2,
+  },
+  TOP = {
+    offsetX = 0,
+    offsetY = 2,
+  },
+  BOTTOM = {
+    offsetX = 0,
+    offsetY = 4,
+  },
+  TOPLEFT = {
+    offsetX = 18,
+    offsetY = 2,
+  },
+  TOPRIGHT = {
+    offsetX = -16,
+    offsetY = 2,
+  },
+  BOTTOMLEFT = {
+    offsetX = 18,
+    offsetY = 4,
+  },
+  BOTTOMRIGHT = {
+    offsetX = -16,
+    offsetY = 4,
+  },
+  CENTER = nil, -- Not supported
 }
 
 local function refreshDropdownWidth(dropdown)
@@ -141,17 +179,16 @@ template:AddScripts({
 
 function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
+  asserttype(options.labelAnchor, "string", "options.labelAnchor", "DataDropdown:Create")
   asserttype(options.get, "function", "options.get", "DataDropdown:Create")
   asserttype(options.set, "function", "options.set", "DataDropdown:Create")
 
   local dropdown = addon:CreateFrame("Frame", frameName, parent, "UIDropDownMenuTemplate")
 
-  local labelOptions = {
-    text = options.label,
-    anchor = "TOPLEFT",
-    offset = { 18, 2 },
-  }
-  local label = addon:CreateFrame("FormLabel", frameName.."Label", dropdown, labelOptions)
+  local labelOpts = labelAnchorOptions[options.labelAnchor]
+  labelOpts.anchor = options.labelAnchor
+  labelOpts.text = options.label
+  local label = addon:CreateFrame("FormLabel", frameName.."Label", dropdown, labelOpts)
 
   dropdown._options = options
   dropdown._label = label
