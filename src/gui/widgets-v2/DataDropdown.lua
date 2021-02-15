@@ -15,7 +15,7 @@ local defaultOptions = {
   width = nil,      -- [number] Manual width of the dropdown's text region
   maxWidth = nil,   -- [number] Maximum allowed width of the dropdown's text region
   choices = {},     -- [table] Array of choices
-  allowNil = false, -- [boolean]
+  allowNil = false, -- [boolean] Allows the selection of a nil (empty) option from the dropdown
 
   autoLoad = true,  -- [boolean] If true, the widget will be refreshed immediately
   get = nil,        -- [function() -> number] Getter to load the value
@@ -23,7 +23,7 @@ local defaultOptions = {
 }
 
 local function refreshDropdownWidth(dropdown)
-  local options, label = dropdown._options, dropdown._label
+  local options, label = dropdown._options, dropdown._label:GetFontString()
   local width = options.width
 
   if not width then
@@ -146,9 +146,12 @@ function template:Create(frameName, parent, options)
 
   local dropdown = addon:CreateFrame("Frame", frameName, parent, "UIDropDownMenuTemplate")
 
-  local label = dropdown:CreateFontString(dropdown, "BACKGROUND", "GameFontNormalSmall")
-  label:SetPoint("BOTTOMLEFT", dropdown, "TOPLEFT", 20, 2)
-  label:SetText(options.label)
+  local labelOptions = {
+    text = options.label,
+    anchor = "TOPLEFT",
+    offset = { 18, 2 },
+  }
+  local label = addon:CreateFrame("FormLabel", frameName.."Label", dropdown, labelOptions)
 
   dropdown._options = options
   dropdown._label = label
