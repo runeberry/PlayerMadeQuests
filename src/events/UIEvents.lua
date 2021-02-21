@@ -23,10 +23,14 @@ local function getUIEventName(frame, scriptType)
 end
 
 local methodOverrides = {
+  --- Requires the UI Frame as the first arg, and will pass that frame
+  --- as the first arg to any handlers.
   ["Publish"] = function(self, frame, scriptType, ...)
     local eventName = getUIEventName(frame, scriptType)
-    internalPublish(addon.UIEvents, eventName, ...)
+    internalPublish(addon.UIEvents, eventName, frame, ...)
   end,
+  --- Requires the UI Frame as the first arg. The handler should always expect
+  --- that UI frame as the first arg.
   ["Subscribe"] = function(self, frame, scriptType, handler)
     local eventName = getUIEventName(frame, scriptType)
     internalSubscribe(addon.UIEvents, eventName, handler)

@@ -57,7 +57,7 @@ local frameMethods = {
     addon.UIEvents:Subscribe(frame, scriptType, handler)
   end,
   ["FireCustomScriptEvent"] = function(frame, scriptType, ...)
-    addon.UIEvents:Publish(frame, scriptType, frame, ...)
+    addon.UIEvents:Publish(frame, scriptType, ...)
   end,
 }
 
