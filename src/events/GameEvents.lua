@@ -11,15 +11,14 @@ local function wrapPublish(event, ...)
 end
 
 function addon.GameEvents:OnSubscribe(event)
-  if self.handlersMap[event] == nil then
+  if self:GetNumSubscribers(event) == 0 then
     -- If this is the first subscriber for this event, register it with Ace
     addon.Ace:RegisterEvent(event, wrapPublish)
   end
 end
 
 function addon.GameEvents:OnUnsubscribe(event)
-  local handlers = self.handlersMap[event]
-  if addon:tlen(handlers) == 1 then
+  if self:GetNumSubscribers(event) == 1 then
     -- If this is the last subscriber for this event, unregister it from Ace
     addon.Ace:UnregisterEvent(event)
   end
