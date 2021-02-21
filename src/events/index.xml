@@ -8,4 +8,5 @@
   <Script file="events/GameEventsList.lua"/>
   <Script file="events/MessageEvents.lua"/>
   <Script file="events/QuestEvents.lua"/>
+  <Script file="events/UIEvents.lua"/>
 </Ui>

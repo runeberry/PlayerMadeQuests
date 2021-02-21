@@ -24,7 +24,7 @@ local templateMethods = {
   end,
   ["RegisterCustomScriptEvent"] = function(template, scriptType)
     if type(scriptType) ~= "string" then
-      addon.UILogger:Error("RegisterCustomScriptEvent, must received a scriptType")
+      addon.UILogger:Error("RegisterCustomScriptEvent: must received a scriptType")
       return
     end
 
@@ -43,35 +43,21 @@ local templateMethods = {
 }
 
 local frameMethods = {
-  ["HasCustomScript"] = function(frame, scriptType)
-    asserttype(scriptType, "string", "scriptType", "HasCustomScript")
+  ["GetCustomObjectType"] = function(frame)
+    return frame._frameType
+  end,
+  ["IsCustomObjectType"] = function(frame, templateName)
+    return frame._frameType == templateName
+  end,
 
-    return frame._customScripts[scriptType] and true
+  ["HasCustomScript"] = function(frame, scriptType)
+    return frameTemplates[frame._frameType]._customScripts[scriptType] and true
   end,
   ["SetCustomScript"] = function(frame, scriptType, handler)
-    asserttype(scriptType, "string", "scriptType", "SetCustomScript")
-    asserttype(handler, "function", "handler", "SetCustomScript")
-
-    local customScripts = frame._customScripts[scriptType]
-    if not customScripts then
-      addon.UILogger:Error("SetCustomScript: %s is not recognized for frame %s", scriptType, frame:GetName())
-      return
-    end
-
-    customScripts[#customScripts+1] = handler
+    addon.UIEvents:Subscribe(frame, scriptType, handler)
   end,
   ["FireCustomScriptEvent"] = function(frame, scriptType, ...)
-    asserttype(scriptType, "string", "scriptType", "FireCustomScriptEvent")
-
-    local customScripts = frame._customScripts[scriptType]
-    if not customScripts then
-      addon.UILogger:Error("FireCustomScriptEvent: %s is not recognized for frame %s", scriptType, frame:GetName())
-      return
-    end
-
-    for _, handler in ipairs(customScripts) do
-      addon:catch(handler, frame, ...)
-    end
+    addon.UIEvents:Publish(frame, scriptType, frame, ...)
   end,
 }
 
@@ -81,20 +67,6 @@ local function assertIsFrame(frame)
   if type(frame.RegisterEvent) ~= "function" then
     error("assertIsFrame: frame does not appear to be a UI Frame", 2)
   end
-end
-
---- Applies a table of scripts to the provided frame.
-local function applyTemplateScripts(frame, template)
-  assertIsFrame(frame)
-
-  -- Create tables to hold any custom script handlers for this frame,
-  -- since they won't be managed by SetScript.
-  frame._customScripts = {}
-  for customScriptType in pairs(template._customScripts) do
-    frame._customScripts[customScriptType] = {}
-  end
-
-  addon:ApplyScripts(frame, template._scripts)
 end
 
 --- Registers a new type of UI frame for PMQ.
@@ -152,10 +124,13 @@ function addon:CreateFrame(frameType, frameName, parent, ...)
     frame = template:Create(frameName, parent, ...)
     assertIsFrame(frame)
 
+    -- Store the custom type on the frame so it can be referenced later
+    frame._frameType = frameType
+
     -- Apply any custom methods and scripts registered for this template
-    addon:ApplyMethods(frame, frameMethods)
-    addon:ApplyMethods(frame, template._methods)
-    applyTemplateScripts(frame, template)
+    addon:ApplyMethods(frame, frameMethods)         -- Frame methods (applied to all custom frames of this type)
+    addon:ApplyMethods(frame, template._methods)    -- Template methods (applied to all custom frames)
+    addon:ApplyScripts(frame, template._scripts)    -- Frame scripts (applied to all custom frames of this type)
 
     -- Finally, the frame is fully formed, finish it up
     template:AfterCreate(frame)
