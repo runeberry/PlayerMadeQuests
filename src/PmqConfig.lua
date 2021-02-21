@@ -7,6 +7,8 @@ addon.defaultSettings = {
   --- Disable this to skip the GUI building events of the Lifecycle.
   --- Useful for unit testing.
   ENABLE_GUI = true,
+  --- Enable this to run whatever code is in the PmqSandbox.lua file.
+  ENABLE_SANDBOX = false,
   --- Enable this to reflect all outbound messages back on the player character.
   --- The sender's name will be listed as "*yourself*"
   ENABLE_SELF_MESSAGING = false,

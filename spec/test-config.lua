@@ -2,6 +2,7 @@
 return {
   CHARSET = "ANSI",
   ENABLE_GUI = false,
+  ENABLE_SANDBOX = false,
   ENABLE_SELF_MESSAGING = true,
   ENABLE_TRANSACTION_LOGS = false,
   FEATURE_PET_KILLS = true,

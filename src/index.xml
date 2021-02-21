@@ -9,4 +9,6 @@
   <Include file="qeng/index.xml"/>
   <Include file="msg/index.xml"/>
   <Include file="gui/index.xml"/>
+
+  <Script file="PmqSandbox.lua"/>
 </Ui>
