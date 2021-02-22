@@ -38,7 +38,14 @@ local templateMethods = {
       return
     end
 
-    template._scripts = scripts
+    for scriptType, handler in pairs(scripts) do
+      -- This abstraction lets us apply multiple handlers to the same scriptType
+      -- over multiple calls to AddScripts
+      template._scripts[#template._scripts+1] = {
+        scriptType = scriptType,
+        handler = handler
+      }
+    end
   end,
 }
 
@@ -122,7 +129,9 @@ function addon:CreateFrame(frameType, frameName, parent, ...)
     -- Apply any custom methods and scripts registered for this template
     addon:ApplyMethods(frame, frameMethods)         -- Frame methods (applied to all custom frames of this type)
     addon:ApplyMethods(frame, template._methods)    -- Template methods (applied to all custom frames)
-    addon:ApplyScripts(frame, template._scripts)    -- Frame scripts (applied to all custom frames of this type)
+    for _, sth in ipairs(template._scripts) do
+      addon:ApplyScript(frame, sth.scriptType, sth.handler) -- Frame scripts (applied to all custom frames of this type)
+    end
 
     -- Finally, the frame is fully formed, finish it up
     template:AfterCreate(frame)
