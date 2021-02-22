@@ -3,6 +3,7 @@
   <Script file="gui/Cli.lua"/>
   <Script file="gui/CustomWidgets.lua"/>
   <Script file="gui/Flex.lua"/>
+  <Script file="gui/Scripts.lua"/>
   <Script file="gui/StaticPopups.lua"/>
   <Script file="gui/StaticPopupsList.lua"/>
   <Script file="gui/Styles.lua"/>
