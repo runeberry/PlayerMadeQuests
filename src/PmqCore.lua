@@ -51,3 +51,12 @@ function addon.asserttype(value, vartype, varname, fname, errLevel)
     error(message, (errLevel or 1) + 1)
   end
 end
+
+function addon.assertframe(frame, varname, fname, errLevel)
+  addon.asserttype(frame, "table", varname or "frame", fname, errLevel)
+  if type(frame.RegisterEvent) ~= "function" then
+    local message = string.format("%s: %s does not appear to be a UI Frame",
+      fname or "Function", varname or "frame")
+    error(message, (errLevel or 1) + 1)
+  end
+end

@@ -1,6 +1,6 @@
 local _, addon = ...
 local CreateFrame, UIParent = addon.G.CreateFrame, addon.G.UIParent
-local assertf, asserttype = addon.assertf, addon.asserttype
+local assertf, asserttype, assertframe = addon.assertf, addon.asserttype, addon.assertframe
 
 local frameTemplates = {} -- Frame creation instructions, indexed by frameType
 local frames = {} -- Instances of created frames, indexed by frameName
@@ -61,14 +61,6 @@ local frameMethods = {
   end,
 }
 
---- Throws an error if the provided arg is not recognized as a UI frame.
-local function assertIsFrame(frame)
-  asserttype(frame, "table", "frame", "assertIsFrame", 2)
-  if type(frame.RegisterEvent) ~= "function" then
-    error("assertIsFrame: frame does not appear to be a UI Frame", 2)
-  end
-end
-
 --- Registers a new type of UI frame for PMQ.
 --- @param frameType string A unique type name for the frame
 function addon:NewFrame(frameType)
@@ -108,7 +100,7 @@ function addon:CreateFrame(frameType, frameName, parent, ...)
   if not parent then
     parent = UIParent
   else
-    assertIsFrame(parent)
+    assertframe(parent, "parent", "CreateFrame")
   end
 
   -- Generate a unique global name for this frame
@@ -122,7 +114,7 @@ function addon:CreateFrame(frameType, frameName, parent, ...)
   if template then
     -- If this type was registered with NewFrame, then create it using the template's custom method
     frame = template:Create(frameName, parent, ...)
-    assertIsFrame(frame)
+    assertframe(frame, "frame", "CreateFrame")
 
     -- Store the custom type on the frame so it can be referenced later
     frame._frameType = frameType
@@ -150,7 +142,7 @@ end
 --- @param frame table A UI frame to set scripts on
 --- @param scripts table A table of scripts
 function addon:ApplyScripts(frame, scripts)
-  assertIsFrame(frame)
+  assertframe(frame)
   asserttype(scripts, "table", "scripts", "ApplyScripts")
 
   for scriptType, handler in pairs(scripts) do
