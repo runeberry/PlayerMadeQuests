@@ -91,7 +91,7 @@ end
 local function refreshChoices(dropdown)
   -- The function passed to Initialize is called each time the dropdown is opened
   UIDropDownMenu_Initialize(dropdown, function()
-    local currentValue = dropdown:GetValue()
+    local currentValue = dropdown:GetFormValue()
 
     for i, choice in ipairs(dropdown._options.choices) do
       choice.checked = i == currentValue
@@ -106,7 +106,7 @@ local function refreshChoices(dropdown)
         -- Only set the value if it's changed
         if i ~= currentValue then
           -- The "choice" value will be passed to the data setter, not "c"
-          dropdown:SetValue(i)
+          dropdown:SetFormValue(i, false)
         end
       end
 
@@ -116,35 +116,11 @@ local function refreshChoices(dropdown)
   end)
 end
 
-local function getValidatedChoice(dropdown, index)
-  local choice
-
-  if index == nil and dropdown._options.allowNil then
-    -- nil must be explicitly allowed
-  else
-    asserttype(index, "number", "index", "DataDropdown:SetSelected")
-    choice = dropdown._options.choices[index]
-    assertf(choice, "%i is not a valid selection for this dropdown", index)
-  end
-
-  return choice
-end
-
 template:AddMethods({
   ["Refresh"] = function(self)
     refreshChoices(self)
     refreshDropdownWidth(self)
   end,
-  ["GetValue"] = function(self)
-    local index = self._options.get()
-    return index, getValidatedChoice(self, index)
-  end,
-  ["SetValue"] = function(self, index)
-    local choice = getValidatedChoice(self, index)
-    self._options.set(index, choice)
-    return choice
-  end,
-
   ["SetText"] = function(self, text)
     self._label:SetText(text)
   end,
@@ -172,6 +148,11 @@ template:AddMethods({
 })
 
 template:AddScripts({
+  ["OnFormValueChange"] = function(self, value, isUserInput)
+    if isUserInput then return end
+
+    self:Refresh()
+  end,
   ["OnShow"] = function(self)
     self:Refresh()
   end,
@@ -180,8 +161,6 @@ template:AddScripts({
 function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
   asserttype(options.labelAnchor, "string", "options.labelAnchor", "DataDropdown:Create")
-  asserttype(options.get, "function", "options.get", "DataDropdown:Create")
-  asserttype(options.set, "function", "options.set", "DataDropdown:Create")
 
   local dropdown = addon:CreateFrame("Frame", frameName, parent, "UIDropDownMenuTemplate")
 
@@ -189,6 +168,8 @@ function template:Create(frameName, parent, options)
   labelOpts.anchor = options.labelAnchor
   labelOpts.text = options.label
   local label = addon:CreateFrame("FormLabel", frameName.."Label", dropdown, labelOpts)
+
+  addon:ApplyFormFieldMethods(dropdown, template)
 
   dropdown._options = options
   dropdown._label = label

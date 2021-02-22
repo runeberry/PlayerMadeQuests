@@ -14,20 +14,18 @@ local defaultOptions = {
 
 template:AddMethods({
   ["Refresh"] = function(self)
-    self:SetChecked(self:GetValue())
-  end,
-  ["GetValue"] = function(self)
-    return self._options.get() and true -- coerce value to boolean
-  end,
-  ["SetValue"] = function(self, value)
-    value = value and true -- coerce value to boolean
-    self._options.set(value)
+    self:SetChecked(self:GetFormValue())
   end,
 })
 
 template:AddScripts({
   ["OnClick"] = function(self, mouseButton, isDown)
-    self:SetValue(self:GetChecked())
+    self:SetFormValue(self:GetChecked())
+  end,
+  ["OnFormValueChange"] = function(self, value, isUserInput)
+    if isUserInput then return end
+
+    self:Refresh()
   end,
   ["OnShow"] = function(self)
     self:Refresh()
@@ -36,8 +34,6 @@ template:AddScripts({
 
 function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
-  asserttype(options.get, "function", "options.get", "DataCheckbox:Create")
-  asserttype(options.set, "function", "options.set", "DataCheckbox:Create")
 
   local button = addon:CreateFrame("CheckButton", frameName, parent, "UICheckButtonTemplate")
   button:SetText(options.label)
@@ -48,6 +44,8 @@ function template:Create(frameName, parent, options)
   local fontString = button:GetFontString()
   fontString:ClearAllPoints()
   fontString:SetPoint("LEFT", button, "RIGHT", options.spacing, 0)
+
+  addon:ApplyFormFieldMethods(button, template)
 
   button._options = options
 

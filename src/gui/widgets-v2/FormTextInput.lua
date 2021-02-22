@@ -2,8 +2,6 @@ local _, addon = ...
 
 local template = addon:NewFrame("FormTextInput")
 
-template:RegisterCustomScriptEvent("OnSubmit")
-
 local defaultOptions = {
   label = "",               -- [string]
   multiline = false,        -- [boolean]
@@ -23,6 +21,9 @@ local defaultOptions = {
 }
 
 template:AddMethods({
+  ["Refresh"] = function(self)
+    self:SetText(self:GetFormValue())
+  end,
   ["SetLabel"] = function(self, text)
     self._label:SetText(text or "")
   end,
@@ -37,7 +38,7 @@ template:AddScripts({
 
     -- OnSubmit will only react to single-line text boxes
     if options.submitOnEnter then
-      self:FireCustomScriptEvent("OnSubmit", self:GetText())
+      self:SetFormValue(self:GetText())
     end
     if options.clearFocusOnEnter then
       self:ClearFocus()
@@ -50,10 +51,12 @@ template:AddScripts({
       self:ClearFocus()
     end
   end,
-  ["OnTextChanged"] = function(self, isUserInput)
+  ["OnFormValueChange"] = function(self, value, isUserInput)
+    if isUserInput then return end
 
+    self:Refresh()
   end,
-  ["OnSubmit"] = function(self, text)
+  ["OnTextChanged"] = function(self, isUserInput)
 
   end,
 })
@@ -84,6 +87,8 @@ function template:Create(frameName, parent, options)
     anchor = "TOPLEFT",
   }
   local label = addon:CreateFrame("FormLabel", frameName.."Label", editBox, labelOpts)
+
+  addon:ApplyFormFieldMethods(editBox, template)
 
   editBox._options = options
   editBox._label = label
