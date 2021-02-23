@@ -8,7 +8,7 @@ local UIDropDownMenu_SetText = addon.G.UIDropDownMenu_SetText
 local UIDropDownMenu_SetSelectedValue = addon.G.UIDropDownMenu_SetSelectedValue
 local UIDropDownMenu_AddButton = addon.G.UIDropDownMenu_AddButton
 
-local template = addon:NewFrame("DataDropdown")
+local template = addon:NewFrame("FormDropdown")
 
 local defaultOptions = {
   label = "",             -- [string] Text to set above the dropdown

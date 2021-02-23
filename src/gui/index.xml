@@ -33,13 +33,13 @@
   <Script file="gui/widgets/ToolWindowPopout.lua"/>
   <Script file="gui/widgets/TreeMenuFrame.lua"/>
 
-  <Script file="gui/widgets-v2/DataCheckbox.lua"/>
-  <Script file="gui/widgets-v2/DataDropdown.lua"/>
-  <Script file="gui/widgets-v2/DataRadio.lua"/>
   <Script file="gui/widgets-v2/DataTable.lua"/>
+  <Script file="gui/widgets-v2/FormCheckbox.lua"/>
+  <Script file="gui/widgets-v2/FormDropdown.lua"/>
   <Script file="gui/widgets-v2/FormField.lua"/>
   <Script file="gui/widgets-v2/FormGroup.lua"/>
   <Script file="gui/widgets-v2/FormLabel.lua"/>
+  <Script file="gui/widgets-v2/FormRadio.lua"/>
   <Script file="gui/widgets-v2/FormTextInput.lua"/>
   <Script file="gui/widgets-v2/SearchSelect.lua"/>
   <Script file="gui/widgets-v2/SearchSelectMulti.lua"/>

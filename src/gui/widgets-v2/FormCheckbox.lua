@@ -1,7 +1,7 @@
 local _, addon = ...
 local asserttype = addon.asserttype
 
-local template = addon:NewFrame("DataCheckbox")
+local template = addon:NewFrame("FormCheckbox")
 
 local defaultOptions = {
   label = "",               -- [string] Text to display to the right of the checkbox
