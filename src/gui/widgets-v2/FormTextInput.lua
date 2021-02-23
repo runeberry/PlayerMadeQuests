@@ -15,9 +15,11 @@ local defaultOptions = {
   labelFontTemplate = "GameFontHighlightSmall",
   labelJustifyH = "LEFT",
 
-  clearFocusOnEnter = true,
-  clearFocusOnEscape = true,
-  submitOnEnter = true,
+  clearFocusOnEnter = true,   -- [boolean] Clears focus when Enter is pressed
+  clearFocusOnEscape = true,  -- [boolean] Clears focus when Escape is pressed
+  saveOnEnter = false,        -- [boolean] Saves form field when Enter is pressed
+  saveOnClearFocus = true,    -- [boolean] Saves form field when focus is lost (incl. above settings)
+  saveOnTextChanged = false,  -- [boolean] Saves form field whenever text is changed
 }
 
 template:AddMethods({
@@ -36,28 +38,38 @@ template:AddScripts({
     -- Don't mess with the Enter behavior of a multiline EditBox
     if options.multiline then return end
 
-    -- OnSubmit will only react to single-line text boxes
-    if options.submitOnEnter then
+    if options.saveOnEnter then
       self:SetFormValue(self:GetText())
     end
     if options.clearFocusOnEnter then
       self:ClearFocus()
     end
   end,
-  ["OnEscapePressed"] = function (self)
-    local options = self._options
-
-    if options.clearFocusOnEscape then
+  ["OnEscapePressed"] = function(self)
+    if self._options.clearFocusOnEscape then
       self:ClearFocus()
     end
   end,
-  ["OnFormValueChange"] = function(self, value, isUserInput)
-    if isUserInput then return end
+  ["OnEditFocusLost"] = function(self)
+    self:HighlightText(0, 0)
 
-    self:Refresh()
+    if self._options.saveOnClearFocus then
+      self:SetFormValue(self:GetText())
+    end
   end,
   ["OnTextChanged"] = function(self, isUserInput)
+    if not isUserInput then return end
+    if self._options.saveOnTextChanged then
+      self:SetFormValue(self:GetText())
+    end
+  end,
 
+  ["OnFormValueChange"] = function(self, value, isUserInput)
+    if isUserInput then return end
+    self:Refresh()
+  end,
+  ["OnShow"] = function(self)
+    self:Refresh()
   end,
 })
 
