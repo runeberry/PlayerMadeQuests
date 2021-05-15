@@ -152,6 +152,14 @@ template:AddMethods({
     else
       refreshButtonsStandard(self)
     end
+
+    for _, button in ipairs(self._buttons) do
+      -- (jb, 5/15/21) Unusual behavior, sometimes the last button in a group
+      -- will just disappear from screen after resizing, though the API indicates
+      -- the button is still visible and shown!
+      -- Calling the button's width seems to fix this.
+      button:GetWidth()
+    end
   end,
   ["GetButton"] = function(self, index)
     asserttype(index, "number", "index", "ButtonGroup:GetButton")
