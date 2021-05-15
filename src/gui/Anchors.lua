@@ -44,6 +44,18 @@ local offsetDirection = {
   CENTER = { 0, 0 },
 }
 
+local offsetLRTB = {
+  LEFT =        { 1, 0, 0, 0 },
+  RIGHT =       { 0, 1, 0, 0 },
+  TOP =         { 0, 0, 1, 0 },
+  BOTTOM =      { 0, 0, 0, 1 },
+  TOPLEFT =     { 1, 0, 1, 0 },
+  TOPRIGHT =    { 0, 1, 1, 0 },
+  BOTTOMLEFT =  { 1, 0, 0, 1 },
+  BOTTOMRIGHT = { 0, 1, 0, 1 },
+  CENTER =      { 0, 0, 0, 0 },
+}
+
 local sides = {
   TOPLEFT = { "TOP", "LEFT" },
   TOPRIGHT = { "TOP", "RIGHT" },
@@ -102,13 +114,35 @@ function addon:GetOffsetDirection(anchor, opp)
 end
 
 --- Returns the x,y values needed to "push away" from the specified anchor.
---- @param anchor string the side to push away from
---- @param padding number the magnitude to push away with (number of px)
-function addon:GetOffsetsFromPadding(anchor, padding)
+--- @param anchor string the anchor to push away from
+--- @param spacing number the magnitude to push away with (number of px)
+function addon:GetOffsetsFromSpacing(anchor, spacing)
   local opp = addon:GetOppositeAnchor(anchor) -- Use opposite to "push away"
-  local offsets = offsetDirection[opp]
+  local dirs = offsetDirection[opp]
 
-  return opp, offsets[1]*padding, offsets[2]*padding
+  return spacing*dirs[1], spacing*dirs[2]
+end
+
+--- Given a set of positive values for LRTB, gives the directionalized offets
+--- to push away from the provided anchor.
+--- @param anchor string the anchor to push away from
+--- @param lrtb table (or number) that can be unpacked as LRTB values
+function addon:GetOffsetsFromLRTB(anchor, lrtb)
+  local opp = addon:GetOppositeAnchor(anchor) -- Use opposite to "push away"
+  local dirs = offsetDirection[opp]
+  local incl = offsetLRTB[anchor]
+  local l, r, t, b = addon:UnpackLRTB(lrtb)
+  local x, y = 0, 0
+
+  -- After deciding which sides are "included" in this anchor
+  --   : 0 or 1 of l/r will be > 0, never both
+  --   : 0 or 1 of t/b will be > 0, never both
+  l, r, t, b = l*incl[1], r*incl[2], t*incl[3], b*incl[4]
+
+  if l > 0 then x = l else x = r end
+  if t > 0 then x = t else x = b end
+
+  return x*dirs[1], y*dirs[2]
 end
 
 --- Returns the two side anchors associated with a corner anchor
@@ -122,7 +156,7 @@ function addon:GetSidesFromCorner(anchor, opp)
   end
 
   assert(sides[anchor], "Unable to determine sides for corner "..anchor)
-  return sides[anchor]
+  return sides[anchor][1], sides[anchor][2]
 end
 
 --- Returns the two corner anchors associated with a side anchor
@@ -136,5 +170,5 @@ function addon:GetCornersFromSide(anchor, opp)
   end
 
   assert(corners[anchor], "Unable to determine corners for side "..anchor)
-  return corners[anchor]
+  return corners[anchor][1], corners[anchor][2]
 end

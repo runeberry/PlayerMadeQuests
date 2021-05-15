@@ -33,6 +33,7 @@
   <Script file="gui/widgets/ToolWindowPopout.lua"/>
   <Script file="gui/widgets/TreeMenuFrame.lua"/>
 
+  <Script file="gui/widgets-v2/ButtonGroup.lua"/>
   <Script file="gui/widgets-v2/DataTable.lua"/>
   <Script file="gui/widgets-v2/FormCheckbox.lua"/>
   <Script file="gui/widgets-v2/FormDropdown.lua"/>
