@@ -1,13 +1,15 @@
 local _, addon = ...
 local asserttype, assertf, assertframe = addon.asserttype, addon.assertf, addon.assertframe
+local unpack = addon.G.unpack
 
 local template = addon:NewFrame("TabGroup")
 
 template:RegisterCustomScriptEvent("OnTabSelect")
 
 local defaultOptions = {
-  tabHeight = 24,     -- [number] Override height of the tab bar, in px
-  tabs = {}
+  tabHeight = 24,               -- [number] Override height of the tab bar, in px
+  tabs = {},
+  autoCreateTabContent = true   -- [bool] Should empty content frames be created automatically?
 }
 
 -- See ButtonGroup for info
@@ -87,6 +89,9 @@ template:AddMethods({
 
     return self._tabContent[index]
   end,
+  ["GetAllTabContent"] = function(self)
+    return unpack(self._tabContent)
+  end,
   ["SetTabContent"] = function(self, index, content)
     assertframe(content, "content")
 
@@ -160,4 +165,13 @@ function template:Create(frameName, parent, options)
   container._numTabs = #options.tabs
 
   return container
+end
+
+function template:AfterCreate(group)
+  if group._options.autoCreateTabContent then
+    for i, _ in ipairs(group._options.tabs) do
+      local content = addon:CreateFrame("Frame", nil, group)
+      group:SetTabContent(i, content)
+    end
+  end
 end
