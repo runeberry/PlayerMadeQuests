@@ -12,7 +12,8 @@ local methods = {
 
     self._formField.value = value
 
-    if isUserInput ~= false then
+    if isUserInput == nil then isUserInput = true end
+    if isUserInput then
       self:SetDirty(true)
     end
 
