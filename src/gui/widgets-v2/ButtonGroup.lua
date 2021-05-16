@@ -1,17 +1,19 @@
 local _, addon = ...
 local asserttype, assertf, assertframe = addon.asserttype, addon.assertf, addon.assertframe
+local PanelTemplates_TabResize = addon.G.PanelTemplates_TabResize
 
 local template = addon:NewFrame("ButtonGroup")
 
 local defaultOptions = {
   -- buttonTemplate = "OptionsFrameTabButtonTemplate",
   template = "UIPanelButtonTemplate",
+  sizeMode = "fit",           -- [string] Options are: "fit" (default), "flex", "tab"
+
   margin = 0,                 -- [LRTB] Space between buttons and edge of containing group
   padding = { 8, 8, 0, 0 },   -- [LRTB] Space between the text inside the button and the edge of the button
   spacing = 0,                -- [number] Space between buttons
 
   anchor = "LEFT",            -- [string] Side anchor where the buttons will start growing from
-  flexFill = false,           -- [bool] Should buttons be resized to fill the width of the group?
 
   buttons = {}                -- [table] Button info, see below
 }
@@ -21,7 +23,7 @@ local defaultButtonOptions = {
   handler = function() end,   -- [function] "OnClick" handler
   width = nil,                -- [number] Default: text width + padding
   height = nil,               -- [number] Default: text height + padding
-  flexParams = { flex = 1 },  -- [table] Params to calculate flex width, if group.flexFill = true
+  flexParams = { flex = 1 },  -- [table] Params to calculate flex width, if sizeMode == "flex"
 
   -- These values will use the group's options unless overriden
   template = nil,
@@ -138,6 +140,15 @@ local function refreshButtonsFlexFill(group)
   end
 end
 
+local function refreshButtonsTab(group)
+  for _, button in ipairs(group._buttons) do
+    -- todo: this doesn't respect the parent container's width
+    -- but I don't quite understand which width parameters to pass
+    -- See source code here: https://github.com/Gethe/wow-ui-source/blob/classic/SharedXML/SharedUIPanelTemplates.lua#L446
+    PanelTemplates_TabResize(button, -8)
+  end
+end
+
 local function refreshButtonsStandard(group)
   for _, button in ipairs(group._buttons) do
     local width, height = calcButtonSize(button)
@@ -147,8 +158,12 @@ end
 
 template:AddMethods({
   ["Refresh"] = function(self)
-    if self._options.flexFill then
+    local sizeMode = self._options.sizeMode
+
+    if sizeMode == "flex" then
       refreshButtonsFlexFill(self)
+    elseif sizeMode == "tab" then
+      refreshButtonsTab(self)
     else
       refreshButtonsStandard(self)
     end

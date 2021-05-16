@@ -94,4 +94,6 @@ addon.G = {
   UIDropDownMenu_CreateInfo = UIDropDownMenu_CreateInfo,
   UIDropDownMenu_SetSelectedValue = UIDropDownMenu_SetSelectedValue,
   UIDropDownMenu_AddButton = UIDropDownMenu_AddButton,
+
+  PanelTemplates_TabResize = PanelTemplates_TabResize,
 }
