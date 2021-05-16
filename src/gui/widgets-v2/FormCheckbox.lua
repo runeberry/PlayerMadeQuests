@@ -8,8 +8,6 @@ local defaultOptions = {
   spacing = 2,              -- [number] Spacing between the checkbox and its text
 
   autoLoad = true,          -- [boolean] If true, the widget will be refreshed immediately
-  get = nil,                -- [function() -> boolean] Getter to load the value
-  set = nil,                -- [function(boolean)] Setter to save the value
 }
 
 template:AddMethods({

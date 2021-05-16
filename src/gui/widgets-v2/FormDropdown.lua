@@ -19,8 +19,6 @@ local defaultOptions = {
   allowNil = false,       -- [boolean] Allows the selection of a nil (empty) option from the dropdown
 
   autoLoad = true,        -- [boolean] If true, the widget will be refreshed immediately
-  get = nil,              -- [function() -> number] Getter to load the value
-  set = nil,              -- [function(number, string)] Setter to save the value
 }
 
 -- Adjustments to make the label look better in each anchored position
