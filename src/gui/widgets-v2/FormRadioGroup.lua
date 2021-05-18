@@ -27,23 +27,21 @@ end
 -- to the BOTTOMRIGHT of the last checkbox
 local function resizeGroup(group)
   local options = group._options
-  local numButtons = #group._buttons
-  local buttonWidth, buttonHeight = group._buttons[1]:GetSize()
+  local horizontal = options.anchor == "LEFT" or options.anchor == "RIGHT"
+  local groupWidth, groupHeight = 0, 0
 
-  if group._options.anchor == "LEFT" then
-    local groupWidth = (buttonWidth * numButtons) + (options.spacing * (numButtons - 1))
-
-    for i, button in ipairs(group._buttons) do
-      if i ~= numButtons then -- don't include text width from the last button
-        groupWidth = groupWidth + button:GetTextWidth()
-      end
+  for i, button in ipairs(group._buttons) do
+    local buttonWidth, buttonHeight = button:GetSize()
+    if horizontal then
+      groupWidth = groupWidth + buttonWidth + options.spacing
+      groupHeight = math.max(groupHeight, buttonHeight)
+    else
+      groupWidth = math.max(groupWidth, buttonWidth)
+      groupHeight = groupHeight + buttonHeight + options.spacing
     end
-
-    group:SetSize(groupWidth, buttonHeight)
-  else
-    local groupHeight = (buttonHeight * numButtons) + (options.spacing * (numButtons - 1))
-    group:SetSize(buttonWidth, groupHeight)
   end
+
+  group:SetSize(groupWidth, groupHeight)
 end
 
 local function addButton(group, label)
@@ -74,13 +72,7 @@ local function addButton(group, label)
     local prevButton = group._buttons[index-1]
     local c1, c2 = addon:GetCornersFromSide(groupOptions.anchor)
     local p1, p2 = addon:GetCornersFromSide(groupOptions.anchor, true)
-
-    local spacing = groupOptions.spacing
-    if groupOptions.anchor == "LEFT" then
-      spacing = spacing + prevButton:GetTextWidth()
-    end
-
-    local sx, sy = addon:GetOffsetsFromSpacing(groupOptions.anchor, spacing)
+    local sx, sy = addon:GetOffsetsFromSpacing(groupOptions.anchor, groupOptions.spacing)
 
     button:SetPoint(c1, prevButton, p1, sx, sy)
     -- button:SetPoint(c2, prevButton, p2, sx, sy)
