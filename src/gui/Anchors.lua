@@ -117,9 +117,7 @@ end
 --- @param anchor string the anchor to push away from
 --- @param spacing number the magnitude to push away with (number of px)
 function addon:GetOffsetsFromSpacing(anchor, spacing)
-  local opp = addon:GetOppositeAnchor(anchor) -- Use opposite to "push away"
-  local dirs = offsetDirection[opp]
-
+  local dirs = offsetDirection[anchor]
   return spacing*dirs[1], spacing*dirs[2]
 end
 
