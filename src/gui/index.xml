@@ -40,7 +40,7 @@
   <Script file="gui/widgets-v2/FormField.lua"/>
   <Script file="gui/widgets-v2/FormGroup.lua"/>
   <Script file="gui/widgets-v2/FormLabel.lua"/>
-  <Script file="gui/widgets-v2/FormRadio.lua"/>
+  <Script file="gui/widgets-v2/FormRadioGroup.lua"/>
   <Script file="gui/widgets-v2/FormTextInput.lua"/>
   <Script file="gui/widgets-v2/SearchSelect.lua"/>
   <Script file="gui/widgets-v2/SearchSelectMulti.lua"/>
