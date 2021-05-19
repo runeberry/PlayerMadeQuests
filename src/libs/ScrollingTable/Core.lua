@@ -621,7 +621,8 @@ do
 	function lib:CreateST(cols, numRows, rowHeight, highlight, parent)
 		local st = {};
 		self.framecount = self.framecount or 1;
-		local f = CreateFrame("Frame", "ScrollTable" .. self.framecount, parent or UIParent);
+		-- FIX: For client 9.0, see here: https://github.com/Stanzilla/WoWUIBugs/wiki/9.0.1-Consolidated-UI-Changes#backdrop-system-changes
+		local f = CreateFrame("Frame", "ScrollTable" .. self.framecount, parent or UIParent, BackdropTemplateMixin and "BackdropTemplate");
 		self.framecount = self.framecount + 1;
 		st.showing = true;
 		st.frame = f;
