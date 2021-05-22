@@ -1,6 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 local asserttype = addon.asserttype
+local Mixin, BackdropTemplateMixin = addon.G.Mixin, addon.G.BackdropTemplateMixin
 
 local backdrop = {
 	bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
@@ -46,7 +47,23 @@ addon.DefaultArticleTextStyle = {
   },
 }
 
+--- As of TBC classic, frames must inherit from "BackdropTemplate" or use
+--- the BackdropTemplateMixin in order to access these methods.
+--- See here: https://github.com/Stanzilla/WoWUIBugs/wiki/9.0.1-Consolidated-UI-Changes#backdrop-system-changes
+local function TryAddBackdropMixin(frame)
+  -- Frame already has backdrop methods
+  if frame.SetBackdrop then return true end
+
+  -- This client does not have the mixin available
+  if not BackdropTemplateMixin then return false end
+
+  Mixin(frame, BackdropTemplateMixin)
+  return true
+end
+
 function addon:ApplyBackgroundStyle(frame)
+  if not TryAddBackdropMixin(frame) then return end
+
   frame:SetBackdrop(backdrop)
   frame:SetBackdropColor(0, 0, 0)
   frame:SetBackdropBorderColor(0.4, 0.4, 0.4)
@@ -59,8 +76,13 @@ function addon:CreateScrollFrame(parent)
   local scrollBarFrame = CreateFrame("Frame", nil, parent)
 
   scrollBarFrame:SetWidth(scrollBar:GetWidth())
-  scrollBarFrame:SetBackdrop(scrollBarBackdrop)
-  scrollBarFrame:SetBackdropColor(0, 0, 0)
+
+  if TryAddBackdropMixin(scrollBarFrame) then
+    -- Scrollbar won't look right without this, but at least the addon won't crash
+    scrollBarFrame:SetBackdrop(scrollBarBackdrop)
+    scrollBarFrame:SetBackdropColor(0, 0, 0)
+  end
+
   scrollBar:ClearAllPoints()
   scrollBar:SetPoint("TOPRIGHT", scrollBarFrame, "TOPRIGHT", 0, -19)
   scrollBar:SetPoint("BOTTOMRIGHT", scrollBarFrame, "BOTTOMRIGHT", 0, 18)
