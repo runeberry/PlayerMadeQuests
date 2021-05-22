@@ -86,4 +86,10 @@ addon.G = {
   SetItemButtonSlotVertexColor = SetItemButtonSlotVertexColor,
   SetItemButtonQuality = SetItemButtonQuality,
   HandleModifiedItemClick = HandleModifiedItemClick,
+
+  -- Mixins
+  Mixin = Mixin,
+  CreateFromMixins = CreateFromMixins,
+  CreateAndInitFromMixin = CreateAndInitFromMixin,
+  BackdropTemplateMixin = BackdropTemplateMixin,
 }
