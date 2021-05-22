@@ -1,8 +1,8 @@
 local _, addon = ...
 
-addon.VERSION = 503
+addon.VERSION = 504
 addon.BRANCH = "beta"
-addon.TIMESTAMP = 1621458739
+addon.TIMESTAMP = 1621712289
 
 function addon.Ace:OnInitialize()
   addon:OnAddonReady(function()
