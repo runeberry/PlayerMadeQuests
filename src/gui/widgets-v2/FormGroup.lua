@@ -8,14 +8,39 @@ local template = addon:NewFrame("FormGroup")
 template:RegisterCustomScriptEvent("OnFormStateChange")
 template:RegisterCustomScriptEvent("OnSubmit")
 
+local function addField(formGroup, fieldName, field)
+  formGroup._fieldsByIndex[#formGroup._fieldsByIndex+1] = field
+  formGroup._fieldsByName[fieldName] = field
+end
+
+local function getFieldsByIndex(formGroup)
+  return formGroup._fieldsByIndex
+end
+
+local function getFieldsByName(formGroup)
+  return formGroup._fieldsByName
+end
+
+local function getField(formGroup, fieldNameOrIndex)
+  local field
+
+  if type(fieldNameOrIndex) == "number" then
+    field = formGroup._fieldsByIndex[fieldNameOrIndex]
+  elseif type(fieldNameOrIndex) == "string" then
+    field = formGroup._fieldsByName[fieldNameOrIndex]
+  end
+
+  return field
+end
+
 template:AddMethods({
   ["AddFormField"] = function(self, fieldName, formField)
     asserttype(formField, "table", "formField", "FormGroup:AddFormField")
     asserttype(fieldName, "string", "fieldName", "FormGroup:AddFormField")
-    assertf(not self._fields[fieldName], "AddFormField: Field name %s is already in use on FormGroup %s", fieldName, self:GetName())
+    assertf(not self._fieldsByName[fieldName], "AddFormField: Field name %s is already in use on FormGroup %s", fieldName, self:GetName())
     assert(formField._formField, "AddFormField: The provided frame is not a FormField")
 
-    self._fields[fieldName] = formField
+    addField(self, fieldName, formField)
 
     -- Since a "FormField" is not a proper template, we cannot "FireCustomScriptEvent".
     -- We have to go around that process by calling UIEvents manually.
@@ -25,19 +50,11 @@ template:AddMethods({
       self:FireCustomScriptEvent("OnFormStateChange", state)
     end)
   end,
-  -- Adds multiple FormFields, where key:FieldName and value:FormField
-  ["AddFormFields"] = function(self, formFields)
-    asserttype(formFields, "table", "formFields", "AddFormFields")
-
-    for fieldName, formField in pairs(formFields) do
-      self:AddFormField(fieldName, formField)
-    end
-  end,
 
   ["GetCurrentFormState"] = function(self)
     local state = {}
 
-    for fieldName, field in pairs(self._fields) do
+    for fieldName, field in pairs(getFieldsByName(self)) do
       state[fieldName] = field:GetFormValue()
     end
 
@@ -62,7 +79,7 @@ template:AddMethods({
     asserttype(state, "table", "state", "FormGroup:LoadFormState")
 
     for fieldName, stateValue in pairs(state) do
-      local field = self._fields[fieldName]
+      local field = getField(self, fieldName)
       if field then
         field:SetFormValue(stateValue, false)
       end
@@ -74,11 +91,9 @@ template:AddMethods({
     local state = self:GetSavedFormState(offsetOrName)
 
     for fieldName, stateValue in pairs(state) do
-      local field = self._fields[fieldName]
+      local field = getField(self, fieldName)
       field:SetFormValue(stateValue, false)
     end
-
-    -- todo: Refresh?
 
     logger:Trace("(%s) Loaded saved form state %s", self:GetName(), tostring(offsetOrName))
   end,
@@ -104,7 +119,7 @@ template:AddMethods({
   end,
 
   ["IsFormDirty"] = function(self)
-    for fieldName, field in pairs(self._fields) do
+    for _, field in pairs(getFieldsByIndex(self)) do
       -- If any field is dirty, then the form is dirty
       if field:IsDirty() then return true end
     end
@@ -112,7 +127,7 @@ template:AddMethods({
     return false
   end,
   ["ClearForm"] = function(self)
-    for fieldName, field in pairs(self._fields) do
+    for _, field in pairs(getFieldsByIndex(self)) do
       field:ClearFormValue(false)
     end
 
@@ -138,7 +153,8 @@ function template:Create(frameName, parent, options)
   -- FormGroups are not intended to be connected to any other Frames, so ignore the provided parent
   local formGroup = addon:CreateFrame("Frame", frameName, nil)
 
-  formGroup._fields = {}
+  formGroup._fieldsByIndex = {}
+  formGroup._fieldsByName = {}
   formGroup._formStates = {}
 
   return formGroup
