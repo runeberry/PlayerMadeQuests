@@ -87,6 +87,12 @@ addon.G = {
   SetItemButtonQuality = SetItemButtonQuality,
   HandleModifiedItemClick = HandleModifiedItemClick,
 
+  -- Mixins
+  Mixin = Mixin,
+  CreateFromMixins = CreateFromMixins,
+  CreateAndInitFromMixin = CreateAndInitFromMixin,
+  BackdropTemplateMixin = BackdropTemplateMixin,
+
   -- Global functions for managing dropdown menus
   UIDropDownMenu_Initialize = UIDropDownMenu_Initialize,
   UIDropDownMenu_SetWidth = UIDropDownMenu_SetWidth,

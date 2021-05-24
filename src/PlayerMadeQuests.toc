@@ -1,8 +1,8 @@
-## Interface: 11306
+## Interface: 20501
 ## Title: PlayerMadeQuests
 ## Author: dolphinspired
 ## Notes: Create your own quests and share them with other players!
-## Version: 0.5.1-beta
+## Version: 0.5.4-beta
 ## RequiredDeps:
 ## OptionalDeps:
 ## SavedVariables: PMQGlobalCache
