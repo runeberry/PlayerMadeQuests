@@ -25,6 +25,20 @@ local opposite = {
   CENTER = nil,
 }
 
+local nextClockwise = {
+  LEFT = "TOPLEFT",
+  RIGHT = "BOTTOMRIGHT",
+  TOP = "TOPRIGHT",
+  BOTTOM = "BOTTOMLEFT",
+  TOPLEFT = "TOP",
+  TOPRIGHT = "RIGHT",
+  BOTTOMLEFT = "LEFT",
+  BOTTOMRIGHT = "BOTTOM",
+  CENTER = "CENTER",
+}
+
+local nextCounterClockwise = addon:InvertTable(nextClockwise)
+
 local direction = {
   LEFT = 1,
   RIGHT = -1,
@@ -169,4 +183,25 @@ function addon:GetCornersFromSide(anchor, opp)
 
   assert(corners[anchor], "Unable to determine corners for side "..anchor)
   return corners[anchor][1], corners[anchor][2]
+end
+
+-- I wrote this function then didn't need it, but I'm leaving it here for future use
+-- This has not been tested
+function addon:GetAdjacentAnchor(anchor, steps)
+  addon:ValidateAnchor(anchor)
+  if steps == nil then steps = 1 end
+
+  local ccw = steps < 0
+  if ccw then steps = steps*-1 end
+
+  while steps > 0 do
+    if ccw then
+      anchor = nextCounterClockwise[anchor]
+    else
+      anchor = nextClockwise[anchor]
+    end
+    steps = steps - 1
+  end
+
+  return anchor
 end
