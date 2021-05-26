@@ -152,7 +152,7 @@ function addon:GetOffsetsFromLRTB(anchor, lrtb)
   l, r, t, b = l*incl[1], r*incl[2], t*incl[3], b*incl[4]
 
   if l > 0 then x = l else x = r end
-  if t > 0 then x = t else x = b end
+  if t > 0 then y = t else y = b end
 
   return x*dirs[1], y*dirs[2]
 end
