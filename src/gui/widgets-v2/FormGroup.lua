@@ -150,8 +150,7 @@ template:AddScripts({
 --- It's intended to be used as a "logical frame", with a set of behaviors to group other frames
 --- (FormFields) together, without being placed on the screen itself.
 function template:Create(frameName, parent, options)
-  -- FormGroups are not intended to be connected to any other Frames, so ignore the provided parent
-  local formGroup = addon:CreateFrame("Frame", frameName, nil)
+  local formGroup = addon:CreateFrame("Frame", frameName, parent)
 
   formGroup._fieldsByIndex = {}
   formGroup._fieldsByName = {}
