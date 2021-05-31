@@ -35,6 +35,7 @@
 
   <Script file="gui/widgets-v2/ButtonGroup.lua"/>
   <Script file="gui/widgets-v2/DataTable.lua"/>
+  <Script file="gui/widgets-v2/FlowLayout.lua"/>
   <Script file="gui/widgets-v2/FormCheckbox.lua"/>
   <Script file="gui/widgets-v2/FormDropdown.lua"/>
   <Script file="gui/widgets-v2/FormField.lua"/>
