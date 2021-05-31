@@ -54,7 +54,7 @@ local offsetDirection = {
   TOPLEFT = { 1, -1 },
   TOPRIGHT = { -1, -1 },
   BOTTOMLEFT = { 1, 1 },
-  BOTTOMRIGHT = { 1, -1 },
+  BOTTOMRIGHT = { -1, 1 },
   CENTER = { 0, 0 },
 }
 
