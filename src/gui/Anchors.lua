@@ -140,8 +140,7 @@ end
 --- @param anchor string the anchor to push away from
 --- @param lrtb table (or number) that can be unpacked as LRTB values
 function addon:GetOffsetsFromLRTB(anchor, lrtb)
-  local opp = addon:GetOppositeAnchor(anchor) -- Use opposite to "push away"
-  local dirs = offsetDirection[opp]
+  local dirs = offsetDirection[anchor]
   local incl = offsetLRTB[anchor]
   local l, r, t, b = addon:UnpackLRTB(lrtb)
   local x, y = 0, 0
