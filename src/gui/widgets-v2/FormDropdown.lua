@@ -21,58 +21,88 @@ local defaultOptions = {
   autoLoad = true,        -- [boolean] If true, the widget will be refreshed immediately
 }
 
+-- The Blizzard dropdown functions put a large margin around dropdowns
+-- I want to get rid of this large margin, so I make some adjustments to the container size/anchoring
+local ddAdjust = 12
+
 -- Adjustments to make the label look better in each anchored position
 local labelAnchorOptions = {
   LEFT = {
     offsetX = 14,
     offsetY = 2,
+    dropdownAnchor = "RIGHT",
+    dropdownOffsetX = 1*ddAdjust,
+    dropdownWidthAdjust = -2.5*ddAdjust,
+    labelHoriz = true,
   },
   RIGHT = {
     offsetX = -12,
     offsetY = 2,
+    dropdownAnchor = "LEFT",
+    dropdownOffsetX = -1*ddAdjust,
+    dropdownWidthAdjust = -1*ddAdjust,
+    labelHoriz = true,
   },
   TOP = {
     offsetX = 0,
     offsetY = 2,
+    dropdownAnchor = "BOTTOMLEFT",
+    dropdownOffsetX = -1*ddAdjust,
+    dropdownWidthAdjust = -2*ddAdjust,
   },
   BOTTOM = {
     offsetX = 0,
     offsetY = 4,
+    dropdownAnchor = "TOPLEFT",
+    dropdownOffsetX = -1*ddAdjust,
+    dropdownWidthAdjust = -2*ddAdjust,
   },
   TOPLEFT = {
     offsetX = 18,
     offsetY = 2,
+    dropdownAnchor = "BOTTOMLEFT",
+    dropdownOffsetX = -1*ddAdjust,
+    dropdownWidthAdjust = -2*ddAdjust,
   },
   TOPRIGHT = {
     offsetX = -16,
     offsetY = 2,
+    dropdownAnchor = "BOTTOMLEFT",
+    dropdownOffsetX = -1*ddAdjust,
+    dropdownWidthAdjust = -2*ddAdjust,
   },
   BOTTOMLEFT = {
     offsetX = 18,
     offsetY = 4,
+    dropdownAnchor = "TOPLEFT",
+    dropdownOffsetX = -1*ddAdjust,
+    dropdownWidthAdjust = -2*ddAdjust,
   },
   BOTTOMRIGHT = {
     offsetX = -16,
     offsetY = 4,
+    dropdownAnchor = "TOPLEFT",
+    dropdownOffsetX = -1*ddAdjust,
+    dropdownWidthAdjust = -2*ddAdjust,
   },
   CENTER = nil, -- Not supported
 }
 
-local function refreshDropdownWidth(dropdown)
-  local options, label = dropdown._options, dropdown._label:GetFontString()
-  local width = options.width
+local function refreshSize(container)
+  local options, label = container._options, container._label:GetFontString()
+  local ddWidth = options.width
 
-  if not width then
+  if not ddWidth then
     -- If no width is specified, auto-resize the dropdown to fit contents
     -- Adapted from: https://medium.com/@JordanBenge/creating-a-wow-dropdown-menu-in-pure-lua-db7b2f9c0364
     local padding = 37
-    width = padding
+    ddWidth = padding
     for _, choice in ipairs(options.choices) do
       -- Borrow the label fontString for a sec so we can do some measuring
       label:SetText(choice.text)
       local strWidth = label:GetStringWidth() + padding
-      if strWidth > width then
-        width = strWidth
+      if strWidth > ddWidth then
+        ddWidth = strWidth
       end
     end
     -- Done measuring, put the label text back
@@ -80,18 +110,35 @@ local function refreshDropdownWidth(dropdown)
   end
 
   if options.maxWidth then
-    width = math.min(width, options.maxWidth)
+    ddWidth = math.min(ddWidth, options.maxWidth)
   end
 
-  UIDropDownMenu_SetWidth(dropdown, width)
+  UIDropDownMenu_SetWidth(container._dropdown, ddWidth)
+
+  local containerWidth, containerHeight = container._dropdown:GetSize()
+
+  local lao = labelAnchorOptions[options.labelAnchor]
+  if lao.labelHoriz then
+    -- If the label is anchored to the left or right of the dropdown,
+    -- then include the label's width and x-spacing in the container's width
+    containerWidth = containerWidth + lao.offsetX + label:GetWidth()
+  else
+    -- If the label is anchored above or below the dropdown,
+    -- then include the label's height and y-spacing int he container's height
+    containerHeight = containerHeight + lao.offsetY + label:GetHeight()
+  end
+
+  containerWidth = containerWidth + lao.dropdownWidthAdjust
+  container:SetSize(containerWidth, containerHeight)
 end
 
-local function refreshChoices(dropdown)
+local function refreshChoices(container)
+  local dropdown = container._dropdown
   -- The function passed to Initialize is called each time the dropdown is opened
   UIDropDownMenu_Initialize(dropdown, function()
-    local currentValue = dropdown:GetFormValue()
+    local currentValue = container:GetFormValue()
 
-    for i, choice in ipairs(dropdown._options.choices) do
+    for i, choice in ipairs(container._options.choices) do
       choice.checked = i == currentValue
 
       -- This "func" is run whenever a choice is selected
@@ -104,7 +151,7 @@ local function refreshChoices(dropdown)
         -- Only set the value if it's changed
         if i ~= currentValue then
           -- The "choice" value will be passed to the data setter, not "c"
-          dropdown:SetFormValue(i, false)
+          container:SetFormValue(i, false)
         end
       end
 
@@ -117,7 +164,7 @@ end
 template:AddMethods({
   ["Refresh"] = function(self)
     refreshChoices(self)
-    refreshDropdownWidth(self)
+    refreshSize(self)
   end,
   ["SetText"] = function(self, text)
     self._label:SetText(text)
@@ -160,26 +207,35 @@ function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
   asserttype(options.labelAnchor, "string", "options.labelAnchor", "FormDropdown:Create")
 
-  local dropdown = addon:CreateFrame("Frame", frameName, parent, "UIDropDownMenuTemplate")
+  local container = addon:CreateFrame("Frame", frameName, parent)
+
+  local dropdown = addon:CreateFrame("Frame", frameName.."Dropdown", container, "UIDropDownMenuTemplate")
+
 
   local labelOpts = labelAnchorOptions[options.labelAnchor]
   labelOpts.anchor = options.labelAnchor
   labelOpts.text = options.label
   local label = addon:CreateFrame("FormLabel", frameName.."Label", dropdown, labelOpts)
 
-  addon:ApplyFormFieldMethods(dropdown, template)
+  -- The dropdown must be anchored opposite from the label, so that the container
+  -- can be resized to fit the label while retaining the label's relative position to the dropdown
+  local ddAnchor = labelOpts.dropdownAnchor
+  dropdown:SetPoint(ddAnchor, container, ddAnchor, labelOpts.dropdownOffsetX, 0)
 
-  dropdown._options = options
-  dropdown._label = label
+  addon:ApplyFormFieldMethods(container, template)
 
-  return dropdown
+  container._options = options
+  container._dropdown = dropdown
+  container._label = label
+
+  return container
 end
 
-function template:AfterCreate(dropdown)
+function template:AfterCreate(container)
   -- Run through SetChoices to perform validation on the list
-  dropdown:SetChoices(dropdown._options.choices)
+  container:SetChoices(container._options.choices)
 
-  if dropdown._options.autoLoad then
-    dropdown:Refresh()
+  if container._options.autoLoad then
+    container:Refresh()
   end
 end
