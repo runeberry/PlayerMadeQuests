@@ -85,7 +85,7 @@ local function addContentToTable(layout, content, options)
     if not prevContent then
       addon.UILogger:Warn("Unable to anchor FlowLayout content (inline, Row %i, Col %i)", #lt, #row)
     else
-      local x, y = addon:GetOffsetsFromSpacing(layoutOptions.anchor, layoutOptions.spacing)
+      local x, y = addon:GetOffsetsFromSpacing(anchor, layoutOptions.spacing)
       content:SetPoint(anchor, prevContent, anchorPoints.horiz[anchor], x, 0)
     end
   else
@@ -98,7 +98,7 @@ local function addContentToTable(layout, content, options)
     if not prevContent then
       addon.UILogger:Warn("Unable to anchor FlowLayout content (newline, Row %i, Col %i)", #lt, #row)
     else
-      local x, y = addon:GetOffsetsFromSpacing(layoutOptions.anchor, layoutOptions.spacing)
+      local x, y = addon:GetOffsetsFromSpacing(anchor, layoutOptions.spacing)
       content:SetPoint(anchor, prevContent, anchorPoints.vert[anchor], 0, y)
     end
   end
