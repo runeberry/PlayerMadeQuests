@@ -127,13 +127,13 @@ template:AddMethods({
       -- Strings can be coerced into a plain text choice
       choice = { text = choice }
     else
-      asserttype(choice, "table", "choice", "DataDropdown:AddChoice")
+      asserttype(choice, "table", "choice", "FormDropdown:AddChoice")
     end
 
     self._options.choices[#self._options.choices+1] = choice
   end,
   ["SetChoices"] = function(self, choices)
-    asserttype(choices, "table", "choices", "DataDropdown:SetChoices")
+    asserttype(choices, "table", "choices", "FormDropdown:SetChoices")
 
     self:ClearChoices()
     for _, choice in ipairs(choices) do
@@ -158,7 +158,7 @@ template:AddScripts({
 
 function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
-  asserttype(options.labelAnchor, "string", "options.labelAnchor", "DataDropdown:Create")
+  asserttype(options.labelAnchor, "string", "options.labelAnchor", "FormDropdown:Create")
 
   local dropdown = addon:CreateFrame("Frame", frameName, parent, "UIDropDownMenuTemplate")
 
