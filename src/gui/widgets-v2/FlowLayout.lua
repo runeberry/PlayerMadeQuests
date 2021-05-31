@@ -6,7 +6,7 @@ local template = addon:NewFrame("FlowLayout")
 local defaultLayoutOptions = {
   margin = 0,                 -- [LRTB] Space between content items and edge of the layout
   -- padding = { 8, 8, 0, 0 },   -- [LRTB] Not used
-  spacing = 6,                -- [number] Space between content items
+  spacing = 6,                -- [XY] Space between content items
 
   anchor = "TOPLEFT",         -- [string] Corner anchor where the layout will start growing from
 
@@ -41,18 +41,25 @@ local function resize(layout)
   local options = layout._options
 
   local ml, mr, mt, mb = addon:UnpackLRTB(options.margin)
-  local sl, sr, st, sb = addon:UnpackLRTB(options.spacing)
+  local sx, sy = addon:UnpackXY(options.spacing)
   local layoutWidth, layoutHeight = 0, 0
 
   for _, row in ipairs(layout._table) do
     local rowWidth, rowHeight = 0, 0
     for _, content in ipairs(row) do
-      rowWidth = rowWidth + content:GetWidth() + sl + sr
+      rowWidth = rowWidth + content:GetWidth() + sx
       rowHeight = math.max(rowHeight, content:GetHeight())
     end
+
+    -- Subtract the spacing for the last item in the row, as spacing should only be between elements
+    rowWidth = rowWidth - sx
+
     layoutWidth = math.max(layoutWidth, rowWidth)
-    layoutHeight = layoutHeight + rowHeight + st + sb
+    layoutHeight = layoutHeight + rowHeight + sy
   end
+
+  -- Subtract the spacing for the last row, as spacing should only be between rows
+  layoutHeight = layoutHeight - sy
 
   -- Account for outer margins in size
   layoutWidth = layoutWidth + ml + mr
