@@ -1,5 +1,5 @@
 local _, addon = ...
-local asserttype, assertf = addon.asserttype, addon.assertf
+local assertf = addon.assertf
 local unpack = addon.G.unpack
 
 local template = addon:NewFrame("FormRadioGroup")
@@ -16,32 +16,35 @@ local defaultOptions = {
   autoLoad = true,          -- [boolean] If true, the widget will be refreshed immediately
 }
 
+local layoutAnchorOptions = {
+  LEFT = {
+    anchor = "TOPLEFT",
+    inline = true,
+  },
+  RIGHT = {
+    anchor = "TOPRIGHT",
+    inline = true,
+  },
+  TOP = {
+    anchor = "TOPLEFT",
+    inline = false,
+  },
+  BOTTOM = {
+    anchor = "BOTTOMLEFT",
+    inline = false,
+  }
+}
+
 local function validateButtonIndex(group, index)
   assertf(type(index) == "number" and index > 0 and index <= #group._buttons,
     "%s is not a valid tab index", tostring(index))
   return index
 end
 
--- The group's container size does not currently encapsulate labels
--- It's simply the area spanning from the TOPLEFT of the first checkbox
--- to the BOTTOMRIGHT of the last checkbox
 local function resizeGroup(group)
-  local options = group._options
-  local horizontal = options.anchor == "LEFT" or options.anchor == "RIGHT"
-  local groupWidth, groupHeight = 0, 0
-
-  for i, button in ipairs(group._buttons) do
-    local buttonWidth, buttonHeight = button:GetSize()
-    if horizontal then
-      groupWidth = groupWidth + buttonWidth + options.spacing
-      groupHeight = math.max(groupHeight, buttonHeight)
-    else
-      groupWidth = math.max(groupWidth, buttonWidth)
-      groupHeight = groupHeight + buttonHeight + options.spacing
-    end
-  end
-
-  group:SetSize(groupWidth, groupHeight)
+  group._layout:Refresh()
+  local width, height = group._layout:GetSize()
+  group:SetSize(width, height)
 end
 
 local function addButton(group, label)
@@ -59,24 +62,8 @@ local function addButton(group, label)
     group:SetFormValue(index)
   end)
 
-  if index == 1 then
-    -- Anchor the first button to the containing group
-    local corner1, corner2 = addon:GetCornersFromSide(groupOptions.anchor)
-    local x1, y1 = addon:GetOffsetsFromLRTB(corner1, groupOptions.margin)
-    local x2, y2 = addon:GetOffsetsFromLRTB(corner2, groupOptions.margin)
-
-    button:SetPoint(corner1, group, corner1, x1, y1)
-    -- button:SetPoint(corner2, group, corner2, x2, y2)
-  else
-    -- Anchor buttons after the first to the previous button in the group
-    local prevButton = group._buttons[index-1]
-    local c1, c2 = addon:GetCornersFromSide(groupOptions.anchor)
-    local p1, p2 = addon:GetCornersFromSide(groupOptions.anchor, true)
-    local sx, sy = addon:GetOffsetsFromSpacing(groupOptions.anchor, groupOptions.spacing)
-
-    button:SetPoint(c1, prevButton, p1, sx, sy)
-    -- button:SetPoint(c2, prevButton, p2, sx, sy)
-  end
+  local lao = layoutAnchorOptions[groupOptions.anchor]
+  group._layout:AddContent(button, { inline = lao.inline })
 
   group._buttons[index] = button
 end
@@ -122,11 +109,21 @@ template:AddScripts({
 function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
   addon:ValidateSide(options.anchor)
-  assert(options.anchor ~= "RIGHT", "The RIGHT anchor is not yet supported")
 
   local group = addon:CreateFrame("Frame", frameName, parent)
 
+  local lao = layoutAnchorOptions[options.anchor]
+  local layoutOptions = {
+    anchor = lao.anchor,
+    margin = options.margin,
+    spacing = options.spacing,
+    autoLoad = false,
+  }
+  local layout = addon:CreateFrame("FlowLayout", frameName.."Layout", group, layoutOptions)
+  layout:SetPoint(lao.anchor, group, lao.anchor)
+
   group._options = options
+  group._layout = layout
   group._buttons = {}
 
   addon:ApplyFormFieldMethods(group, template)
