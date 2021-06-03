@@ -10,7 +10,7 @@ local defaultOptions = {
   sizeMode = "fit",           -- [string] Options are: "fit" (default), "flex", "tab"
 
   margin = 0,                 -- [LRTB] Space between buttons and edge of containing group
-  padding = { 8, 8, 0, 0 },   -- [LRTB] Space between the text inside the button and the edge of the button
+  padding = 8,                -- [LRTB] Space between the text inside the button and the edge of the button
   spacing = 0,                -- [number] Space between buttons
 
   anchor = "LEFT",            -- [string] Side anchor where the buttons will start growing from
@@ -30,6 +30,25 @@ local defaultButtonOptions = {
   padding = nil,
 }
 
+local layoutAnchorOptions = {
+  LEFT = {
+    anchor = "TOPLEFT",
+    inline = true,
+  },
+  RIGHT = {
+    anchor = "TOPRIGHT",
+    inline = true,
+  },
+  TOP = {
+    anchor = "TOPLEFT",
+    inline = false,
+  },
+  BOTTOM = {
+    anchor = "BOTTOMLEFT",
+    inline = false,
+  }
+}
+
 local function addButton(group, buttonOptions)
   local groupOptions = group._options
   buttonOptions = addon:MergeOptionsTable(groupOptions, defaultButtonOptions, buttonOptions)
@@ -42,24 +61,8 @@ local function addButton(group, buttonOptions)
     addon:catch(buttonOptions.handler, button)
   end)
 
-  if index == 1 then
-    -- Anchor the first button to the containing group
-    local corner1, corner2 = addon:GetCornersFromSide(groupOptions.anchor)
-    local x1, y1 = addon:GetOffsetsFromLRTB(corner1, groupOptions.margin)
-    local x2, y2 = addon:GetOffsetsFromLRTB(corner2, groupOptions.margin)
-
-    button:SetPoint(corner1, group, corner1, x1, y1)
-    button:SetPoint(corner2, group, corner2, x2, y2)
-  else
-    -- Anchor buttons after the first to the previous button in the group
-    local prevButton = group._buttons[index-1]
-    local c1, c2 = addon:GetCornersFromSide(groupOptions.anchor)
-    local p1, p2 = addon:GetCornersFromSide(groupOptions.anchor, true)
-    local sx, sy = addon:GetOffsetsFromSpacing(groupOptions.anchor, groupOptions.spacing)
-
-    button:SetPoint(c1, prevButton, p1, sx, sy)
-    button:SetPoint(c2, prevButton, p2, sx, sy)
-  end
+  local lao = layoutAnchorOptions[groupOptions.anchor]
+  group._layout:AddContent(button, { inline = lao.inline })
 
   button._options = buttonOptions
 
@@ -156,6 +159,12 @@ local function refreshButtonsStandard(group)
   end
 end
 
+local function resizeGroup(group)
+  group._layout:Refresh()
+  local width, height = group._layout:GetSize()
+  group:SetSize(width, height)
+end
+
 template:AddMethods({
   ["Refresh"] = function(self)
     local sizeMode = self._options.sizeMode
@@ -167,6 +176,8 @@ template:AddMethods({
     else
       refreshButtonsStandard(self)
     end
+
+    resizeGroup(self)
 
     for _, button in ipairs(self._buttons) do
       -- (jb, 5/15/21) Unusual behavior, sometimes the last button in a group
@@ -192,7 +203,18 @@ function template:Create(frameName, parent, options)
 
   local group = addon:CreateFrame("Frame", frameName, parent)
 
+  local lao = layoutAnchorOptions[options.anchor]
+  local layoutOptions = {
+    anchor = lao.anchor,
+    margin = options.margin,
+    spacing = options.spacing,
+    autoLoad = false,
+  }
+  local layout = addon:CreateFrame("FlowLayout", frameName.."Layout", group, layoutOptions)
+  layout:SetPoint(lao.anchor, group, lao.anchor)
+
   group._options = options
+  group._layout = layout
   group._buttons = {}
 
   for _, buttonOptions in ipairs(options.buttons) do
