@@ -4,11 +4,10 @@ local template = addon:NewFrame("FormTextInput")
 
 local defaultOptions = {
   label = "",               -- [string]
-  multiline = false,        -- [boolean]
   autoFocus = false,        -- [boolean]
   textInset = 0,            -- [LRTB]
   defaultText = "",         -- [string]
-  width = 100,              -- [number]
+  width = 200,              -- [number]
 
   frameTemplate = "InputBoxTemplate",
   fontTemplate = "ChatFontNormal",
@@ -24,7 +23,10 @@ local defaultOptions = {
 
 template:AddMethods({
   ["Refresh"] = function(self)
-    self:SetText(self:GetFormValue())
+    self._editBox:SetText(self:GetFormValue())
+  end,
+  ["SetText"] = function(self, text)
+    self._editBox:SetText(self, text or "")
   end,
   ["SetLabel"] = function(self, text)
     self._label:SetText(text or "")
@@ -32,38 +34,6 @@ template:AddMethods({
 })
 
 template:AddScripts({
-  ["OnEnterPressed"] = function(self)
-    local options = self._options
-
-    -- Don't mess with the Enter behavior of a multiline EditBox
-    if options.multiline then return end
-
-    if options.saveOnEnter then
-      self:SetFormValue(self:GetText())
-    end
-    if options.clearFocusOnEnter then
-      self:ClearFocus()
-    end
-  end,
-  ["OnEscapePressed"] = function(self)
-    if self._options.clearFocusOnEscape then
-      self:ClearFocus()
-    end
-  end,
-  ["OnEditFocusLost"] = function(self)
-    self:HighlightText(0, 0)
-
-    if self._options.saveOnClearFocus then
-      self:SetFormValue(self:GetText())
-    end
-  end,
-  ["OnTextChanged"] = function(self, isUserInput)
-    if not isUserInput then return end
-    if self._options.saveOnTextChanged then
-      self:SetFormValue(self:GetText())
-    end
-  end,
-
   ["OnFormValueChange"] = function(self, value, isUserInput)
     if isUserInput then return end
     self:Refresh()
@@ -73,37 +43,74 @@ template:AddScripts({
   end,
 })
 
+local editBoxScripts = {
+  ["OnEnterPressed"] = function(editBox)
+    local options = editBox._container._options
+
+    if options.saveOnEnter then
+      editBox._container:SetFormValue(editBox:GetText())
+    end
+    if options.clearFocusOnEnter then
+      editBox:ClearFocus()
+    end
+  end,
+  ["OnEscapePressed"] = function(editBox)
+    if editBox._container._options.clearFocusOnEscape then
+      editBox:ClearFocus()
+    end
+  end,
+  ["OnEditFocusLost"] = function(editBox)
+    editBox:HighlightText(0, 0)
+
+    if editBox._container._options.saveOnClearFocus then
+      editBox._container:SetFormValue(editBox:GetText())
+    end
+  end,
+  ["OnTextChanged"] = function(editBox, isUserInput)
+    if not isUserInput then return end
+    if editBox._container._options.saveOnTextChanged then
+      editBox._container:SetFormValue(editBox:GetText())
+    end
+  end,
+}
+
 function template:Create(frameName, parent, options)
   options = addon:MergeOptionsTable(defaultOptions, options)
 
-  local editBox = addon:CreateFrame("EditBox", frameName, parent, options.frameTemplate)
-  editBox:SetAutoFocus(options.autoFocus)
-  editBox:SetFontObject(options.fontTemplate)
-  editBox:SetMultiLine(options.multiline)
-  editBox:SetText(options.defaultText)
+  local container = addon:CreateFrame("Frame", frameName, parent)
 
+  local editBox = addon:CreateFrame("EditBox", frameName.."EditBox", container, options.frameTemplate)
   local insetL, insetR, insetT, insetB = addon:UnpackLRTB(options.textInset)
   editBox:SetTextInsets(insetL, insetR, insetT, insetB)
+  editBox:SetAutoFocus(options.autoFocus)
+  editBox:SetFontObject(options.fontTemplate)
+  editBox:SetText(options.defaultText)
+  addon:ApplyScripts(editBox, editBoxScripts)
 
-  -- local _, height = editBox:GetFont()
-  -- if options.multiline then
-  --   height = height * 3
-  -- end
-  -- editBox:SetSize(options.width, height)
-
-  -- todo: still need this?
-  -- addon:ApplyBackgroundStyle(editBox)
-
+  local labelSpacing = 4
   local labelOpts = {
     text = options.label,
     anchor = "TOPLEFT",
+    offsetY = labelSpacing
   }
   local label = addon:CreateFrame("FormLabel", frameName.."Label", editBox, labelOpts)
 
-  addon:ApplyFormFieldMethods(editBox, template)
+  local labelHeight = label:GetHeight() + labelSpacing
+  local _, editBoxFontHeight = editBox:GetFont()
+  editBox:SetHeight(editBoxFontHeight)
+  editBox:SetPoint("TOPLEFT", container, "TOPLEFT", 6, -1*labelHeight)
+  editBox:SetPoint("TOPRIGHT", container, "TOPRIGHT", 0, -1*labelHeight)
 
-  editBox._options = options
-  editBox._label = label
+  -- Extra height is to account for the size of the bottom visual border
+  local containerHeight = editBox:GetHeight() + labelHeight + 4
+  container:SetSize(options.width, containerHeight)
 
-  return editBox
+  addon:ApplyFormFieldMethods(container, template)
+
+  container._options = options
+  container._editBox = editBox
+  container._label = label
+  editBox._container = container
+
+  return container
 end
