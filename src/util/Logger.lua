@@ -285,6 +285,39 @@ function addon:ForceLogs(fn, level)
   end
 end
 
+local function colorcode(flag, value, valueIfFalse)
+  local color = (flag and "green") or "red"
+  if not flag and valueIfFalse ~= nil then value = valueIfFalse end
+  return addon:Colorize(color, tostring(value))
+end
+
+--- Just a useful utility function for debugging UI frame visibility
+--- (Don't really know where else to put this)
+function addon:LogFrameVisibility(frame, depth, indent)
+  depth = depth or 0
+  indent = indent or ""
+  local frameVisible = colorcode(frame:IsVisible(), "Visible", "Not Visible")
+  local frameShown = colorcode(frame:IsShown(), "Shown", "Not Shown")
+
+  local w, h = frame:GetSize()
+  local frameWidth = colorcode(w > 0, string.format("%i", w))
+  local frameHeight = colorcode(h > 0, string.format("%i", h))
+
+  addon.Logger:Info("%s%s: %s, %s, %sx%s",
+    indent,
+    frame:GetName(),
+    frameVisible,
+    frameShown,
+    frameWidth,
+    frameHeight)
+
+  if depth > 0 then
+    for _, child in ipairs({ frame:GetChildren() }) do
+      addon:LogFrameVisibility(child, depth-1, indent.."  ")
+    end
+  end
+end
+
 --- Cannot create the global logger until this method is available
 addon.Logger = logger_NewLogger(nil, "PMQ", ll.trace)
 addon.UILogger = addon.Logger:NewLogger("UI", ll.info)
