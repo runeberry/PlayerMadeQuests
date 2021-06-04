@@ -16,25 +16,6 @@ local defaultOptions = {
   autoLoad = true,          -- [boolean] If true, the widget will be refreshed immediately
 }
 
-local layoutAnchorOptions = {
-  LEFT = {
-    anchor = "TOPLEFT",
-    inline = true,
-  },
-  RIGHT = {
-    anchor = "TOPRIGHT",
-    inline = true,
-  },
-  TOP = {
-    anchor = "TOPLEFT",
-    inline = false,
-  },
-  BOTTOM = {
-    anchor = "BOTTOMLEFT",
-    inline = false,
-  }
-}
-
 local function validateButtonIndex(group, index)
   assertf(type(index) == "number" and index > 0 and index <= #group._buttons,
     "%s is not a valid tab index", tostring(index))
@@ -62,8 +43,7 @@ local function addButton(group, label)
     group:SetFormValue(index)
   end)
 
-  local lao = layoutAnchorOptions[groupOptions.anchor]
-  group._layout:AddContent(button, { inline = lao.inline })
+  group._layout:AddContent(button, { inline = true })
 
   group._buttons[index] = button
 end
@@ -112,15 +92,11 @@ function template:Create(frameName, parent, options)
 
   local group = addon:CreateFrame("Frame", frameName, parent)
 
-  local lao = layoutAnchorOptions[options.anchor]
-  local layoutOptions = {
-    anchor = lao.anchor,
-    margin = options.margin,
-    spacing = options.spacing,
-    autoLoad = false,
-  }
+  local layoutOptions = addon:CopyTable(options)
+  layoutOptions.autoLoad = false
   local layout = addon:CreateFrame("FlowLayout", frameName.."Layout", group, layoutOptions)
-  layout:SetPoint(lao.anchor, group, lao.anchor)
+  local layoutAnchor = layout:GetPrimaryAnchor()
+  layout:SetPoint(layoutAnchor, group, layoutAnchor)
 
   group._options = options
   group._layout = layout

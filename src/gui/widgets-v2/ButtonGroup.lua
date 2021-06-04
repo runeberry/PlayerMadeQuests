@@ -30,25 +30,6 @@ local defaultButtonOptions = {
   padding = nil,
 }
 
-local layoutAnchorOptions = {
-  LEFT = {
-    anchor = "TOPLEFT",
-    inline = true,
-  },
-  RIGHT = {
-    anchor = "TOPRIGHT",
-    inline = true,
-  },
-  TOP = {
-    anchor = "TOPLEFT",
-    inline = false,
-  },
-  BOTTOM = {
-    anchor = "BOTTOMLEFT",
-    inline = false,
-  }
-}
-
 local function addButton(group, buttonOptions)
   local groupOptions = group._options
   buttonOptions = addon:MergeOptionsTable(groupOptions, defaultButtonOptions, buttonOptions)
@@ -61,8 +42,7 @@ local function addButton(group, buttonOptions)
     addon:catch(buttonOptions.handler, button)
   end)
 
-  local lao = layoutAnchorOptions[groupOptions.anchor]
-  group._layout:AddContent(button, { inline = lao.inline })
+  group._layout:AddContent(button, { inline = true })
 
   button._options = buttonOptions
 
@@ -203,15 +183,11 @@ function template:Create(frameName, parent, options)
 
   local group = addon:CreateFrame("Frame", frameName, parent)
 
-  local lao = layoutAnchorOptions[options.anchor]
-  local layoutOptions = {
-    anchor = lao.anchor,
-    margin = options.margin,
-    spacing = options.spacing,
-    autoLoad = false,
-  }
+  local layoutOptions = addon:CopyTable(options)
+  layoutOptions.autoLoad = false
   local layout = addon:CreateFrame("FlowLayout", frameName.."Layout", group, layoutOptions)
-  layout:SetPoint(lao.anchor, group, lao.anchor)
+  local layoutAnchor = layout:GetPrimaryAnchor()
+  layout:SetPoint(layoutAnchor, group, layoutAnchor)
 
   group._options = options
   group._layout = layout

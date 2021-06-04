@@ -191,6 +191,9 @@ template:AddMethods({
       self:Refresh()
     end
   end,
+  ["GetPrimaryAnchor"] = function(self)
+    return anchorPoints[self._options.anchor][1]
+  end
 })
 
 function template:Create(frameName, parent, options)
