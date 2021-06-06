@@ -296,20 +296,24 @@ end
 function addon:LogFrameVisibility(frame, depth, indent)
   depth = depth or 0
   indent = indent or ""
-  local frameVisible = colorcode(frame:IsVisible(), "Visible", "Not Visible")
-  local frameShown = colorcode(frame:IsShown(), "Shown", "Not Shown")
+  local frameVisible = colorcode(frame:IsVisible(), "V")
+  local frameShown = colorcode(frame:IsShown(), "S")
 
   local w, h = frame:GetSize()
+  local nPoints = frame:GetNumPoints()
+  local frameName = frame:GetName() or ("(anon) "..frame:GetObjectType())
+  local framePoints = colorcode(nPoints > 0, string.format("%i pts", nPoints))
   local frameWidth = colorcode(w > 0, string.format("%i", w))
   local frameHeight = colorcode(h > 0, string.format("%i", h))
 
-  addon.Logger:Info("%s%s: %s, %s, %sx%s",
+  addon.Logger:Info("%s%s: %s, %s, %sx%s, %s",
     indent,
-    frame:GetName(),
+    frameName,
     frameVisible,
     frameShown,
     frameWidth,
-    frameHeight)
+    frameHeight,
+    framePoints)
 
   if depth > 0 then
     for _, child in ipairs({ frame:GetChildren() }) do
