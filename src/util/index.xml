@@ -2,6 +2,7 @@
   <!-- No Logger dependency -->
   <Script file="util/Strings.lua"/>
   <Script file="util/Identifiers.lua"/>
+  <Script file="util/Methods.lua"/>
   <Script file="util/Tables.lua"/>
   <Script file="util/Types.lua"/>
 

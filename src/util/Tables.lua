@@ -120,24 +120,6 @@ function addon:MergeOptionsTable(defaultOptions, ...)
   return merged
 end
 
---- Copies a table of methods to an object
-function addon:ApplyMethods(obj, methods, force)
-  assert(obj ~= nil, "ApplyMethods: cannot apply methods to a nil object")
-  assert(type(obj) == "table", "ApplyMethods: object must be a table, got type: "..type(obj))
-  assert(methods ~= nil, "ApplyMethods: cannot apply nil method table to an object")
-  assert(type(methods) == "table", "ApplyMethods: methods must be a table, got type: "..type(methods))
-
-  for fname, fn in pairs(methods) do
-    if type(fname) == "string" and type(fn) == "function" then
-      if not force and obj[fname] ~= nil then
-        addon.Logger:Error("ApplyMethods: '%s' is already a method on this object", fname)
-      else
-        obj[fname] = fn
-      end
-    end
-  end
-end
-
 function addon:DistinctSet(t)
   if t == nil then error("Cannot create a set from a nil table") end
   local set, i = {}, 0
