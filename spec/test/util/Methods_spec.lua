@@ -51,20 +51,20 @@ describe("Tables", function()
       local hookCalled = 0
 
       local obj = {
-        ["DoThing"] = function()
+        ["DoThing"] = function(self, val)
           origCalled = origCalled + 1
           currentValue = "original"
         end
       }
       local methods = {
-        ["DoThing"] = function()
+        ["DoThing"] = function(self, val)
           hookCalled = hookCalled + 1
-          currentValue = "hook"
+          currentValue = val
         end
       }
 
       addon:HookMethods(obj, methods, addon.HookType.PreHook)
-      obj:DoThing()
+      obj:DoThing("hook")
 
       assert.equals(1, origCalled)
       assert.equals(1, hookCalled)
@@ -76,20 +76,20 @@ describe("Tables", function()
       local hookCalled = 0
 
       local obj = {
-        ["DoThing"] = function()
+        ["DoThing"] = function(self, val)
           origCalled = origCalled + 1
           currentValue = "original"
         end
       }
       local methods = {
-        ["DoThing"] = function()
+        ["DoThing"] = function(self, val)
           hookCalled = hookCalled + 1
-          currentValue = "hook"
+          currentValue = val
         end
       }
 
       addon:HookMethods(obj, methods, addon.HookType.PostHook)
-      obj:DoThing()
+      obj:DoThing("hook")
 
       assert.equals(1, origCalled)
       assert.equals(1, hookCalled)
@@ -101,15 +101,38 @@ describe("Tables", function()
 
       local obj = {}
       local methods = {
-        ["DoThing"] = function()
+        ["DoThing"] = function(self, val)
           hookCalled = hookCalled + 1
-          currentValue = "hook"
+          currentValue = val
         end
       }
 
       addon:HookMethods(obj, methods)
-      obj:DoThing()
+      obj:DoThing("hook")
 
+      assert.equals(1, hookCalled)
+      assert.equals("hook", currentValue)
+    end)
+    it("can hook a single method", function()
+      local currentValue = nil
+      local origCalled = 0
+      local hookCalled = 0
+
+      local obj = {
+        ["DoThing"] = function(self, val)
+          origCalled = origCalled + 1
+          currentValue = "original"
+        end
+      }
+      local handler = function(self, val)
+        hookCalled = hookCalled + 1
+        currentValue = val
+      end
+
+      addon:HookMethod(obj, "DoThing", handler)
+      obj:DoThing("hook")
+
+      assert.equals(1, origCalled)
       assert.equals(1, hookCalled)
       assert.equals("hook", currentValue)
     end)

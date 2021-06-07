@@ -62,6 +62,17 @@ function addon:ApplyMethods(obj, methods, force)
   end
 end
 
+function addon:HookMethod(obj, fname, fn, hookType)
+  asserttype(obj, "table", "obj", "HookMethod")
+  asserttype(fname, "string", "fname", "HookMethod")
+  asserttype(fn, "function", "fn", "HookMethod")
+
+  hookType = hookType or addon.HookType.PostHook
+  assertf(addon.HookType[hookType], "HookMethod: '%s' is not a recognized hookType", hookType)
+
+  hookMethod(obj, fname, fn, hookType)
+end
+
 function addon:HookMethods(obj, methods, hookType)
   asserttype(obj, "table", "obj", "HookMethods")
   asserttype(methods, "table", "methods", "HookMethods")
