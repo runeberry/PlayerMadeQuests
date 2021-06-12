@@ -9,11 +9,7 @@ function addon:tlen(t)
   return count
 end
 
--- Removes all fields that are not of type: string, number, boolean, or table
--- Removes all fields that begin with _
--- May not play well with array tables... idk!
-function addon:CleanTable(t, circ)
-  if t == nil then error("Cannot clean a nil table") end
+local function cleanTable(t, circ)
   circ = circ or {}
   circ[t] = true -- Ensure the provided table won't get cleaned twice
   local ktype, vtype
@@ -26,7 +22,7 @@ function addon:CleanTable(t, circ)
     elseif vtype == "table" then
       -- Any inner tables will also be cleaned
       if not circ[v] then
-        self:CleanTable(v, circ)
+        cleanTable(v, circ)
       end
     elseif vtype == "string" or vtype == "number" or vtype == "boolean" then
       -- Any values of type string, number, or boolean are left as-is
@@ -38,12 +34,17 @@ function addon:CleanTable(t, circ)
   return t
 end
 
--- Performs a deep copy of the table and all subtables
--- References to functions will not be changed
-function addon:CopyTable(t, circ)
-  if t == nil then error("Cannot copy a nil table") end
-  circ = circ or {}
+--- Removes all fields that are not of type: string, number, boolean, or table.
+--- Removes all fields that begin with _underscore.
+--- May not play well with array tables... idk!
+function addon:CleanTable(t)
+  if t == nil then error("CleanTable: Cannot clean a nil table", 2) end
+  return cleanTable(t)
+end
+
+local function copyTable(t, circ)
   local copy = {}
+  circ = circ or {}
   circ[t] = copy -- Ensure the provided table won't get copied twice
   for k, v in pairs(t) do
     if type(v) == "table" then
@@ -51,7 +52,7 @@ function addon:CopyTable(t, circ)
         -- Use the same copy for each instance of the same inner table
         copy[k] = circ[v]
       else
-        copy[k] = self:CopyTable(v, circ)
+        copy[k] = copyTable(v, circ)
       end
     else
       copy[k] = v
@@ -60,12 +61,15 @@ function addon:CopyTable(t, circ)
   return copy
 end
 
--- Performs a recursive table merge of t2 onto t1
--- If any fields collide, t2 will overwrite t1
--- Returns a new table - does not modify t1 or t2
-function addon:MergeTable(t1, t2, circ)
-  if t1 == nil or t2 == nil then error("Cannot merge a nil table") end
-  local merged = self:CopyTable(t1)
+--- Performs a deep copy of the table and all subtables.
+--- References to functions will not be changed.
+function addon:CopyTable(t)
+  if t == nil then error("CopyTable: Cannot copy a nil table", 2) end
+  return copyTable(t)
+end
+
+local function mergeTable(t1, t2, circ)
+  local merged = copyTable(t1)
   circ = circ or {}
   circ[t1] = merged -- Ensure that both provided tables will only be merged once
   circ[t2] = merged
@@ -73,7 +77,7 @@ function addon:MergeTable(t1, t2, circ)
   for _, v in ipairs(t2) do
     -- Append all array-like items onto t1's array-like list
     if type(v) == "table" then
-      merged[#merged+1] = self:CopyTable(v)
+      merged[#merged+1] = copyTable(v)
     else
       merged[#merged+1] = v
     end
@@ -87,16 +91,24 @@ function addon:MergeTable(t1, t2, circ)
       elseif type(merged[k]) == "table" then
         -- If t1 and t2 both have tables at index k,
         -- then merge the two subtables and assign the result
-        merged[k] = self:MergeTable(merged[k], v, circ)
+        merged[k] = mergeTable(merged[k], v, circ)
       else
         -- Otherwise, t2's subtable simply overwrites t1's value
-        merged[k] = self:CopyTable(v, circ)
+        merged[k] = copyTable(v, circ)
       end
     else
       merged[k] = v
     end
   end
   return merged
+end
+
+--- Performs a recursive table merge of t2 onto t1.
+--- If any fields collide, t2 will overwrite t1.
+--- Returns a new table - does not modify t1 or t2.
+function addon:MergeTable(t1, t2)
+  if t1 == nil or t2 == nil then error("MergeTable: Cannot merge a nil table", 2) end
+  return mergeTable(t1, t2)
 end
 
 --- Extension of MergeOptions that will return a copy of defaultOptions
