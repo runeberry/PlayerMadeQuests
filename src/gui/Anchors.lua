@@ -1,4 +1,5 @@
 local _, addon = ...
+local asserttype, assertf = addon.asserttype, addon.assertf
 
 local anchors = {
   LEFT = "LEFT",
@@ -87,29 +88,29 @@ local corners = {
 --- Ensures that the provided string is a known anchor value
 --- @param anchor string the anchor to validate
 function addon:ValidateAnchor(anchor)
-  assert(type(anchor) == "string", "Anchor must be a string")
-  assert(anchors[anchor], anchor.." is not a valid anchor value")
+  asserttype(anchor, "string", "anchor", "ValidateAnchor", 2)
+  assertf(anchors[anchor], "%s is not a valid anchor value", anchor)
 end
 
 --- Ensures that the provided string is a side anchor (not a corner or center)
 --- @param anchor string the anchor to validate
 function addon:ValidateSide(anchor)
-  assert(type(anchor) == "string", "Anchor must be a string")
-  assert(corners[anchor], anchor.." is not a valid side anchor")
+  asserttype(anchor, "string", "anchor", "ValidateSide", 2)
+  assertf(corners[anchor], "%s is not a valid side anchor", anchor)
 end
 
 --- Ensures that the provided string is a corner anchor (not a side or center)
 --- @param anchor string the anchor to validate
 function addon:ValidateCorner(anchor)
-  assert(type(anchor) == "string", "Anchor must be a string")
-  assert(sides[anchor], anchor.." is not a valid corner anchor")
+  asserttype(anchor, "string", "anchor", "ValidateCorner", 2)
+  assertf(sides[anchor], "%s is not a valid corner anchor", anchor)
 end
 
 --- Returns a valid anchor value representing the opposite side/corner of the provided anchor
 --- @param anchor string the anchor to get the opposite of
 function addon:GetOppositeAnchor(anchor)
   addon:ValidateAnchor(anchor)
-  assert(opposite[anchor], "Unable to determine opposite anchor for "..anchor)
+  assertf(opposite[anchor], "Unable to determine opposite anchor for %s", anchor)
   return opposite[anchor]
 end
 
@@ -123,7 +124,7 @@ function addon:GetOffsetDirection(anchor, opp)
     anchor = addon:GetOppositeAnchor(anchor)
   end
 
-  assert(direction[anchor], "Unable to determine offset direction for anchor "..anchor)
+  assertf(direction[anchor], "Unable to determine offset direction for anchor %s", anchor)
   return direction[anchor]
 end
 
@@ -166,7 +167,7 @@ function addon:GetSidesFromCorner(anchor, opp)
     anchor = addon:GetOppositeAnchor(anchor)
   end
 
-  assert(sides[anchor], "Unable to determine sides for corner "..anchor)
+  assertf(sides[anchor], "Unable to determine sides for corner %s", anchor)
   return sides[anchor][1], sides[anchor][2]
 end
 
@@ -180,7 +181,7 @@ function addon:GetCornersFromSide(anchor, opp)
     anchor = addon:GetOppositeAnchor(anchor)
   end
 
-  assert(corners[anchor], "Unable to determine corners for side "..anchor)
+  assertf(corners[anchor], "Unable to determine corners for side %s", anchor)
   return corners[anchor][1], corners[anchor][2]
 end
 
