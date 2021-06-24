@@ -149,6 +149,7 @@ local methods = {
     -- These logs are only intended for debugging, so just print them at the lowest visible log level
     if type(t) ~= "table" then
       self:Log(ll.fatal, "Failed to log table: type is %s", type(t))
+      return
     end
     local level = getMinLogLevel(self.name)
     indent = indent or ""
