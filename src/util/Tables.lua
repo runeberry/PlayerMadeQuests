@@ -68,30 +68,60 @@ function addon:CopyTable(t)
   return copyTable(t)
 end
 
-local function mergeTable(t1, t2, circ)
+local function mergeTable(t1, t2, tableOption, arrayOption, maxDepth, curDepth, circ)
   local merged = copyTable(t1)
   circ = circ or {}
   circ[t1] = merged -- Ensure that both provided tables will only be merged once
   circ[t2] = merged
   circ[merged] = merged -- Ensure that any references to the merged table are not re-merged
-  for _, v in ipairs(t2) do
-    -- Append all array-like items onto t1's array-like list
-    if type(v) == "table" then
-      merged[#merged+1] = copyTable(v)
-    else
-      merged[#merged+1] = v
+
+  local arraysHandled = false
+  if arrayOption == "merge" then
+    arraysHandled = true
+    for i, v in ipairs(t2) do
+      -- Overwrite index values
+      if type(v) == "table" then
+        merged[i] = copyTable(v)
+      else
+        merged[i] = v
+      end
+    end
+  elseif arrayOption == "append" then
+    arraysHandled = true
+    for _, v in ipairs(t2) do
+      -- Append all array-like items onto t1's array-like list
+      if type(v) == "table" then
+        merged[#merged+1] = copyTable(v)
+      else
+        merged[#merged+1] = v
+      end
+    end
+  elseif arrayOption == "overwrite" then
+    arraysHandled = true
+    for i, _ in ipairs(merged) do
+      -- Remove all t1 index values...
+      merged[i] = nil
+    end
+    for i, v in ipairs(t2) do
+      -- ...and insert all t2 index values
+      if type(v) == "table" then
+        merged[i] = copyTable(v)
+      else
+        merged[i] = v
+      end
     end
   end
+
   for k, v in pairs(t2) do
-    if type(k) == "number" then
-      -- Do nothing, this was already "appended" during ipairs
+    if type(k) == "number" and arraysHandled then
+      -- Do nothing
     elseif type(v) == "table" then
       if circ[v] then
         merged[k] = circ[v]
-      elseif type(merged[k]) == "table" then
+      elseif type(merged[k]) == "table" and curDepth < maxDepth and tableOption == "merge" then
         -- If t1 and t2 both have tables at index k,
         -- then merge the two subtables and assign the result
-        merged[k] = mergeTable(merged[k], v, circ)
+        merged[k] = mergeTable(merged[k], v, tableOption, arrayOption, maxDepth, curDepth+1, circ)
       else
         -- Otherwise, t2's subtable simply overwrites t1's value
         merged[k] = copyTable(v, circ)
@@ -106,9 +136,22 @@ end
 --- Performs a recursive table merge of t2 onto t1.
 --- If any fields collide, t2 will overwrite t1.
 --- Returns a new table - does not modify t1 or t2.
-function addon:MergeTable(t1, t2)
+--- @param tableOption string How should nested tables be merged? (Default: "merge")
+--      If "merge",     then {a=1,b=2,c=3} + {a=8,d=9} => {a=9,b=2,c=3,d=9}
+--      If "overwrite", then {a=1,b=2,c=3} + {a=8,d=9} => {a=8,d=9}
+--- @param arrayOption string How should nested arrays be merged? (Default: "append")
+--      If "merge",     then ["a","b","c"] + ["d","e"] => ["d","e","c"]
+--      If "append",    then ["a","b","c"] + ["d","e"] => ["a","b","c","d","e"]
+--      If "overwrite", then ["a","b","c"] + ["d","e"] => ["d","e"]
+--- @param maxDepth number How many layers deep should the table be merged? (Default: very high)
+function addon:MergeTable(t1, t2, tableOption, arrayOption, maxDepth)
   if t1 == nil or t2 == nil then error("MergeTable: Cannot merge a nil table", 2) end
-  return mergeTable(t1, t2)
+
+  tableOption = tableOption or "merge"
+  arrayOption = arrayOption or "append"
+  maxDepth = maxDepth or 10000
+
+  return mergeTable(t1, t2, tableOption, arrayOption, maxDepth, 0)
 end
 
 --- Extension of MergeOptions that will return a copy of defaultOptions
@@ -125,7 +168,7 @@ function addon:MergeOptionsTable(defaultOptions, ...)
   else
     for _, customOptions in ipairs(customOptionsTables) do
       assert(type(customOptions) == "table", "MergeOptionsTable: customOptions must be a table, got type "..type(customOptions))
-      merged = addon:MergeTable(merged, customOptions)
+      merged = addon:MergeTable(merged, customOptions, "merge", "overwrite")
     end
   end
 

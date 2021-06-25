@@ -155,6 +155,19 @@ describe("Tables", function()
 
       assert.same(expected, merged.table)
     end)
+    it("can overwrite nested table (with appropriate option)", function()
+      local patch = {
+        table = {
+          ["new_id"] = { name = "new table item", value = 123 }
+        }
+      }
+
+      local expected = patch.table
+
+      local merged = addon:MergeTable(t, patch, "overwrite")
+
+      assert.same(expected, merged.table)
+    end)
     it("can merge base array by appending items", function()
       local patch = {
         { name = "another name" },
@@ -182,6 +195,33 @@ describe("Tables", function()
       expected[#expected+1] = patch.array[2]
 
       local merged = addon:MergeTable(t, patch)
+
+      assert.same(expected, merged.array)
+    end)
+    it("can merge base array by overwriting items (with appropriate option)", function()
+      local patch = {
+        array = {
+          [1] = { name = "another name" },
+        }
+      }
+
+      local expected = addon:CopyTable(t.array)
+      expected[1] = patch.array[1]
+
+      local merged = addon:MergeTable(t, patch, nil, "merge")
+
+      assert.same(expected, merged.array)
+    end)
+    it("can merge base array by overwriting the whole array (with appropriate option)", function()
+      local patch = {
+        array = {
+          [1] = { name = "another name" },
+        }
+      }
+
+      local expected = patch.array
+
+      local merged = addon:MergeTable(t, patch, nil, "overwrite")
 
       assert.same(expected, merged.array)
     end)
@@ -213,10 +253,12 @@ describe("Tables", function()
       local defaultOptions = {
         v1 = "v1",
         v2 = "v2",
+        va = { 1, 2, 3, 4 },
       }
       local customOptions = {
         v2 = "custom-v2",
         v3 = "custom-v3",
+        va = { 1, 2 },
       }
 
       local merged = addon:MergeOptionsTable(defaultOptions, customOptions)
@@ -224,19 +266,23 @@ describe("Tables", function()
       assert.equals(defaultOptions.v1, merged.v1)
       assert.equals(customOptions.v2, merged.v2)
       assert.equals(customOptions.v3, merged.v3)
+      assert.same(customOptions.va, merged.va)
     end)
     it("can merge multiple options tables", function()
       local defaultOptions = {
         v1 = "v1",
         v2 = "v2",
+        va = { 1, 2, 3, 4 },
       }
       local customOptions1 = {
         v2 = "custom-v2",
         v3 = "custom-v3",
+        va = { 1, 2, 3 },
       }
       local customOptions2 = {
         v3 = "super-custom-v3",
         v4 = "super-custom-v4",
+        va = { 8, 9 }
       }
 
       local merged = addon:MergeOptionsTable(defaultOptions, customOptions1, customOptions2)
@@ -245,6 +291,7 @@ describe("Tables", function()
       assert.equals(customOptions1.v2, merged.v2)
       assert.equals(customOptions2.v3, merged.v3)
       assert.equals(customOptions2.v4, merged.v4)
+      assert.same(customOptions2.va, merged.va)
     end)
     it("can copy default options if no custom options provided", function()
       local defaultOptions = {
