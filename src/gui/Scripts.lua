@@ -16,9 +16,9 @@ end
 --- @param scriptType string The UI event to hook into. Can be a standard Blizzard event or a custom PMQ event.
 --- @param handler function The function to run when the event is fired.
 function addon:ApplyScript(frame, scriptType, handler)
-  assertframe(frame, "frame", "ApplyScripts")
-  asserttype(scriptType, "string", "scriptType", "ApplyScript")
-  asserttype(handler, "function", "handler", "ApplyScript")
+  assertframe(frame, "frame", "ApplyScripts", 2)
+  asserttype(scriptType, "string", "scriptType", "ApplyScript", 2)
+  asserttype(handler, "function", "handler", "ApplyScript", 2)
 
   applyScript(frame, scriptType, handler)
 end
@@ -29,10 +29,12 @@ end
 --- @param frame table A UI frame to set scripts on
 --- @param scripts table A table of scripts
 function addon:ApplyScripts(frame, scripts)
-  assertframe(frame, "frame", "ApplyScripts")
-  asserttype(scripts, "table", "scripts", "ApplyScripts")
+  assertframe(frame, "frame", "ApplyScripts", 2)
+  asserttype(scripts, "table", "scripts", "ApplyScripts", 2)
 
   for scriptType, handler in pairs(scripts) do
+    asserttype(scriptType, "string", "scriptType", "ApplyScripts", 2)
+    asserttype(handler, "function", "handler", "ApplyScripts", 2)
     applyScript(frame, scriptType, handler)
   end
 end
