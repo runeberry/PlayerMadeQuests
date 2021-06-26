@@ -1,111 +1,123 @@
 local _, addon = ...
-local asserttype, assertf = addon.asserttype, addon.assertf
+local asserttype, assertf, assertframe = addon.asserttype, addon.assertf, addon.assertframe
 
 local template = addon:NewFrame("FormLabel")
+template:RegisterCustomScriptEvent("OnFormLabelChange")
 
-local defaultOptions = {
-  text = "",              -- [string] The text of the label
-  anchor = "LEFT",        -- [string] The anchor of the parent frame to hook the fontString to
-  layer = "BACKGROUND",   -- [string] The drawing layer for the fontString
-  clickable = false,      -- [boolean] True to enable mouse script events
+template:SetDefaultOptions({
+  label = "",                  -- [string] The text of the label
+  labelAnchor = "LEFT",        -- [string] The anchor of the parent frame to hook the fontString to
+  labelLayer = "BACKGROUND",   -- [string] The drawing layer for the fontString
+  labelClickable = false,      -- [boolean] True to enable mouse script events
 
   -- Specify the following settings only if you want to override anchor-specific options
-  fontTemplate = nil,     -- [string]
-  offsetX = nil,          -- [number]
-  offsetY = nil,          -- [number]
-}
+  labelFontTemplate = nil,     -- [string]
+  labelOffsetX = nil,          -- [number]
+  labelOffsetY = nil,          -- [number]
+})
 
-local anchorOptions = {
+template:SetConditionalOptions("labelAnchor", {
   LEFT = {
-    fontTemplate = "GameFontNormal",
-    anchorHook = "RIGHT",
-    offsetX = -2,
-    offsetY = 0,
+    labelFontTemplate = "GameFontNormal",
+    labelAnchorHook = "RIGHT",
+    labelOffsetX = -2,
+    labelOffsetY = 0,
   },
   RIGHT = {
-    fontTemplate = "GameFontNormal",
-    anchorHook = "LEFT",
-    offsetX = 2,
-    offsetY = 0,
+    labelFontTemplate = "GameFontNormal",
+    labelAnchorHook = "LEFT",
+    labelOffsetX = 2,
+    labelOffsetY = 0,
   },
   TOP = {
-    fontTemplate = "GameFontNormalSmall",
-    anchorHook = "BOTTOM",
-    offsetX = 0,
-    offsetY = 2,
+    labelFontTemplate = "GameFontNormalSmall",
+    labelAnchorHook = "BOTTOM",
+    labelOffsetX = 0,
+    labelOffsetY = 2,
   },
   BOTTOM = {
-    fontTemplate = "GameFontNormalSmall",
-    anchorHook = "TOP",
-    offsetX = 0,
-    offsetY = -2,
+    labelFontTemplate = "GameFontNormalSmall",
+    labelAnchorHook = "TOP",
+    labelOffsetX = 0,
+    labelOffsetY = -2,
   },
   TOPLEFT = {
-    fontTemplate = "GameFontNormalSmall",
-    anchorHook = "BOTTOMLEFT",
-    offsetX = 0,
-    offsetY = 2,
+    labelFontTemplate = "GameFontNormalSmall",
+    labelAnchorHook = "BOTTOMLEFT",
+    labelOffsetX = 0,
+    labelOffsetY = 2,
   },
   TOPRIGHT = {
-    fontTemplate = "GameFontNormalSmall",
-    anchorHook = "BOTTOMRIGHT",
-    offsetX = 0,
-    offsetY = 2,
+    labelFontTemplate = "GameFontNormalSmall",
+    labelAnchorHook = "BOTTOMRIGHT",
+    labelOffsetX = 0,
+    labelOffsetY = 2,
   },
   BOTTOMLEFT = {
-    fontTemplate = "GameFontNormalSmall",
-    anchorHook = "TOPLEFT",
-    offsetX = 0,
-    offsetY = -2,
+    labelFontTemplate = "GameFontNormalSmall",
+    labelAnchorHook = "TOPLEFT",
+    labelOffsetX = 0,
+    labelOffsetY = -2,
   },
   BOTTOMRIGHT = {
-    fontTemplate = "GameFontNormalSmall",
-    anchorHook = "TOPRIGHT",
-    offsetX = 0,
-    offsetY = -2,
+    labelFontTemplate = "GameFontNormalSmall",
+    labelAnchorHook = "TOPRIGHT",
+    labelOffsetX = 0,
+    labelOffsetY = -2,
   },
-  CENTER = nil, -- Not supported
-}
+  -- CENTER = nil, -- Not supported
+})
+
+local function setFormLabel(self, text)
+  self._labelFontString:SetText(text)
+
+  -- Refresh label size
+  local width, height = self._labelFontString:GetSize()
+  self:SetSize(width, height)
+end
+
+local function setFormLabelParent(self, parentFrame)
+  self._labelParent = parentFrame
+
+  -- Refresh label position
+  local options = self:GetOptions()
+  local labelParent = self._labelParent or self
+  self._labelFontString:ClearAllPoints(true)
+  self._labelFontString:SetPoint(options.labelAnchorHook, labelParent, options.labelAnchor, options.labelOffsetX, options.labelOffsetY)
+end
 
 template:AddMethods({
-  ["GetText"] = function(self)
-    return self._fontString:GetText()
+  ["GetFormLabel"] = function(self)
+    return self._labelFontString
   end,
-  ["SetText"] = function(self, text, resize)
-    if resize == nil then resize = true end
-
-    self._fontString:SetText(tostring(text))
-
-    if resize then
-      self:SetWidth(self._fontString:GetStringWidth())
-    end
+  ["GetFormLabelDimensions"] = function(self)
+    local width, height = self._labelFontString:GetSize()
+    local options = self:GetOptions()
+    return width, height, options.labelOffsetX, options.labelOffsetY
   end,
-  ["GetFontString"] = function(self)
-    return self._fontString
+  ["SetFormLabel"] = function(self, text)
+    asserttype(text, "string", "text", "SetFormLabel")
+    setFormLabel(self, text)
+    self:FireCustomScriptEvent("OnFormLabelChange")
+  end,
+  ["SetFormLabelParent"] = function(self, parentFrame)
+    assertframe(parentFrame, "parentFrame", "SetFormLabelParent", 2)
+    setFormLabelParent(self, parentFrame)
+    self:FireCustomScriptEvent("OnFormLabelChange")
   end,
 })
 
-function template:Create(frameName, parent, options)
-  options = addon:MergeOptionsTable(defaultOptions, options)
-  assertf(anchorOptions[options.anchor], "FormLabel:Create - %s is not a supported anchor", options.anchor)
-  options = addon:MergeOptionsTable(anchorOptions[options.anchor], options)
-
-  local container = addon:CreateFrame("Frame", frameName, parent)
-  if options.clickable then
-    container:EnableMouse(true)
+function template:Create(frame, options)
+  if options.labelClickable then
+    frame:EnableMouse(true)
   end
 
-  container:SetPoint(options.anchorHook, parent, options.anchor, options.offsetX, options.offsetY)
+  local labelName = addon:CreateGlobalName("FormLabel_FS%i")
+  local fontString = frame:CreateFontString(labelName, options.labelLayer, options.labelFontTemplate)
 
-  local fontString = container:CreateFontString(frameName.."_FS", options.layer, options.fontTemplate)
-  fontString:SetText(options.text)
-  fontString:SetPoint("CENTER", container, "CENTER")
+  frame._labelFontString = fontString
+  frame._labelParent = nil
 
-  -- Automatically size the container to fit the label text
-  container:SetSize(fontString:GetStringWidth(), fontString:GetStringHeight())
-
-  container._options = options
-  container._fontString = fontString
-
-  return container
+  setFormLabel(frame, options.label)
+  setFormLabelParent(frame, frame)
 end

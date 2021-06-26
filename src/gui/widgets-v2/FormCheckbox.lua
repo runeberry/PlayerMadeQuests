@@ -1,31 +1,31 @@
 local _, addon = ...
 
-local template = addon:NewFrame("FormCheckbox")
+local template = addon:NewFrame("FormCheckbox", "Button")
+template:AddMixin("FormField")
 
-local defaultOptions = {
+template:SetDefaultOptions({
   label = "",               -- [string] Text to display to the right of the checkbox
-  spacing = 2,              -- [number] Spacing between the checkbox and its text
+  labelAnchor = "RIGHT",
   radio = false,            -- [boolean] Should the button look and act like a radio button?
-
-  autoLoad = true,          -- [boolean] If true, the widget will be refreshed immediately
-}
+})
 
 -- The size of the checkbox widget should also encapsulate its text
 local function resize(checkbox)
-  local options = checkbox._options
+  local formLabelWidth, _, formLabelOffsetX = checkbox:GetFormLabelDimensions()
   local button = checkbox._button
 
   local buttonWidth, buttonHeight = button:GetSize()
-  buttonWidth = buttonWidth + options.spacing + button:GetTextWidth()
+  buttonWidth = buttonWidth + formLabelWidth + formLabelOffsetX
   checkbox:SetSize(buttonWidth, buttonHeight)
 end
 
 local function onButtonClick(button, mouseButton, isDown)
   local checkbox = button._checkbox
+  local options = checkbox:GetOptions()
   local prevChecked = checkbox:GetFormValue()
   local curChecked = button:GetChecked()
 
-  if prevChecked and not curChecked and checkbox._options.radio then
+  if prevChecked and not curChecked and options.radio then
     -- Clicking on a "checked" radio button should not "uncheck" the box
     button:SetChecked(true)
     return
@@ -34,17 +34,10 @@ local function onButtonClick(button, mouseButton, isDown)
   checkbox:SetFormValue(curChecked)
 end
 
-template:AddMethods({
-  ["Refresh"] = function(self)
+template:AddScripts({
+  ["OnRefresh"] = function(self)
     self._button:SetChecked(self:GetFormValue())
   end,
-  ["SetLabel"] = function(self, label)
-    self._button:SetText(label)
-    resize(self)
-  end,
-})
-
-template:AddScripts({
   ["OnClick"] = function(self, mouseButton, isDown)
     self._button:Click()
   end,
@@ -67,45 +60,28 @@ template:AddScripts({
 
     self:Refresh()
   end,
+  ["OnFormLabelChange"] = function(self)
+    resize(self)
+  end,
   ["OnShow"] = function(self)
     self:Refresh()
   end,
 })
 
-function template:Create(frameName, parent, options)
-  options = addon:MergeOptionsTable(defaultOptions, options)
-
-  local checkbox = addon:CreateFrame("Button", frameName, parent)
-  checkbox:EnableMouse()
+function template:Create(frame, options)
+  frame:EnableMouse(true)
 
   local templateName = "UICheckButtonTemplate"
   if options.radio then templateName = "UIRadioButtonTemplate" end
 
-  local button = addon:CreateFrame("CheckButton", nil, checkbox, templateName)
-  button:SetPoint("TOPLEFT", checkbox, "TOPLEFT")
-  button:SetText(options.label)
-  button:SetPushedTextOffset(0, 0)
-  button:SetNormalFontObject("GameFontNormal")
-  button:SetDisabledFontObject("GameFontDisable")
+  local button = addon:CreateFrame("CheckButton", nil, frame, templateName)
+  button:SetPoint("TOPLEFT", frame, "TOPLEFT")
   button:SetScript("OnClick", onButtonClick)
-  button._checkbox = checkbox
+  frame:SetFormLabel(options.label)
+  frame:SetFormLabelParent(button)
 
-  local fontString = button:GetFontString()
-  fontString:ClearAllPoints()
-  fontString:SetPoint("LEFT", button, "RIGHT", options.spacing, 0)
+  frame._button = button
+  button._checkbox = frame
 
-  addon:ApplyFormFieldMethods(checkbox, template)
-
-  checkbox._options = options
-  checkbox._button = button
-
-  resize(checkbox)
-
-  return checkbox
-end
-
-function template:AfterCreate(checkbox)
-  if checkbox._options.autoLoad then
-    checkbox:Refresh()
-  end
+  resize(frame)
 end

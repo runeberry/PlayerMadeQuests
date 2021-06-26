@@ -1,9 +1,11 @@
 local _, addon = ...
 
 local template = addon:NewFrame("FormTextInputLong")
+template:AddMixin("FormField")
 
-local defaultOptions = {
+template:SetDefaultOptions({
   label = "",               -- [string]
+  labelAnchor = "TOPLEFT",  -- [string]
   lines = 3,                -- [number]
   autoFocus = false,        -- [boolean]
   textInset = 6,            -- [LRTB]
@@ -13,26 +15,22 @@ local defaultOptions = {
   frameTemplate = "InputBoxTemplate",
   fontTemplate = "ChatFontNormal",
   labelFontTemplate = "GameFontHighlightSmall",
-  labelJustifyH = "LEFT",
 
   clearFocusOnEscape = true,  -- [boolean] Clears focus when Escape is pressed
   saveOnClearFocus = true,    -- [boolean] Saves form field when focus is lost (incl. above settings)
   saveOnTextChanged = false,  -- [boolean] Saves form field whenever text is changed
-}
+})
 
 template:AddMethods({
-  ["Refresh"] = function(self)
-    self._editBox:SetText(self:GetFormValue())
-  end,
   ["SetText"] = function(self, text)
-    self._editBox:SetText(self, text or "")
-  end,
-  ["SetLabel"] = function(self, text)
-    self._label:SetText(text or "")
+    self._editBox:SetText(text or "")
   end,
 })
 
 template:AddScripts({
+  ["OnRefresh"] = function(self)
+    self:SetText(self:GetFormValue())
+  end,
   ["OnFormValueChange"] = function(self, value, isUserInput)
     if isUserInput then return end
     self:Refresh()
@@ -63,20 +61,23 @@ local editBoxScripts = {
     end
   end,
   ["OnEscapePressed"] = function(editBox)
-    if editBox._container._options.clearFocusOnEscape then
+    local options = editBox._container:GetOptions()
+    if options.clearFocusOnEscape then
       editBox:ClearFocus()
     end
   end,
   ["OnEditFocusLost"] = function(editBox)
     editBox:HighlightText(0, 0)
 
-    if editBox._container._options.saveOnClearFocus then
+    local options = editBox._container:GetOptions()
+    if options.saveOnClearFocus then
       editBox._container:SetFormValue(editBox:GetText())
     end
   end,
   ["OnTextChanged"] = function(editBox, isUserInput)
     if not isUserInput then return end
-    if editBox._container._options.saveOnTextChanged then
+    local options = editBox._container:GetOptions()
+    if options.saveOnTextChanged then
       editBox._container:SetFormValue(editBox:GetText())
     end
   end,
@@ -103,20 +104,17 @@ local function SF_OnMouseWheel(self, delta)
   self:SetVerticalScroll(newValue);
 end
 
-function template:Create(frameName, parent, options)
-  options = addon:MergeOptionsTable(defaultOptions, options)
-
-  local container = addon:CreateFrame("Frame", frameName, parent)
-
+function template:Create(frame, options)
   -- This border frame is a Button so that we can add a click handler
-  local editBoxBorderFrame = addon:CreateFrame("Button", frameName.."BorderFrame", container)
+  local editBoxBorderFrame = addon:CreateFrame("Button", "$parentBorderFrame", frame)
   addon:ApplyBackgroundStyle(editBoxBorderFrame)
   editBoxBorderFrame:SetScript("OnClick", EBBF_OnClick)
+  frame:SetFormLabelParent(editBoxBorderFrame)
 
-  local scrollFrame = addon:CreateFrame("ScrollFrame", frameName.."ScrollFrame", editBoxBorderFrame)
+  local scrollFrame = addon:CreateFrame("ScrollFrame", nil, editBoxBorderFrame)
   scrollFrame:SetScript("OnMouseWheel", SF_OnMouseWheel)
 
-  local editBox = addon:CreateFrame("EditBox", frameName.."EditBox", scrollFrame)
+  local editBox = addon:CreateFrame("EditBox", nil, scrollFrame)
   editBox:SetMultiLine(true)
   editBox:SetAutoFocus(options.autoFocus)
   editBox:SetFontObject(options.fontTemplate)
@@ -124,17 +122,8 @@ function template:Create(frameName, parent, options)
   addon:ApplyScripts(editBox, editBoxScripts)
   scrollFrame:SetScrollChild(editBox)
 
-  local labelSpacing = 0
-  local labelOpts = {
-    text = options.label,
-    anchor = "TOPLEFT",
-    offsetX = 6,
-    offsetY = labelSpacing
-  }
-  local label = addon:CreateFrame("FormLabel", frameName.."Label", editBoxBorderFrame, labelOpts)
-
-  -- The containe r must be tall enough to contain the label
-  local labelHeight = label:GetHeight() + labelSpacing
+  -- The container must be tall enough to contain the label
+  local _, labelHeight, _, labelOffsetY = frame:GetFormLabelDimensions()
   local _, lineHeight = editBox:GetFont()
   local lineSpacing = editBox:GetSpacing()
   local il, ir, it, ib = addon:UnpackLRTB(options.textInset)
@@ -143,14 +132,14 @@ function template:Create(frameName, parent, options)
     (lineSpacing * options.lines) +   -- Total height of spacing between lines, leaving extra space at bottom
     2 +                               -- Small buffer so the box doesn't scroll on the last line
     it + ib +                         -- Vertical text insets
-    labelHeight                       -- Height of the label above the editBox border
+    labelHeight + labelOffsetY        -- Height of the label above the editBox border
   local containerWidth = options.width
 
-  container:SetSize(containerWidth, containerHeight)
+  frame:SetSize(containerWidth, containerHeight)
 
   -- The editBox border must be anchored low enough to not overlap with the label
-  editBoxBorderFrame:SetPoint("TOPLEFT", container, "TOPLEFT", 0, -1*labelHeight)
-  editBoxBorderFrame:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT")
+  editBoxBorderFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -1*labelHeight)
+  editBoxBorderFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
   -- The scroll frame must be inset within the editBox border frame
   scrollFrame:SetPoint("TOPLEFT", editBoxBorderFrame, "TOPLEFT", il, -1*it)
@@ -165,14 +154,8 @@ function template:Create(frameName, parent, options)
   -- becoming its scrollChild, so we just need to set width.
   editBox:SetWidth(containerWidth - il - ir)
 
-  addon:ApplyFormFieldMethods(container, template)
-
-  container._options = options
-  container._scrollFrame = scrollFrame
-  container._editBox = editBox
-  container._label = label
-  editBox._container = container
-  editBoxBorderFrame._container = container
-
-  return container
+  frame._scrollFrame = scrollFrame
+  frame._editBox = editBox
+  editBox._container = frame
+  editBoxBorderFrame._container = frame
 end

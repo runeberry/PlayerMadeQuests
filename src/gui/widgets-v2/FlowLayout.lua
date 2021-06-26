@@ -3,15 +3,13 @@ local assertframe = addon.assertframe
 
 local template = addon:NewFrame("FlowLayout")
 
-local defaultLayoutOptions = {
+template:SetDefaultOptions({
   margin = 0,                 -- [LRTB] Space between content items and edge of the layout
   -- padding = { 8, 8, 0, 0 },   -- [LRTB] Not used
   spacing = 6,                -- [XY] Space between content items
 
   anchor = "TOPLEFT",         -- [string] Corner anchor where the layout will start growing from
-
-  autoLoad = true,            -- [boolean] If true, the widget will be refreshed whenever its contents change
-}
+})
 
 -- Not yet implemented
 local defaultItemOptions = {
@@ -44,7 +42,7 @@ local anchorPoints = {
 
 local function anchorFirstItem(layout, content)
   local lt = layout._table
-  local layoutOptions = layout._options
+  local layoutOptions = layout:GetOptions()
   local anchors = anchorPoints[layoutOptions.anchor]
 
   -- First content item, create a new row in the table and add the content
@@ -57,7 +55,7 @@ end
 
 local function anchorInlineItem(layout, content)
   local lt = layout._table
-  local layoutOptions = layout._options
+  local layoutOptions = layout:GetOptions()
   local anchors = anchorPoints[layoutOptions.anchor]
 
   -- Append the content to the end of the last line in the table
@@ -77,7 +75,7 @@ end
 
 local function anchorNewlineItem(layout, content)
   local lt = layout._table
-  local layoutOptions = layout._options
+  local layoutOptions = layout:GetOptions()
   local anchors = anchorPoints[layoutOptions.anchor]
 
   -- Create a new row in the table and add the content
@@ -109,7 +107,7 @@ local function addContentToTable(layout, content, options)
 end
 
 local function resizeHorizontal(layout)
-  local options = layout._options
+  local options = layout:GetOptions()
   local sx, sy = addon:UnpackXY(options.spacing)
   local layoutWidth, layoutHeight = 0, 0
 
@@ -134,7 +132,7 @@ local function resizeHorizontal(layout)
 end
 
 local function resizeVertical(layout)
-  local options = layout._options
+  local options = layout:GetOptions()
   local sx, sy = addon:UnpackXY(options.spacing)
   local layoutWidth, layoutHeight = 0, 0
 
@@ -159,7 +157,7 @@ local function resizeVertical(layout)
 end
 
 local function resize(layout)
-  local options = layout._options
+  local options = layout:GetOptions()
   local isVertical = anchorPoints[options.anchor][9]
 
   local layoutWidth, layoutHeight
@@ -179,31 +177,25 @@ local function resize(layout)
 end
 
 template:AddMethods({
-  ["Refresh"] = function(self)
-    resize(self)
-  end,
   ["AddContent"] = function(self, content, options)
     assertframe(content, "content", "AddContent")
 
     addContentToTable(self, content, options)
 
-    if self._options.autoLoad then
+    if self:GetOptions().autoRefresh then
       self:Refresh()
     end
-  end,
-  ["GetPrimaryAnchor"] = function(self)
-    return anchorPoints[self._options.anchor][1]
   end
 })
 
-function template:Create(frameName, parent, options)
-  options = addon:MergeOptionsTable(defaultLayoutOptions, options)
+template:AddScripts({
+  ["AfterRefresh"] = function(self)
+    resize(self)
+  end,
+})
+
+function template:Create(frame, options)
   addon:ValidateAnchor(options.anchor)
 
-  local layout = addon:CreateFrame("Frame", frameName, parent)
-
-  layout._options = options
-  layout._table = {}
-
-  return layout
+  frame._table = {}
 end

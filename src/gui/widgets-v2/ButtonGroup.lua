@@ -2,9 +2,9 @@ local _, addon = ...
 local asserttype, assertf, assertframe = addon.asserttype, addon.assertf, addon.assertframe
 local PanelTemplates_TabResize = addon.G.PanelTemplates_TabResize
 
-local template = addon:NewFrame("ButtonGroup")
+local template = addon:NewFrame("ButtonGroup", "FlowLayout")
 
-local defaultOptions = {
+template:SetDefaultOptions({
   -- buttonTemplate = "OptionsFrameTabButtonTemplate",
   template = "UIPanelButtonTemplate",
   sizeMode = "fit",           -- [string] Options are: "fit" (default), "flex", "tab"
@@ -16,7 +16,7 @@ local defaultOptions = {
   anchor = "LEFT",            -- [string] Side anchor where the buttons will start growing from
 
   buttons = {}                -- [table] Button info, see below
-}
+})
 
 local defaultButtonOptions = {
   text = " ",                 -- [string] Button text
@@ -31,7 +31,7 @@ local defaultButtonOptions = {
 }
 
 local function addButton(group, buttonOptions)
-  local groupOptions = group._options
+  local groupOptions = group:GetOptions()
   buttonOptions = addon:MergeOptionsTable(groupOptions, defaultButtonOptions, buttonOptions)
   local index = #group._buttons+1
 
@@ -42,7 +42,7 @@ local function addButton(group, buttonOptions)
     addon:catch(buttonOptions.handler, button)
   end)
 
-  group._layout:AddContent(button, { inline = true })
+  group:AddContent(button, { inline = true })
 
   button._options = buttonOptions
 
@@ -67,14 +67,15 @@ local function calcButtonSize(button)
 end
 
 local function isGroupHorizontal(group)
-  return group._options.anchor == "LEFT" or group._options.anchor == "RIGHT"
+  local options = group:GetOptions()
+  return options.anchor == "LEFT" or options.anchor == "RIGHT"
 end
 
 local function refreshButtonsFlexFill(group)
   local groupWidth, groupHeight = group:GetSize()
   if groupWidth == 0 or groupHeight == 0 then return end -- can't calculate
 
-  local groupOptions = group._options
+  local groupOptions = group:GetOptions()
   local isHorizontal = isGroupHorizontal(group)
   local buttonSizes = {}
   local allFlexParams = {}
@@ -139,33 +140,11 @@ local function refreshButtonsStandard(group)
   end
 end
 
-local function resizeGroup(group)
-  group._layout:Refresh()
-  local width, height = group._layout:GetSize()
-  group:SetSize(width, height)
-end
-
 template:AddMethods({
-  ["Refresh"] = function(self)
-    local sizeMode = self._options.sizeMode
+  ["AddButton"] = function(self, buttonOptions)
+    asserttype(buttonOptions, "table", "buttonOptions", "ButtonGroup:AddButton")
 
-    if sizeMode == "flex" then
-      refreshButtonsFlexFill(self)
-    elseif sizeMode == "tab" then
-      refreshButtonsTab(self)
-    else
-      refreshButtonsStandard(self)
-    end
-
-    resizeGroup(self)
-
-    for _, button in ipairs(self._buttons) do
-      -- (jb, 5/15/21) Unusual behavior, sometimes the last button in a group
-      -- will just disappear from screen after resizing, though the API indicates
-      -- the button is still visible and shown!
-      -- Calling the button's width seems to fix this.
-      button:GetWidth()
-    end
+    addButton(self, buttonOptions)
   end,
   ["GetButton"] = function(self, index)
     asserttype(index, "number", "index", "ButtonGroup:GetButton")
@@ -177,25 +156,34 @@ template:AddMethods({
   end,
 })
 
-function template:Create(frameName, parent, options)
-  options = addon:MergeOptionsTable(defaultOptions, options)
+template:AddScripts({
+  ["OnRefresh"] = function(self)
+    local sizeMode = self:GetOptions().sizeMode
+
+    if sizeMode == "flex" then
+      refreshButtonsFlexFill(self)
+    elseif sizeMode == "tab" then
+      refreshButtonsTab(self)
+    else
+      refreshButtonsStandard(self)
+    end
+
+    for _, button in ipairs(self._buttons) do
+      -- (jb, 5/15/21) Unusual behavior, sometimes the last button in a group
+      -- will just disappear from screen after resizing, though the API indicates
+      -- the button is still visible and shown!
+      -- Calling the button's width seems to fix this.
+      button:GetWidth()
+    end
+  end,
+})
+
+function template:Create(frame, options)
   addon:ValidateSide(options.anchor)
 
-  local group = addon:CreateFrame("Frame", frameName, parent)
-
-  local layoutOptions = addon:CopyTable(options)
-  layoutOptions.autoLoad = false
-  local layout = addon:CreateFrame("FlowLayout", frameName.."Layout", group, layoutOptions)
-  local layoutAnchor = layout:GetPrimaryAnchor()
-  layout:SetPoint(layoutAnchor, group, layoutAnchor)
-
-  group._options = options
-  group._layout = layout
-  group._buttons = {}
+  frame._buttons = {}
 
   for _, buttonOptions in ipairs(options.buttons) do
-    addButton(group, buttonOptions)
+    addButton(frame, buttonOptions)
   end
-
-  return group
 end

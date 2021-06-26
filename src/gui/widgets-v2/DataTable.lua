@@ -7,7 +7,7 @@ template:RegisterCustomScriptEvent("OnHeaderClick")       -- When any header But
 template:RegisterCustomScriptEvent("OnCellClick")         -- When any non-header cell is clicked
 template:RegisterCustomScriptEvent("OnSelectionChange")   -- When the currently selected cell changes
 
-local defaultOptions = {
+template:SetDefaultOptions({
   columns = nil,          -- [table] An array of column info objects
   rowHeight = 12,         -- [number] Height of each row
   tablePadding = 8,       -- [LRTB] Padding on each side of the whole table
@@ -20,7 +20,7 @@ local defaultOptions = {
 
   get = nil,              -- [function() -> table] Get all rows to display in the table
   getItem = nil,          -- [function(row, index) -> any] Getter to convert a row into another object for GetSelectedItem
-}
+})
 
 local defaultColumnOptions  = {
   text = nil,             -- [string] The text for
@@ -112,7 +112,7 @@ local tableCellScripts = {
     if not self._hasContent then return end -- Don't highlight cells with no content
     if isCellSelected(self._dataTable, self._r, self._c) then return end -- Don't change highlight if the cell is selected
 
-    local hoverColor = self._dataTable._options.hoverColor
+    local hoverColor = self._dataTable:GetOptions().hoverColor
     forRowCells(self._dataTable, self._r, function(cell, c)
       cell:SetBackgroundColor(hoverColor)
     end)
@@ -129,7 +129,7 @@ local tableCellScripts = {
 }
 
 local function createTableCell(dataTable, r, c)
-  local options = dataTable._options
+  local options = dataTable:GetOptions()
 
   local name = string.format("%sCell_R%iC%i", dataTable:GetName(), r, c)
   local button = addon:CreateFrame("Button", name, dataTable)
@@ -164,8 +164,8 @@ local function createTableCell(dataTable, r, c)
 end
 
 local function initHeaders(dataTable)
-  local columns = dataTable._options.columns
-  local numCols = #columns
+  local options = dataTable:GetOptions()
+  local numCols = #options.columns
   local headerRow = dataTable._cells[0]
 
   -- Header can only be initialized once
@@ -182,18 +182,19 @@ local function initHeaders(dataTable)
       headerCell:SetPoint("TOPLEFT", headerRow[c-1], "TOPRIGHT")
     else
       -- Anchor the first column header to the corner of the header frame
-      local padL, padR, padT, padB = addon:UnpackLRTB(dataTable._options.tablePadding)
+      local padL, padR, padT, padB = addon:UnpackLRTB(options.tablePadding)
       headerCell:SetPoint("TOPLEFT", dataTable._headerFrame, "TOPLEFT", padL, 0)
     end
 
-    headerCell:SetText(columns[c].header)
+    headerCell:SetText(options.columns[c].header)
     headerRow[c] = headerCell
   end
 end
 
 local function initCells(dataTable)
+  local options = dataTable:GetOptions()
   local numRows = dataTable:GetNumVisibleRows()
-  local numCols = #dataTable._options.columns
+  local numCols = #options.columns
   local tableRows = dataTable._cells
 
   if #tableRows < numRows then
@@ -216,7 +217,7 @@ local function initCells(dataTable)
           tableCell:SetPoint("TOPLEFT", tableRows[r-1][1], "BOTTOMLEFT")
         else
           -- Anchor the first cell to the corner of the table frame
-          local padL, padR, padT, padB = addon:UnpackLRTB(dataTable._options.tablePadding)
+          local padL, padR, padT, padB = addon:UnpackLRTB(options.tablePadding)
           tableCell:SetPoint("TOPLEFT", dataTable._tableFrame, "TOPLEFT", padL, -1*padT)
         end
 
@@ -227,7 +228,8 @@ local function initCells(dataTable)
 end
 
 local function setSortColumnToDefault(dataTable)
-  for c, column in ipairs(dataTable._options.columns) do
+  local options = dataTable:GetOptions()
+  for c, column in ipairs(options.columns) do
     if column.defaultSort then
       dataTable:SetSortColumn(c, column.defaultSort)
       break
@@ -239,12 +241,9 @@ template:AddMethods({
   --------------------------
   -- View refresh methods --
   --------------------------
-  ["Refresh"] = function(self)
-    self:RefreshData()
-    self:RefreshDisplay()
-  end,
   ["RefreshData"] = function(self)
-    local data = self._options.get() or {}
+    local options = self:GetOptions()
+    local data = options.get() or {}
 
     local sortCol, sortOrder = self:GetSortColumn()
     if sortCol then
@@ -258,7 +257,7 @@ template:AddMethods({
     self._data = data
   end,
   ["RefreshDisplay"] = function(self)
-    local options = self._options
+    local options = self:GetOptions()
 
     initHeaders(self)
     initCells(self)
@@ -268,7 +267,7 @@ template:AddMethods({
       flexParams[i] = column.width
     end
 
-    local padL, padR, padT, padB = addon:UnpackLRTB(self._options.tablePadding)
+    local padL, padR, padT, padB = addon:UnpackLRTB(options.tablePadding)
     local usableWidth = self._tableFrame:GetWidth() - padL - padR
     local widths = addon:CalculateFlex(usableWidth, flexParams)
 
@@ -344,7 +343,7 @@ template:AddMethods({
   -- Scroll & paging methods --
   -----------------------------
   ["GetNumVisibleRows"] = function(self)
-    local options = self._options
+    local options = self:GetOptions()
 
     -- Show however many rows it takes to fill out the parent frame
     local frameHeight = self._tableFrame:GetHeight()
@@ -396,9 +395,10 @@ template:AddMethods({
   end,
   -- order: "ASC" or "DESC"
   ["SetSortColumn"] = function(self, colIndex, order)
+    local options = self:GetOptions()
     asserttype(colIndex, "number", "colIndex", "DataTable:SetSortColumn")
-    assertf(colIndex > 0 and colIndex <= #self._options.columns,
-      "DataTable:SetSortColumn - colIndex must be 1 - %i", #self._options.columns)
+    assertf(colIndex > 0 and colIndex <= #options.columns,
+      "DataTable:SetSortColumn - colIndex must be 1 - %i", #options.columns)
 
     if order ~= "DESC" then
       -- All values other than "DESC" will default to "ASC"
@@ -429,12 +429,16 @@ template:AddMethods({
 })
 
 template:AddScripts({
+  ["OnRefresh"] = function(self)
+    self:RefreshData()
+    self:RefreshDisplay()
+  end,
   ["OnMouseWheel"] = function(self, delta)
     -- Delta will either be +1 (scroll up) or -1 (scroll down)
     self:ScrollByRow(-1*delta)
   end,
   ["OnHeaderClick"] = function(self, c)
-    local colOptions = self._options.columns[c]
+    local colOptions = self:GetOptions().columns[c]
 
     if colOptions.sortable then
       local sortCol, sortOrder = self:GetSortColumn()
@@ -468,11 +472,12 @@ template:AddScripts({
   end,
 })
 
-function template:Create(frameName, parent, options)
-  options = addon:MergeOptionsTable(defaultOptions, options)
+function template:Create(frame, options)
   asserttype(options.columns, "table", "options.columns", "DataTable:Create")
   assert(options.columns[1], "DataTable: at least one column is required")
   asserttype(options.get, "function", "options.get", "DataTable:Create")
+
+  frame:EnableMouse(true)
 
   local defaultSort
   for c, column in ipairs(options.columns) do
@@ -493,31 +498,23 @@ function template:Create(frameName, parent, options)
     end
   end
 
-  local dataTable = addon:CreateFrame("Frame", frameName, parent)
-  dataTable:EnableMouse(true)
-
-  local headerFrame = addon:CreateFrame("Frame", frameName.."Header", dataTable)
+  local headerFrame = addon:CreateFrame("Frame", "$parentHeader", frame)
   headerFrame:SetHeight(options.rowHeight)
-  headerFrame:SetPoint("TOPLEFT", dataTable, "TOPLEFT")
-  headerFrame:SetPoint("TOPRIGHT", dataTable, "TOPRIGHT")
+  headerFrame:SetPoint("TOPLEFT", frame, "TOPLEFT")
+  headerFrame:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
 
-  local tableFrame = addon:CreateFrame("Frame", frameName.."Table", dataTable, options.frameTemplate)
+  local tableFrame = addon:CreateFrame("Frame", "$parentTable", frame, options.frameTemplate)
   tableFrame:SetPoint("TOPLEFT", headerFrame, "BOTTOMLEFT")
   tableFrame:SetPoint("TOPRIGHT", headerFrame, "BOTTOMRIGHT")
-  tableFrame:SetPoint("BOTTOMLEFT", dataTable, "BOTTOMLEFT")
-  tableFrame:SetPoint("BOTTOMRIGHT", dataTable, "BOTTOMRIGHT")
+  tableFrame:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT")
+  tableFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
-  dataTable._headerFrame = headerFrame
-  dataTable._tableFrame = tableFrame
-  dataTable._options = options
+  frame._headerFrame = headerFrame
+  frame._tableFrame = tableFrame
 
-  dataTable._scrollPos = 1
-  dataTable._data = {}
-  dataTable._cells = {}
+  frame._scrollPos = 1
+  frame._data = {}
+  frame._cells = {}
 
-  return dataTable
-end
-
-function template:AfterCreate(dataTable)
-  setSortColumnToDefault(dataTable)
+  setSortColumnToDefault(frame)
 end

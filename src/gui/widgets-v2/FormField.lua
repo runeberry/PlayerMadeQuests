@@ -2,7 +2,11 @@ local _, addon = ...
 local UIEvents = addon.UIEvents
 local asserttype, assertf = addon.asserttype, addon.assertf
 
-local methods = {
+local template = addon:NewFrame("FormField")
+template:AddMixin("FormLabel")
+template:RegisterCustomScriptEvent("OnFormValueChange")
+
+template:AddMethods({
   ["GetFormValue"] = function(self)
     return self._formField.value
   end,
@@ -51,25 +55,12 @@ local methods = {
   ["ClearFormGroup"] = function(self)
     self._formField.formGroup = nil
   end,
-}
+})
 
---- Applies FormField methods to the provided UI frame. A FormField is not a UI frame or widget,
---- only a set of methods that can be added to one.
---- @param frame table A UI frame to add FormField methods to.
---- @param template table (optional) The widget template to ensure that it registers the right custom events
-function addon:ApplyFormFieldMethods(frame, template)
-  asserttype(frame, "table", "frame", "ApplyFormFieldMethods")
-  assertf(not frame._formField, "CreateFormField: %s is already a FormField", frame:GetName())
-
-  if template then
-    template:RegisterCustomScriptEvent("OnFormValueChange")
-  end
-
+function template:Create(frame)
   frame._formField = {
     value = nil,
     isDirty = false,
     formGroup = nil,
   }
-
-  addon:ApplyMethods(frame, methods)
 end

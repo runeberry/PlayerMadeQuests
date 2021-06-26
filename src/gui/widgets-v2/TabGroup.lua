@@ -3,14 +3,13 @@ local asserttype, assertf, assertframe = addon.asserttype, addon.assertf, addon.
 local unpack = addon.G.unpack
 
 local template = addon:NewFrame("TabGroup")
-
 template:RegisterCustomScriptEvent("OnTabSelect")
 
-local defaultOptions = {
+template:SetDefaultOptions({
   tabHeight = 24,               -- [number] Override height of the tab bar, in px
   tabs = {},
   autoCreateTabContent = true   -- [bool] Should empty content frames be created automatically?
-}
+})
 
 -- See ButtonGroup for info
 local defaultButtonGroupOptions = {
@@ -62,11 +61,6 @@ local function validateTabIndex(tabGroup, index)
 end
 
 template:AddMethods({
-  ["Refresh"] = function(self)
-    self._buttonGroup:SetWidth(self:GetWidth())
-    self._buttonGroup:Refresh()
-  end,
-
   ["GetTabButton"] = function(self, index)
     if index then
       validateTabIndex(self, index)
@@ -75,7 +69,6 @@ template:AddMethods({
     else
       return nil
     end
-
     return self._buttonGroup:GetButton(index)
   end,
   ["GetTabContent"] = function(self, index)
@@ -130,6 +123,10 @@ template:AddMethods({
 })
 
 template:AddScripts({
+  ["OnRefresh"] = function(self)
+    self._buttonGroup:SetWidth(self:GetWidth())
+    self._buttonGroup:Refresh()
+  end,
   ["OnTabSelect"] = function(self, tabIndex)
     -- no-op for now
   end,
@@ -138,40 +135,32 @@ template:AddScripts({
   end,
 })
 
-function template:Create(frameName, parent, options)
-  options = addon:MergeOptionsTable(defaultOptions, options)
+function template:Create(container, options)
   assert(#options.tabs > 0, "TabGroup: at least one tab must be specified")
 
-  local container = addon:CreateFrame("Frame", frameName, parent)
-
   local buttonGroupOptions = buildButtonGroupOptions(container, options.tabs)
-  local buttonGroup = addon:CreateFrame("ButtonGroup", frameName.."Tabs", container, buttonGroupOptions)
+  local buttonGroup = addon:CreateFrame("ButtonGroup", nil, container, buttonGroupOptions)
   buttonGroup:SetPoint("TOPLEFT", container, "TOPLEFT")
   buttonGroup:SetPoint("TOPRIGHT", container, "TOPRIGHT")
   if options.tabHeight then
     buttonGroup:SetHeight(options.tabHeight)
   end
 
-  local contentFrame = addon:CreateFrame("Frame", frameName.."Content", container)
+  local contentFrame = addon:CreateFrame("Frame", "$parentContent", container)
   contentFrame:SetPoint("TOPLEFT", buttonGroup, "BOTTOMLEFT")
   contentFrame:SetPoint("TOPRIGHT", buttonGroup, "BOTTOMRIGHT")
   contentFrame:SetPoint("BOTTOMLEFT", container, "BOTTOMLEFT")
   contentFrame:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT")
 
-  container._options = options
   container._buttonGroup = buttonGroup
   container._contentFrame = contentFrame
   container._tabContent = {}
   container._numTabs = #options.tabs
 
-  return container
-end
-
-function template:AfterCreate(group)
-  if group._options.autoCreateTabContent then
-    for i, _ in ipairs(group._options.tabs) do
-      local content = addon:CreateFrame("Frame", nil, group)
-      group:SetTabContent(i, content)
+  if options.autoCreateTabContent then
+    for i, _ in ipairs(options.tabs) do
+      local content = addon:CreateFrame("Frame", nil, container)
+      container:SetTabContent(i, content)
     end
   end
 end

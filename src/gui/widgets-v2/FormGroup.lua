@@ -149,12 +149,8 @@ template:AddScripts({
 --- Note that a FormGroup is not intended to be placed on screen like a standard UI Frame.
 --- It's intended to be used as a "logical frame", with a set of behaviors to group other frames
 --- (FormFields) together, without being placed on the screen itself.
-function template:Create(frameName, parent, options)
-  local formGroup = addon:CreateFrame("Frame", frameName, parent)
-
+function template:Create(formGroup, options)
   formGroup._fieldsByIndex = {}
   formGroup._fieldsByName = {}
   formGroup._formStates = {}
-
-  return formGroup
 end
