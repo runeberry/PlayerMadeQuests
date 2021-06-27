@@ -86,14 +86,13 @@ template:AddMethods({
 
     x, y, w, h = tonumber(x), tonumber(y), tonumber(w), tonumber(h)
     shown = addon:ConvertValue(shown, "boolean")
-    if not options.layoutSaveOpenState then
-      shown = false
-    end
 
     self:ClearAllPoints()
     self:SetPoint(p1, UIParent, p2, x, y)
     self:SetSize(w, h)
-    self:SetShown(shown)
+    if options.layoutSaveOpenState then
+      self:SetShown(shown)
+    end
 
     shown = (shown and "shown") or "hidden"
     addon.UILogger:Trace("LoadLayout: %s\n%s-%s (%i,%i) %ix%i [%s]", frameName, p1, p2, x, y, w, h, shown)
