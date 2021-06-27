@@ -49,7 +49,7 @@ local function anchorFirstItem(layout, content)
   lt[1] = { content }
 
   -- Anchor the content to the layout itself
-  local x, y = addon:GetOffsetsFromSpacing(anchors[1], layoutOptions.margin)
+  local x, y = addon:GetOffsetsFromLRTB(anchors[1], layoutOptions.margin)
   content:SetPoint(anchors[1], layout, anchors[2], x, y)
 end
 
