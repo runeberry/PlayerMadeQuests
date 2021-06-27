@@ -14,6 +14,7 @@ local configExclude = {
   URL_WIKI = true,
   FrameData = true,
   Logging = true,
+  WidgetLayouts = true,
 }
 
 local colorsBySource = {
