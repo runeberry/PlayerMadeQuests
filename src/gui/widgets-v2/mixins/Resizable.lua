@@ -1,6 +1,7 @@
 local _, addon = ...
 
 local template = addon:NewMixin("Resizable")
+template:AddMixin("LayoutSavable")
 
 template:SetDefaultOptions({
   resizable = true,           -- [boolean]
@@ -30,7 +31,7 @@ local resizerScripts = {
   ["OnMouseUp"] = function(self)
     local parent = self:GetParent()
     parent:StopMovingOrSizing()
-    parent:SetUserPlaced(false) -- Bypass Blizzard's layout cache, we roll our own for finer control
+    parent:AutoSaveLayout()
   end,
 }
 

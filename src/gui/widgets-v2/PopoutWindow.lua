@@ -7,10 +7,6 @@ template:AddMixin("Resizable")
 
 template:SetDefaultOptions({
   title = "",      -- [string]
-  width = 200,
-  height = 200,
-
-  movableSize = 28,
   resizable = false,
 })
 
@@ -151,7 +147,6 @@ function template:Create(frame, options)
   frame._contentFrame = contentFrame
 
   frame:SetTitle(options.title)
-  frame:SetSize(options.width, options.height)
 end
 
 --[[

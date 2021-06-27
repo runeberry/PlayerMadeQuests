@@ -26,4 +26,5 @@ return {
 
   Logging = {},
   FrameData = {},
+  WidgetLayouts = {},
 }

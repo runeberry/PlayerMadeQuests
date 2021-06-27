@@ -2,12 +2,11 @@ local _, addon = ...
 local asserttype = addon.asserttype
 
 local template = addon:NewMixin("Movable")
+template:AddMixin("LayoutSavable")
 
 template:SetDefaultOptions({
   movable = true,             -- [boolean] Should this frame be movable by dragging?
   movableWholeFrame = false,  -- [boolean] Should the whole frame be draggable? This will cover up any other mouse interaction.
-  autoSave = true,            -- [boolean] Should this frame's position be saved whenever it's changed?
-  autoLoad = true,            -- [boolean] Should this frame's saved position be set as soon as it's created?
 })
 
 template:AddMethods({
@@ -39,7 +38,7 @@ local dragRegionScripts = {
   ["OnDragStop"] = function(self)
     local parent = self:GetParent()
     parent:StopMovingOrSizing()
-    parent:SetUserPlaced(false) -- Bypass Blizzard's layout cache, we roll our own for finer control
+    parent:AutoSaveLayout()
   end,
 }
 

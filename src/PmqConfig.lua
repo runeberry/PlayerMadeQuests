@@ -56,4 +56,5 @@ addon.defaultSettings = {
 
   Logging = {},
   FrameData = {},
+  WidgetLayouts = {},
 }
