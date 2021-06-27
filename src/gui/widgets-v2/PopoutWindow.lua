@@ -2,8 +2,8 @@ local _, addon = ...
 local asserttype, assertframe = addon.asserttype, addon.assertframe
 
 local template = addon:NewFrame("PopoutWindow")
-template:AddMixin("MixinMovable")
-template:AddMixin("MixinResizable")
+template:AddMixin("Movable")
+template:AddMixin("Resizable")
 
 template:SetDefaultOptions({
   title = "",      -- [string]

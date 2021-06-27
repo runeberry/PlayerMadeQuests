@@ -1,11 +1,13 @@
 local _, addon = ...
 
-local template = addon:NewFrame("MixinResizable")
+local template = addon:NewFrame("Resizable")
 
 template:SetDefaultOptions({
   resizable = true,           -- [boolean]
   minResize = 100,            -- [XY]
   maxResize = nil,            -- [XY]
+  autoSave = true,            -- [boolean] Should this frame's size be saved whenever it's changed?
+  autoLoad = true,            -- [boolean] Should this frame's saved size be set as soon as it's created?
 })
 
 template:AddMethods({
@@ -26,7 +28,9 @@ local resizerScripts = {
     self:GetParent():StartSizing("BOTTOMRIGHT")
   end,
   ["OnMouseUp"] = function(self)
-    self:GetParent():StopMovingOrSizing()
+    local parent = self:GetParent()
+    parent:StopMovingOrSizing()
+    parent:SetUserPlaced(false) -- Bypass Blizzard's layout cache, we roll our own for finer control
   end,
 }
 
