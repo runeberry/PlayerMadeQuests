@@ -406,6 +406,29 @@ function addon:NewFrame(frameType, inheritsFrom, inheritsTemplate)
   return frameTemplate
 end
 
+--- Registers a new type of Mixin for PMQ.
+--- All regular frames can also be applied as mixins, but mixins cannot be
+--- created as standalone frames (via addon:CreateFrame).
+--- @param frameType string A unique type name for the mixin
+function addon:NewMixin(frameType)
+  local frameTemplate = newFrameTemplate(frameType)
+
+  -- Always return the template even if validation fails, so we don't get null refs during file load
+  if type(frameTemplate._frameType) ~= "string" then
+    addon.UILogger:Error("Failed to create NewMixin: frameType is required")
+    return frameTemplate
+  end
+  if frameTemplates[frameTemplate._frameType] then
+    addon.UILogger:Error("Failed to create NewMixin: frameType \"%s\" already exists", frameType)
+    return frameTemplate
+  end
+
+  -- But only register the template if validation was successful
+  frameTemplate._mixinOnly = true -- This flag prevents it from being called during CreateFrame
+  frameTemplates[frameType] = frameTemplate
+  return frameTemplate
+end
+
 function addon:CreateFrame(frameType, frameName, parent, ...)
   asserttype(frameType, "string", "frameType", "CreateFrame", 2)
   asserttype(frameName or "", "string", "frameName", "CreateFrame", 2)
@@ -420,12 +443,14 @@ function addon:CreateFrame(frameType, frameName, parent, ...)
   -- Generate a unique global name for this frame
   frameName = createFrameName(frameType, frameName, parent)
 
-  if not frameTemplates[frameType] then
+  local frameTemplate = frameTemplates[frameType]
+  if not frameTemplate then
     -- If this is not a custom widget type, bypass the custom widget creation process
     -- and just return the created Blizzard frame
     return CreateFrame(frameType, frameName, parent, ...)
   else
     -- Otherwise, do all the custom widget creation stuff seen above
+    assertf(not frameTemplate._mixinOnly, "Cannot CreateFrame from mixin '%s'", frameType)
     return createCustomFrame(frameType, frameName, parent, ...)
   end
 end

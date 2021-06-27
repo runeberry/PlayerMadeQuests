@@ -1,7 +1,7 @@
 local _, addon = ...
 local asserttype = addon.asserttype
 
-local template = addon:NewFrame("Movable")
+local template = addon:NewMixin("Movable")
 
 template:SetDefaultOptions({
   movable = true,             -- [boolean] Should this frame be movable by dragging?
@@ -28,13 +28,6 @@ template:AddMethods({
     self._movableDragRegion:ClearAllPoints()
     self._movableDragRegion:SetSize(0, 0)
     handler(self, self._movableDragRegion)
-  end,
-
-  ["SavePosition"] = function(self)
-
-  end,
-  ["LoadPosition"] = function(self)
-
   end,
 })
 

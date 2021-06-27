@@ -1,6 +1,6 @@
 local _, addon = ...
 
-local template = addon:NewFrame("Resizable")
+local template = addon:NewMixin("Resizable")
 
 template:SetDefaultOptions({
   resizable = true,           -- [boolean]
