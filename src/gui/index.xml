@@ -44,6 +44,9 @@
   <Script file="gui/widgets-v2/FormRadioGroup.lua"/>
   <Script file="gui/widgets-v2/FormTextInput.lua"/>
   <Script file="gui/widgets-v2/FormTextInputLong.lua"/>
+  <Script file="gui/widgets-v2/MixinMovable.lua"/>
+  <Script file="gui/widgets-v2/MixinResizable.lua"/>
+  <Script file="gui/widgets-v2/PopoutWindow.lua"/>
   <Script file="gui/widgets-v2/SearchSelect.lua"/>
   <Script file="gui/widgets-v2/SearchSelectMulti.lua"/>
   <Script file="gui/widgets-v2/TabGroup.lua"/>
