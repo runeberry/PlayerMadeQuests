@@ -18,20 +18,14 @@ local function isChildOfUIParent(frame)
   return frame:GetParent() == UIParent
 end
 
--- For some reason GetPoint() returns the wrong position unless you move the window
--- Still trying to figure this one out
-local function isInaccuratePoint(p1, p2, x, y)
-  return p1 == "CENTER" and p2 == "CENTER" and x == 0 and y == 0
-end
-
 local function getUIParentPoint(frame)
   local p1, relative, p2, x, y
   local i = 1
   -- Loop over points by index until we stop getting data back
   repeat
     p1, relative, p2, x, y = frame:GetPoint(i)
-    if not p1 then return end
-    if relative == nil or relative == UIParent and not isInaccuratePoint(p1, p2, x, y) then
+    if not p1 then return end -- No anchor at this index, we have looped through them all
+    if relative == nil or relative == UIParent then
       return p1, p2, x, y
     end
     i = i + 1
