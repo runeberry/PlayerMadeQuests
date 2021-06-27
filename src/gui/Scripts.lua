@@ -8,7 +8,7 @@ local function applyScript(frame, scriptType, handler)
     frame:SetCustomScript(scriptType, handler)
   else
     -- Otherwise, assume this is a standard Blizzard UI script event
-    frame:SetScript(scriptType, handler)
+    frame:HookScript(scriptType, handler)
   end
 end
 
