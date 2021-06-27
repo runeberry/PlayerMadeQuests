@@ -118,12 +118,19 @@ local function setWindowTextures(frame)
   right:SetTexCoord(0.1171875, 0.2421875, 0, 1)
 end
 
+local function setDragRegion(frame, dragRegion)
+  dragRegion:SetPoint("TOPLEFT", frame, "TOPLEFT")
+  dragRegion:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -28, 0)
+  dragRegion:SetHeight(28)
+end
+
 function template:Create(frame, options)
   frame:SetFrameStrata("FULLSCREEN_DIALOG")
   frame:SetMovable(true)
   frame:EnableMouse(true)
 
   setWindowTextures(frame)
+  frame:SetDragRegion(setDragRegion)
 
   local closeButton = addon:CreateFrame("Button", "$parentCloseButton", frame, "UIPanelCloseButton")
   closeButton:SetPoint("TOPRIGHT", 2, 1)

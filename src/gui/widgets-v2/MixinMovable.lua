@@ -1,11 +1,11 @@
 local _, addon = ...
+local asserttype = addon.asserttype
 
 local template = addon:NewFrame("MixinMovable")
 
 template:SetDefaultOptions({
-  movable = true,           -- [boolean] Should this frame be movable by dragging?
-  movableAnchor = "TOP",    -- [string] Side anchor indicating where dragging should be enabled
-  movableSize = nil,        -- [number] Indicates how large the draggable area should be
+  movable = true,             -- [boolean] Should this frame be movable by dragging?
+  movableWholeFrame = false,  -- [boolean] Should the whole frame be draggable? This will cover up any other mouse interaction.
 })
 
 template:AddMethods({
@@ -18,7 +18,14 @@ template:AddMethods({
   end,
   ["UnlockPosition"] = function(self)
     self._positionLocked = nil
-  end
+  end,
+  ["SetDragRegion"] = function(self, handler)
+    asserttype(handler, "function", "handler", "SetDragRegion")
+
+    self._movableDragRegion:ClearAllPoints()
+    self._movableDragRegion:SetSize(0, 0)
+    handler(self, self._movableDragRegion)
+  end,
 })
 
 local dragRegionScripts = {
@@ -31,24 +38,23 @@ local dragRegionScripts = {
   end,
 }
 
+local function makeMovableWholeFrame(frame, dragRegion)
+  dragRegion:SetAllPoints(true)
+end
+
 function template:Create(frame, options)
   -- This mixin can be disabled with a simple option flag
   if not options.movable then return end
 
   -- Create an invisible button over the region where dragging should cause the frame to move
-  local dragRegion = addon:CreateFrame("Button", nil, frame)
+  local dragRegion = addon:CreateFrame("Button", "$parentMovableDragRegion", frame)
   dragRegion:RegisterForDrag("LeftButton")
   dragRegion._window = frame
   addon:ApplyScripts(dragRegion, dragRegionScripts)
 
-  if options.movableSize then
-    -- If a size is specified, then only a certain "bar" of the frame is draggable
-    local c1, c2 = addon:GetCornersFromSide(options.movableAnchor)
-    dragRegion:SetPoint(c1, frame, c1)
-    dragRegion:SetPoint(c2, frame, c2)
-    dragRegion:SetHeight(options.movableSize)
-  else
-    -- If no size is specified, then the whole frame is draggable
-    dragRegion:SetAllPoints(true)
+  frame._movableDragRegion = dragRegion
+
+  if options.movableWholeFrame then
+    frame:SetDragRegion(makeMovableWholeFrame)
   end
 end
