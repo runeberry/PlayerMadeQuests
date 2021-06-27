@@ -35,8 +35,7 @@ local function addButton(group, buttonOptions)
   buttonOptions = addon:MergeOptionsTable(groupOptions, defaultButtonOptions, buttonOptions)
   local index = #group._buttons+1
 
-  local buttonName = string.format("%sButton%i", group:GetName(), index)
-  local button = addon:CreateFrame("Button", buttonName, group, buttonOptions.template)
+  local button = addon:CreateFrame("Button", "$parentButton%i", group, buttonOptions.template)
   button:SetText(buttonOptions.text or " ")
   button:SetScript("OnClick", function()
     addon:catch(buttonOptions.handler, button)
