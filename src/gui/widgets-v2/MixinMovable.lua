@@ -31,10 +31,10 @@ template:AddMethods({
 local dragRegionScripts = {
   ["OnDragStart"] = function(self)
     if self._positionLocked then return end
-    self._window:StartMoving()
+    self:GetParent():StartMoving()
   end,
   ["OnDragStop"] = function(self)
-    self._window:StopMovingOrSizing()
+    self:GetParent():StopMovingOrSizing()
   end,
 }
 
@@ -49,7 +49,6 @@ function template:Create(frame, options)
   -- Create an invisible button over the region where dragging should cause the frame to move
   local dragRegion = addon:CreateFrame("Button", "$parentMovableDragRegion", frame)
   dragRegion:RegisterForDrag("LeftButton")
-  dragRegion._window = frame
   addon:ApplyScripts(dragRegion, dragRegionScripts)
 
   frame._movableDragRegion = dragRegion
