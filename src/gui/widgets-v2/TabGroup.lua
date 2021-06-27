@@ -7,6 +7,7 @@ template:RegisterCustomScriptEvent("OnTabSelect")
 
 template:SetDefaultOptions({
   tabHeight = 24,               -- [number] Override height of the tab bar, in px
+  tabContentTemplate = "InsetFrameTemplate3",
   tabs = {},
   autoCreateTabContent = true   -- [bool] Should empty content frames be created automatically?
 })
@@ -15,8 +16,8 @@ template:SetDefaultOptions({
 local defaultButtonGroupOptions = {
   template = "TabButtonTemplate", -- "OptionsFrameTabButtonTemplate"
   sizeMode = "tab",
-  margin = 0,
-  padding = { 8, 8, 0, 0 }, -- bug: this won't merge properly with base, it concats instead
+  margin = { 4, 4, 0, 0 },
+  padding = 0,
   spacing = 0,
 
   anchor = "LEFT",
@@ -139,14 +140,14 @@ function template:Create(container, options)
   assert(#options.tabs > 0, "TabGroup: at least one tab must be specified")
 
   local buttonGroupOptions = buildButtonGroupOptions(container, options.tabs)
-  local buttonGroup = addon:CreateFrame("ButtonGroup", nil, container, buttonGroupOptions)
+  local buttonGroup = addon:CreateFrame("ButtonGroup", "$parentTabs", container, buttonGroupOptions)
   buttonGroup:SetPoint("TOPLEFT", container, "TOPLEFT")
   buttonGroup:SetPoint("TOPRIGHT", container, "TOPRIGHT")
   if options.tabHeight then
     buttonGroup:SetHeight(options.tabHeight)
   end
 
-  local contentFrame = addon:CreateFrame("Frame", "$parentContent", container)
+  local contentFrame = addon:CreateFrame("Frame", "$parentContent", container, options.tabContentTemplate)
   contentFrame:SetPoint("TOPLEFT", buttonGroup, "BOTTOMLEFT")
   contentFrame:SetPoint("TOPRIGHT", buttonGroup, "BOTTOMRIGHT")
   contentFrame:SetPoint("BOTTOMLEFT", container, "BOTTOMLEFT")
