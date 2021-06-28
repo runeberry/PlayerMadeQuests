@@ -22,9 +22,10 @@ local function newFrameTemplate(frameType, inheritsFrom, inheritsTemplate)
   }
   addon:ApplyMethods(frameTemplate, templateMethods)
 
-  -- All custom frames have a Refresh method, which calls the OnRefresh events
+  -- All custom frames have some common custom script events
   frameTemplate:RegisterCustomScriptEvent("OnRefresh")
   frameTemplate:RegisterCustomScriptEvent("AfterRefresh")
+  frameTemplate:RegisterCustomScriptEvent("AfterCreate")
 
   return frameTemplate
 end
@@ -368,6 +369,9 @@ local function createCustomFrame(frameType, frameName, parent, options)
   -- FINALIZING: Flag the frame as created, flush any events that may have queued up
   frame._frameCreated = true
   frame:FlushEventQueue()
+
+  -- FINALIZING: The AfterCreate event is triggered only once per frame
+  frame:FireCustomScriptEvent("AfterCreate")
 
   -- FINALIZING: If autoRefresh is not explicitly disabled, run the frame's Refresh method now
   if frame._options.autoRefresh ~= false then

@@ -61,14 +61,20 @@ local function addSizerWidget(frame)
   line2:SetTexCoord(0.05 - x, 0.5, 0.05, 0.5 + x, 0.05, 0.5 - x, 0.5 + x, 0.5)
 end
 
+template:AddScripts({
+  ["AfterCreate"] = function(self)
+    -- Wait until the frame is fully created shown to add the sizer widget
+    -- That way, the sizer gets placed in front of whatever content is in the frame
+    addSizerWidget(self)
+  end,
+})
+
 function template:Create(frame, options)
   -- This mixin can be disabled with a simple option flag
   if not options.resizable then return end
 
   frame:EnableMouse(true)
   frame:SetResizable(true)
-
-  addSizerWidget(frame)
 
   frame._resizableBounds = {}
 
