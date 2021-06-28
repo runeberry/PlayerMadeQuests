@@ -1,6 +1,6 @@
 local _, addon = ...
 local UIEvents = addon.UIEvents
-local asserttype, assertf = addon.asserttype, addon.assertf
+local asserttype, assertf, assertframe = addon.asserttype, addon.assertf, addon.assertframe
 local logger = addon.Logger:NewLogger("Forms")
 
 local template = addon:NewFrame("FormGroup")
@@ -34,11 +34,13 @@ local function getField(formGroup, fieldNameOrIndex)
 end
 
 template:AddMethods({
-  ["AddFormField"] = function(self, fieldName, formField)
-    asserttype(formField, "table", "formField", "FormGroup:AddFormField")
+  ["AddFormField"] = function(self, formField, fieldName)
+    assertframe(formField, "table", "formField", "FormGroup:AddFormField")
+    assert(formField._formField, "AddFormField: The provided frame is not a FormField")
+
+    fieldName = fieldName or (formField:GetName() and addon:CleanGlobalName(formField:GetName()))
     asserttype(fieldName, "string", "fieldName", "FormGroup:AddFormField")
     assertf(not self._fieldsByName[fieldName], "AddFormField: Field name %s is already in use on FormGroup %s", fieldName, self:GetName())
-    assert(formField._formField, "AddFormField: The provided frame is not a FormField")
 
     addField(self, fieldName, formField)
 

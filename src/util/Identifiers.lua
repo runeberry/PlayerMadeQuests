@@ -32,6 +32,13 @@ function addon:CreateGlobalName(pattern)
   return pattern
 end
 
+--- Removes the PMQ prefix from the provided global name, if present
+function addon:CleanGlobalName(globalName)
+  asserttype(globalName, "string", "globalName", "CleanGlobalName")
+
+  return globalName:gsub("^PMQ_", "")
+end
+
 --- Parses a GUID string into a table with named properties
 --- Parsed based on this information: https://wow.gamepedia.com/GUID
 function addon:ParseGUID(guid)
