@@ -4,7 +4,6 @@ local template = addon:NewFrame("FormCheckbox", "Button")
 template:AddMixin("FormField")
 
 template:SetDefaultOptions({
-  label = "",               -- [string] Text to display to the right of the checkbox
   labelAnchor = "RIGHT",
   radio = false,            -- [boolean] Should the button look and act like a radio button?
 })
@@ -77,7 +76,6 @@ function template:Create(frame, options)
   local button = addon:CreateFrame("CheckButton", nil, frame, templateName)
   button:SetPoint("TOPLEFT", frame, "TOPLEFT")
   button:SetScript("OnClick", onButtonClick)
-  frame:SetFormLabel(options.label)
   frame:SetFormLabelParent(button)
 
   frame._button = button
