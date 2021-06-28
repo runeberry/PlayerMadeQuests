@@ -182,9 +182,7 @@ template:AddMethods({
 
     addContentToTable(self, content, options)
 
-    if self:GetOptions().autoRefresh then
-      self:Refresh()
-    end
+    self:AutoRefresh()
   end
 })
 

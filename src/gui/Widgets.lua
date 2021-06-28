@@ -158,10 +158,17 @@ frameMethods = {
     frame._scriptEventQueue = nil
   end,
 
+  ["AutoRefresh"] = function(frame)
+    -- This operation will be skipped only if autoRefresh is explicitly set to false
+    if frame:GetOptions().autoRefresh ~= false then
+      frame:Refresh()
+    end
+  end,
   ["Refresh"] = function(frame)
     frame:FireCustomScriptEvent("OnRefresh")
     frame:FireCustomScriptEvent("AfterRefresh")
   end,
+
   ["GetOptions"] = function(frame)
     return frame._options
   end,
@@ -373,10 +380,8 @@ local function createCustomFrame(frameType, frameName, parent, options)
   -- FINALIZING: The AfterCreate event is triggered only once per frame
   frame:FireCustomScriptEvent("AfterCreate")
 
-  -- FINALIZING: If autoRefresh is not explicitly disabled, run the frame's Refresh method now
-  if frame._options.autoRefresh ~= false then
-    frame:Refresh()
-  end
+  -- FINALIZING: Refresh the frame
+  frame:AutoRefresh()
 
   return frame
 end
