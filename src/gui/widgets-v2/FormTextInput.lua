@@ -2,6 +2,7 @@ local _, addon = ...
 
 local template = addon:NewFrame("FormTextInput")
 template:AddMixin("FormField")
+template:AddMixin("DefaultSize")
 
 template:SetDefaultOptions({
   label = "",               -- [string]
@@ -9,7 +10,14 @@ template:SetDefaultOptions({
   autoFocus = false,        -- [boolean]
   textInset = 0,            -- [LRTB]
   defaultText = "",         -- [string]
-  width = 200,              -- [number]
+
+  defaultWidth = 200,
+  defaultHeight = function(frame)
+    local _, labelHeight, _, labelOffsetY = frame:GetFormLabelDimensions()
+
+    -- Extra height is to account for the size of the bottom visual border
+    return frame._editBox:GetHeight() + labelHeight + labelOffsetY + 8
+  end,
 
   frameTemplate = "InputBoxTemplate",
   fontTemplate = "ChatFontNormal",
@@ -74,7 +82,7 @@ local editBoxScripts = {
 }
 
 function template:Create(frame, options)
-  local editBox = addon:CreateFrame("EditBox", nil, frame, options.frameTemplate)
+  local editBox = addon:CreateFrame("EditBox", "$parentEditBox", frame, options.frameTemplate)
   local insetL, insetR, insetT, insetB = addon:UnpackLRTB(options.textInset)
   editBox:SetTextInsets(insetL, insetR, insetT, insetB)
   editBox:SetAutoFocus(options.autoFocus)
@@ -83,15 +91,10 @@ function template:Create(frame, options)
   addon:ApplyScripts(editBox, editBoxScripts)
   frame:SetFormLabelParent(editBox)
 
-  local labelHeight = frame:GetFormLabel():GetHeight() + options.labelOffsetY
   local _, editBoxFontHeight = editBox:GetFont()
   editBox:SetHeight(editBoxFontHeight)
-  editBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 6, -1*labelHeight)
-  editBox:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, -1*labelHeight)
-
-  -- Extra height is to account for the size of the bottom visual border
-  local containerHeight = editBox:GetHeight() + labelHeight + 4
-  frame:SetSize(options.width, containerHeight)
+  editBox:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT")
+  editBox:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
 
   frame._editBox = editBox
   editBox._container = frame

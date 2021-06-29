@@ -70,10 +70,6 @@ template:SetConditionalOptions("labelAnchor", {
 
 local function setFormLabel(self, text)
   self._labelFontString:SetText(text)
-
-  -- Refresh label size
-  local width, height = self._labelFontString:GetSize()
-  self:SetSize(width, height)
 end
 
 local function setFormLabelParent(self, parentFrame)

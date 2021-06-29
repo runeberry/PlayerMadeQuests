@@ -1,6 +1,6 @@
 local _, addon = ...
 local CreateFrame, UIParent, unpack = addon.G.CreateFrame, addon.G.UIParent, addon.G.unpack
-local assertf, asserttype, assertframe = addon.assertf, addon.asserttype, addon.assertframe
+local assertf, asserttype, assertframe, errorf = addon.assertf, addon.asserttype, addon.assertframe, addon.errorf
 
 local frameTemplates = {} -- Frame creation instructions, indexed by frameType
 local templateMethods
@@ -32,10 +32,6 @@ end
 
 --- Default methods to be applied to every frame template (not instance) when it's registered.
 templateMethods = {
-  ["Create"] = function()
-    -- All templates should override this method
-    error("Frame template must implement method: Create")
-  end,
   ["SetDefaultOptions"] = function(template, options)
     if type(options) ~= "table" then
       addon.UILogger:Error("SetDefaultOptions: options must be a table")
@@ -347,7 +343,12 @@ end
 local function runCreate(frame, template)
   -- Create method call order is determined ahead-of-time and saved to the template
   forInheritanceOrder(template, function(_, t2)
-    t2:Create(frame, frame._options)
+    if t2.Create then
+      t2:Create(frame, frame._options)
+    elseif not t2._mixinOnly then
+      -- All templates must implement a Create method, unless it's used only as a mixin
+      errorf("Template %s must implement a Create method", template._frameType)
+    end
   end)
 end
 

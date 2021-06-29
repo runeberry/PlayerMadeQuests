@@ -49,6 +49,7 @@
   <Script file="gui/widgets-v2/SearchSelectMulti.lua"/>
   <Script file="gui/widgets-v2/TabGroup.lua"/>
 
+  <Script file="gui/widgets-v2/mixins/DefaultSize.lua"/>
   <Script file="gui/widgets-v2/mixins/LayoutSavable.lua"/>
   <Script file="gui/widgets-v2/mixins/Movable.lua"/>
   <Script file="gui/widgets-v2/mixins/Resizable.lua"/>
