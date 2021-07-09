@@ -44,9 +44,8 @@ template:AddScripts({
       addon.UILogger:Error("Failed to set DefaultSize on %s: %s", frame:GetName() or "frame", err)
       return
     end
-    print("Before", frame:GetName(), frame:GetWidth(), frame:GetHeight())
+
     if width then frame:SetWidth(width) end
     if height then frame:SetHeight(height) end
-    print("After", frame:GetName(), frame:GetWidth(), frame:GetHeight())
   end,
 })
