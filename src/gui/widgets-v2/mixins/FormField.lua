@@ -2,7 +2,7 @@ local _, addon = ...
 local UIEvents = addon.UIEvents
 local asserttype, assertf = addon.asserttype, addon.assertf
 
-local template = addon:NewFrame("FormField")
+local template = addon:NewMixin("FormField")
 template:AddMixin("FormLabel")
 template:RegisterCustomScriptEvent("OnFormValueChange")
 

@@ -12,12 +12,6 @@ template:SetDefaultOptions({
   defaultText = "",         -- [string]
 
   defaultWidth = 200,
-  defaultHeight = function(frame)
-    local _, labelHeight, _, labelOffsetY = frame:GetFormLabelDimensions()
-
-    -- Extra height is to account for the size of the bottom visual border
-    return frame._editBox:GetHeight() + labelHeight + labelOffsetY + 8
-  end,
 
   frameTemplate = "InputBoxTemplate",
   fontTemplate = "ChatFontNormal",
@@ -28,6 +22,14 @@ template:SetDefaultOptions({
   saveOnClearFocus = true,    -- [boolean] Saves form field when focus is lost (incl. above settings)
   saveOnTextChanged = false,  -- [boolean] Saves form field whenever text is changed
 })
+
+local function refreshSize(frame)
+  local _, labelHeight, _, labelOffsetY = frame:GetFormLabelDimensions()
+
+  -- Extra height is to account for the size of the bottom visual border
+  local height = frame._editBox:GetHeight() + labelHeight + labelOffsetY
+  frame:SetHeight(height)
+end
 
 template:AddMethods({
   ["SetText"] = function(self, text)
@@ -42,6 +44,9 @@ template:AddScripts({
   ["OnFormValueChange"] = function(self, value, isUserInput)
     if isUserInput then return end
     self:Refresh()
+  end,
+  ["OnLabelChange"] = function(self)
+    refreshSize(self)
   end,
   ["OnShow"] = function(self)
     self:Refresh()
@@ -99,5 +104,5 @@ function template:Create(frame, options)
   frame._editBox = editBox
   editBox._container = frame
 
-  return frame
+  refreshSize(frame)
 end

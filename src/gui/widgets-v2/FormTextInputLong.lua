@@ -10,7 +10,8 @@ template:SetDefaultOptions({
   autoFocus = false,        -- [boolean]
   textInset = 6,            -- [LRTB]
   defaultText = "",         -- [string]
-  width = 200,              -- [number]
+
+  defaultWidth = 200,
 
   frameTemplate = "InputBoxTemplate",
   fontTemplate = "ChatFontNormal",
@@ -20,6 +21,42 @@ template:SetDefaultOptions({
   saveOnClearFocus = true,    -- [boolean] Saves form field when focus is lost (incl. above settings)
   saveOnTextChanged = false,  -- [boolean] Saves form field whenever text is changed
 })
+
+local function refreshSize(frame)
+  local options = frame:GetOptions()
+  local editBox, scrollFrame, editBoxBorderFrame = frame._editBox, frame._scrollFrame, frame._editBoxBorderFrame
+
+  -- The container must be tall enough to contain the label
+  local _, labelHeight, _, labelOffsetY = frame:GetFormLabelDimensions()
+  local _, lineHeight = editBox:GetFont()
+  local lineSpacing = editBox:GetSpacing()
+  local il, ir, it, ib = addon:UnpackLRTB(options.textInset)
+  local containerHeight =             -- Container must be tall enough to show the specified # lines
+    (lineHeight * options.lines) +    -- Height of text * number of lines to be shown
+    (lineSpacing * options.lines) +   -- Total height of spacing between lines, leaving extra space at bottom
+    2 +                               -- Small buffer so the box doesn't scroll on the last line
+    it + ib +                         -- Vertical text insets
+    labelHeight + labelOffsetY        -- Height of the label above the editBox border
+
+  frame:SetHeight(containerHeight)
+
+  -- The editBox border must be anchored low enough to not overlap with the label
+  editBoxBorderFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -1*labelHeight)
+  editBoxBorderFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
+
+  -- The scroll frame must be inset within the editBox border frame
+  scrollFrame:SetPoint("TOPLEFT", editBoxBorderFrame, "TOPLEFT", il, -1*it)
+  scrollFrame:SetPoint("BOTTOMRIGHT", editBoxBorderFrame, "BOTTOMRIGHT", -1*ir, ib)
+
+  -- When the mouse wheel is scrolled, scroll the text by one line
+  scrollFrame._scrollHeight = lineHeight + lineSpacing
+
+  -- The editBox must match the width of the scrollFrame without anchoring to it
+  -- because the scrollFrame's anchors seem to get altered when it scrolls.
+  -- It looks like the editBox gets anchored to scrollFrame automatically by
+  -- becoming its scrollChild, so we just need to set width.
+  editBox:SetWidth(containerWidth - il - ir)
+end
 
 template:AddMethods({
   ["SetText"] = function(self, text)
@@ -34,6 +71,9 @@ template:AddScripts({
   ["OnFormValueChange"] = function(self, value, isUserInput)
     if isUserInput then return end
     self:Refresh()
+  end,
+  ["OnLabelChange"] = function(self)
+    refreshSize(self)
   end,
   ["OnShow"] = function(self)
     self:Refresh()
@@ -122,40 +162,12 @@ function template:Create(frame, options)
   addon:ApplyScripts(editBox, editBoxScripts)
   scrollFrame:SetScrollChild(editBox)
 
-  -- The container must be tall enough to contain the label
-  local _, labelHeight, _, labelOffsetY = frame:GetFormLabelDimensions()
-  local _, lineHeight = editBox:GetFont()
-  local lineSpacing = editBox:GetSpacing()
-  local il, ir, it, ib = addon:UnpackLRTB(options.textInset)
-  local containerHeight =             -- Container must be tall enough to show the specified # lines
-    (lineHeight * options.lines) +    -- Height of text * number of lines to be shown
-    (lineSpacing * options.lines) +   -- Total height of spacing between lines, leaving extra space at bottom
-    2 +                               -- Small buffer so the box doesn't scroll on the last line
-    it + ib +                         -- Vertical text insets
-    labelHeight + labelOffsetY        -- Height of the label above the editBox border
-  local containerWidth = options.width
-
-  frame:SetSize(containerWidth, containerHeight)
-
-  -- The editBox border must be anchored low enough to not overlap with the label
-  editBoxBorderFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -1*labelHeight)
-  editBoxBorderFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
-
-  -- The scroll frame must be inset within the editBox border frame
-  scrollFrame:SetPoint("TOPLEFT", editBoxBorderFrame, "TOPLEFT", il, -1*it)
-  scrollFrame:SetPoint("BOTTOMRIGHT", editBoxBorderFrame, "BOTTOMRIGHT", -1*ir, ib)
-
-  -- When the mouse wheel is scrolled, scroll the text by one line
-  scrollFrame._scrollHeight = lineHeight + lineSpacing
-
-  -- The editBox must match the width of the scrollFrame without anchoring to it
-  -- because the scrollFrame's anchors seem to get altered when it scrolls.
-  -- It looks like the editBox gets anchored to scrollFrame automatically by
-  -- becoming its scrollChild, so we just need to set width.
-  editBox:SetWidth(containerWidth - il - ir)
-
+  frame._editBoxBorderFrame = editBoxBorderFrame
   frame._scrollFrame = scrollFrame
   frame._editBox = editBox
   editBox._container = frame
   editBoxBorderFrame._container = frame
+  scrollFrame._scrollHeight = 1
+
+  refreshSize(frame)
 end

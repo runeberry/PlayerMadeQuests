@@ -8,9 +8,8 @@ template:SetDefaultOptions({
   defaultHeight = nil,  -- [number or function(frame) => number]
 })
 
-template:AddScripts({
-  ["AfterCreate"] = function(frame)
-    local options = frame:GetOptions()
+local function resize(frame, setWidth, setHeight)
+  local options = frame:GetOptions()
 
     local width, height, err
     if options.defaultSize then
@@ -23,20 +22,24 @@ template:AddScripts({
         err = "defaultSize must be a function or XY value"
       end
     elseif options.defaultWidth or options.defaultHeight then
-      if type(options.defaultWidth) == "function" then
-        width = options.defaultWidth(frame)
-      elseif type(options.defaultWidth) == "number" then
-        width = options.defaultWidth
-      elseif options.defaultWidth then
-        err = "defaultWidth must be a function or number"
+      if setWidth then
+        if type(options.defaultWidth) == "function" then
+          width = options.defaultWidth(frame)
+        elseif type(options.defaultWidth) == "number" then
+          width = options.defaultWidth
+        elseif options.defaultWidth then
+          err = "defaultWidth must be a function or number"
+        end
       end
 
-      if type(options.defaultHeight) == "function" then
-        height = options.defaultHeight(frame)
-      elseif type(options.defaultHeight) == "number" then
-        height = options.defaultHeight
-      elseif options.defaultHeight then
-        err = "defaultHeight must be a function or number"
+      if setHeight then
+        if type(options.defaultHeight) == "function" then
+          height = options.defaultHeight(frame)
+        elseif type(options.defaultHeight) == "number" then
+          height = options.defaultHeight
+        elseif options.defaultHeight then
+          err = "defaultHeight must be a function or number"
+        end
       end
     end
 
@@ -45,7 +48,24 @@ template:AddScripts({
       return
     end
 
-    if width then frame:SetWidth(width) end
-    if height then frame:SetHeight(height) end
+    if setWidth and width then frame:SetWidth(width) end
+    if setHeight and height then frame:SetHeight(height) end
+end
+
+template:AddMethods({
+  ["RestoreDefaultSize"] = function(frame)
+    resize(frame, true, true)
+  end,
+  ["RestoreDefaultWidth"] = function(frame)
+    resize(frame, true, false)
+  end,
+  ["RestoreDefaultHeight"] = function(frame)
+    resize(frame, false, true)
+  end,
+})
+
+template:AddScripts({
+  ["AfterCreate"] = function(frame)
+    resize(frame, true, true)
   end,
 })

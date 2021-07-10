@@ -38,18 +38,19 @@
   <Script file="gui/widgets-v2/FlowLayout.lua"/>
   <Script file="gui/widgets-v2/FormCheckbox.lua"/>
   <Script file="gui/widgets-v2/FormDropdown.lua"/>
-  <Script file="gui/widgets-v2/FormField.lua"/>
   <Script file="gui/widgets-v2/FormGroup.lua"/>
-  <Script file="gui/widgets-v2/FormLabel.lua"/>
   <Script file="gui/widgets-v2/FormRadioGroup.lua"/>
   <Script file="gui/widgets-v2/FormTextInput.lua"/>
   <Script file="gui/widgets-v2/FormTextInputLong.lua"/>
+  <Script file="gui/widgets-v2/Label.lua"/>
   <Script file="gui/widgets-v2/PopoutWindow.lua"/>
   <Script file="gui/widgets-v2/SearchSelect.lua"/>
   <Script file="gui/widgets-v2/SearchSelectMulti.lua"/>
   <Script file="gui/widgets-v2/TabGroup.lua"/>
 
   <Script file="gui/widgets-v2/mixins/DefaultSize.lua"/>
+  <Script file="gui/widgets-v2/mixins/FormField.lua"/>
+  <Script file="gui/widgets-v2/mixins/FormLabel.lua"/>
   <Script file="gui/widgets-v2/mixins/LayoutSavable.lua"/>
   <Script file="gui/widgets-v2/mixins/Movable.lua"/>
   <Script file="gui/widgets-v2/mixins/Resizable.lua"/>

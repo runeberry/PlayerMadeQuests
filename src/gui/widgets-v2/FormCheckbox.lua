@@ -59,7 +59,7 @@ template:AddScripts({
 
     self:Refresh()
   end,
-  ["OnFormLabelChange"] = function(self)
+  ["OnLabelChange"] = function(self)
     resize(self)
   end,
   ["OnShow"] = function(self)

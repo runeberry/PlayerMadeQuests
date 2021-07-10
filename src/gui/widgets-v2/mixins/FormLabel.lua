@@ -1,17 +1,13 @@
 local _, addon = ...
 local asserttype, assertf, assertframe = addon.asserttype, addon.assertf, addon.assertframe
 
-local template = addon:NewFrame("FormLabel")
-template:RegisterCustomScriptEvent("OnFormLabelChange")
+local template = addon:NewMixin("FormLabel")
+template:RegisterCustomScriptEvent("OnLabelChange")
 
 template:SetDefaultOptions({
-  label = "",                  -- [string] The text of the label
   labelAnchor = "LEFT",        -- [string] The anchor of the parent frame to hook the fontString to
-  labelLayer = "BACKGROUND",   -- [string] The drawing layer for the fontString
-  labelClickable = false,      -- [boolean] True to enable mouse script events
 
   -- Specify the following settings only if you want to override anchor-specific options
-  labelFontTemplate = nil,     -- [string]
   labelOffsetX = nil,          -- [number]
   labelOffsetY = nil,          -- [number]
 })
@@ -68,52 +64,42 @@ template:SetConditionalOptions("labelAnchor", {
   -- CENTER = nil, -- Not supported
 })
 
-local function setFormLabel(self, text)
-  self._labelFontString:SetText(text)
-end
-
 local function setFormLabelParent(self, parentFrame)
-  self._labelParent = parentFrame
+  self._formLabelParent = parentFrame
 
   -- Refresh label position
   local options = self:GetOptions()
-  local labelParent = self._labelParent or self
-  self._labelFontString:ClearAllPoints(true)
-  self._labelFontString:SetPoint(options.labelAnchorHook, labelParent, options.labelAnchor, options.labelOffsetX, options.labelOffsetY)
+  local labelParent = self._formLabelParent or self
+  self._formLabel:ClearAllPoints(true)
+  self._formLabel:SetPoint(options.labelAnchorHook, labelParent, options.labelAnchor, options.labelOffsetX, options.labelOffsetY)
 end
 
 template:AddMethods({
-  ["GetFormLabel"] = function(self)
-    return self._labelFontString
-  end,
   ["GetFormLabelDimensions"] = function(self)
-    local width, height = self._labelFontString:GetSize()
+    local width, height = self._formLabel:GetSize()
     local options = self:GetOptions()
     return width, height, options.labelOffsetX, options.labelOffsetY
   end,
+  ["GetFormLabel"] = function(self)
+    return self._formLabel:GetText()
+  end,
   ["SetFormLabel"] = function(self, text)
-    asserttype(text, "string", "text", "SetFormLabel")
-    setFormLabel(self, text)
-    self:FireCustomScriptEvent("OnFormLabelChange")
+    self._formLabel:SetText(text)
+    self:FireCustomScriptEvent("OnLabelChange", text)
   end,
   ["SetFormLabelParent"] = function(self, parentFrame)
     assertframe(parentFrame, "parentFrame", "SetFormLabelParent", 2)
     setFormLabelParent(self, parentFrame)
-    self:FireCustomScriptEvent("OnFormLabelChange")
+    self:FireCustomScriptEvent("OnLabelChange", self._formLabel:GetText())
   end,
 })
 
 function template:Create(frame, options)
-  if options.labelClickable then
-    frame:EnableMouse(true)
-  end
+  local label = addon:CreateFrame("Label", "$parentLabel", frame, options)
+  label._formParent = frame
 
-  local labelName = addon:CreateGlobalName("FormLabel_FS%i")
-  local fontString = frame:CreateFontString(labelName, options.labelLayer, options.labelFontTemplate)
+  frame._formLabel = label
+  frame._formLabelParent = nil
 
-  frame._labelFontString = fontString
-  frame._labelParent = nil
-
-  setFormLabel(frame, options.label)
   setFormLabelParent(frame, frame)
 end

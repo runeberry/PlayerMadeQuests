@@ -74,6 +74,9 @@ template:AddScripts({
   ["OnFormValueChange"] = function(self, value, isUserInput)
     self:Refresh()
   end,
+  ["OnLabelChange"] = function(self)
+
+  end,
   ["OnShow"] = function(self)
     self:Refresh()
   end,

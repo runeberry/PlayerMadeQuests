@@ -1,5 +1,6 @@
 local _, addon = ...
 local asserttype, assertf = addon.asserttype, addon.assertf
+local UIParent = addon.G.UIParent
 
 local UIDropDownMenu_Initialize = addon.G.UIDropDownMenu_Initialize
 local UIDropDownMenu_SetWidth = addon.G.UIDropDownMenu_SetWidth
@@ -87,8 +88,21 @@ template:SetConditionalOptions("labelAnchor", {
   CENTER = nil, -- Not supported
 })
 
+-- Temporary fontStrings used for measurements
+local testFontStrings = {}
+local function getTestFontString(fontTemplate)
+  local testFontString = testFontStrings[fontTemplate]
+
+  if not testFontString then
+    testFontString = UIParent:CreateFontString(nil, "BACKGROUND", fontTemplate)
+    testFontStrings[fontTemplate] = testFontString
+  end
+
+  return testFontString
+end
+
 local function refreshSize(container)
-  local options, label = container:GetOptions(), container:GetFormLabel()
+  local options = container:GetOptions()
   local ddWidth = options.width
 
   if not ddWidth then
@@ -96,16 +110,14 @@ local function refreshSize(container)
     -- Adapted from: https://medium.com/@JordanBenge/creating-a-wow-dropdown-menu-in-pure-lua-db7b2f9c0364
     local padding = 37
     ddWidth = padding
+    local testFontString = getTestFontString("GameFontNormalSmall")
     for _, choice in ipairs(options.choices) do
-      -- Borrow the label fontString for a sec so we can do some measuring
-      label:SetText(choice.text)
-      local strWidth = label:GetStringWidth() + padding
+      testFontString:SetText(choice.text)
+      local strWidth = testFontString:GetStringWidth() + padding
       if strWidth > ddWidth then
         ddWidth = strWidth
       end
     end
-    -- Done measuring, put the label text back
-    label:SetText(options.label)
   end
 
   if options.maxWidth then
@@ -114,16 +126,17 @@ local function refreshSize(container)
 
   UIDropDownMenu_SetWidth(container._dropdown, ddWidth)
 
+  local labelWidth, labelHeight, labelOffsetX, labelOffsetY = container:GetFormLabelDimensions()
   local containerWidth, containerHeight = container._dropdown:GetSize()
 
   if options.labelHoriz then
     -- If the label is anchored to the left or right of the dropdown,
     -- then include the label's width and x-spacing in the container's width
-    containerWidth = containerWidth + options.labelOffsetX + label:GetWidth()
+    containerWidth = containerWidth + labelWidth + labelOffsetX
   else
     -- If the label is anchored above or below the dropdown,
     -- then include the label's height and y-spacing int he container's height
-    containerHeight = containerHeight + options.labelOffsetY + label:GetHeight()
+    containerHeight = containerHeight + labelHeight + labelOffsetY
   end
 
   containerWidth = containerWidth + options.dropdownWidthAdjust
@@ -193,6 +206,9 @@ template:AddScripts({
     if isUserInput then return end
 
     self:Refresh()
+  end,
+  ["OnLabelChange"] = function(self)
+    refreshSize(self)
   end,
   ["OnShow"] = function(self)
     self:Refresh()
