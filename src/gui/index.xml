@@ -42,6 +42,7 @@
   <Script file="gui/widgets-v2/FormRadioGroup.lua"/>
   <Script file="gui/widgets-v2/FormTextInput.lua"/>
   <Script file="gui/widgets-v2/FormTextInputLong.lua"/>
+  <Script file="gui/widgets-v2/Header.lua"/>
   <Script file="gui/widgets-v2/Label.lua"/>
   <Script file="gui/widgets-v2/PopoutWindow.lua"/>
   <Script file="gui/widgets-v2/SearchSelect.lua"/>
@@ -53,6 +54,7 @@
   <Script file="gui/widgets-v2/mixins/FormLabel.lua"/>
   <Script file="gui/widgets-v2/mixins/LayoutSavable.lua"/>
   <Script file="gui/widgets-v2/mixins/Movable.lua"/>
+  <Script file="gui/widgets-v2/mixins/RelativeSize.lua"/>
   <Script file="gui/widgets-v2/mixins/Resizable.lua"/>
 
   <!-- Top-level frames -->

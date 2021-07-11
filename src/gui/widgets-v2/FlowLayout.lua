@@ -9,6 +9,7 @@ template:SetDefaultOptions({
   spacing = 6,                -- [XY] Space between content items
 
   anchor = "TOPLEFT",         -- [string] Corner anchor where the layout will start growing from
+  autoResize = true,
 })
 
 -- Not yet implemented
@@ -114,8 +115,12 @@ local function resizeHorizontal(layout)
   for _, line in ipairs(layout._table) do
     local lineWidth, lineHeight = 0, 0
     for _, content in ipairs(line) do
-      lineWidth = lineWidth + content:GetWidth() + sx
-      lineHeight = math.max(lineHeight, content:GetHeight())
+      if content._isFlowLayoutHeader then
+
+      else
+        lineWidth = lineWidth + content:GetWidth() + sx
+        lineHeight = math.max(lineHeight, content:GetHeight())
+      end
     end
 
     -- Subtract the spacing for the last item in the row, as spacing should only be between elements
@@ -183,12 +188,26 @@ template:AddMethods({
     addContentToTable(self, content, options)
 
     self:AutoRefresh()
-  end
+  end,
+  ["AddHeader"] = function(self, text)
+    local options = self:GetOptions()
+
+    local l, r, t, b = addon:UnpackLRTB(options.margin)
+    local headerOptions = { relativeWidthOffset = -1 * (l + r) }
+
+    local header = addon:CreateFrame("Header", "$parentHeader%i", self, headerOptions)
+    header:SetText(text)
+    header._isFlowLayoutHeader = true
+
+    self:AddContent(header)
+  end,
 })
 
 template:AddScripts({
   ["AfterRefresh"] = function(self)
-    resize(self)
+    if self:GetOptions().autoResize then
+      resize(self)
+    end
   end,
 })
 
