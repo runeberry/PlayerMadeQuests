@@ -125,10 +125,8 @@ end
 
 local function refreshButtonsTab(group)
   for _, button in ipairs(group._buttons) do
-    -- todo: this doesn't respect the parent container's width
-    -- but I don't quite understand which width parameters to pass
     -- See source code here: https://github.com/Gethe/wow-ui-source/blob/classic/SharedXML/SharedUIPanelTemplates.lua#L446
-    PanelTemplates_TabResize(button, -8)
+    PanelTemplates_TabResize(button, 0)
   end
 end
 
@@ -152,6 +150,9 @@ template:AddMethods({
     assertf(button, "No button exists at index %i", index)
 
     return button
+  end,
+  ["GetButtons"] = function(self)
+    return self._buttons
   end,
 })
 

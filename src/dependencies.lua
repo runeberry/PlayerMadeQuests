@@ -101,5 +101,8 @@ addon.G = {
   UIDropDownMenu_SetSelectedValue = UIDropDownMenu_SetSelectedValue,
   UIDropDownMenu_AddButton = UIDropDownMenu_AddButton,
 
+  PanelTemplates_SetDisabledTabState = PanelTemplates_SetDisabledTabState,
+  PanelTemplates_SelectTab = PanelTemplates_SelectTab,
+  PanelTemplates_DeselectTab = PanelTemplates_DeselectTab,
   PanelTemplates_TabResize = PanelTemplates_TabResize,
 }

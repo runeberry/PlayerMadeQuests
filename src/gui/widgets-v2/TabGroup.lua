@@ -2,6 +2,10 @@ local _, addon = ...
 local asserttype, assertf, assertframe = addon.asserttype, addon.assertf, addon.assertframe
 local unpack = addon.G.unpack
 
+local PanelTemplates_SetDisabledTabState = addon.G.PanelTemplates_SetDisabledTabState
+local PanelTemplates_SelectTab = addon.G.PanelTemplates_SelectTab
+local PanelTemplates_DeselectTab = addon.G.PanelTemplates_DeselectTab
+
 local template = addon:NewFrame("TabGroup")
 template:RegisterCustomScriptEvent("OnTabSelect")
 
@@ -14,9 +18,9 @@ template:SetDefaultOptions({
 
 -- See ButtonGroup for info
 local defaultButtonGroupOptions = {
-  template = "TabButtonTemplate", -- "OptionsFrameTabButtonTemplate"
+  template = "OptionsFrameTabButtonTemplate",
   sizeMode = "tab",
-  margin = { 4, 4, 0, 0 },
+  margin = 0,
   padding = 0,
   spacing = 0,
 
@@ -110,14 +114,14 @@ template:AddMethods({
     -- First, hide and release the current tab
     local content, button = self:GetTabContent(), self:GetTabButton()
     if content then content:Hide() end
-    if button then button:UnlockHighlight() end
+    if button then PanelTemplates_DeselectTab(button) end
 
     self._selected = index
 
     -- Then, show and hold-open the chosen tab
     content, button = self:GetTabContent(), self:GetTabButton()
     if content then content:Show() end
-    if button then button:LockHighlight() end
+    if button then PanelTemplates_SelectTab(button) end
 
     self:FireCustomScriptEvent("OnTabSelect", index)
   end,
@@ -145,6 +149,9 @@ function template:Create(container, options)
   buttonGroup:SetPoint("TOPRIGHT", container, "TOPRIGHT")
   if options.tabHeight then
     buttonGroup:SetHeight(options.tabHeight)
+  end
+  for _, button in ipairs(buttonGroup:GetButtons()) do
+    PanelTemplates_DeselectTab(button)
   end
 
   local contentFrame = addon:CreateFrame("Frame", "$parentContent", container, options.tabContentTemplate)
