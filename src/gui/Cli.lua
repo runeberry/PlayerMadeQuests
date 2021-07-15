@@ -1,6 +1,6 @@
 local _, addon = ...
 local SlashCmdList, unpack = addon.G.SlashCmdList, addon.G.unpack
-local strjoin = addon.G.strjoin
+local strjoin, strsplit = addon.G.strjoin, addon.G.strsplit
 
 local handlers
 
@@ -160,12 +160,37 @@ handlers = {
     addon:ToggleSpellWatch()
   end,
   ["dump-player-data"] = function()
-    local cache = addon:GetPlayerDataCache()
-    addon.Logger:Table(cache)
+    local cache = addon.PlayerDataCache:FindAll()
+    local currentRealm = addon:GetPlayerRealm()
+
+    for _, player in ipairs(cache) do
+      local name = player.Name
+      if player.Realm ~= currentRealm then name = player.FullName end
+      if player.Guild then name = name.." <"..player.Guild..">" end
+      name = addon:Colorize("yellow", name)
+
+      local faction = player.Faction
+      if faction == "Horde" then faction = addon:Colorize("red", "[H]")
+      elseif faction == "Alliance" then faction = addon:Colorize("blue", "[A]")
+      else faction = "" end
+
+      local sex = player.Sex
+      if sex == "male" then sex = "Male"
+      elseif sex == "female" then sex = "Female"
+      else sex = "" end
+
+      addon.Logger:Info("%s: %s Level %i %s %s %s",
+        name,
+        faction,
+        player.Level or 0,
+        sex,
+        player.Race or "",
+        player.Class or "")
+    end
   end,
   ["flush-player-data"] = function()
-    local cache = addon:GetPlayerDataCache()
-    addon:FlushPlayerDataCache()
-    addon.Logger:Warn("Flushed player data cache (%i fields)", addon:tlen(cache))
+    local cache = addon.PlayerDataCache:FindAll()
+    addon.PlayerDataCache:DeleteAll()
+    addon.Logger:Warn("Flushed player data cache [%i player(s)]", addon:tlen(cache))
   end,
 }
