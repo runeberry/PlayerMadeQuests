@@ -27,6 +27,13 @@ local function ifParam(name, fn)
   end
 end
 
+local function pluralize(str) return addon:Pluralize(2, str) end
+local function addGuildBackets(str) return string.format("<%s>", str) end
+local function clean(str)
+  -- Clean up any leading, trailing, or duplicate spaces before returning
+  return str:gsub("^%s+", ""):gsub("%s+$", ""):gsub(" +", " "):gsub("\n ", "\n")
+end
+
 vars = {
   ----------------
   -- Conditions --
@@ -42,7 +49,11 @@ vars = {
   ["msg"] = t.PARAM_MESSAGE,
   ["player"] = t.PARAM_PLAYER,
   ["rc"] = t.PARAM_REWARDCHOICE,
-  ["t"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_SPELLTARGET, t.PARAM_RECIPIENT },
+  ["tn"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_SPELLTARGET, t.PARAM_RECIPIENT },
+  ["tc"] = { t.PARAM_TARGETCLASS, t.PARAM_KILLTARGETCLASS, t.PARAM_SPELLTARGETCLASS },
+  ["tf"] = { t.PARAM_TARGETFACTION, t.PARAM_KILLTARGETFACTION, t.PARAM_SPELLTARGETFACTION },
+  ["tg"] = { t.PARAM_TARGETGUILD, t.PARAM_KILLTARGETGUILD, t.PARAM_SPELLTARGETGUILD },
+  ["tl"] = { t.PARAM_TARGETLEVEL, t.PARAM_KILLTARGETLEVEL, t.PARAM_SPELLTARGETLEVEL },
   ["st"] = t.PARAM_SAMETARGET,
   ["sz"] = t.PARAM_SUBZONE,
   ["z"] = t.PARAM_ZONE,
@@ -119,6 +130,52 @@ vars = {
 
     return defaultConditionTextHandler(spellNames)
   end,
+  -- Returns a descriptive name of the matching objective target(s)
+  ["t"] = function(cp)
+    local targetName = cp.conditions[t.PARAM_TARGET] or cp.conditions[t.PARAM_KILLTARGET] or cp.conditions[t.PARAM_SPELLTARGET] or cp.conditions[t.PARAM_RECIPIENT]
+    if targetName then
+      -- "Player1, Player2, or Player3"
+      return defaultConditionTextHandler(targetName)
+    end
+
+    local targetLevel = cp.conditions[t.PARAM_TARGETLEVEL] or cp.conditions[t.PARAM_KILLTARGETLEVEL] or cp.conditions[t.PARAM_SPELLTARGETLEVEL]
+    local targetFaction = cp.conditions[t.PARAM_TARGETFACTION] or cp.conditions[t.PARAM_KILLTARGETFACTION] or cp.conditions[t.PARAM_SPELLTARGETFACTION]
+    local targetClass = cp.conditions[t.PARAM_TARGETCLASS] or cp.conditions[t.PARAM_KILLTARGETCLASS] or cp.conditions[t.PARAM_SPELLTARGETCLASS]
+    local targetGuild = cp.conditions[t.PARAM_TARGETGUILD] or cp.conditions[t.PARAM_KILLTARGETGUILD] or cp.conditions[t.PARAM_SPELLTARGETGUILD]
+
+    if not targetLevel and not targetFaction and not targetClass and not targetGuild then
+      return
+    end
+
+    local strModifier
+    if cp.conditions[t.PARAM_GOAL] and cp.conditions[t.PARAM_GOAL] > 1 then
+      strModifier = pluralize
+    end
+
+    if targetLevel then
+      -- "Level 60+..."
+      targetLevel = string.format("Level %i+", targetLevel)
+    end
+
+    -- "...Horde..."
+
+    if targetClass then
+      -- "...Hunter, Shaman or Paladin..." or "...Hunters, Shamans or Paladins..."
+      targetClass = defaultConditionTextHandler(targetClass, strModifier)
+    else
+      -- "...member..." or "...members..."
+      targetClass = defaultConditionTextHandler("member", strModifier)
+    end
+
+    if targetGuild then
+      -- "...of <Guild1>, <Guild2> or <Guild3>"
+      targetGuild = defaultConditionTextHandler(targetGuild, addGuildBackets)
+      targetGuild = string.format("of %s", targetGuild)
+    end
+
+    -- Extra whitespace will be trimmed when the final string is cleaned
+    return string.format("%s %s %s %s", targetLevel or "", targetFaction or "", targetClass or "", targetGuild or "")
+  end,
 
   ------------------------
   -- Objective-specific --
@@ -173,7 +230,7 @@ vars = {
 
 -- If the condition value is a table of values, then returns each value in that table
 -- in a reader-friendly comma-separated string, with the last two items separated by "or"
-defaultConditionTextHandler = function(condVal)
+defaultConditionTextHandler = function(condVal, modifier)
   if condVal == nil then
     logger:Trace("     ^ condition: value is nil")
     return
@@ -184,11 +241,13 @@ defaultConditionTextHandler = function(condVal)
     if len == 1 then
       logger:Trace("     ^ condition: value is 1 distinct item")
       for v in pairs(condVal) do
+        if modifier then v = modifier(v) end
         result = v
       end
     elseif len > 1 then
       local i = 1
       for v in pairs(condVal) do
+        if modifier then v = modifier(v) end
         if i == 1 then
           result = v
         elseif i == 2 then
@@ -203,6 +262,8 @@ defaultConditionTextHandler = function(condVal)
     condVal = result
   else
     logger:Trace("     ^ condition: value is type %s", type(condVal))
+
+    if modifier then condVal = modifier(condVal) end
   end
 
   return condVal
@@ -403,8 +464,7 @@ function addon:PopulateText(str, context)
 
   local text = populateDisplayText(str, context)
 
-  -- Clean up any leading, trailing, or duplicate spaces before returning
-  return text:gsub("^%s+", ""):gsub("%s+$", ""):gsub(" +", " "):gsub("\n ", "\n")
+  return clean(text)
 end
 
 -- Valid values for scope are: log [default], progress, quest, full

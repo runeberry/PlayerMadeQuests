@@ -17,7 +17,11 @@ objective:AddParameter(tokens.PARAM_TEXT, {
 })
 
 objective:AddCondition(tokens.PARAM_SPELL, { required = true })
-objective:AddCondition(tokens.PARAM_SPELLTARGET, { alias = tokens.PARAM_TARGET })
+objective:AddCondition(tokens.PARAM_SPELLTARGET, { alias = "target" })
+objective:AddCondition(tokens.PARAM_SPELLTARGETCLASS, { alias = "class" })
+objective:AddCondition(tokens.PARAM_SPELLTARGETFACTION, { alias = "faction" })
+objective:AddCondition(tokens.PARAM_SPELLTARGETGUILD, { alias = "guild" })
+objective:AddCondition(tokens.PARAM_SPELLTARGETLEVEL, { alias = "level" })
 objective:AddCondition(tokens.PARAM_ITEM)
 objective:AddCondition(tokens.PARAM_AURA)
 objective:AddCondition(tokens.PARAM_EQUIP)

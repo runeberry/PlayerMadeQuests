@@ -49,6 +49,10 @@
   <Script file="qeng/conditions/faction.lua"/>
   <Script file="qeng/conditions/item.lua"/>
   <Script file="qeng/conditions/killtarget.lua"/>
+  <Script file="qeng/conditions/killtargetclass.lua"/>
+  <Script file="qeng/conditions/killtargetfaction.lua"/>
+  <Script file="qeng/conditions/killtargetguild.lua"/>
+  <Script file="qeng/conditions/killtargetlevel.lua"/>
   <Script file="qeng/conditions/language.lua"/>
   <Script file="qeng/conditions/level.lua"/>
   <Script file="qeng/conditions/message.lua"/>
@@ -56,5 +60,13 @@
   <Script file="qeng/conditions/recipient.lua"/>
   <Script file="qeng/conditions/spell.lua"/>
   <Script file="qeng/conditions/spelltarget.lua"/>
+  <Script file="qeng/conditions/spelltargetclass.lua"/>
+  <Script file="qeng/conditions/spelltargetfaction.lua"/>
+  <Script file="qeng/conditions/spelltargetguild.lua"/>
+  <Script file="qeng/conditions/spelltargetlevel.lua"/>
   <Script file="qeng/conditions/target.lua"/>
+  <Script file="qeng/conditions/targetclass.lua"/>
+  <Script file="qeng/conditions/targetfaction.lua"/>
+  <Script file="qeng/conditions/targetguild.lua"/>
+  <Script file="qeng/conditions/targetlevel.lua"/>
 </Ui>

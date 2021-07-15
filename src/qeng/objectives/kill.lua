@@ -7,6 +7,7 @@ local objective = addon.QuestEngine:NewObjective("kill")
 objective:AddShorthandForm(tokens.PARAM_GOAL, tokens.PARAM_KILLTARGET)
 
 objective:AddParameter(tokens.PARAM_GOAL)
+objective:AddParameter(tokens.PARAM_SAMETARGET)
 objective:AddParameter(tokens.PARAM_TEXT, {
   defaultValue = {
     log = "%t %p/%g",
@@ -19,7 +20,11 @@ objective:AddParameter(tokens.PARAM_TEXT, {
 objective:AddCondition(tokens.PARAM_AURA)
 objective:AddCondition(tokens.PARAM_EQUIP)
 objective:AddCondition(tokens.PARAM_ITEM)
-objective:AddCondition(tokens.PARAM_KILLTARGET, { required = true, alias = tokens.PARAM_TARGET })
+objective:AddCondition(tokens.PARAM_KILLTARGET, { alias = "target" })
+objective:AddCondition(tokens.PARAM_KILLTARGETCLASS, { alias = "class" })
+objective:AddCondition(tokens.PARAM_KILLTARGETFACTION, { alias = "faction" })
+objective:AddCondition(tokens.PARAM_KILLTARGETGUILD, { alias = "guild" })
+objective:AddCondition(tokens.PARAM_KILLTARGETLEVEL, { alias = "level" })
 objective:AddCondition(tokens.PARAM_ZONE)
 objective:AddCondition(tokens.PARAM_SUBZONE)
 objective:AddCondition(tokens.PARAM_COORDS)
@@ -27,6 +32,9 @@ objective:AddCondition(tokens.PARAM_COORDS)
 function objective:AfterEvaluate(result, obj)
   -- Only concerned with objectives that have passed and have a goal > 1
   if not result or obj.goal <= 1 then return result end
+  -- If flagged, then killing the same target repeatedly is allowed
+  if obj.parameters and obj.parameters[tokens.PARAM_SAMETARGET] then return result end
+
   return addon:EvaluateUniqueTargetForObjective(self, obj, addon.LastPartyKill.destGuid)
 end
 
