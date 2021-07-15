@@ -2,7 +2,7 @@ local _, addon = ...
 
 local condition = addon.QuestEngine:NewCondition("faction")
 condition:AllowType("string")
-condition:AllowValues({ "Alliance", "Horde" })
+condition:AllowValues(addon.WOW_FACTIONS)
 
 function condition:OnParse(args)
   return args:lower()
