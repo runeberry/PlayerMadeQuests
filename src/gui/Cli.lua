@@ -159,4 +159,13 @@ handlers = {
   ["watch-spells"] = function()
     addon:ToggleSpellWatch()
   end,
+  ["dump-player-data"] = function()
+    local cache = addon:GetPlayerDataCache()
+    addon.Logger:Table(cache)
+  end,
+  ["flush-player-data"] = function()
+    local cache = addon:GetPlayerDataCache()
+    addon:FlushPlayerDataCache()
+    addon.Logger:Warn("Flushed player data cache (%i fields)", addon:tlen(cache))
+  end,
 }
