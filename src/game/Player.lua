@@ -8,9 +8,6 @@ local UnitLevel = addon.G.UnitLevel
 local UnitFactionGroup = addon.G.UnitFactionGroup
 local UnitRace = addon.G.UnitRace
 local UnitSex = addon.G.UnitSex
-local UnitIsPlayer = addon.G.UnitIsPlayer
-local IsInGroup = addon.G.IsInGroup
-local IsInRaid = addon.G.IsInRaid
 
 ---------------------------
 -- Player Data by UnitId --
