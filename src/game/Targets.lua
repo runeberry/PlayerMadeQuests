@@ -12,7 +12,7 @@ end
 --- the provided context.
 --- @param context string, the context to which this exclusion applies (usually objective id)
 --- @param targetGuid string, the guid of the target to check
---- @return boolean, true if the target has been excluded, false otherwise
+--- @return boolean - true if the target has been excluded, false otherwise
 function addon:IsTargetExcluded(context, targetGuid)
   assert(type(context) == "string", "Failed to check IsTargetExcluded: context must be a string")
   assert(type(targetGuid) == "string", "Failed to check IsTargetExcluded: targetGuid must be a string")
@@ -24,7 +24,7 @@ end
 --- IsTargetExcluded to return true. Writes to save file.
 --- @param context string, the context to which this exclusion applies (usually objective id)
 --- @param targetGuid string, the guid of the target to exclude
---- @return boolean, true if the target was already excluded, false otherwise
+--- @return boolean - true if the target was already excluded, false otherwise
 function addon:AddTargetExclusion(context, targetGuid)
   assert(type(context) == "string", "Failed to AddTargetExclusion: context must be a string")
   assert(type(targetGuid) == "string", "Failed to AddTargetExclusion: targetGuid must be a string")

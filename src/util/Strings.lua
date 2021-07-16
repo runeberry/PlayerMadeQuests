@@ -108,7 +108,7 @@ function addon:strmod(str, findPattern, fn, ...)
   assert(type(fn) == "function")
 
   -- To start, find the first occurence of the pattern within the string
-  local from, to = 1
+  local from, to = 1, nil
   local before, middle, after
 
   while true do
@@ -147,7 +147,7 @@ local esc_ptn = [=[(\*)['"]$]=]
 -- Splits a string into words, keeping quoted phrases intact
 function addon:SplitWords(line)
   -- Solution adapted from: https://stackoverflow.com/a/28664691
-  local words, buf, quoted = {}
+  local words, buf, quoted = {}, nil, nil
   for str in line:gmatch("%S+") do
     local SQ_start = str:match(SQ_start_ptn)
     local SQ_end = str:match(SQ_end_ptn)
