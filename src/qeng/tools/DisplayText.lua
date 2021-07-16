@@ -140,15 +140,15 @@ vars = {
 
     local targetLevel = cp.conditions[t.PARAM_TARGETLEVEL] or cp.conditions[t.PARAM_KILLTARGETLEVEL] or cp.conditions[t.PARAM_SPELLTARGETLEVEL]
     local targetFaction = cp.conditions[t.PARAM_TARGETFACTION] or cp.conditions[t.PARAM_KILLTARGETFACTION] or cp.conditions[t.PARAM_SPELLTARGETFACTION]
-    local targetClass = cp.conditions[t.PARAM_TARGETCLASS] or cp.conditions[t.PARAM_KILLTARGETCLASS] or cp.conditions[t.PARAM_SPELLTARGETCLASS]
     local targetGuild = cp.conditions[t.PARAM_TARGETGUILD] or cp.conditions[t.PARAM_KILLTARGETGUILD] or cp.conditions[t.PARAM_SPELLTARGETGUILD]
+    local targetClass = cp.conditions[t.PARAM_TARGETCLASS] or cp.conditions[t.PARAM_KILLTARGETCLASS] or cp.conditions[t.PARAM_SPELLTARGETCLASS]
 
     if not targetLevel and not targetFaction and not targetClass and not targetGuild then
       return
     end
 
     local strModifier
-    if cp.conditions[t.PARAM_GOAL] and cp.conditions[t.PARAM_GOAL] > 1 then
+    if cp.goal and cp.goal > 1 then
       strModifier = pluralize
     end
 
@@ -159,22 +159,24 @@ vars = {
 
     -- "...Horde..."
 
+    if targetGuild then
+      -- "...<Guild1>, <Guild2> or <Guild3>..."
+      targetGuild = defaultConditionTextHandler(targetGuild, addGuildBackets)
+    end
+
     if targetClass then
       -- "...Hunter, Shaman or Paladin..." or "...Hunters, Shamans or Paladins..."
       targetClass = defaultConditionTextHandler(targetClass, strModifier)
-    else
-      -- "...member..." or "...members..."
+    elseif targetGuild then
+      -- "...member" or "...members"
       targetClass = defaultConditionTextHandler("member", strModifier)
-    end
-
-    if targetGuild then
-      -- "...of <Guild1>, <Guild2> or <Guild3>"
-      targetGuild = defaultConditionTextHandler(targetGuild, addGuildBackets)
-      targetGuild = string.format("of %s", targetGuild)
+    else
+      -- "...foe" or "...foes"
+      targetClass = defaultConditionTextHandler("foe", strModifier)
     end
 
     -- Extra whitespace will be trimmed when the final string is cleaned
-    return string.format("%s %s %s %s", targetLevel or "", targetFaction or "", targetClass or "", targetGuild or "")
+    return string.format("%s %s %s %s", targetLevel or "", targetFaction or "", targetGuild or "", targetClass or "")
   end,
 
   ------------------------
