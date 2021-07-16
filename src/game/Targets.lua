@@ -68,16 +68,10 @@ end
 --- @param objective table - An objective template (for logger access)
 --- @param obj table - The instance of the objective being evaluated
 --- @param targetGuid string - The guid of the target
-function addon:EvaluateUniqueTargetForObjective(objective, obj, targetGuid)
+function addon:EvaluateUniqueTargetForObjective(objective, obj, targetGuid, allowDuplicatePlayerTargets)
   if not targetGuid then
     objective.logger:Fail("No unit is targeted")
     return false
-  end
-
-  local parsed = addon:ParseGUID(targetGuid)
-  if parsed.type == "Player" then
-    objective.logger:Pass("Target is a player, will not be excluded")
-    return true
   end
 
   if addon:IsTargetExcluded(obj.id, targetGuid) then

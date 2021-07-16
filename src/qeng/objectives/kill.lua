@@ -29,13 +29,30 @@ objective:AddCondition(tokens.PARAM_ZONE)
 objective:AddCondition(tokens.PARAM_SUBZONE)
 objective:AddCondition(tokens.PARAM_COORDS)
 
+-- Returns true if the objective is to target a specific player, false otherwise
+local function hasSpecificPlayerTarget(obj, targetGuid)
+  -- Specific targets must be defined by the 'target' condition
+  if not obj.conditions[tokens.PARAM_KILLTARGET] then return end
+
+  -- During AfterEvaluate, we know we have a matching target on LastSpellCast
+  -- So we can analyze that guid to determine if the successful target was, in fact, a Player
+  return addon:ParseGUID(targetGuid).type == "Player"
+end
+
 function objective:AfterEvaluate(result, obj)
   -- Only concerned with objectives that have passed and have a goal > 1
   if not result or obj.goal <= 1 then return result end
+
   -- If flagged, then killing the same target repeatedly is allowed
   if obj.parameters and obj.parameters[tokens.PARAM_SAMETARGET] then return result end
 
-  return addon:EvaluateUniqueTargetForObjective(self, obj, addon.LastPartyKill.destGuid)
+  -- This is an unusual edge case to avoid otherwise incompletable quests to cast spells on multiple
+  -- different player targets w/ the same name
+  -- (bug: you could cheese a quest to "kill 10 Devilsaur" by killing a player named "Devilsaur" 10 times)
+  local targetGuid = addon.LastPartyKill.destGuid
+  if hasSpecificPlayerTarget(obj, targetGuid) then return result end
+
+  return addon:EvaluateUniqueTargetForObjective(self, obj, targetGuid)
 end
 
 local petDamageTable = {}

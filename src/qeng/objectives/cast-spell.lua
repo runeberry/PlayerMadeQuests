@@ -29,13 +29,41 @@ objective:AddCondition(tokens.PARAM_ZONE)
 objective:AddCondition(tokens.PARAM_SUBZONE)
 objective:AddCondition(tokens.PARAM_COORDS)
 
+local function hasSpellTarget(obj)
+  return (
+    obj.conditions[tokens.PARAM_SPELLTARGET]
+    or obj.conditions[tokens.PARAM_SPELLTARGETCLASS]
+    or obj.conditions[tokens.PARAM_SPELLTARGETFACTION]
+    or obj.conditions[tokens.PARAM_SPELLTARGETGUILD]
+    or obj.conditions[tokens.PARAM_SPELLTARGETLEVEL]
+  ) and true
+end
+
+-- Returns true if the objective is to target a specific player, false otherwise
+local function hasSpecificPlayerTarget(obj, targetGuid)
+  -- Specific targets must be defined by the 'target' condition
+  if not obj.conditions[tokens.PARAM_SPELLTARGET] then return end
+
+  -- During AfterEvaluate, we know we have a matching target on LastSpellCast
+  -- So we can analyze that guid to determine if the successful target was, in fact, a Player
+  return addon:ParseGUID().type == "Player"
+end
+
 function objective:AfterEvaluate(result, obj)
   -- Only concerned with objectives that have passed, have a target, and have a goal > 1
-  if not result or not obj.conditions[tokens.PARAM_SPELLTARGET] or obj.goal <= 1 then return result end
+  if not result or not hasSpellTarget(obj) or obj.goal <= 1 then return result end
+
   -- If flagged, then spells cast on the same target repeatedly are allowed
   if obj.parameters and obj.parameters[tokens.PARAM_SAMETARGET] then return result end
 
-  return addon:EvaluateUniqueTargetForObjective(self, obj, addon.LastSpellCast.targetGuid)
+  -- If the target is a specific player, then allow casting the spell on the same target multiple times
+  -- This is an unusual edge case to avoid otherwise incompletable quests to cast spells on multiple
+  -- different player targets w/ the same name
+  -- (bug: you could cheese a quest to "kill 10 Devilsaur" by killing a player named "Devilsaur" 10 times)
+  local targetGuid = addon.LastSpellCast.targetGuid
+  if hasSpecificPlayerTarget(obj, targetGuid) then return result end
+
+  return addon:EvaluateUniqueTargetForObjective(self, obj, targetGuid)
 end
 
 objective:AddAppEvent("PlayerCastSpell", function(spellcast)
