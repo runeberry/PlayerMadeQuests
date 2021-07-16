@@ -102,9 +102,9 @@ function addon:GetPlayerRaceByName(name, realm)
 end
 
 function addon:GetPlayerGenderByName(name, realm)
-  return PlayerDataCache:GetPlayerData(name, realm, "Gender")
+  return PlayerDataCache:GetPlayerData(name, realm, "Sex")
 end
 
 function addon:GetPlayerGuildNameByName(name, realm)
-  return PlayerDataCache:GetPlayerData(name, realm, "Sex")
+  return PlayerDataCache:GetPlayerData(name, realm, "Guild")
 end
