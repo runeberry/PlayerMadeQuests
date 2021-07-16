@@ -5,7 +5,7 @@ condition:AllowType("string")
 condition:AllowValues(addon.WOW_FACTIONS)
 
 function condition:Evaluate(faction)
-  local spellTargetName = addon.LastSpellCast.destName
+  local spellTargetName = addon.LastSpellCast.targetName
   if not spellTargetName then
     self.logger:Fail("No unit was targeted with the last spell")
     return false

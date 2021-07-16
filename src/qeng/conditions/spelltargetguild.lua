@@ -13,7 +13,7 @@ function condition:OnParse(arg)
 end
 
 function condition:Evaluate(guilds)
-  local spellTargetName = addon.LastSpellCast.destName
+  local spellTargetName = addon.LastSpellCast.targetName
   if not spellTargetName then
     self.logger:Fail("No unit was targeted with the last spell")
     return false

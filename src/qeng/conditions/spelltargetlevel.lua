@@ -14,7 +14,7 @@ function condition:OnValidate(rawValue, options)
 end
 
 function condition:Evaluate(level)
-  local spellTargetName = addon.LastSpellCast.destName
+  local spellTargetName = addon.LastSpellCast.targetName
   if not spellTargetName then
     self.logger:Fail("No unit was targeted with the last spell")
     return false
