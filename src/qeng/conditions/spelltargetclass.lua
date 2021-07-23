@@ -2,7 +2,7 @@ local _, addon = ...
 
 local condition = addon.QuestEngine:NewCondition(addon.QuestScriptTokens.PARAM_SPELLTARGETCLASS)
 condition:AllowType("string")
-condition:AllowValues(addon.WOW_ALL_CLASSES)
+condition:AllowValues(addon.WOW_CLASS_NAMES)
 condition:AllowMultiple(true)
 
 function condition:OnParse(arg)
