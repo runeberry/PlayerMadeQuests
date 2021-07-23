@@ -15,7 +15,7 @@ end
 
 function condition:Evaluate(classes)
   local killTargetName = addon.LastPartyKill.destName
-  local killTargetClass = addon:GetPlayerClassByName(killTargetName)
+  local killTargetClass = addon:GetUnitClassByName(killTargetName)
 
   if not killTargetClass then
     self.logger:Fail("Kill target (%s) class unknown", killTargetName)

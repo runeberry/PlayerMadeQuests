@@ -1,7 +1,4 @@
 local _, addon = ...
-
-local UnitIsPlayer = addon.G.UnitIsPlayer
-local UnitFullName = addon.G.UnitFullName
 local time = addon.G.time
 
 addon.PlayerDataCache = addon:NewRepository("PlayerData", "FullName")
@@ -25,79 +22,47 @@ local function getCacheKey(playerName, playerRealm)
   return playerName.."-"..playerRealm
 end
 
-function addon.PlayerDataCache:GetPlayerData(playerName, playerRealm, dataField)
+function addon.PlayerDataCache:GetPlayerDataByName(playerName, playerRealm, dataField, includeTimestamp)
   if not isCacheReady() then return end
 
   local cacheKey = getCacheKey(playerName, playerRealm)
-  local pdata = self:FindByID(cacheKey)
-  if pdata then return pdata[dataField] end
-end
+  local playerData = self:FindByID(cacheKey)
 
-function addon.PlayerDataCache:SetPlayerData(playerName, playerRealm, dataField, dataValue)
-  if playerName == nil or dataField == nil or dataValue == nil then return end
-  if not isCacheReady() then return end
-
-  local cacheKey = getCacheKey(playerName, playerRealm)
-  local timestamp = time()
-
-  local pdata = self:FindByID(cacheKey) or {
-    id = cacheKey,
-    Name = playerName,
-    Realm = playerRealm or currentRealm,
-    FullName = cacheKey,
-  }
-  pdata[dataField] = dataValue
-  pdata[dataField.."@"] = timestamp
-
-  self:Save(pdata)
-end
-
-function addon.PlayerDataCache:SetUnitData(unitId, dataField, dataValue)
-  if dataValue == nil or not UnitIsPlayer(unitId) then return end
-  local playerName, playerRealm = UnitFullName(unitId)
-  addon.PlayerDataCache:SetPlayerData(playerName, playerRealm, dataField, dataValue)
-end
-
-------------
--- Events --
-------------
-
-local function cacheAllUnitData(unitId)
-  if not UnitIsPlayer(unitId) then return end
-  local playerName = addon:GetPlayerName(unitId)
-  if not playerName then return end
-
-  addon:GetPlayerLevel(unitId)
-  addon:GetPlayerClass(unitId)
-  addon:GetPlayerFaction(unitId)
-  addon:GetPlayerRace(unitId)
-  addon:GetPlayerGender(unitId)
-  addon:GetPlayerGuildName(unitId)
-
-  addon.Logger:Trace("Cached data for player: %s", playerName)
-end
-
-local function cacheGroupData()
-  if IsInRaid() then
-    for i = 1,40 do
-      cacheAllUnitData("raid"..tostring(i))
+  if not dataField then
+    if includeTimestamp then
+      -- Return the whole cached object and timestamp
+      return playerData, playerData["@"]
+    else
+      -- Return the whole cached object
+      return playerData
     end
-  elseif IsInGroup() then
-    for i = 1,4 do
-      cacheAllUnitData("party"..tostring(i))
+
+  elseif playerData then
+    if includeTimestamp then
+      -- Return the specified field value and the timestamp at which it was cached
+      return playerData[dataField], playerData[dataField.."@"]
+    else
+      -- Return only the specified field value
+      return playerData[dataField]
     end
   end
 end
 
-addon:OnBackendReady(function()
-  addon.GameEvents:Subscribe("PLAYER_TARGET_CHANGED", function()
-    cacheAllUnitData("target")
-  end)
+function addon.PlayerDataCache:SetPlayerDataByName(playerName, playerRealm, dataField, dataValue)
+  if playerName == nil or dataField == nil or dataValue == nil then return end
+  if not isCacheReady() then return end
 
-  addon.GameEvents:Subscribe("UPDATE_MOUSEOVER_UNIT", function()
-    cacheAllUnitData("mouseover")
-  end)
+  local cacheKey = getCacheKey(playerName, playerRealm)
+  local playerData = self:FindByID(cacheKey) or {
+    Name = playerName,
+    Realm = playerRealm or currentRealm,
+    FullName = cacheKey,
+  }
 
-  addon.GameEvents:Subscribe("GROUP_JOINED", cacheGroupData)
-  addon.GameEvents:Subscribe("GROUP_ROSTER_UPDATE", cacheGroupData)
-end)
+  local timestamp = time()
+  playerData["@"] = timestamp
+  playerData[dataField] = dataValue
+  playerData[dataField.."@"] = timestamp
+
+  self:Save(playerData)
+end

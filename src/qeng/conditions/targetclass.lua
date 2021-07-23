@@ -14,7 +14,7 @@ function condition:OnParse(arg)
 end
 
 function condition:Evaluate(classes)
-  local targetClass = addon:GetPlayerClass("target")
+  local targetClass = addon:GetUnitClass("target")
 
   if not targetClass then
     self.logger:Fail("Target has no class")

@@ -15,7 +15,7 @@ end
 
 function condition:Evaluate(level)
   local killTargetName = addon.LastPartyKill.destName
-  local killTargetLevel = addon:GetPlayerLevelByName(killTargetName)
+  local killTargetLevel = addon:GetUnitLevelByName(killTargetName)
 
   if not killTargetLevel then
     self.logger:Fail("Kill target (%s) level not found", killTargetName)

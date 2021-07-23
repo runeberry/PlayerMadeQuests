@@ -18,6 +18,7 @@ local charsets = {
       purple = "ffa335ee",
       orange = "ffff8000",
       yellow = "ffffff00",
+      cyan = "ff33c0ff",
     }
   },
   -- For use in terminals outside of game
@@ -34,6 +35,7 @@ local charsets = {
       purple = "0;35m",
       orange = "0;33m",
       yellow = "1;33m",
+      cyan = "0;34m",
     }
   },
   -- Disables all special coloring

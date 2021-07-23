@@ -20,7 +20,7 @@ function condition:Evaluate(classes)
     return false
   end
 
-  local spellTargetClass = addon:GetPlayerClassByName(spellTargetName)
+  local spellTargetClass = addon:GetUnitClassByName(spellTargetName)
   if not spellTargetClass then
     self.logger:Fail("Spell target (%s) class unknown", spellTargetName)
     return false

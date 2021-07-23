@@ -14,7 +14,7 @@ function condition:OnValidate(rawValue, options)
 end
 
 function condition:Evaluate(level)
-  local targetLevel = addon:GetPlayerLevel("target")
+  local targetLevel = addon:GetUnitLevel("target")
 
   if not targetLevel then
     self.logger:Fail("Target level not found")

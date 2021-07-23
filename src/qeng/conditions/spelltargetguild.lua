@@ -19,7 +19,7 @@ function condition:Evaluate(guilds)
     return false
   end
 
-  local spellTargetGuild = addon:GetPlayerGuildNameByName(spellTargetName)
+  local spellTargetGuild = addon:GetUnitGuildNameByName(spellTargetName)
   if not spellTargetGuild then
     self.logger:Fail("Spell target (%s) has no guild", spellTargetName)
     return false

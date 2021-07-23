@@ -5,7 +5,7 @@ condition:AllowType("string")
 condition:AllowValues(addon.WOW_FACTIONS)
 
 function condition:Evaluate(faction)
-  local playerFaction = addon:GetPlayerFaction("target")
+  local playerFaction = addon:GetUnitFaction("target")
 
   if not playerFaction then
     self.logger:Fail("Target has no faction")

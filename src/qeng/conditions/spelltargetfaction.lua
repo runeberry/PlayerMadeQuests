@@ -11,7 +11,7 @@ function condition:Evaluate(faction)
     return false
   end
 
-  local spellTargetFaction = addon:GetPlayerFactionByName(spellTargetName)
+  local spellTargetFaction = addon:GetUnitFactionByName(spellTargetName)
   if not spellTargetFaction then
     self.logger:Fail("Spell target (%s) has no faction", spellTargetName)
     return false

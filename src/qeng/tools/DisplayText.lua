@@ -195,8 +195,8 @@ vars = {
   ["name"] = function() return addon:GetPlayerName() end,
   ["class"] = function() return addon:GetPlayerClass() end,
   ["race"] = function() return addon:GetPlayerRace() end,
-  -- Use as a gender conditional flag, e.g. [%gen:his|her]
-  ["gen"] = function() return (addon:GetPlayerGender() == "male") or nil end,
+  -- Use as a sex conditional flag, e.g. [%gen:his|her]
+  ["gen"] = function() return (addon:GetPlayerSex() == "Male") or nil end,
 
   --------------------
   -- Quest-specific --

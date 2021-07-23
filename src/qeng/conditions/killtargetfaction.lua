@@ -6,7 +6,7 @@ condition:AllowValues(addon.WOW_FACTIONS)
 
 function condition:Evaluate(faction)
   local killTargetName = addon.LastPartyKill.destName
-  local killTargetFaction = addon:GetPlayerFactionByName(killTargetName)
+  local killTargetFaction = addon:GetUnitFactionByName(killTargetName)
 
   if not killTargetFaction then
     self.logger:Fail("Kill target (%s) has no faction", killTargetName)

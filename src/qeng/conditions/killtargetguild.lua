@@ -14,7 +14,7 @@ end
 
 function condition:Evaluate(guilds)
   local killTargetName = addon.LastPartyKill.destName
-  local killTargetGuild = addon:GetPlayerGuildNameByName(killTargetName)
+  local killTargetGuild = addon:GetUnitGuildNameByName(killTargetName)
 
   if not killTargetGuild then
     self.logger:Fail("Kill target (%s) has no guild", killTargetName)

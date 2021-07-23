@@ -169,28 +169,56 @@ handlers = {
       if player.Guild then name = name.." <"..player.Guild..">" end
       name = addon:Colorize("yellow", name)
 
+      local level = tostring(player.Level) or "??"
+
       local faction = player.Faction
       if faction == "Horde" then faction = addon:Colorize("red", "[H]")
-      elseif faction == "Alliance" then faction = addon:Colorize("blue", "[A]")
+      elseif faction == "Alliance" then faction = addon:Colorize("cyan", "[A]")
       else faction = "" end
 
-      local sex = player.Sex
-      if sex == "male" then sex = "Male"
-      elseif sex == "female" then sex = "Female"
-      else sex = "" end
-
-      addon.Logger:Info("%s: %s Level %i %s %s %s",
+      addon.Logger:Info("%s: %s Level %s %s %s %s",
         name,
         faction,
-        player.Level or 0,
-        sex,
-        player.Race or "",
-        player.Class or "")
+        level,
+        player.Sex or "",
+        player.RaceLocal or "",
+        player.ClassLocal or "")
+    end
+  end,
+  ["dump-npc-data"] = function()
+    local cache = addon.NpcDataCache:FindAll()
+
+    for _, npc in ipairs(cache) do
+      local name = addon:Colorize("yellow", npc.Name)
+
+      local level
+      if npc.LevelMin and npc.LevelMax and npc.LevelMin ~= npc.LevelMax then
+        level = string.format("%i-%i", npc.LevelMin, npc.LevelMax)
+      elseif npc.Level then
+        level = tostring(npc.Level)
+      else
+        level = "??"
+      end
+
+      local faction = npc.Faction
+      if faction == "Horde" then faction = addon:Colorize("red", "[H]")
+      elseif faction == "Alliance" then faction = addon:Colorize("cyan", "[A]")
+      else faction = "" end
+
+      addon.Logger:Info("%s: %s Level %s",
+        name,
+        faction,
+        level)
     end
   end,
   ["flush-player-data"] = function()
     local cache = addon.PlayerDataCache:FindAll()
     addon.PlayerDataCache:DeleteAll()
-    addon.Logger:Warn("Flushed player data cache [%i player(s)]", addon:tlen(cache))
+    addon.Logger:Warn("Flushed player data cache [%i players]", addon:tlen(cache))
+  end,
+  ["flush-npc-data"] = function()
+    local cache = addon.NpcDataCache:FindAll()
+    addon.NpcDataCache:DeleteAll()
+    addon.Logger:Warn("Flushed NPC data cache [%i NPCs]", addon:tlen(cache))
   end,
 }

@@ -13,7 +13,7 @@ function condition:OnParse(arg)
 end
 
 function condition:Evaluate(guilds)
-  local targetGuild = addon:GetPlayerGuildName("target")
+  local targetGuild = addon:GetUnitGuildName("target")
 
   if not targetGuild then
     self.logger:Fail("Target has no guild")

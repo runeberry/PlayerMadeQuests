@@ -381,7 +381,7 @@ describe("DisplayText", function()
       local str = addon:PopulateText("You call yourself a %race?")
       assert.equals("You call yourself a Night Elf?", str)
     end)
-    it("can display based on the player's gender", function()
+    it("can display based on the player's sex", function()
       game:SetPlayerInfo(addon, { sex = 2 })
       local text = "Look at [%gen:him|her]!"
       local str = addon:PopulateText(text)

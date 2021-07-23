@@ -20,7 +20,7 @@ function condition:Evaluate(level)
     return false
   end
 
-  local spellTargetLevel = addon:GetPlayerLevelByName(spellTargetName)
+  local spellTargetLevel = addon:GetUnitLevelByName(spellTargetName)
   if not spellTargetLevel then
     self.logger:Fail("Spell target (%s) level not found", spellTargetName)
     return false
