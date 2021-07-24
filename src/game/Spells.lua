@@ -293,9 +293,3 @@ function addon:ScanSpells(min, max)
 
   addon.Logger:Warn("Beginning spell scan - /reload to cancel...")
 end
-
-function addon:ClearSpellCache()
-  local spells = GameSpellCache:FindAll()
-  GameSpellCache:DeleteAll()
-  addon.Logger:Warn("Item cache cleared (%i items removed)", #spells)
-end

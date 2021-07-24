@@ -136,9 +136,6 @@ handlers = {
   ["scan-items"] = function(min, max)
     addon:ScanItems(min, max)
   end,
-  ["clear-items"] = function()
-    addon:ClearItemCache()
-  end,
   ["lookup-spell"] = function(...)
     local idOrName = strjoin(" ", ...)
 
@@ -152,9 +149,6 @@ handlers = {
   end,
   ["scan-spells"] = function(min, max)
     addon:ScanSpells(min, max)
-  end,
-  ["clear-spells"] = function()
-    addon:ClearSpellCache()
   end,
   ["watch-spells"] = function()
     addon:ToggleSpellWatch()
@@ -210,15 +204,5 @@ handlers = {
         faction,
         level)
     end
-  end,
-  ["flush-player-data"] = function()
-    local cache = addon.PlayerDataCache:FindAll()
-    addon.PlayerDataCache:DeleteAll()
-    addon.Logger:Warn("Flushed player data cache [%i players]", addon:tlen(cache))
-  end,
-  ["flush-npc-data"] = function()
-    local cache = addon.NpcDataCache:FindAll()
-    addon.NpcDataCache:DeleteAll()
-    addon.Logger:Warn("Flushed NPC data cache [%i NPCs]", addon:tlen(cache))
   end,
 }
