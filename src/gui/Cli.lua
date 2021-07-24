@@ -159,24 +159,22 @@ handlers = {
 
     for _, player in ipairs(cache) do
       local name = player.Name
-      if player.Realm ~= currentRealm then name = player.FullName end
+      if player.Realm and player.Realm ~= currentRealm then name = player.FullName end
       if player.Guild then name = name.." <"..player.Guild..">" end
       name = addon:Colorize("yellow", name)
 
-      local level = tostring(player.Level) or "??"
-
-      local faction = player.Faction
+      local faction = player.FactionId
       if faction == "Horde" then faction = addon:Colorize("red", "[H]")
       elseif faction == "Alliance" then faction = addon:Colorize("cyan", "[A]")
       else faction = "" end
 
+      local level = tostring(player.Level) or "??"
+      local sex = player.SexId and addon:GetSexNameById(player.SexId) or ""
+      local race = player.RaceId and addon:GetRaceNameById(player.RaceId) or ""
+      local class = player.ClassId and addon:GetClassNameById(player.ClassId) or ""
+
       addon.Logger:Info("%s: %s Level %s %s %s %s",
-        name,
-        faction,
-        level,
-        player.Sex or "",
-        player.RaceLocal or "",
-        player.ClassLocal or "")
+        name, faction, level, sex, race, class)
     end
   end,
   ["dump-npc-data"] = function()
@@ -184,6 +182,11 @@ handlers = {
 
     for _, npc in ipairs(cache) do
       local name = addon:Colorize("yellow", npc.Name)
+
+      local faction = npc.FactionId
+      if faction == "Horde" then faction = addon:Colorize("red", "[H]")
+      elseif faction == "Alliance" then faction = addon:Colorize("cyan", "[A]")
+      else faction = "" end
 
       local level
       if npc.LevelMin and npc.LevelMax and npc.LevelMin ~= npc.LevelMax then
@@ -194,15 +197,8 @@ handlers = {
         level = "??"
       end
 
-      local faction = npc.Faction
-      if faction == "Horde" then faction = addon:Colorize("red", "[H]")
-      elseif faction == "Alliance" then faction = addon:Colorize("cyan", "[A]")
-      else faction = "" end
-
       addon.Logger:Info("%s: %s Level %s",
-        name,
-        faction,
-        level)
+        name, faction, level)
     end
   end,
 }
