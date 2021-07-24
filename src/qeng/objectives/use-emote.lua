@@ -10,10 +10,10 @@ objective:AddParameter(tokens.PARAM_GOAL)
 objective:AddParameter(tokens.PARAM_SAMETARGET)
 objective:AddParameter(tokens.PARAM_TEXT, {
   defaultValue = {
-    log = "/%em[%t: with %t][%g2: %p/%g]",
-    progress = "/%em[%t: with %t]: %p/%g",
-    quest = "/%em[%t: with [%g2 ]%t|[%g2: %g2 times]][%xysz: in %xysz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
-    full = "Use emote /%em[%t: on [%g2 ]%t|[%g2: %g2 times]][%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
+    log = "/%em[%t: with %an %t][%g2: %p/%g]",
+    progress = "/%em[%t: with %an %t]: %p/%g",
+    quest = "/%em[%t: with %g3 %t|[%g2: %g2 times]][%xysz: in %xysz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
+    full = "Use emote /%em[%t: on %g3 %t|[%g2: %g2 times]][%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
   },
 })
 

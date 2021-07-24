@@ -77,6 +77,12 @@ vars = {
   -- Derived from Conditions --
   -----------------------------
 
+  ["an"] = function(cp)
+    if cp.goal and cp.goal > 1 then return end
+    local isSpecificTarget = cp.conditions[t.PARAM_TARGET] or cp.conditions[t.PARAM_KILLTARGET] or cp.conditions[t.PARAM_SPELLTARGET]
+    if isSpecificTarget then return end
+    return "a" -- todo: "a"/"an" based on resolved target name
+  end,
   --- Decides whether to display "at" or "in" based on context
   ["atin"] = function(cp)
     local target = cp.conditions[t.PARAM_TARGET]
@@ -187,7 +193,7 @@ vars = {
       targetClass = defaultConditionTextHandler("member", strModifier)
     else
       -- "...foe" or "...foes"
-      targetClass = defaultConditionTextHandler("foe", strModifier)
+      targetClass = defaultConditionTextHandler("target", strModifier)
     end
 
     -- Extra whitespace will be trimmed when the final string is cleaned
@@ -200,6 +206,12 @@ vars = {
 
   ["g"] = function(obj) return obj.goal end,
   ["g2"] = function(obj) if obj.goal > 1 then return obj.goal end end,
+  ["g3"] = function(obj)
+    if obj.goal > 1 then return obj.goal end
+    local isSpecificTarget = obj.conditions[t.PARAM_TARGET] or obj.conditions[t.PARAM_KILLTARGET] or obj.conditions[t.PARAM_SPELLTARGET]
+    if isSpecificTarget then return end
+    return "a" -- todo: "a"/"an" based on resolved target name
+  end,
   ["p"] = function(obj) return obj.progress end,
   ["p2"] = function(obj) if obj.progress < obj.goal then return obj.progress end end,
 

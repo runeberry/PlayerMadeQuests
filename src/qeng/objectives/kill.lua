@@ -12,8 +12,8 @@ objective:AddParameter(tokens.PARAM_TEXT, {
   defaultValue = {
     log = "%t %p/%g",
     progress = "%t slain: %p/%g",
-    quest = "Kill [%g2 ]%t[%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
-    full = "Kill [%g2 ]%t[%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
+    quest = "Kill %g3 %t[%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
+    full = "Kill %g3 %t[%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]"
   },
 })
 

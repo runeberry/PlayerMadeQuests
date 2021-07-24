@@ -9,10 +9,10 @@ objective:AddParameter(tokens.PARAM_GOAL)
 objective:AddParameter(tokens.PARAM_SAMETARGET)
 objective:AddParameter(tokens.PARAM_TEXT, {
   defaultValue = {
-    log = "%s[%t: on %t] %p/%g",
-    progress = "Cast %s[%t: on %t]: %p/%g",
-    quest = "Cast %s[%t:[%g2:[%st:[ on %t %g times]|[ on %g different %t]]|[ on %t]]|[%g2: %g times]][%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
-    full = "Cast %s[%t:[%g2:[%st:[ on %t %g times]|[ on %g different %t]]|[ on %t]]|[%g2: %g times]][%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
+    log = "%s[%t: on %an %t] %p/%g",
+    progress = "Cast %s[%t: on %an %t]: %p/%g",
+    quest = "Cast %s[%t:[%g2:[%st:[ on %an %t %g times]|[ on %g different %t]]|[ on %an %t]]|[%g2: %g times]][%xyz: in %xyz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
+    full = "Cast %s[%t:[%g2:[%st:[ on %an %t %g times]|[ on %g different %t]]|[ on %an %t]]|[%g2: %g times]][%xyz: in %xyrz][%a: while having %a][%i: while having %i][%e: while wearing %e]",
   }
 })
 

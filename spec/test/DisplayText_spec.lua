@@ -60,46 +60,64 @@ describe("DisplayText", function()
       {
         objective = "use-emote: { emote: dance, guild: Theramore Guard }",
         expected = {
-          log = "/dance with <Theramore Guard> member",
-          progress = "/dance with <Theramore Guard> member: 0/1",
-          quest = "/dance with <Theramore Guard> member",
-          full = "Use emote /dance on <Theramore Guard> member",
+          log = "/dance with a <Theramore Guard> member",
+          progress = "/dance with a <Theramore Guard> member: 0/1",
+          quest = "/dance with a <Theramore Guard> member",
+          full = "Use emote /dance on a <Theramore Guard> member",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, goal: 3, guild: Theramore Guard }",
+        expected = {
+          log = "/dance with <Theramore Guard> members 0/3",
+          progress = "/dance with <Theramore Guard> members: 0/3",
+          quest = "/dance with 3 <Theramore Guard> members",
+          full = "Use emote /dance on 3 <Theramore Guard> members",
         }
       },
       {
         objective = "use-emote: { emote: dance, class: Druid }",
         expected = {
-          log = "/dance with Druid",
-          progress = "/dance with Druid: 0/1",
-          quest = "/dance with Druid",
-          full = "Use emote /dance on Druid",
+          log = "/dance with a Druid",
+          progress = "/dance with a Druid: 0/1",
+          quest = "/dance with a Druid",
+          full = "Use emote /dance on a Druid",
         }
       },
       {
         objective = "use-emote: { emote: dance, level: 30 }",
         expected = {
-          log = "/dance with Level 30+ foe",
-          progress = "/dance with Level 30+ foe: 0/1",
-          quest = "/dance with Level 30+ foe",
-          full = "Use emote /dance on Level 30+ foe",
+          log = "/dance with a Level 30+ target",
+          progress = "/dance with a Level 30+ target: 0/1",
+          quest = "/dance with a Level 30+ target",
+          full = "Use emote /dance on a Level 30+ target",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, goal: 12, level: 30 }",
+        expected = {
+          log = "/dance with Level 30+ targets 0/12",
+          progress = "/dance with Level 30+ targets: 0/12",
+          quest = "/dance with 12 Level 30+ targets",
+          full = "Use emote /dance on 12 Level 30+ targets",
         }
       },
       {
         objective = "use-emote: { emote: dance, faction: Horde }",
         expected = {
-          log = "/dance with Horde foe",
-          progress = "/dance with Horde foe: 0/1",
-          quest = "/dance with Horde foe",
-          full = "Use emote /dance on Horde foe",
+          log = "/dance with a Horde target",
+          progress = "/dance with a Horde target: 0/1",
+          quest = "/dance with a Horde target",
+          full = "Use emote /dance on a Horde target",
         }
       },
       {
         objective = "use-emote: { emote: dance, guild: Theramore Guard, class: Druid, level: 30, faction: Horde }",
         expected = {
-          log = "/dance with Level 30+ Horde <Theramore Guard> Druid",
-          progress = "/dance with Level 30+ Horde <Theramore Guard> Druid: 0/1",
-          quest = "/dance with Level 30+ Horde <Theramore Guard> Druid",
-          full = "Use emote /dance on Level 30+ Horde <Theramore Guard> Druid",
+          log = "/dance with a Level 30+ Horde <Theramore Guard> Druid",
+          progress = "/dance with a Level 30+ Horde <Theramore Guard> Druid: 0/1",
+          quest = "/dance with a Level 30+ Horde <Theramore Guard> Druid",
+          full = "Use emote /dance on a Level 30+ Horde <Theramore Guard> Druid",
         }
       },
       {
@@ -170,8 +188,17 @@ describe("DisplayText", function()
         expected = {
           log = "<Theramore Guard> member 0/1",
           progress = "<Theramore Guard> member slain: 0/1",
-          quest = "Kill <Theramore Guard> member",
-          full = "Kill <Theramore Guard> member",
+          quest = "Kill a <Theramore Guard> member",
+          full = "Kill a <Theramore Guard> member",
+        }
+      },
+      {
+        objective = "kill: { goal: 5, guild: Theramore Guard }",
+        expected = {
+          log = "<Theramore Guard> members 0/5",
+          progress = "<Theramore Guard> members slain: 0/5",
+          quest = "Kill 5 <Theramore Guard> members",
+          full = "Kill 5 <Theramore Guard> members",
         }
       },
       {
@@ -179,26 +206,35 @@ describe("DisplayText", function()
         expected = {
           log = "Druid 0/1",
           progress = "Druid slain: 0/1",
-          quest = "Kill Druid",
-          full = "Kill Druid",
+          quest = "Kill a Druid",
+          full = "Kill a Druid",
         }
       },
       {
         objective = "kill: { level: 30 }",
         expected = {
-          log = "Level 30+ foe 0/1",
-          progress = "Level 30+ foe slain: 0/1",
-          quest = "Kill Level 30+ foe",
-          full = "Kill Level 30+ foe",
+          log = "Level 30+ target 0/1",
+          progress = "Level 30+ target slain: 0/1",
+          quest = "Kill a Level 30+ target",
+          full = "Kill a Level 30+ target",
+        }
+      },
+      {
+        objective = "kill: { goal: 6, level: 30 }",
+        expected = {
+          log = "Level 30+ targets 0/6",
+          progress = "Level 30+ targets slain: 0/6",
+          quest = "Kill 6 Level 30+ targets",
+          full = "Kill 6 Level 30+ targets",
         }
       },
       {
         objective = "kill: { faction: Horde }",
         expected = {
-          log = "Horde foe 0/1",
-          progress = "Horde foe slain: 0/1",
-          quest = "Kill Horde foe",
-          full = "Kill Horde foe",
+          log = "Horde target 0/1",
+          progress = "Horde target slain: 0/1",
+          quest = "Kill a Horde target",
+          full = "Kill a Horde target",
         }
       },
       {
@@ -206,8 +242,8 @@ describe("DisplayText", function()
         expected = {
           log = "Level 30+ Horde <Theramore Guard> Druid 0/1",
           progress = "Level 30+ Horde <Theramore Guard> Druid slain: 0/1",
-          quest = "Kill Level 30+ Horde <Theramore Guard> Druid",
-          full = "Kill Level 30+ Horde <Theramore Guard> Druid",
+          quest = "Kill a Level 30+ Horde <Theramore Guard> Druid",
+          full = "Kill a Level 30+ Horde <Theramore Guard> Druid",
         }
       },
       {
@@ -287,46 +323,64 @@ describe("DisplayText", function()
       {
         objective = "cast-spell: { spell: 'Fire Blast', guild: Theramore Guard }",
         expected = {
-          log = "Fire Blast on <Theramore Guard> member 0/1",
-          progress = "Cast Fire Blast on <Theramore Guard> member: 0/1",
-          quest = "Cast Fire Blast on <Theramore Guard> member",
-          full = "Cast Fire Blast on <Theramore Guard> member",
+          log = "Fire Blast on a <Theramore Guard> member 0/1",
+          progress = "Cast Fire Blast on a <Theramore Guard> member: 0/1",
+          quest = "Cast Fire Blast on a <Theramore Guard> member",
+          full = "Cast Fire Blast on a <Theramore Guard> member",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', goal: 2, guild: Theramore Guard }",
+        expected = {
+          log = "Fire Blast on <Theramore Guard> members 0/2",
+          progress = "Cast Fire Blast on <Theramore Guard> members: 0/2",
+          quest = "Cast Fire Blast on 2 different <Theramore Guard> members",
+          full = "Cast Fire Blast on 2 different <Theramore Guard> members",
         }
       },
       {
         objective = "cast-spell: { spell: 'Fire Blast', class: Druid }",
         expected = {
-          log = "Fire Blast on Druid 0/1",
-          progress = "Cast Fire Blast on Druid: 0/1",
-          quest = "Cast Fire Blast on Druid",
-          full = "Cast Fire Blast on Druid",
+          log = "Fire Blast on a Druid 0/1",
+          progress = "Cast Fire Blast on a Druid: 0/1",
+          quest = "Cast Fire Blast on a Druid",
+          full = "Cast Fire Blast on a Druid",
         }
       },
       {
         objective = "cast-spell: { spell: 'Fire Blast', level: 30 }",
         expected = {
-          log = "Fire Blast on Level 30+ foe 0/1",
-          progress = "Cast Fire Blast on Level 30+ foe: 0/1",
-          quest = "Cast Fire Blast on Level 30+ foe",
-          full = "Cast Fire Blast on Level 30+ foe",
+          log = "Fire Blast on a Level 30+ target 0/1",
+          progress = "Cast Fire Blast on a Level 30+ target: 0/1",
+          quest = "Cast Fire Blast on a Level 30+ target",
+          full = "Cast Fire Blast on a Level 30+ target",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', goal: 2, level: 30 }",
+        expected = {
+          log = "Fire Blast on Level 30+ targets 0/2",
+          progress = "Cast Fire Blast on Level 30+ targets: 0/2",
+          quest = "Cast Fire Blast on 2 different Level 30+ targets",
+          full = "Cast Fire Blast on 2 different Level 30+ targets",
         }
       },
       {
         objective = "cast-spell: { spell: 'Fire Blast', faction: Horde }",
         expected = {
-          log = "Fire Blast on Horde foe 0/1",
-          progress = "Cast Fire Blast on Horde foe: 0/1",
-          quest = "Cast Fire Blast on Horde foe",
-          full = "Cast Fire Blast on Horde foe",
+          log = "Fire Blast on a Horde target 0/1",
+          progress = "Cast Fire Blast on a Horde target: 0/1",
+          quest = "Cast Fire Blast on a Horde target",
+          full = "Cast Fire Blast on a Horde target",
         }
       },
       {
         objective = "cast-spell: { spell: 'Fire Blast', guild: Theramore Guard, class: Druid, level: 30, faction: Horde }",
         expected = {
-          log = "Fire Blast on Level 30+ Horde <Theramore Guard> Druid 0/1",
-          progress = "Cast Fire Blast on Level 30+ Horde <Theramore Guard> Druid: 0/1",
-          quest = "Cast Fire Blast on Level 30+ Horde <Theramore Guard> Druid",
-          full = "Cast Fire Blast on Level 30+ Horde <Theramore Guard> Druid",
+          log = "Fire Blast on a Level 30+ Horde <Theramore Guard> Druid 0/1",
+          progress = "Cast Fire Blast on a Level 30+ Horde <Theramore Guard> Druid: 0/1",
+          quest = "Cast Fire Blast on a Level 30+ Horde <Theramore Guard> Druid",
+          full = "Cast Fire Blast on a Level 30+ Horde <Theramore Guard> Druid",
         }
       },
     }
