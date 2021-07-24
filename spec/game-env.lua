@@ -60,8 +60,12 @@ function game:SetPlayerTarget(addon, target)
 
   mock:GetFunctionMock(addon.G.GetUnitName):SetReturnsWhen(unitIdIsTarget, target.name)
   mock:GetFunctionMock(addon.G.UnitGUID):SetReturnsWhen(unitIdIsTarget, target.guid)
+  mock:GetFunctionMock(addon.G.UnitIsPlayer):SetReturnsWhen(unitIdIsTarget, true)
+  mock:GetFunctionMock(addon.G.UnitExists):SetReturnsWhen(unitIdIsTarget, true)
   mocks[#mocks+1] = addon.G.GetUnitName
   mocks[#mocks+1] = addon.G.UnitGUID
+  mocks[#mocks+1] = addon.G.UnitIsPlayer
+  mocks[#mocks+1] = addon.G.UnitExists
 end
 
 function game:SetPlayerLocation(addon, loc)
