@@ -147,6 +147,7 @@ function deps:Init(addon)
     GetBuildInfo = ret("1.2.3", "10203", "Jan 1, 2000", 10203),
     GetCoinTextureString = ret("money"),
     GetGuildInfo = ret(),
+    GetClassInfo = ret(),
     GetMapInfo = ret(),
     GetPlayerMapPosition = ret(),
     GetUnitName = function(uid)
@@ -155,6 +156,7 @@ function deps:Init(addon)
         return "PlayerName"
       end
     end,
+    GetRaceInfo = ret(),
     GetRealZoneText = ret(),
     GetSubZoneText = ret(),
     GetMinimapZoneText = ret(),
@@ -186,7 +188,10 @@ function deps:Init(addon)
     UnitFullName = ret("PlayerName", "PlayerRealm"),
     UnitGUID = ret(),
     UnitIsFriend = ret(),
-    UnitIsPlayer = ret(),
+    UnitIsPlayer = function(unitId)
+      -- mock out if you want other unitIds to players
+      return unitId == "player"
+    end,
     UnitLevel = ret(),
     UnitRace = ret(),
     UnitSex = ret(),

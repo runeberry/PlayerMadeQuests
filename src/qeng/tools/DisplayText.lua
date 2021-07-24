@@ -27,7 +27,12 @@ local function ifParam(name, fn)
   end
 end
 
-local function pluralize(str) return addon:Pluralize(2, str) end
+local function pluralize(str)
+  return addon:Pluralize(2, str)
+end
+local function getClassNames(classId)
+  return addon:GetClassNameById(classId)
+end
 local function addGuildBackets(str) return string.format("<%s>", str) end
 local function clean(str)
   -- Clean up any leading, trailing, or duplicate spaces before returning
@@ -50,8 +55,18 @@ vars = {
   ["player"] = t.PARAM_PLAYER,
   ["rc"] = t.PARAM_REWARDCHOICE,
   ["tn"] = { t.PARAM_TARGET, t.PARAM_KILLTARGET, t.PARAM_SPELLTARGET, t.PARAM_RECIPIENT },
-  ["tc"] = { t.PARAM_TARGETCLASS, t.PARAM_KILLTARGETCLASS, t.PARAM_SPELLTARGETCLASS },
-  ["tf"] = { t.PARAM_TARGETFACTION, t.PARAM_KILLTARGETFACTION, t.PARAM_SPELLTARGETFACTION },
+  ["tc"] = function(cp)
+    local targetClassId = cp.conditions[t.PARAM_TARGETCLASS]
+      or cp.conditions[t.PARAM_KILLTARGETCLASS]
+      or cp.conditions[t.PARAM_SPELLTARGETCLASS]
+    return targetClassId and addon:GetClassNameById(targetClassId)
+  end,
+  ["tf"] = function(cp)
+    local targetFactionId = cp.conditions[t.PARAM_TARGETFACTION]
+      or cp.conditions[t.PARAM_KILLTARGETFACTION]
+      or cp.conditions[t.PARAM_SPELLTARGETFACTION]
+    return targetFactionId and addon:GetFactionNameById(targetFactionId)
+  end,
   ["tg"] = { t.PARAM_TARGETGUILD, t.PARAM_KILLTARGETGUILD, t.PARAM_SPELLTARGETGUILD },
   ["tl"] = { t.PARAM_TARGETLEVEL, t.PARAM_KILLTARGETLEVEL, t.PARAM_SPELLTARGETLEVEL },
   ["st"] = t.PARAM_SAMETARGET,
@@ -166,7 +181,7 @@ vars = {
 
     if targetClass then
       -- "...Hunter, Shaman or Paladin..." or "...Hunters, Shamans or Paladins..."
-      targetClass = defaultConditionTextHandler(targetClass, strModifier)
+      targetClass = defaultConditionTextHandler(targetClass, getClassNames)
     elseif targetGuild then
       -- "...member" or "...members"
       targetClass = defaultConditionTextHandler("member", strModifier)
@@ -192,11 +207,12 @@ vars = {
   -- Player Info --
   -----------------
 
-  ["name"] = function() return addon:GetPlayerName() end,
-  ["class"] = function() return addon:GetPlayerClass() end,
-  ["race"] = function() return addon:GetPlayerRace() end,
+  ["name"] = function() return addon:GetPlayerName(true) end,
+  ["class"] = function() return addon:GetPlayerClass(true) end,
+  ["race"] = function() return addon:GetPlayerRace(true) end,
+  ["guild"] = function() return addon:GetPlayerGuildName() end,
   -- Use as a sex conditional flag, e.g. [%gen:his|her]
-  ["gen"] = function() return (addon:GetPlayerSex() == "Male") or nil end,
+  ["gen"] = function() return addon:GetPlayerSex() == 2 or nil end,
 
   --------------------
   -- Quest-specific --

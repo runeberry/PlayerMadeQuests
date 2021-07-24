@@ -87,54 +87,48 @@ function addon:GetUnitClass(unitId, localized)
   -- Only attempt to cache class for players
   if not UnitIsPlayer(unitId) then return end
 
-  local classLocal, class = UnitClass(unitId)
-  setCacheValue(unitId, "Class", class)
-  setCacheValue(unitId, "ClassLocal", classLocal)
+  local classLocal, _, classId = UnitClass(unitId)
+  setCacheValue(unitId, "ClassId", classId)
 
   if localized then
     return classLocal
   end
 
-  return class
+  return classId
 end
 
 function addon:GetUnitFaction(unitId, localized)
-  local faction, factionLocal = UnitFactionGroup(unitId)
-  setCacheValue(unitId, "Faction", faction)
-  setCacheValue(unitId, "FactionLocal", factionLocal)
+  local factionId, factionLocal = UnitFactionGroup(unitId)
+  setCacheValue(unitId, "FactionId", factionId)
+  addon:SetFactionNameById(factionId, factionLocal)
 
   if localized then
     return factionLocal
   end
 
-  return faction
+  return factionId
 end
 
 function addon:GetUnitRace(unitId, localized)
-  local raceLocal, race = UnitRace(unitId)
-  setCacheValue(unitId, "Race", race)
-  setCacheValue(unitId, "RaceLocal", raceLocal)
+  local raceLocal, _, raceId = UnitRace(unitId)
+  setCacheValue(unitId, "RaceId", raceId)
 
   if localized then
     return raceLocal
   end
 
-  return race
+  return raceId
 end
 
-function addon:GetUnitSex(unitId)
-  local sex = UnitSex(unitId)
+function addon:GetUnitSex(unitId, localized)
+  local sexId = UnitSex(unitId)
+  setCacheValue(unitId, "SexId", sexId)
 
-  if sex == 2 then
-    sex = "Male"
-  elseif sex == 3 then
-    sex = "Female"
-  else
-    return nil
+  if localized then
+    return addon:GetSexNameById(sexId)
   end
 
-  setCacheValue(unitId, "Sex", sex)
-  return sex
+  return sexId
 end
 
 function addon:GetUnitGuildName(unitId)
@@ -172,8 +166,8 @@ function addon:GetPlayerRace(localized)
   return addon:GetUnitRace("player", localized)
 end
 
-function addon:GetPlayerSex()
-  return addon:GetUnitSex("player")
+function addon:GetPlayerSex(localized)
+  return addon:GetUnitSex("player", localized)
 end
 
 function addon:GetPlayerGuildName()
@@ -189,19 +183,27 @@ function addon:GetUnitLevelByName(name, realm)
 end
 
 function addon:GetUnitClassByName(name, realm, localized)
-  return getCacheValue(name, realm, localized and "ClassLocal" or "Class")
+  local classId = getCacheValue(name, realm, "ClassId")
+  if classId and localized then return addon:GetClassNameById(classId) end
+  return classId
 end
 
 function addon:GetUnitFactionByName(name, realm, localized)
-  return getCacheValue(name, realm, localized and "FactionLocal" or "Faction")
+  local factionId = getCacheValue(name, realm, "FactionId")
+  if factionId and localized then return addon:GetFactionNameById(factionId) end
+  return factionId
 end
 
 function addon:GetUnitRaceByName(name, realm, localized)
-  return getCacheValue(name, realm, localized and "RaceLocal" or "Race")
+  local raceId = getCacheValue(name, realm, "RaceId")
+  if raceId and localized then return addon:GetRaceNameById(raceId) end
+  return raceId
 end
 
-function addon:GetUnitSexByName(name, realm)
-  return getCacheValue(name, realm, "Sex")
+function addon:GetUnitSexByName(name, realm, localized)
+  local sexId = getCacheValue(name, realm, "SexId")
+  if sexId and localized then return addon:GetSexNameById(sexId) end
+  return sexId
 end
 
 function addon:GetUnitGuildNameByName(name, realm)

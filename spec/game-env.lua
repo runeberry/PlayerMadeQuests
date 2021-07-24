@@ -7,6 +7,9 @@ local mocks = {}
 
 local function unitIdIsTarget(uid) return uid == "target" end
 local function unitIdIsPlayer(uid) return uid == "player" end
+local function firstArgEquals(value)
+  return function(arg0) return arg0 == value end
+end
 
 function game:ResetEnv(addon)
   addon._genv_aura_index = nil
@@ -136,9 +139,7 @@ end
 function game:AddPlayerEquipment(addon, item)
   assert(type(item) == "table", "AddPlayerEquipment must receive a table")
 
-  mock:GetFunctionMock(addon.G.IsEquippedItem):SetReturnsWhen(function(itemIdOrName)
-    return itemIdOrName == item.name
-  end, true)
+  mock:GetFunctionMock(addon.G.IsEquippedItem):SetReturnsWhen(firstArgEquals(item.name), true)
   mocks[#mocks+1] = addon.G.IsEquippedItem
 end
 
@@ -161,18 +162,28 @@ function game:SetPlayerInfo(addon, info)
   end
 
   if info.class then
-    mock:GetFunctionMock(addon.G.UnitClass):SetReturnsWhen(unitIdIsPlayer, info.class)
+    mock:GetFunctionMock(addon.G.UnitClass):SetReturnsWhen(unitIdIsPlayer, info.class, nil, info.classId)
     mocks[#mocks+1] = addon.G.UnitClass
+
+    if info.classId then
+      mock:GetFunctionMock(addon.G.GetClassInfo):SetReturnsWhen(firstArgEquals(info.classId), { className = info.class })
+      mocks[#mocks+1] = addon.G.GetClassInfo
+    end
   end
 
   if info.faction then
-    mock:GetFunctionMock(addon.G.UnitFactionGroup):SetReturnsWhen(unitIdIsPlayer, info.faction)
+    mock:GetFunctionMock(addon.G.UnitFactionGroup):SetReturnsWhen(unitIdIsPlayer, info.faction, info.faction)
     mocks[#mocks+1] = addon.G.UnitFactionGroup
   end
 
   if info.race then
-    mock:GetFunctionMock(addon.G.UnitRace):SetReturnsWhen(unitIdIsPlayer, info.race)
+    mock:GetFunctionMock(addon.G.UnitRace):SetReturnsWhen(unitIdIsPlayer, info.race, nil, info.raceId)
     mocks[#mocks+1] = addon.G.UnitRace
+
+    if info.raceId then
+      mock:GetFunctionMock(addon.G.GetRaceInfo):SetReturnsWhen(firstArgEquals(info.raceId), { raceName = info.race })
+      mocks[#mocks+1] = addon.G.GetRaceInfo
+    end
   end
 
   if info.sex then

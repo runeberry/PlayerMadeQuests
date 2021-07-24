@@ -9,5 +9,5 @@ function condition:OnParse(args)
 end
 
 function condition:Evaluate(class)
-  return addon:GetPlayerClass():lower() == class
+  return addon:GetPlayerClass(true):lower() == class
 end

@@ -1,4 +1,6 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="game/Localization.lua"/>
+
   <Script file="game/Auras.lua"/>
   <Script file="game/Constants.lua"/>
   <Script file="game/Images.lua"/>
