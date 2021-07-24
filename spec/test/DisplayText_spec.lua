@@ -85,6 +85,15 @@ describe("DisplayText", function()
         }
       },
       {
+        objective = "use-emote: { emote: dance, goal: 3, class: Druid }",
+        expected = {
+          log = "/dance with Druids 0/3",
+          progress = "/dance with Druids: 0/3",
+          quest = "/dance with 3 Druids",
+          full = "Use emote /dance on 3 Druids",
+        }
+      },
+      {
         objective = "use-emote: { emote: dance, level: 30 }",
         expected = {
           log = "/dance with a Level 30+ target",
@@ -208,6 +217,15 @@ describe("DisplayText", function()
           progress = "Druid slain: 0/1",
           quest = "Kill a Druid",
           full = "Kill a Druid",
+        }
+      },
+      {
+        objective = "kill: { goal: 7, class: Warlock, faction: Alliance }",
+        expected = {
+          log = "Alliance Warlocks 0/7",
+          progress = "Alliance Warlocks slain: 0/7",
+          quest = "Kill 7 Alliance Warlocks",
+          full = "Kill 7 Alliance Warlocks",
         }
       },
       {
@@ -345,6 +363,15 @@ describe("DisplayText", function()
           progress = "Cast Fire Blast on a Druid: 0/1",
           quest = "Cast Fire Blast on a Druid",
           full = "Cast Fire Blast on a Druid",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', goal: 4, class: Mage }",
+        expected = {
+          log = "Fire Blast on Mages 0/4",
+          progress = "Cast Fire Blast on Mages: 0/4",
+          quest = "Cast Fire Blast on 4 different Mages",
+          full = "Cast Fire Blast on 4 different Mages",
         }
       },
       {

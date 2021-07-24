@@ -30,8 +30,12 @@ end
 local function pluralize(str)
   return addon:Pluralize(2, str)
 end
-local function getClassNames(classId)
+local function getClassNamesSingular(classId)
   return addon:GetClassNameById(classId)
+end
+local function getClassNamesPlural(classId)
+  -- todo: this is not l10n friendly, but it's good for English users so... I'll take it
+  return addon:Pluralize(2, addon:GetClassNameById(classId))
 end
 local function addGuildBackets(str) return string.format("<%s>", str) end
 local function clean(str)
@@ -169,8 +173,10 @@ vars = {
     end
 
     local strModifier
+    local classModifier = getClassNamesSingular
     if cp.goal and cp.goal > 1 then
       strModifier = pluralize
+      classModifier = getClassNamesPlural
     end
 
     if targetLevel then
@@ -187,7 +193,7 @@ vars = {
 
     if targetClass then
       -- "...Hunter, Shaman or Paladin..." or "...Hunters, Shamans or Paladins..."
-      targetClass = defaultConditionTextHandler(targetClass, getClassNames)
+      targetClass = defaultConditionTextHandler(targetClass, classModifier)
     elseif targetGuild then
       -- "...member" or "...members"
       targetClass = defaultConditionTextHandler("member", strModifier)
