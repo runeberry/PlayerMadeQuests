@@ -222,6 +222,9 @@ local methods = {
   ------------------
   -- Read Methods --
   ------------------
+  ["CountAll"] = function(self)
+    return addon:tlen(self.data)
+  end,
   ["FindAll"] = function(self)
     local results = {}
     if self._directReadEnabled then

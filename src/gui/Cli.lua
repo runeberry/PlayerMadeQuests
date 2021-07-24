@@ -47,6 +47,16 @@ local function tryRunScript(str)
   return true, ret
 end
 
+function addon:RunSlashCommand(cmd, ...)
+  local handler = handlers[cmd]
+  if not handler then
+    addon.Logger:Warn("Unrecognized command: %s", cmd)
+    return
+  end
+
+  handler(...)
+end
+
 handlers = {
   ["reset-quests"] = function()
     addon.QuestLog:DeleteAll()
@@ -152,53 +162,5 @@ handlers = {
   end,
   ["watch-spells"] = function()
     addon:ToggleSpellWatch()
-  end,
-  ["dump-player-data"] = function()
-    local cache = addon.PlayerDataCache:FindAll()
-    local currentRealm = addon:GetPlayerRealm()
-
-    for _, player in ipairs(cache) do
-      local name = player.Name
-      if player.Realm and player.Realm ~= currentRealm then name = player.FullName end
-      if player.Guild then name = name.." <"..player.Guild..">" end
-      name = addon:Colorize("yellow", name)
-
-      local faction = player.FactionId
-      if faction == "Horde" then faction = addon:Colorize("red", "[H]")
-      elseif faction == "Alliance" then faction = addon:Colorize("cyan", "[A]")
-      else faction = "" end
-
-      local level = tostring(player.Level) or "??"
-      local sex = player.SexId and addon:GetSexNameById(player.SexId) or ""
-      local race = player.RaceId and addon:GetRaceNameById(player.RaceId) or ""
-      local class = player.ClassId and addon:GetClassNameById(player.ClassId) or ""
-
-      addon.Logger:Info("%s: %s Level %s %s %s %s",
-        name, faction, level, sex, race, class)
-    end
-  end,
-  ["dump-npc-data"] = function()
-    local cache = addon.NpcDataCache:FindAll()
-
-    for _, npc in ipairs(cache) do
-      local name = addon:Colorize("yellow", npc.Name)
-
-      local faction = npc.FactionId
-      if faction == "Horde" then faction = addon:Colorize("red", "[H]")
-      elseif faction == "Alliance" then faction = addon:Colorize("cyan", "[A]")
-      else faction = "" end
-
-      local level
-      if npc.LevelMin and npc.LevelMax and npc.LevelMin ~= npc.LevelMax then
-        level = string.format("%i-%i", npc.LevelMin, npc.LevelMax)
-      elseif npc.Level then
-        level = tostring(npc.Level)
-      else
-        level = "??"
-      end
-
-      addon.Logger:Info("%s: %s Level %s",
-        name, faction, level)
-    end
   end,
 }
