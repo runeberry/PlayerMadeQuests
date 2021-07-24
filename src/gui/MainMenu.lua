@@ -20,10 +20,11 @@ local function initMainMenu()
         { value = "QuestArchiveMenu", text = "Quest Archive" },
       }
     },
-    { value = "SettingsMenu", text = "Settings",
+    { value = "SettingsMenu-Placeholder", text = "Settings",
       children = {
         { value = "ConfigMenu", text = "Configuration" },
         { value = "LoggingMenu", text = "Logging" },
+        { value = "SettingsMenu", text = "Save Data" },
       }
     },
     { value = "HelpMenu-Placeholder", text = "Help",
