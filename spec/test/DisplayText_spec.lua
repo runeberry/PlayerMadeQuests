@@ -58,6 +58,51 @@ describe("DisplayText", function()
         }
       },
       {
+        objective = "use-emote: { emote: dance, guild: Theramore Guard }",
+        expected = {
+          log = "/dance with <Theramore Guard> member",
+          progress = "/dance with <Theramore Guard> member: 0/1",
+          quest = "/dance with <Theramore Guard> member",
+          full = "Use emote /dance on <Theramore Guard> member",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, class: Druid }",
+        expected = {
+          log = "/dance with Druid",
+          progress = "/dance with Druid: 0/1",
+          quest = "/dance with Druid",
+          full = "Use emote /dance on Druid",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, level: 30 }",
+        expected = {
+          log = "/dance with Level 30+ foe",
+          progress = "/dance with Level 30+ foe: 0/1",
+          quest = "/dance with Level 30+ foe",
+          full = "Use emote /dance on Level 30+ foe",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, faction: Horde }",
+        expected = {
+          log = "/dance with Horde foe",
+          progress = "/dance with Horde foe: 0/1",
+          quest = "/dance with Horde foe",
+          full = "Use emote /dance on Horde foe",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, guild: Theramore Guard, class: Druid, level: 30, faction: Horde }",
+        expected = {
+          log = "/dance with Level 30+ Horde <Theramore Guard> Druid",
+          progress = "/dance with Level 30+ Horde <Theramore Guard> Druid: 0/1",
+          quest = "/dance with Level 30+ Horde <Theramore Guard> Druid",
+          full = "Use emote /dance on Level 30+ Horde <Theramore Guard> Druid",
+        }
+      },
+      {
         objective = "explore Durotar",
         expected = {
           log = "Go to Durotar",
@@ -118,6 +163,51 @@ describe("DisplayText", function()
           progress = "Mangy Wolf slain: 0/15",
           quest = "Kill 15 Mangy Wolf",
           full = "Kill 15 Mangy Wolf"
+        }
+      },
+      {
+        objective = "kill: { guild: Theramore Guard }",
+        expected = {
+          log = "<Theramore Guard> member 0/1",
+          progress = "<Theramore Guard> member slain: 0/1",
+          quest = "Kill <Theramore Guard> member",
+          full = "Kill <Theramore Guard> member",
+        }
+      },
+      {
+        objective = "kill: { class: Druid }",
+        expected = {
+          log = "Druid 0/1",
+          progress = "Druid slain: 0/1",
+          quest = "Kill Druid",
+          full = "Kill Druid",
+        }
+      },
+      {
+        objective = "kill: { level: 30 }",
+        expected = {
+          log = "Level 30+ foe 0/1",
+          progress = "Level 30+ foe slain: 0/1",
+          quest = "Kill Level 30+ foe",
+          full = "Kill Level 30+ foe",
+        }
+      },
+      {
+        objective = "kill: { faction: Horde }",
+        expected = {
+          log = "Horde foe 0/1",
+          progress = "Horde foe slain: 0/1",
+          quest = "Kill Horde foe",
+          full = "Kill Horde foe",
+        }
+      },
+      {
+        objective = "kill: { guild: Theramore Guard, class: Druid, level: 30, faction: Horde }",
+        expected = {
+          log = "Level 30+ Horde <Theramore Guard> Druid 0/1",
+          progress = "Level 30+ Horde <Theramore Guard> Druid slain: 0/1",
+          quest = "Kill Level 30+ Horde <Theramore Guard> Druid",
+          full = "Kill Level 30+ Horde <Theramore Guard> Druid",
         }
       },
       {
@@ -192,6 +282,51 @@ describe("DisplayText", function()
           progress = "Cast Fire Blast on Stonetusk Boar: 0/1",
           quest = "Cast Fire Blast on Stonetusk Boar",
           full = "Cast Fire Blast on Stonetusk Boar"
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', guild: Theramore Guard }",
+        expected = {
+          log = "Fire Blast on <Theramore Guard> member 0/1",
+          progress = "Cast Fire Blast on <Theramore Guard> member: 0/1",
+          quest = "Cast Fire Blast on <Theramore Guard> member",
+          full = "Cast Fire Blast on <Theramore Guard> member",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', class: Druid }",
+        expected = {
+          log = "Fire Blast on Druid 0/1",
+          progress = "Cast Fire Blast on Druid: 0/1",
+          quest = "Cast Fire Blast on Druid",
+          full = "Cast Fire Blast on Druid",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', level: 30 }",
+        expected = {
+          log = "Fire Blast on Level 30+ foe 0/1",
+          progress = "Cast Fire Blast on Level 30+ foe: 0/1",
+          quest = "Cast Fire Blast on Level 30+ foe",
+          full = "Cast Fire Blast on Level 30+ foe",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', faction: Horde }",
+        expected = {
+          log = "Fire Blast on Horde foe 0/1",
+          progress = "Cast Fire Blast on Horde foe: 0/1",
+          quest = "Cast Fire Blast on Horde foe",
+          full = "Cast Fire Blast on Horde foe",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', guild: Theramore Guard, class: Druid, level: 30, faction: Horde }",
+        expected = {
+          log = "Fire Blast on Level 30+ Horde <Theramore Guard> Druid 0/1",
+          progress = "Cast Fire Blast on Level 30+ Horde <Theramore Guard> Druid: 0/1",
+          quest = "Cast Fire Blast on Level 30+ Horde <Theramore Guard> Druid",
+          full = "Cast Fire Blast on Level 30+ Horde <Theramore Guard> Druid",
         }
       },
     }
