@@ -1,7 +1,7 @@
 local _, addon = ...
 local CreateFrame = addon.G.CreateFrame
 
-local menu = addon.MainMenu:NewMenuScreen("SettingsMenu")
+local menu = addon.MainMenu:NewMenuScreen("SaveDataMenu")
 
 local function placeButton(button, prevButton)
   button:SetPoint("TOPLEFT", prevButton, "BOTTOMLEFT", 0, -8)

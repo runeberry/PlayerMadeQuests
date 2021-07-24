@@ -24,7 +24,7 @@ local function initMainMenu()
       children = {
         { value = "ConfigMenu", text = "Configuration" },
         { value = "LoggingMenu", text = "Logging" },
-        { value = "SettingsMenu", text = "Save Data" },
+        { value = "SaveDataMenu", text = "Save Data" },
       }
     },
     { value = "HelpMenu-Placeholder", text = "Help",
