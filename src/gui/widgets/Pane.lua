@@ -59,7 +59,7 @@ local methods = {
       local doWrap = self:GetHeight()
     end
 
-    frame:SetPoint(anchor, parent, pAnchor, offx, offy)
+    -- frame:SetPoint(anchor, parent, pAnchor, offx, offy)
 
     frame._paneAnchor = anchor
     table.insert(self._frames, frame)

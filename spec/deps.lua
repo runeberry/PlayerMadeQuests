@@ -1,4 +1,5 @@
 local mock = require("spec/mock")
+local localization = require("spec/localization")
 
 local deps = {}
 
@@ -147,6 +148,9 @@ function deps:Init(addon)
     GetBuildInfo = ret("1.2.3", "10203", "Jan 1, 2000", 10203),
     GetCoinTextureString = ret("money"),
     GetGuildInfo = ret(),
+    GetClassInfo = function(classId)
+      return { className = localization.CLASSES_EN[classId] }
+    end,
     GetMapInfo = ret(),
     GetPlayerMapPosition = ret(),
     GetUnitName = function(uid)
@@ -154,6 +158,9 @@ function deps:Init(addon)
       if uid == "player" then
         return "PlayerName"
       end
+    end,
+    GetRaceInfo = function(raceId)
+      return { raceName = localization.RACES_EN[raceId] }
     end,
     GetRealZoneText = ret(),
     GetSubZoneText = ret(),
@@ -186,7 +193,10 @@ function deps:Init(addon)
     UnitFullName = ret("PlayerName", "PlayerRealm"),
     UnitGUID = ret(),
     UnitIsFriend = ret(),
-    UnitIsPlayer = ret(),
+    UnitIsPlayer = function(unitId)
+      -- mock out if you want other unitIds to players
+      return unitId == "player"
+    end,
     UnitLevel = ret(),
     UnitRace = ret(),
     UnitSex = ret(),

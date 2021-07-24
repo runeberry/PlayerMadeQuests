@@ -1,6 +1,6 @@
 local _, addon = ...
 local SlashCmdList, unpack = addon.G.SlashCmdList, addon.G.unpack
-local strjoin = addon.G.strjoin
+local strjoin, strsplit = addon.G.strjoin, addon.G.strsplit
 
 local handlers
 
@@ -45,6 +45,16 @@ local function tryRunScript(str)
   end
 
   return true, ret
+end
+
+function addon:RunSlashCommand(cmd, ...)
+  local handler = handlers[cmd]
+  if not handler then
+    addon.Logger:Warn("Unrecognized command: %s", cmd)
+    return
+  end
+
+  handler(...)
 end
 
 handlers = {
@@ -136,9 +146,6 @@ handlers = {
   ["scan-items"] = function(min, max)
     addon:ScanItems(min, max)
   end,
-  ["clear-items"] = function()
-    addon:ClearItemCache()
-  end,
   ["lookup-spell"] = function(...)
     local idOrName = strjoin(" ", ...)
 
@@ -152,9 +159,6 @@ handlers = {
   end,
   ["scan-spells"] = function(min, max)
     addon:ScanSpells(min, max)
-  end,
-  ["clear-spells"] = function()
-    addon:ClearSpellCache()
   end,
   ["watch-spells"] = function()
     addon:ToggleSpellWatch()
