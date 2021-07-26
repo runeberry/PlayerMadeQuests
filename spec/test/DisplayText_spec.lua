@@ -58,6 +58,78 @@ describe("DisplayText", function()
         }
       },
       {
+        objective = "use-emote: { emote: dance, guild: Theramore Guard }",
+        expected = {
+          log = "/dance with a <Theramore Guard> member",
+          progress = "/dance with a <Theramore Guard> member: 0/1",
+          quest = "/dance with a <Theramore Guard> member",
+          full = "Use emote /dance on a <Theramore Guard> member",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, goal: 3, guild: Theramore Guard }",
+        expected = {
+          log = "/dance with <Theramore Guard> members 0/3",
+          progress = "/dance with <Theramore Guard> members: 0/3",
+          quest = "/dance with 3 <Theramore Guard> members",
+          full = "Use emote /dance on 3 <Theramore Guard> members",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, class: Druid }",
+        expected = {
+          log = "/dance with a Druid",
+          progress = "/dance with a Druid: 0/1",
+          quest = "/dance with a Druid",
+          full = "Use emote /dance on a Druid",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, goal: 3, class: Druid }",
+        expected = {
+          log = "/dance with Druids 0/3",
+          progress = "/dance with Druids: 0/3",
+          quest = "/dance with 3 Druids",
+          full = "Use emote /dance on 3 Druids",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, level: 30 }",
+        expected = {
+          log = "/dance with a Level 30+ target",
+          progress = "/dance with a Level 30+ target: 0/1",
+          quest = "/dance with a Level 30+ target",
+          full = "Use emote /dance on a Level 30+ target",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, goal: 12, level: 30 }",
+        expected = {
+          log = "/dance with Level 30+ targets 0/12",
+          progress = "/dance with Level 30+ targets: 0/12",
+          quest = "/dance with 12 Level 30+ targets",
+          full = "Use emote /dance on 12 Level 30+ targets",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, faction: Horde }",
+        expected = {
+          log = "/dance with a Horde target",
+          progress = "/dance with a Horde target: 0/1",
+          quest = "/dance with a Horde target",
+          full = "Use emote /dance on a Horde target",
+        }
+      },
+      {
+        objective = "use-emote: { emote: dance, guild: Theramore Guard, class: Druid, level: 30, faction: Horde }",
+        expected = {
+          log = "/dance with a Level 30+ Horde <Theramore Guard> Druid",
+          progress = "/dance with a Level 30+ Horde <Theramore Guard> Druid: 0/1",
+          quest = "/dance with a Level 30+ Horde <Theramore Guard> Druid",
+          full = "Use emote /dance on a Level 30+ Horde <Theramore Guard> Druid",
+        }
+      },
+      {
         objective = "explore Durotar",
         expected = {
           log = "Go to Durotar",
@@ -118,6 +190,78 @@ describe("DisplayText", function()
           progress = "Mangy Wolf slain: 0/15",
           quest = "Kill 15 Mangy Wolf",
           full = "Kill 15 Mangy Wolf"
+        }
+      },
+      {
+        objective = "kill: { guild: Theramore Guard }",
+        expected = {
+          log = "<Theramore Guard> member 0/1",
+          progress = "<Theramore Guard> member slain: 0/1",
+          quest = "Kill a <Theramore Guard> member",
+          full = "Kill a <Theramore Guard> member",
+        }
+      },
+      {
+        objective = "kill: { goal: 5, guild: Theramore Guard }",
+        expected = {
+          log = "<Theramore Guard> members 0/5",
+          progress = "<Theramore Guard> members slain: 0/5",
+          quest = "Kill 5 <Theramore Guard> members",
+          full = "Kill 5 <Theramore Guard> members",
+        }
+      },
+      {
+        objective = "kill: { class: Druid }",
+        expected = {
+          log = "Druid 0/1",
+          progress = "Druid slain: 0/1",
+          quest = "Kill a Druid",
+          full = "Kill a Druid",
+        }
+      },
+      {
+        objective = "kill: { goal: 7, class: Warlock, faction: Alliance }",
+        expected = {
+          log = "Alliance Warlocks 0/7",
+          progress = "Alliance Warlocks slain: 0/7",
+          quest = "Kill 7 Alliance Warlocks",
+          full = "Kill 7 Alliance Warlocks",
+        }
+      },
+      {
+        objective = "kill: { level: 30 }",
+        expected = {
+          log = "Level 30+ target 0/1",
+          progress = "Level 30+ target slain: 0/1",
+          quest = "Kill a Level 30+ target",
+          full = "Kill a Level 30+ target",
+        }
+      },
+      {
+        objective = "kill: { goal: 6, level: 30 }",
+        expected = {
+          log = "Level 30+ targets 0/6",
+          progress = "Level 30+ targets slain: 0/6",
+          quest = "Kill 6 Level 30+ targets",
+          full = "Kill 6 Level 30+ targets",
+        }
+      },
+      {
+        objective = "kill: { faction: Horde }",
+        expected = {
+          log = "Horde target 0/1",
+          progress = "Horde target slain: 0/1",
+          quest = "Kill a Horde target",
+          full = "Kill a Horde target",
+        }
+      },
+      {
+        objective = "kill: { guild: Theramore Guard, class: Druid, level: 30, faction: Horde }",
+        expected = {
+          log = "Level 30+ Horde <Theramore Guard> Druid 0/1",
+          progress = "Level 30+ Horde <Theramore Guard> Druid slain: 0/1",
+          quest = "Kill a Level 30+ Horde <Theramore Guard> Druid",
+          full = "Kill a Level 30+ Horde <Theramore Guard> Druid",
         }
       },
       {
@@ -192,6 +336,78 @@ describe("DisplayText", function()
           progress = "Cast Fire Blast on Stonetusk Boar: 0/1",
           quest = "Cast Fire Blast on Stonetusk Boar",
           full = "Cast Fire Blast on Stonetusk Boar"
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', guild: Theramore Guard }",
+        expected = {
+          log = "Fire Blast on a <Theramore Guard> member 0/1",
+          progress = "Cast Fire Blast on a <Theramore Guard> member: 0/1",
+          quest = "Cast Fire Blast on a <Theramore Guard> member",
+          full = "Cast Fire Blast on a <Theramore Guard> member",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', goal: 2, guild: Theramore Guard }",
+        expected = {
+          log = "Fire Blast on <Theramore Guard> members 0/2",
+          progress = "Cast Fire Blast on <Theramore Guard> members: 0/2",
+          quest = "Cast Fire Blast on 2 different <Theramore Guard> members",
+          full = "Cast Fire Blast on 2 different <Theramore Guard> members",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', class: Druid }",
+        expected = {
+          log = "Fire Blast on a Druid 0/1",
+          progress = "Cast Fire Blast on a Druid: 0/1",
+          quest = "Cast Fire Blast on a Druid",
+          full = "Cast Fire Blast on a Druid",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', goal: 4, class: Mage }",
+        expected = {
+          log = "Fire Blast on Mages 0/4",
+          progress = "Cast Fire Blast on Mages: 0/4",
+          quest = "Cast Fire Blast on 4 different Mages",
+          full = "Cast Fire Blast on 4 different Mages",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', level: 30 }",
+        expected = {
+          log = "Fire Blast on a Level 30+ target 0/1",
+          progress = "Cast Fire Blast on a Level 30+ target: 0/1",
+          quest = "Cast Fire Blast on a Level 30+ target",
+          full = "Cast Fire Blast on a Level 30+ target",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', goal: 2, level: 30 }",
+        expected = {
+          log = "Fire Blast on Level 30+ targets 0/2",
+          progress = "Cast Fire Blast on Level 30+ targets: 0/2",
+          quest = "Cast Fire Blast on 2 different Level 30+ targets",
+          full = "Cast Fire Blast on 2 different Level 30+ targets",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', faction: Horde }",
+        expected = {
+          log = "Fire Blast on a Horde target 0/1",
+          progress = "Cast Fire Blast on a Horde target: 0/1",
+          quest = "Cast Fire Blast on a Horde target",
+          full = "Cast Fire Blast on a Horde target",
+        }
+      },
+      {
+        objective = "cast-spell: { spell: 'Fire Blast', guild: Theramore Guard, class: Druid, level: 30, faction: Horde }",
+        expected = {
+          log = "Fire Blast on a Level 30+ Horde <Theramore Guard> Druid 0/1",
+          progress = "Cast Fire Blast on a Level 30+ Horde <Theramore Guard> Druid: 0/1",
+          quest = "Cast Fire Blast on a Level 30+ Horde <Theramore Guard> Druid",
+          full = "Cast Fire Blast on a Level 30+ Horde <Theramore Guard> Druid",
         }
       },
     }
@@ -372,16 +588,21 @@ describe("DisplayText", function()
       assert.equals("Good Hank", str)
     end)
     it("can display the player's class", function()
-      game:SetPlayerInfo(addon, { class = "mage" })
+      game:SetPlayerInfo(addon, { class = "Mage", classId = 1 })
       local str = addon:PopulateText("Not bad for a %class.")
-      assert.equals("Not bad for a mage.", str)
+      assert.equals("Not bad for a Mage.", str)
     end)
     it("can display the player's race", function()
-      game:SetPlayerInfo(addon, { race = "Night Elf" })
+      game:SetPlayerInfo(addon, { race = "Night Elf", raceId = 1 })
       local str = addon:PopulateText("You call yourself a %race?")
       assert.equals("You call yourself a Night Elf?", str)
     end)
-    it("can display based on the player's gender", function()
+    it("can display the player's guild", function()
+      game:SetPlayerInfo(addon, { guild = "Rocket Surgery" })
+      local str = addon:PopulateText("Welcome to <%guild>!")
+      assert.equals("Welcome to <Rocket Surgery>!", str)
+    end)
+    it("can display based on the player's sex", function()
       game:SetPlayerInfo(addon, { sex = 2 })
       local text = "Look at [%gen:him|her]!"
       local str = addon:PopulateText(text)

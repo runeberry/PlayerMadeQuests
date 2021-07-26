@@ -134,7 +134,7 @@ end
 local function findEntitiesByIndex(repo, indexProp, indexValue)
   local indexTable = repo.index[indexProp]
   if not indexTable then return end
-  local indexed, count, result = indexTable.data[indexValue]
+  local indexed, count, result = indexTable.data[indexValue], nil, nil
   if indexTable.unique then
     if indexed == nil then
       result = nil
@@ -222,6 +222,9 @@ local methods = {
   ------------------
   -- Read Methods --
   ------------------
+  ["CountAll"] = function(self)
+    return addon:tlen(self.data)
+  end,
   ["FindAll"] = function(self)
     local results = {}
     if self._directReadEnabled then

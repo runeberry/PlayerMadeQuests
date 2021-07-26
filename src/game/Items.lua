@@ -81,13 +81,6 @@ local function getItem(idOrName)
   return item
 end
 
---- Empties all cached items from this session
-function addon:ClearItemCache()
-  local items = GameItemCache:FindAll()
-  GameItemCache:DeleteAll()
-  addon.Logger:Warn("Item cache cleared (%i items removed)", #items)
-end
-
 --- Gets all known info about this item id, name, or link.
 --- If some data is missing, a server request will be initiated to get the remainder.
 --- If this is not a valid item id, name, or link, an error will be thrown.

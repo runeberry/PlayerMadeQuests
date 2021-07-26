@@ -78,7 +78,7 @@ local function determineParseMode(cp)
   if type(cp) == "string" then
     return 1
   elseif type(cp) == "table" then
-    local len, v1 = 0
+    local len, v1 = 0, nil
     for k, v in pairs(cp) do
       len = len + 1
       if len == 1 then

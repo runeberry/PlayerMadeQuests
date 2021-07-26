@@ -81,5 +81,5 @@
   <Script file="gui/menu/QuestDraftListMenu.lua"/>
   <Script file="gui/menu/QuestLogMenu.lua"/>
   <Script file="gui/menu/QuestRewardsMenu.lua"/>
-  <Script file="gui/menu/SettingsMenu.lua"/>
+  <Script file="gui/menu/SaveDataMenu.lua"/>
 </Ui>
