@@ -29,9 +29,7 @@ function addon.QuestDemos:CopyToDrafts(demoId, name)
 
   draft.draftName = name or demo.demoName
   draft.script = demo.script
-  draft.parameters = {
-    demoId = demo.demoId, -- Each draft created from a demo copy will remember which demo it came from
-  }
+  draft.parameters.demoId = demo.demoId -- Each draft created from a demo copy will remember which demo it came from
 
   addon.QuestDrafts:Save(draft)
   return draft
