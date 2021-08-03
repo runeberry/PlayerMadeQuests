@@ -1,6 +1,7 @@
 local _, addon = ...
 
 addon.QuestScriptTokens = {
+  CMD_CHAIN = "chain",
   CMD_COMPLETE = "complete",
   CMD_OBJ = "objectives",
   CMD_QUEST = "quest",
@@ -63,6 +64,13 @@ addon.QuestScript = {
       ["name"] = { type = "string" },
       ["description"] = { type = "string" },
       ["completion"] = { type = "string" },
+    },
+  },
+  [t.CMD_CHAIN] = {
+    type = "table",
+    properties = {
+      ["name"] = { type = "string" },
+      ["order"] = { type = "number" },
     },
   },
   [t.CMD_OBJ] = {
