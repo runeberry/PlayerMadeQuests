@@ -45,6 +45,9 @@ function addon:ParseQuest(questRaw)
     end
   end
 
+  if questRaw[tokens.CMD_CHAIN] then
+    quest.chain = checkpoints["chain"]:Parse(questRaw[tokens.CMD_CHAIN])
+  end
   if questRaw[tokens.CMD_START] then
     quest.start = checkpoints["start"]:Parse(questRaw[tokens.CMD_START])
   end

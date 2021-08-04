@@ -27,6 +27,7 @@
   <Script file="qeng/parameters/sametarget.lua"/>
   <Script file="qeng/parameters/text.lua"/>
 
+  <Script file="qeng/checkpoints/chain.lua"/>
   <Script file="qeng/checkpoints/recreq.lua"/>
   <Script file="qeng/checkpoints/rewards.lua"/>
   <Script file="qeng/checkpoints/startcomplete.lua"/>

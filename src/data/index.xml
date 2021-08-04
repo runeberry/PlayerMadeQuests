@@ -12,6 +12,7 @@
   <Script file="data/PlayerDataCache.lua"/>
   <Script file="data/QuestArchive.lua"/>
   <Script file="data/QuestCatalog.lua"/>
+  <Script file="data/QuestChains.lua"/>
   <Script file="data/QuestDemos.lua"/>
   <Script file="data/QuestDrafts.lua"/>
   <Script file="data/QuestLog.lua"/>
