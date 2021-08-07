@@ -50,12 +50,6 @@ local function refreshSize(frame)
 
   -- When the mouse wheel is scrolled, scroll the text by one line
   scrollFrame._scrollHeight = lineHeight + lineSpacing
-
-  -- The editBox must match the width of the scrollFrame without anchoring to it
-  -- because the scrollFrame's anchors seem to get altered when it scrolls.
-  -- It looks like the editBox gets anchored to scrollFrame automatically by
-  -- becoming its scrollChild, so we just need to set width.
-  editBox:SetWidth(containerWidth - il - ir)
 end
 
 template:AddMethods({
@@ -77,6 +71,14 @@ template:AddScripts({
   end,
   ["OnShow"] = function(self)
     self:Refresh()
+  end,
+  ["OnSizeChanged"] = function(self, width, height)
+    -- The editBox must match the width of the scrollFrame without anchoring to it
+    -- because the scrollFrame's anchors seem to get altered when it scrolls.
+    -- It looks like the editBox gets anchored to scrollFrame automatically by
+    -- becoming its scrollChild, so we just need to set width.
+    local il, ir, it, ib = addon:UnpackLRTB(self:GetOptions().textInset)
+    self._editBox:SetWidth(width - il - ir)
   end,
 })
 
@@ -141,7 +143,7 @@ local function SF_OnMouseWheel(self, delta)
     newValue = self:GetVerticalScrollRange();
   end
 
-  self:SetVerticalScroll(newValue);
+  self:SetVerticalScroll(newValue)
 end
 
 function template:Create(frame, options)
