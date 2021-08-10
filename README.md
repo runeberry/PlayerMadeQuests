@@ -4,6 +4,9 @@
 
 <h1 align="center">PlayerMadeQuests</h1>
 
+**PMQ is looking for contributors!**<br/>
+**Have experience developing WoW addons, and want to help? Message Dolphinspired on [Discord](https://discord.gg/U9cDAQg)!**
+
 Create and share your own custom quests in World of Warcraft: Classic!
 
 * Download links:
@@ -27,9 +30,7 @@ Create and share your own custom quests in World of Warcraft: Classic!
 ### Upcoming plans for PMQ
 
 * **Quest Chains** - link multiple quests together to form a larger story
-* **More Objectives** - involving items, auras, merchants, and more
 * **Localization** - share quests reliably between different-language game clients
-* **Quest Development Tools** - tools to track coordinates, NPCs, etc. that you want to put in your quests
 * **Quest Builder UI** - build your quest with a friendlier user interface instead of writing script
 
 Check out the [Issues](https://github.com/runeberry/PlayerMadeQuests/issues) page for a big list of features in the works for PMQ.
