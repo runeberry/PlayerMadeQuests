@@ -130,7 +130,7 @@ This objective is not limited to just magical spells; it can be invoked by a var
 
 ### Shorthand
 
-{{code-yaml|c=
+```yaml
 objectives:
   # Generic
   - cast-spell goal "spell*" "target"
@@ -138,11 +138,11 @@ objectives:
   - cast-spell Frostbolt                    # Cast Frostbolt (any rank)
   - cast-spell 3 "Fire Blast"               # Cast Fire Blast 3 times
   - cast-spell 5 Frostbolt "Stonetusk Boar" # Cast Frostbolt on 3 different Stonetusk Boars
-}}
+```
 
 ### Long form
 
-{{code-yaml|c=
+```yaml
 objectives:
   - cast-spell:
       spell: Arcane Intellect # Required
@@ -160,7 +160,7 @@ objectives:
       equip: Apprentice's Robe
       item: Light Leather
       text: "Custom display text"
-}}
+```
 
 *&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
@@ -259,12 +259,12 @@ objectives:
 * The value for channel is case-insensitive, meaning both "yell" and "YELL" will work.
 * You can specify multiple channels, which means that sending the message in *any one* of these channels will satisfy the objective. For example:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - say:
       message: "wash yer back"
       channel: [ say, yell ] # You can either /say or /yell this message
-}}
+```
 
 [[Category:Quest Objective Parameters]]</text>
       <sha1>2r1gmbs036dvx4i01ffb7jbuxn66cb0</sha1>
@@ -460,7 +460,7 @@ This page outlines the settings you can configure in PMQ.
 
 See the following examples showing how **coords** can be written.
 
-{{code-yaml|c=
+```yaml
 objectives:
   - explore:
       zone: Elwynn Forest
@@ -474,27 +474,27 @@ objectives:
   - explore:
       zone: Elwynn Forest
       coords: 38.51, 72.64, 0.8   # A little space is fine, as a treat
-}}
+```
 
 Note that when using **coords** in a shorthand objective, the string must not contain any spaces. However, if you want to include spaces, you can do so safely by wrapping the value in quotes.
 
-{{code-yaml|c=
+```yaml
 objectives:
   - explore Durotar 22.1,47.6          # OK
   - explore Durotar 22.1,47.6,0.25     # OK
   - explore Durotar 22.1, 47.6, 0.25   # Not OK! Coords will get broken apart
   - explore Durotar '22.1, 47.6, 0.25' # OK (either double or single quotes)
   - explore 'Elwynn Forest'            # Same rule applies to 'zone'
-}}
+```
 
 Here's a practical example explained. Given the following objective:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - explore:
       zone: Elwynn Forest
       coords: 38.2, 47.5, 1
-}}
+```
 
 The player must enter the box bounded by the top-left coordinate (37.2, 46.5) and the bottom-right coordinate (39.2, 48.5) in [https://wow.gamepedia.com/Elwynn_Forest Elwynn Forest] order to complete the objective.
 
@@ -599,17 +599,17 @@ Custom display text can also be used with a [[Start &amp; Complete Objectives|st
 
 ### Usage notes
 
-{{code-yaml|c=
+```yaml
 start:
   zone: Azshara
   text: Go to the treacherous cliffs north of Orgrimmar to begin this quest.
-}}
+```
 
 With the above configuration, your custom text will be displayed wherever PMQ displays information about the &lt;code&gt;start&lt;/code&gt; objective for a quest.
 
 You can take this a step further and specify different text for different contexts within PMQ. See the following example:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - explore:
       zone: Azshara
@@ -619,7 +619,7 @@ objectives:
         log: Go to the secret spot
         progress: Secret spot uncovered
         quest: Find the hero's secret spot in %z
-}}
+```
 
 With this configuration, you will see different custom text displayed in the quest log, progress message, and quest info frame, instead of the same line of text for all 3 cases. Any cases not specified under &lt;code&gt;text&lt;/code&gt; will fall back on the default display text provided by PMQ.
 
@@ -707,11 +707,11 @@ The following variables can be used in the quest's &lt;code&gt;description&lt;/c
 
 The &lt;code&gt;%gen&lt;/code&gt; variable is intended to be used as a flag that can result in different text depending on the player's gender. See how it's used in this example:
 
-{{code-yaml|c=
+```yaml
 quest:
   name: Joining the Team
   description: So you're the infamous %name, huh? Aren't you kinda short for a %race?
-  completion: Well I'll be, you actually did it! Not bad for a %class. Glad to have a [%gen:guy{{!}}gal] like you on our team.
+  completion: Well I'll be, you actually did it! Not bad for a %class. Glad to have a [%gen:guy{{!```gal] like you on our team.
 }}
 
 {| class="wikitable boldlinks"
@@ -861,23 +861,23 @@ quest:
         <username>Dolphinspired</username>
         <id>3</id>
       </contributor>
-      <comment>Created page with "The **equip-item** objective is triggered whenever you equip an item.  ### Shorthand  {{code-yaml|c= objectives:   - equip-item "equip*" }}  ''&lt;nowiki&gt;*required&lt;/nowiki&gt;..."</comment>
+      <comment>Created page with "The **equip-item** objective is triggered whenever you equip an item.  ### Shorthand  ```yaml objectives:   - equip-item "equip*" ```  ''&lt;nowiki&gt;*required&lt;/nowiki&gt;..."</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="981">The **equip-item** objective is triggered whenever you equip an item.
 
 ### Shorthand
 
-{{code-yaml|c=
+```yaml
 objectives:
   - equip-item "equip*"
-}}
+```
 
 *&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
-{{code-yaml|c=
+```yaml
 objectives:
   - equip-item:
       equip: Loose Chain Mail # Required
@@ -887,7 +887,7 @@ objectives:
       subzone: Goldshire
       coords: 42.41, 64.47, 0.3
       text: "Custom display text"
-}}
+```
 
 ### Supported parameters
 
@@ -935,16 +935,16 @@ When you enter a zone or subzone in which you have an objective to explore certa
 
 ### Shorthand
 
-{{code-yaml|c=
+```yaml
 objectives:
   - explore "zone*" "coords"
-}}
+```
 
 *&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
-{{code-yaml|c=
+```yaml
 objectives:
   - explore:
       zone: Elwynn Forest # Required
@@ -954,7 +954,7 @@ objectives:
       equip: Loose Chain Mail
       item: Light Leather
       text: "Custom display text"
-}}
+```
 
 ### Supported parameters
 
@@ -1046,16 +1046,16 @@ This parameter can also be used as a [[Requirements|quest requirement or recomme
 
 ### Shorthand
 
-{{code-yaml|c=
+```yaml
 objectives:
   - gain-aura "aura*"
-}}
+```
 
 *&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
-{{code-yaml|c=
+```yaml
 objectives:
   - gain-aura:
       aura: "Power Word: Fortitude" # Required
@@ -1065,7 +1065,7 @@ objectives:
       subzone: Goldshire
       coords: 42.41, 64.47, 0.3
       text: "Custom display text"
-}}
+```
 
 ### Supported parameters
 
@@ -1191,7 +1191,7 @@ Ready to learn more? Or just want to see all the options available for PMQ quest
 
 Here's an example of what a fully-featured quest might look like:
 
-{{code-yaml|c=
+```yaml
 quest:
   name: It's All Ogre Now
   description: &gt;
@@ -1212,7 +1212,7 @@ objectives:
 complete:
   zone: Steamwheedle Port
   coords: 68.24,22.95
-}}
+```
 
 Want to see how it works? Feel free to copy-paste this quest into your own draft in-game. Try changing some of the values and see how the quest is changed as a result.</text>
       <sha1>nmircac8djumykbfojcbncw5o8e5hn8</sha1>
@@ -1370,7 +1370,7 @@ The **item** parameter of a quest reward allows you to specify one or more items
 
 * String - the name of the item as it appears in game, along with an optional quantity
 
-{{code-yaml|c=
+```yaml
 # Single item
   item: Traveler's Jerkin
 # Single item with quantity
@@ -1385,11 +1385,11 @@ The **item** parameter of a quest reward allows you to specify one or more items
     - Flimsy Chain Gloves
     - 5 Minor Healing Potion
     - 10 Minor Mana Potion
-}}
+```
 
 * Table - with the either "id" or "name" and, optionally, "quantity"
 
-{{code-yaml|c=
+```yaml
 # Single item
   item:
     - id: 19019
@@ -1409,7 +1409,7 @@ The **item** parameter of a quest reward allows you to specify one or more items
       quantity: 20
     - id: 2180
       quantity: 5
-}}
+```
 
 ### Getting items by name
 
@@ -1445,16 +1445,16 @@ But because it's not a perfect system, you may run into issues when trying to se
 
 ### Shorthand
 
-{{code-yaml|c=
+```yaml
 objectives:
   - kill goal "target*"
-}}
+```
 
 *&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
-{{code-yaml|c=
+```yaml
 objectives:
   - kill:
       goal: 3
@@ -1470,7 +1470,7 @@ objectives:
       equip: Loose Chain Mail
       item: Light Leather
       text: "Custom display text"
-}}
+```
 
 ### Supported parameters
 
@@ -1562,12 +1562,12 @@ In order to speak in a special language other than Common (Alliance default) or 
 * You cannot whisper another player in a different language, so don't specify a language if the objective's [[channel]] is "whisper", or if you specify a message [[recipient]].
 * You can specify multiple languages, which means that sending the message in *any one* of these languages will satisfy the objective. For example:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - say:
       message: "wash yer back"
       language: [ Dwarvish, Gnomish ] # You can say this in either Dwarvish or Gnomish
-}}
+```
 
 [[Category:Quest Objective Parameters]]</text>
       <sha1>os94nbmia7jth9qunq4f4x3yguzke2x</sha1>
@@ -1643,16 +1643,16 @@ This parameter can also be used as a [[Requirements|quest requirement or recomme
 
 ### Shorthand
 
-{{code-yaml|c=
+```yaml
 objectives:
   - loot-item goal "item*"
-}}
+```
 
 *&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
-{{code-yaml|c=
+```yaml
 objectives:
   - loot-item:
       item: Light Leather # Required
@@ -1663,7 +1663,7 @@ objectives:
       subzone: Goldshire
       coords: 42.41, 64.47, 0.3
       text: "Custom display text"
-}}
+```
 
 ### Supported parameters
 
@@ -1712,7 +1712,7 @@ objectives:
 
 TODO: finish this later
 
-{{code-lua|c=
+```lua
 addon:catch(fn, ...)
 addon:onload(fn)
 addon:load()
@@ -1728,7 +1728,7 @@ addon:PlaySound(name)
 addon:IsTargetExcluded(context, targetGuid)
 addon:AddTargetExclusion(context, targetGuid)
 addon:ClearTargetExclusions()
-}}</text>
+```</text>
       <sha1>4tqsjlsquumf1ijbklhvv9lnydqifm0</sha1>
     </revision>
   </page>
@@ -1807,7 +1807,7 @@ Note that all values for message are **case-insensitive**, meaning that "happy b
 * While Lua patterns are case-sensitive, the value for this message parameter is intentionally **not case-sensitive**, meaning that you cannot force a player to say something in a specific casing style. For example, if you specify the pattern "Happy Birthday", then a player will be able to say "happy birthday" to satisfy the condition. As such, it's recommended to keep your patterns for message to all lowercase letters, for simplicity.
 * It can be somewhat tedious to test complex message patterns in-game, so until there is a better testing method included with PMQ, consider using this [https://rextester.com/l/lua_online_compiler Online Lua Compiler] to test which phrases will or will not work with your message pattern. Simply copy/paste the following code into the editor linked, and click **Run it (F8)** to print the results below the code editor. Of course, you'll want to change out the pattern and chat messages in the below code to suit your needs.
 
-{{code-lua|c=
+```lua
 -- Change this pattern to the "message" pattern value you want to test
 local pattern = "nothing %w-, nothing %w-"
 
@@ -1825,7 +1825,7 @@ end
 testPattern("nothing ventured, nothing gained")
 testPattern("nothing spent, nothing saved")
 testPattern("this message should not pass")
-}}
+```
 
 [[Category:Quest Objective Parameters]]</text>
       <sha1>mp7dd8lngcfhhmtvdtgrj4bqjfvq50j</sha1>
@@ -1857,21 +1857,21 @@ All objectives are written under the &lt;code&gt;objectives&lt;/code&gt; propert
 
 ✔️ OK
 
-{{code-yaml|c=
+```yaml
 objectives:
   - kill Cow
   - kill 3 Chicken
   - kill 5 "Mangy Wolf"
-}}
+```
 
 ❌ Not OK
 
-{{code-yaml|c=
+```yaml
 objectives:
 - kill Cow                  # not indented far enough
   -kill 3 Chicken           # no space after dash
     - kill 5 "Mangy Wolf"   # indented too far
-}}
+```
 
 ### Shorthand
 
@@ -1879,10 +1879,10 @@ Each objective supports a "shorthand" format, which lets you quickly write an ob
 
 For example, let's break down the shorthand form of the &lt;code&gt;kill&lt;/code&gt; objective:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - kill 5 "Mangy Wolf"
-}}
+```
 
 When compiled into a quest, this line gets broken apart into the following properties:
 
@@ -1898,12 +1898,12 @@ The help page for each objective (linked below) will outline the parameters supp
 
 If you want to access the full set of parameters for an objective, you can write it out in its complete form, where each parameter of the objective is defined explicitly. For example, the last example would be written in long-form as:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - kill:
       goal: 5
       target: Mangy Wolf
-}}
+```
 
 ## List of objectives
 
@@ -2001,12 +2001,12 @@ File:Questlog1.png|Quest objectives are tracked and updated in real-time as you 
 * You do not need to specify &lt;code&gt;channel: whisper&lt;/code&gt; on a [[Say]] objective if you specify a recipient. Since whispers are the only channel that are targeted toward a specific player, the whisper channel is implied by specifying a recipient.
 * You can specify multiple recipients, which means that interacting with *any one* of these recipients will satisfy the objective. For example:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - say:
       message: "wash yer back"
       recipient: [ Playerone, Playertwo ] # You can message either Playerone or Playertwo to complete this objective
-}}
+```
 
 [[Category:Quest Objective Parameters]]</text>
       <sha1>5bh9453fp0wnmt7c0axwf78k6hddje8</sha1>
@@ -2031,13 +2031,13 @@ objectives:
 
 By default, quests written in PMQ can be started by any player character without restriction. However, you may want to place some restrictions on who is able to take on your quest. PMQ supports this through the **recommended** and **required** properties on a quest.
 
-{{code-yaml|c=
+```yaml
 required:
   class: Mage
 recommended:
   level: 30
   faction: Horde
-}}
+```
 
 ### What's the difference?
 
@@ -2105,7 +2105,7 @@ However, if a quest has rewards and you're a reward-giver for that quest, then t
 
 ### Syntax
 
-{{code-yaml|c=
+```yaml
 rewards:
   player: Playername # Required
   money: 2g 46s 13c
@@ -2114,7 +2114,7 @@ rewards:
     - 5 Major Mana Potion
     - 20 Major Healing Potion
     - 10 Greater Nature Protection Potion
-}}
+```
 
 * You must specify either **money** or at least one **item** in your rewards.
 * If you specify **choose: true**, then you must specify at least 2 **item** rewards.
@@ -2144,29 +2144,29 @@ rewards:
 
 You can specify multiple players who are responsible for giving out the rewards on a quest. If a player trades with any of players listed on the quest, then that trade can count towards the player claiming the quest's reward.
 
-{{code-yaml|c=
+```yaml
 rewards:
   player: [ Playerone, Playertwo, Playerthree ]
   money: 5g
-}}
+```
 
 =### Quest giver as the reward giver=
 
 If you specify **%giver** as the player under rewards, then the person who shares the quest will always be responsible for distributing the reward. This way, you can write a quest that provides rewards but doesn't necessarily have to relate back to a specific player or group of players.
 
-{{code-yaml|c=
+```yaml
 rewards:
   player: %giver
   money: 5g
-}}
+```
 
 If you would like, you can also specify **%author** as the reward giver, and the person who originally drafted the quest will always be responsible for distributing rewards.
 
-{{code-yaml|c=
+```yaml
 rewards:
   player: %author
   money: 5g
-}}
+```
 
 =### Single/Multiple item rewards=
 
@@ -2277,10 +2277,10 @@ Menu options:
 
 ### Shorthand
 
-{{code-yaml|c=
+```yaml
 objectives:
   - say "message*"
-}}
+```
 
 *&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
@@ -2288,7 +2288,7 @@ Note that this shorthand form is not recommended for real quest objectives, only
 
 ### Long form
 
-{{code-yaml|c=
+```yaml
 objectives:
   - say:
       message: "my secret message" # Required. Quotes are optional, but recommended.
@@ -2302,7 +2302,7 @@ objectives:
       equip: Loose Chain Mail
       item: Light Leather
       text: "Custom display text"
-}}
+```
 
 ### Supported parameters
 
@@ -2344,7 +2344,7 @@ objectives:
 
 You will likely want to change the default display text of the objective so that it doesn't reveal the exact text that the player should speak in order to progress. Consider the following example:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - say:
       text: "Speak, friend, and enter."
@@ -2353,7 +2353,7 @@ objectives:
       zone: Moria
       subzone: Doors of Durin
       coords: 38.7, 42.5, 0.1
-}}
+```
 
 In this hypothetical example, the player would need to /say or /yell a message with the phrase "mellon", while standing in front of the Doors of Durin, in order to progress the quest objective. However, the quest log would simply read the riddle: "Speak, friend, and enter."
 
@@ -2361,14 +2361,14 @@ Note that this will print the same text to the quest log, quest info frame, and 
 
 Here's another take on this old classic:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - say:
       text: "Speak, friend, and enter."
       message: "^friend$"
       language: Dwarvish
       channel: [ say, yell ]
-}}
+```
 
 In this example, the player would need to /say or /yell exactly the word "friend" (see the) while speaking in the Dwarvish [[language]] in-game. Saying "friend" in Common or any other language would not complete the objective.
 
@@ -2399,14 +2399,14 @@ In this example, the player would need to /say or /yell exactly the word "friend
 
 Note that regardless of whether you specify the name or ID of a spell in your quests, **all spells with the same name** will count towards objective completion. For example, whether you use name "Frostbolt" or the number [https://classic.wowhead.com/spell=7322/frostbolt 7322] as the spell in your quest, all ranks of Frostbolt will count towards objectives.
 
-{{code-yaml|c=
+```yaml
 objectives:
   # Both of the following will support any rank of Frostbolt being cast
   - cast-spell:
       spell: frostbolt
   - cast-spell:
       spell: 7322
-}}
+```
 
 See the guide below for more info on how to get spells by name to use in your quests.
 
@@ -2471,14 +2471,14 @@ By default, quests written in PMQ can be started anywhere in the world at any ti
 
 But quests in WoW generally don't operate this way - you're usually required to talk to an NPC or interact with an object in order to start or complete a quest. To support this flow of gameplay, PMQ provides the **start** and **complete** conditions for quests.
 
-{{code-yaml|c=
+```yaml
 start:
   zone: Elwynn Forest
   target: Marshal Dughan
 complete:
   zone: Lion's Pride Inn
   target: Innkeeper Farley
-}}
+```
 
 ### What's the difference?
 
@@ -2564,16 +2564,16 @@ In case you cannot talk to the target NPC in game (for example, if you've finish
 
 ### Shorthand
 
-{{code-yaml|c=
+```yaml
 objectives:
   - talk-to goal "target*"
-}}
+```
 
 *&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
-{{code-yaml|c=
+```yaml
 objectives:
   - talk-to:
       target: "Stormwind Guard" # Required
@@ -2585,7 +2585,7 @@ objectives:
       equip: Loose Chain Mail
       item: Light Leather
       text: "Custom display text"
-}}
+```
 
 ### Supported parameters
 
@@ -2695,16 +2695,16 @@ If your goal is to use an emote more than 1 time on a target NPC, you must use t
 
 ### Shorthand
 
-{{code-yaml|c=
+```yaml
 objectives:
   - use-emote "emote*" goal "target"
-}}
+```
 
 *&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
-{{code-yaml|c=
+```yaml
 objectives:
   - use-emote:
       goal: 3
@@ -2721,7 +2721,7 @@ objectives:
       equip: Loose Chain Mail
       item: Light Leather
       text: "Custom display text"
-}}
+```
 
 ### Supported parameters
 
@@ -2788,11 +2788,11 @@ objectives:
 
 ### Properties and values
 
-{{code-yaml|c=
+```yaml
 name: Ragnaros    # this is a string - a line of text
 level: 63         # this is a number - can also include decimals
 spicy: true       # this is a boolean - can be true or false
-}}
+```
 
 In this example, we have a simple YAML document with 3 properties: &lt;code&gt;name&lt;/code&gt;, &lt;code&gt;level&lt;/code&gt;, and &lt;code&gt;spicy&lt;/code&gt; - each with a value assigned.
 
@@ -2802,27 +2802,27 @@ In addition, everything after a &lt;code&gt;#&lt;/code&gt; character is a commen
 
 When writing out simple string values in YAML, quotes are generally optional. The following values will all be interpreted in the same way:
 
-{{code-yaml|c=
+```yaml
 target: Murloc Steamrunner   # Will print as: Murloc Steamrunner
 zone: "Elwynn Forest"        # Will print as: Elwynn Forest
 subzone: 'Crystal Lake'      # Will print as: Crystal lake
-}}
+```
 
 However, if you are using any YAML special characters in your string, then you *must* include quotes. Either single or double quotes are fine.
 
-{{code-yaml|c=
+```yaml
 name: Lesson 1: Tutorial     # BAD! YAML gets confused by the extra colon
 name: "Lesson 1: Tutorial"   # Easy fix
 name: 'Lesson 1: Tutorial'   # Also fine
-}}
+```
 
 PMQ also includes a special rule for writing shorthand quest [[objective|objectives]]. When you are writing strings that contain multiple words, you *must* include quotes in order to group these words together.
 
-{{code-yaml|c=
+```yaml
 objectives:
   - kill 5 Mangy Wolf        # BAD! Gets broken into 3 parameters: 5, Mangy, and Wolf
   - kill 5 "Mangy Wolf"      # Gets broken into 2 parameters: 5 and Mangy Wolf
-}}
+```
 
 When in doubt, include quotes anyway!
 
@@ -2833,29 +2833,29 @@ When in doubt, include quotes anyway!
 
 You can spread a long string over multiple lines by prefixing it with the &lt;code&gt;&amp;gt;&lt;/code&gt; character, like this:
 
-{{code-yaml|c=
+```yaml
 quest:
   description: &gt;
     Get up on the floor
     Dancin' all night long
     Get up on the floor
     Dancin' till the break of dawn
-}}
+```
 
 However, the above example will still print out as one long line when displayed in game. For cases like this, PMQ allows you to insert line breaks using the special escape code &lt;code&gt;%br&lt;/code&gt;.
 
-{{code-yaml|c=
+```yaml
 quest:
   description: &gt;
     Get up on the floor%br
     Dancin' all night long%br
     Get up on the floor%br
     Dancin' till the break of dawn
-}}
+```
 
 ### Block indentation
 
-{{code-yaml|c=
+```yaml
 name: Malfurion
 pet: # the "pet" block has 4 properties
   name: Tricky
@@ -2866,13 +2866,13 @@ pet: # the "pet" block has 4 properties
   level: 35
 # Simple blocks can also be written on one line (flow-style)
 pet: { name: Tricky, species: Raptor, level: 35 }
-}}
+```
 
 You can nest properties inside other properties to form a block. This is achieved by simply indenting a line more. It doesn't matter how much you indent the line, as long as you are consistent throughout your YAML document. We recommend indenting with 2 or 4 spaces per level.
 
 ### Sequences
 
-{{code-yaml|c=
+```yaml
 name: Malfurion
 # Sequence with one item per line
 pets:
@@ -2881,17 +2881,17 @@ pets:
   - Midna
 # Sequence with all items on one line (flow-style)
 pets: [ Tricky, Beedle, Midna ]
-}}
+```
 
 You can assign multiple values to a property by adding a &lt;code&gt;-&lt;/code&gt; before each value. Each item in a sequence can be a simple type (string, number, or boolean) or another block of properties, which you will see when writing quest objectives:
 
-{{code-yaml|c=
+```yaml
 objectives:
   - kill 5 Chicken
   - explore:
       zone: Elwynn Forest
       subzone: Goldshire
-}}
+```
 
 ### More information
 
