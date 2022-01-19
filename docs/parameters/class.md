@@ -22,9 +22,9 @@ The following class values are supported for TBC:
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | The spellcast target must be a player of this class |
-| [[kill]] | The kill target must be a player of this class |
-| [[use-emote]] | The emote target must be a player of this class |
+| [cast-spell](../objectives/cast-spell.md) | The spellcast target must be a player of this class |
+| [kill](../objectives/kill.md) | The kill target must be a player of this class |
+| [use-emote](../objectives/use-emote.md) | The emote target must be a player of this class |
 
 This parameter can also be used as a [[Requirements|quest requirement or recommendation]].
 

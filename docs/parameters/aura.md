@@ -10,15 +10,15 @@ The **aura** parameter allows you to specify any aura (buff or debuff) that the 
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | The aura you must have when casting the spell |
-| [[equip-item]] | The aura you must have when equipping the item |
-| [[explore]] | The aura you must have when entering the area to be explored |
-| [[gain-aura]] | The aura you must gain |
-| [[kill]] | The aura you must have when killing the target enemy |
-| [[loot-item]] | The aura you must have when looting an item |
-| [[say]] | The aura you must have when saying the message |
-| [[talk-to]] | The aura you must have when talking to the target NPC |
-| [[use-emote]] | The aura you must have when performing the emote |
+| [cast-spell](../objectives/cast-spell.md) | The aura you must have when casting the spell |
+| [equip-item](../objectives/equip-item.md) | The aura you must have when equipping the item |
+| [explore](../objectives/explore.md) | The aura you must have when entering the area to be explored |
+| [gain-aura](../objectives/gain-aura.md) | The aura you must gain |
+| [kill](../objectives/kill.md) | The aura you must have when killing the target enemy |
+| [loot-item](../objectives/loot-item.md) | The aura you must have when looting an item |
+| [say](../objectives/say.md) | The aura you must have when saying the message |
+| [talk-to](../objectives/talk-to.md) | The aura you must have when talking to the target NPC |
+| [use-emote](../objectives/use-emote.md) | The aura you must have when performing the emote |
 
 ### Usage notes
 

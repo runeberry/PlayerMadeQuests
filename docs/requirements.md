@@ -24,6 +24,6 @@ Both of these properties support all the same parameters and are evaluated in th
 
 | Parameter | How it's used |
 |---|---|
-| [[class]] | The name of the class allowed to start this quest |
-| [[faction]] | Either "Horde" or "Alliance" |
-| [[level]] | The minimum level to start the quest |
+| [class](parameters/class.md) | The name of the class allowed to start this quest |
+| [faction](parameters/faction.md) | Either "Horde" or "Alliance" |
+| [level](parameters/level.md) | The minimum level to start the quest |

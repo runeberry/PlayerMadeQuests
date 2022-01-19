@@ -35,19 +35,19 @@ objectives:
 
 | Parameter | How it's used |
 |---|---|
-| [[aura]] | The name of the aura you must have when killing the target |
-| [[class]] | The kill target must be a player of this class |
-| [[equip]] | An item you must have equipped when killing the target |
-| [[faction]] | The kill target must be a player or NPC of this faction (Alliance or Horde) |
-| [[goal]] | The number of enemies to kill |
-| [[guild]] | The kill target must be a player in this guild |
-| [[item]] | An item you must have in your bags when killing the target |
-| [[level]] | The kill target must be this level or higher |
-| [[target]] | The name of the NPC or player to kill |
-| [[Display Text | text]] | Custom display text for this objective |
-| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when killing the target |
+| [aura](../parameters/aura.md) | The name of the aura you must have when killing the target |
+| [class](../parameters/class.md) | The kill target must be a player of this class |
+| [equip](../parameters/equip.md) | An item you must have equipped when killing the target |
+| [faction](../parameters/faction.md) | The kill target must be a player or NPC of this faction (Alliance or Horde) |
+| [goal](../parameters/goal.md) | The number of enemies to kill |
+| [guild](../parameters/guild.md) | The kill target must be a player in this guild |
+| [item](../parameters/item.md) | An item you must have in your bags when killing the target |
+| [level](../parameters/level.md) | The kill target must be this level or higher |
+| [target](../parameters/target.md) | The name of the NPC or player to kill |
+| [text](../parameters/text.md) | Custom display text for this objective |
+| [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md)<br/>[coords](../parameters/coords.md) | The location you must be in when killing the target |
 
 ### Notes
 
-* This objective contains additional logic to count players' pet contributions as kills. In short, when your pet attacks any target, you will get kill credit for that target when it dies. This behavior can be toggled off with the FEATURE_PET_KILLS setting in the [[Configuration]] menu. If this behavior is inaccurate or causing problems, let us known on Discord!
+* This objective contains additional logic to count players' pet contributions as kills. In short, when your pet attacks any target, you will get kill credit for that target when it dies. This behavior can be toggled off with the FEATURE_PET_KILLS setting in the [Configuration](../guides/Configuration.md) menu. If this behavior is inaccurate or causing problems, let us known on Discord!
 * This objective relies on caching player/NPC data while you're playing the game. For more information, see [[Save Data &amp; Cache]].

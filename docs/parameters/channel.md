@@ -1,6 +1,6 @@
 # channel
 
-The **channel** parameter allows you to specify the channel through which a [[message]] must be sent in order to satisfy an objective.
+The **channel** parameter allows you to specify the channel through which a [message](../parameters/message.md) must be sent in order to satisfy an objective.
 
 ### Value type
 
@@ -16,7 +16,7 @@ The **channel** parameter allows you to specify the channel through which a [[me
 
 | Objective | How it's used |
 |---|---|
-| [[say]] | The channel(s) in which you can send the message to complete the objective |
+| [say](../objectives/say.md) | The channel(s) in which you can send the message to complete the objective |
 
 ### Usage notes
 

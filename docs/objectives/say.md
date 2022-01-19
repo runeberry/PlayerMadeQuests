@@ -35,15 +35,15 @@ objectives:
 
 | Parameter | How it's used |
 |---|---|
-| [[aura]] | The name of the aura you must have when saying the message |
-| [[channel]] | The channel(s) you must say the message through (see linked page for options) |
-| [[equip]] | An item you must have equipped when saying the message |
-| [[item]] | An item you must have in your bags when saying the message |
-| [[language]] | The RP language(s) that the message must be spoken in |
-| [[message]] | The phrase or pattern that must be present within the message |
-| [[recipient]] | The name of the player(s) you must send the message to (only applicable to whispers) |
-| [[Display Text | text]] | Custom display text for this objective |
-| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when saying the message |
+| [aura](../parameters/aura.md) | The name of the aura you must have when saying the message |
+| [channel](../parameters/channel.md) | The channel(s) you must say the message through (see linked page for options) |
+| [equip](../parameters/equip.md) | An item you must have equipped when saying the message |
+| [item](../parameters/item.md) | An item you must have in your bags when saying the message |
+| [language](../parameters/language.md) | The RP language(s) that the message must be spoken in |
+| [message](../parameters/message.md) | The phrase or pattern that must be present within the message |
+| [recipient](../parameters/recipient.md) | The name of the player(s) you must send the message to (only applicable to whispers) |
+| [text](../parameters/text.md) | Custom display text for this objective |
+| [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md)<br/>[coords](../parameters/coords.md) | The location you must be in when saying the message |
 
 ### Examples
 
@@ -77,4 +77,4 @@ objectives:
       channel: [ say, yell ]
 ```
 
-In this example, the player would need to /say or /yell exactly the word "friend" (see the) while speaking in the Dwarvish [[language]] in-game. Saying "friend" in Common or any other language would not complete the objective.
+In this example, the player would need to /say or /yell exactly the word "friend" (see the) while speaking in the Dwarvish [language](../parameters/language.md) in-game. Saying "friend" in Common or any other language would not complete the objective.

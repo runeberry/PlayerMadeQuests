@@ -24,7 +24,7 @@ See the guide below for more info on how to get spells by name to use in your qu
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | The spell you must cast |
+| [cast-spell](../objectives/cast-spell.md) | The spell you must cast |
 
 ### Getting spells by name
 
@@ -36,7 +36,7 @@ Fortunately, PMQ offers some solutions to work around this limitation so that yo
   * Use the spell by ID in your quest, following the examples above. Keep in mind that **any spell with the same name** will count towards your objective, so you don't need to worry about getting the ID of a specific rank of a spell. Any rank will work.
   * You can also use the chat command `/pmq lookup-spell 1234`, where 1234 is your spell ID. PMQ will now remember that spell's name and you can reference it by name in your quests.
 * If you want to avoid this problem in the future, run the command `/pmq scan-spells`. This kicks off a process that will check for **every known spell in the game** and cache their names for future use in any quest draft on any character.
-  * This process only takes about 2-3 minutes to run and may have a small effect on your game's performance while it's running. See [[Configuration]] for info on how to configure this scan.
+  * This process only takes about 2-3 minutes to run and may have a small effect on your game's performance while it's running. See [Configuration](../guides/configuration.md) for info on how to configure this scan.
 
 Finally, you can erase all cached spell names from PMQ with the chat command `/pmq clear-spells`.
 

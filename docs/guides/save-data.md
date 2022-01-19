@@ -24,7 +24,7 @@ PMQ caches data about other players whenever you target a player, mouseover a pl
 
 * You may not get credit for kills made by other members in your party if you have never "seen" the target that they killed
 * You may not get credit for kills or spellcasts performed with AOE spells, if you happen to have never moused over the target.
-* Targets with level "??"/"Skull" may not count towards objectives with a [[level]] condition, because WoW does not make the target's true level available to addons
+* Targets with level "??"/"Skull" may not count towards objectives with a [level](../parameters/level.md) condition, because WoW does not make the target's true level available to addons
 
 If you think you should have gotten credit for a kill, try confirming the target's info with **Print All**, and let us know in Discord if it's not working like you'd expect.
 

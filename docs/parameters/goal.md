@@ -12,11 +12,11 @@ Some objectives do not support a goal parameter because it doesn't make sense to
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | The number of times you must cast the spell |
-| [[kill]] | The number of times the target must be killed |
-| [[loot-item]] | The number of items you must loot |
-| [[talk-to]] | The number of times the target must be talked to |
-| [[use-emote]] | The number of times the emote must be used |
+| [cast-spell](../objectives/cast-spell.md) | The number of times you must cast the spell |
+| [kill](../objectives/kill.md) | The number of times the target must be killed |
+| [loot-item](../objectives/loot-item.md) | The number of items you must loot |
+| [talk-to](../objectives/talk-to.md) | The number of times the target must be talked to |
+| [use-emote](../objectives/use-emote.md) | The number of times the emote must be used |
 
 ### Usage notes
 

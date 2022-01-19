@@ -2,7 +2,7 @@
 
 The **cast-spell** objective is triggered whenever the player successfully casts a spell. It will not be triggered when a spell or action fails or is interrupted.
 
-This objective is not limited to just magical spells; it can be invoked by a variety of in-game actions related to abilities, items, or interactions within the world. PMQ includes features to help you find the right names and IDs for spells in the game - see the [[spell]] condition page for more information.
+This objective is not limited to just magical spells; it can be invoked by a variety of in-game actions related to abilities, items, or interactions within the world. PMQ includes features to help you find the right names and IDs for spells in the game - see the [spell](../parameters/spell.md) condition page for more information.
 
 ### Shorthand
 
@@ -44,19 +44,19 @@ _*required_
 
 | Parameter | How it's used |
 |---|---|
-| [[aura]] | The name of the aura you must have when casting the spell |
-| [[class]] | The spellcast target must be a player of this class |
-| [[equip]] | The name of the item you must have equipped when casting the spell |
-| [[faction]] | The spellcast target must be a player or NPC of this faction (Alliance or Horde) |
-| [[goal]] | The number of times you must cast the spell |
-| [[guild]] | The spellcast target must be a player in this guild |
-| [[item]] | The name of the item you must have in your bags when casting the spell |
-| [[level]] | The spellcast target must be this level or higher |
+| [aura](../parameters/aura.md) | The name of the aura you must have when casting the spell |
+| [class](../parameters/class.md) | The spellcast target must be a player of this class |
+| [equip](../parameters/equip.md) | The name of the item you must have equipped when casting the spell |
+| [faction](../parameters/faction.md) | The spellcast target must be a player or NPC of this faction (Alliance or Horde) |
+| [goal](../parameters/goal.md) | The number of times you must cast the spell |
+| [guild](../parameters/guild.md) | The spellcast target must be a player in this guild |
+| [item](../parameters/item.md) | The name of the item you must have in your bags when casting the spell |
+| [level](../parameters/level.md) | The spellcast target must be this level or higher |
 | **sametarget** | If true, then multiple casts on the same target will count toward the objective (default: false) |
-| [[spell]] | The name or ID of the spell you must cast |
-| [[target]] | The name of the target you must cast the spell on |
-| [[Display Text | text]] | Custom display text for this objective |
-| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when casting the spell |
+| [spell](../parameters/spell.md) | The name or ID of the spell you must cast |
+| [target](../parameters/target.md) | The name of the target you must cast the spell on |
+| [text](../parameters/text.md) | Custom display text for this objective |
+| [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md)<br/>[coords](../parameters/coords.md) | The location you must be in when casting the spell |
 
 ### Usage notes
 

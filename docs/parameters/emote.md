@@ -1,6 +1,6 @@
 # emote
 
-The **emote** parameter is only available for use with the [[use-emote]] objective. It allows you to specify which emote should trigger the objective.
+The **emote** parameter is only available for use with the [use-emote](../objectives/use-emote.md) objective. It allows you to specify which emote should trigger the objective.
 
 ### Value type
 
@@ -10,7 +10,7 @@ The **emote** parameter is only available for use with the [[use-emote]] objecti
 
 | Objective | How it's used |
 |---|---|
-| [[use-emote]] | The name of the emote to use |
+| [use-emote](../objectives/use-emote.md) | The name of the emote to use |
 
 ### Usage notes
 

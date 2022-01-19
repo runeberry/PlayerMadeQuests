@@ -52,14 +52,14 @@ The player must enter the box bounded by the top-left coordinate (37.2, 46.5) an
 
 | Objective | How it's used |
 |---|---|
-| [[equip-item]] | The coordinates you must be near when equipping the item |
-| [[explore]] | The coordinates you must be near in order to complete the objective |
-| [[gain-aura]] | The coordinates where you must gain the aura |
-| [[kill]] | The coordinates where you must kill the target |
-| [[loot-item]] | The coordinates where you must loot the item |
-| [[say]] | The coordinates where you must say the message |
-| [[talk-to]] | The coordinates where you must talk to the target |
-| [[use-emote]] | The coordinates where you must use the emote |
+| [equip-item](../objectives/equip-item.md) | The coordinates you must be near when equipping the item |
+| [explore](../objectives/explore.md) | The coordinates you must be near in order to complete the objective |
+| [gain-aura](../objectives/gain-aura.md) | The coordinates where you must gain the aura |
+| [kill](../objectives/kill.md) | The coordinates where you must kill the target |
+| [loot-item](../objectives/loot-item.md) | The coordinates where you must loot the item |
+| [say](../objectives/say.md) | The coordinates where you must say the message |
+| [talk-to](../objectives/talk-to.md) | The coordinates where you must talk to the target |
+| [use-emote](../objectives/use-emote.md) | The coordinates where you must use the emote |
 
 This parameter can also be used as a [[Start &amp; Complete Objectives|start or complete condition]].
 

@@ -10,15 +10,15 @@ The **zone** and **subzone** parameters are used to specify the names of in-game
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | The zone where you must be when casting the spell |
-| [[equip-item]] | The zone where you must be when equipping the item |
-| [[explore]] | The zone where you must be in order to complete the objective |
-| [[gain-aura]] | The zone where you must gain the aura |
-| [[kill]] | The zone where you must kill the target |
-| [[loot-item]] | The zone where you must loot the item |
-| [[say]] | The zone you must be in when saying the message |
-| [[talk-to]] | The zone where you must talk to the target |
-| [[use-emote]] | The zone where you must use the emote |
+| [cast-spell](../objectives/cast-spell.md) | The zone where you must be when casting the spell |
+| [equip-item](../objectives/equip-item.md) | The zone where you must be when equipping the item |
+| [explore](../objectives/explore.md) | The zone where you must be in order to complete the objective |
+| [gain-aura](../objectives/gain-aura.md) | The zone where you must gain the aura |
+| [kill](../objectives/kill.md) | The zone where you must kill the target |
+| [loot-item](../objectives/loot-item.md) | The zone where you must loot the item |
+| [say](../objectives/say.md) | The zone you must be in when saying the message |
+| [talk-to](../objectives/talk-to.md) | The zone where you must talk to the target |
+| [use-emote](../objectives/use-emote.md) | The zone where you must use the emote |
 
 This parameter can also be used as a [[Start &amp; Complete Objectives|start or complete condition]].
 

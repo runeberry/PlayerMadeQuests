@@ -12,9 +12,9 @@ The **guild** parameter allows you to specify the name of a guild that a target 
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | The spellcast target must be a player in this guild |
-| [[kill]] | The kill target must be a player in this guild |
-| [[use-emote]] | The emote target must be a player in this guild |
+| [cast-spell](../objectives/cast-spell.md) | The spellcast target must be a player in this guild |
+| [kill](../objectives/kill.md) | The kill target must be a player in this guild |
+| [use-emote](../objectives/use-emote.md) | The emote target must be a player in this guild |
 
 ### Usage notes
 

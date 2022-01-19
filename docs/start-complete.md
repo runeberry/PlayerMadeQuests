@@ -27,9 +27,9 @@ Both properties support all the same parameters and are evaluated in the same wa
 
 | Parameter | How it's used |
 |---|---|
-| [[coords]] | The coordinates you must be at in order to start or complete the quest |
-| [[target]] | The NPC that must be targeted in order to start or complete the quest |
-| [[Display Text | text]] | Custom display text for the start or complete condition |
+| [coords](parameters/coords.md) | The coordinates you must be at in order to start or complete the quest |
+| [target](parameters/target.md) | The NPC that must be targeted in order to start or complete the quest |
+| [text](parameters/text.md) | Custom display text for the start or complete condition |
 | [[zone | zone<br/>subzone]] | The name of the zone and/or subzone where the quest starts or ends |
 
 ### [[Display Text]] variables

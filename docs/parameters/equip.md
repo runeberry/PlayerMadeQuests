@@ -10,15 +10,15 @@ The **equip** parameter allows you to specify an item that the player must have 
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | The item you must have equipped when casting the spell |
-| [[equip-item]] | The item you must equip to complete the objective |
-| [[explore]] | An item you must have equipped when entering the area to be explored |
-| [[gain-aura]] | An item you must have equipped when gaining the aura |
-| [[kill]] | An item you must have equipped when killing the target enemy |
-| [[loot-item]] | An item you must have equipped when looting the target item |
-| [[say]] | An item you must have equipped when saying the message |
-| [[talk-to]] | An item you must have equipped when talking to the target NPC |
-| [[use-emote]] | An item you must have equipped when using the emote |
+| [cast-spell](../objectives/cast-spell.md) | The item you must have equipped when casting the spell |
+| [equip-item](../objectives/equip-item.md) | The item you must equip to complete the objective |
+| [explore](../objectives/explore.md) | An item you must have equipped when entering the area to be explored |
+| [gain-aura](../objectives/gain-aura.md) | An item you must have equipped when gaining the aura |
+| [kill](../objectives/kill.md) | An item you must have equipped when killing the target enemy |
+| [loot-item](../objectives/loot-item.md) | An item you must have equipped when looting the target item |
+| [say](../objectives/say.md) | An item you must have equipped when saying the message |
+| [talk-to](../objectives/talk-to.md) | An item you must have equipped when talking to the target NPC |
+| [use-emote](../objectives/use-emote.md) | An item you must have equipped when using the emote |
 
 ### Usage notes
 

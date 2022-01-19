@@ -29,8 +29,8 @@ objectives:
 
 | Parameter | How it's used |
 |---|---|
-| [[aura]] | The name of the aura you must have when equipping the item |
-| [[equip]] | The name of the item you must equip |
-| [[item]] | The name of another item you must have in your bags when you equip this item |
-| [[Display Text | text]] | Custom display text for this objective |
-| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when equipping this item |
+| [aura](../parameters/aura.md) | The name of the aura you must have when equipping the item |
+| [equip](../parameters/equip.md) | The name of the item you must equip |
+| [item](../parameters/item.md) | The name of another item you must have in your bags when you equip this item |
+| [text](../parameters/text.md) | Custom display text for this objective |
+| [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md)<br/>[coords](../parameters/coords.md) | The location you must be in when equipping this item |

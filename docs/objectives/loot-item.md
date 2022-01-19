@@ -34,9 +34,9 @@ objectives:
 
 | Parameter | How it's used |
 |---|---|
-| [[aura]] | The name of the aura you must have when looting |
-| [[equip]] | The name of an item you must have equipped when looting |
-| [[goal]] | The number of items you must loot |
-| [[item]] | The name of the item you must loot |
-| [[Display Text | text]] | Custom display text for this objective |
-| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when looting this item |
+| [aura](../parameters/aura.md) | The name of the aura you must have when looting |
+| [equip](../parameters/equip.md) | The name of an item you must have equipped when looting |
+| [goal](../parameters/goal.md) | The number of items you must loot |
+| [item](../parameters/item.md) | The name of the item you must loot |
+| [text](../parameters/text.md) | Custom display text for this objective |
+| [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md)<br/>[coords](../parameters/coords.md) | The location you must be in when looting this item |

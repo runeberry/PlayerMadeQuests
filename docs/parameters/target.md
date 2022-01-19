@@ -10,10 +10,10 @@ The **target** parameter is used in a variety of ways, but in general it is used
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | The target that you must cast a spell on |
-| [[kill]] | The target that must be killed |
-| [[talk-to]] | The target that must be talked to |
-| [[use-emote]] | The target which the emote must be used on |
+| [cast-spell](../objectives/cast-spell.md) | The target that you must cast a spell on |
+| [kill](../objectives/kill.md) | The target that must be killed |
+| [talk-to](../objectives/talk-to.md) | The target that must be talked to |
+| [use-emote](../objectives/use-emote.md) | The target which the emote must be used on |
 
 This parameter can also be used as a [[Start &amp; Complete Objectives|start or complete condition]].
 

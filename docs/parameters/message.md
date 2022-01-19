@@ -21,7 +21,7 @@ Note that all values for message are **case-insensitive**, meaning that "happy b
 
 | Objective | How it's used |
 |---|---|
-| [[say]] | The message which the player must say in order to complete the objective |
+| [say](../objectives/say.md) | The message which the player must say in order to complete the objective |
 
 ### Usage notes
 

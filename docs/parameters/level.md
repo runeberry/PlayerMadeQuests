@@ -12,9 +12,9 @@ Currently, this number must be from 1-73 (the maximum visible level for monsters
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | The spellcast target must be this level or higher |
-| [[kill]] | The kill target must be this level or higher |
-| [[use-emote]] | The emote target must be this level or higher |
+| [cast-spell](../objectives/cast-spell.md) | The spellcast target must be this level or higher |
+| [kill](../objectives/kill.md) | The kill target must be this level or higher |
+| [use-emote](../objectives/use-emote.md) | The emote target must be this level or higher |
 
 This parameter can also be used as a [[Requirements|quest requirement or recommendation]].
 

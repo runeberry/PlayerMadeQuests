@@ -10,15 +10,15 @@ The **text** parameter allows you to precisely define how your quest information
 
 | Objective | How it's used |
 |---|---|
-| [[cast-spell]] | Custom display text |
-| [[equip-item]] | Custom display text |
-| [[gain-aura]] | Custom display text |
-| [[explore]] | Custom display text |
-| [[kill]] | Custom display text |
-| [[loot-item]] | Custom display text |
-| [[say]] | Custom display text |
-| [[talk-to]] | Custom display text |
-| [[use-emote]] | Custom display text |
+| [cast-spell](../objectives/cast-spell.md) | Custom display text |
+| [equip-item](../objectives/equip-item.md) | Custom display text |
+| [gain-aura](../objectives/gain-aura.md) | Custom display text |
+| [explore](../objectives/explore.md) | Custom display text |
+| [kill](../objectives/kill.md) | Custom display text |
+| [loot-item](../objectives/loot-item.md) | Custom display text |
+| [say](../objectives/say.md) | Custom display text |
+| [talk-to](../objectives/talk-to.md) | Custom display text |
+| [use-emote](../objectives/use-emote.md) | Custom display text |
 
 Custom display text can also be used with a [[Start &amp; Complete Objectives|start and complete conditions]] as well as [[Requirements|quest requirements]].
 
@@ -56,19 +56,19 @@ You can use special variables in your display text string to show the value of d
 
 | Parameter values |
 |---|
-| **%a**, [[aura]] |
-| **%co**, [[coords]] |
-| **%ch**, [[channel]] |
-| **%e**, [[equip]] |
-| **%em**, [[emote]] |
-| **%g**, [[goal]] |
-| **%i**, [[item]] |
-| **%lang**, [[language]] |
-| **%msg**, [[message]] |
+| **%a**, [aura](../parameters/aura.md) |
+| **%co**, [coords](../parameters/coords.md) |
+| **%ch**, [channel](../parameters/channel.md) |
+| **%e**, [equip](../parameters/equip.md) |
+| **%em**, [emote](../parameters/emote.md) |
+| **%g**, [goal](../parameters/goal.md) |
+| **%i**, [item](../parameters/item.md) |
+| **%lang**, [language](../parameters/language.md) |
+| **%msg**, [message](../parameters/message.md) |
 | **%p**, [[goal | progress]] |
-| **%t**, [[target]] or [[recipient]] |
-| **%sz**, [[zone | subzone]] |
-| **%z**, [[zone]] |
+| **%t**, [target](../parameters/target.md) or [recipient](../parameters/recipient.md) |
+| **%sz**, [subzone](../parameters/zone.md) |
+| **%z**, [zone](../parameters/zone.md) |
 | **Derived Values** |
 | **%g2**, prints **goal** only if goal > 1 |
 | **%p2**, prints **progress** only if progress < goal |
