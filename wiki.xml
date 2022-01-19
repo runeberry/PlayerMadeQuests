@@ -50,37 +50,17 @@
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The aura you must have when casting the spell
-|-
-| [[equip-item]]
-| The aura you must have when equipping the item
-|-
-| [[explore]]
-| The aura you must have when entering the area to be explored
-|-
-| [[gain-aura]]
-| The aura you must gain
-|-
-| [[kill]]
-| The aura you must have when killing the target enemy
-|-
-| [[loot-item]]
-| The aura you must have when looting an item
-|-
-| [[say]]
-| The aura you must have when saying the message
-|-
-| [[talk-to]]
-| The aura you must have when talking to the target NPC
-|-
-| [[use-emote]]
-| The aura you must have when performing the emote
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The aura you must have when casting the spell |
+| [[equip-item]] | The aura you must have when equipping the item |
+| [[explore]] | The aura you must have when entering the area to be explored |
+| [[gain-aura]] | The aura you must gain |
+| [[kill]] | The aura you must have when killing the target enemy |
+| [[loot-item]] | The aura you must have when looting an item |
+| [[say]] | The aura you must have when saying the message |
+| [[talk-to]] | The aura you must have when talking to the target NPC |
+| [[use-emote]] | The aura you must have when performing the emote |
 
 ### Usage notes
 
@@ -166,49 +146,21 @@ objectives:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[aura]]
-| The name of the aura you must have when casting the spell
-|-
-| [[class]]
-| The spellcast target must be a player of this class
-|-
-| [[equip]]
-| The name of the item you must have equipped when casting the spell
-|-
-| [[faction]]
-| The spellcast target must be a player or NPC of this faction (Alliance or Horde)
-|-
-| [[goal]]
-| The number of times you must cast the spell
-|-
-| [[guild]]
-| The spellcast target must be a player in this guild
-|-
-| [[item]]
-| The name of the item you must have in your bags when casting the spell
-|-
-| [[level]]
-| The spellcast target must be this level or higher
-|-
-| **sametarget**
-| If true, then multiple casts on the same target will count toward the objective (default: false)
-|-
-| [[spell]]
-| The name or ID of the spell you must cast
-|-
-| [[target]]
-| The name of the target you must cast the spell on
-|-
-| [[Display Text|text]]
-| Custom display text for this objective
-|-
-| [[zone]]&lt;br/&gt;[[zone|subzone]]&lt;br/&gt;[[coords]]
-| The location you must be in when casting the spell
-|}
+| Parameter | How it's used |
+|---|---|
+| [[aura]] | The name of the aura you must have when casting the spell |
+| [[class]] | The spellcast target must be a player of this class |
+| [[equip]] | The name of the item you must have equipped when casting the spell |
+| [[faction]] | The spellcast target must be a player or NPC of this faction (Alliance or Horde) |
+| [[goal]] | The number of times you must cast the spell |
+| [[guild]] | The spellcast target must be a player in this guild |
+| [[item]] | The name of the item you must have in your bags when casting the spell |
+| [[level]] | The spellcast target must be this level or higher |
+| **sametarget** | If true, then multiple casts on the same target will count toward the objective (default: false) |
+| [[spell]] | The name or ID of the spell you must cast |
+| [[target]] | The name of the target you must cast the spell on |
+| [[Display Text | text]] | Custom display text for this objective |
+| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when casting the spell |
 
 ### Usage notes
 
@@ -246,13 +198,9 @@ objectives:
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[say]]
-| The channel(s) in which you can send the message to complete the objective
-|}
+| Objective | How it's used |
+|---|---|
+| [[say]] | The channel(s) in which you can send the message to complete the objective |
 
 ### Usage notes
 
@@ -304,19 +252,11 @@ The following class values are supported for TBC:
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The spellcast target must be a player of this class
-|-
-| [[kill]]
-| The kill target must be a player of this class
-|-
-| [[use-emote]]
-| The emote target must be a player of this class
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The spellcast target must be a player of this class |
+| [[kill]] | The kill target must be a player of this class |
+| [[use-emote]] | The emote target must be a player of this class |
 
 This parameter can also be used as a [[Requirements|quest requirement or recommendation]].
 
@@ -355,83 +295,27 @@ This page outlines the settings you can configure in PMQ.
 
 ### Settings
 
-{| class="wikitable boldlinks"
-! Setting
-! Expected Value
-! Description
-|-
-| ENABLE_GUI
-| true, false
-| If false, some GUI elements will not be created on startup. Use for troubleshooting only.
-|-
-| ENABLE_SELF_MESSAGING
-| true, false
-| If true, any outgoing messages (such as quest sharing) will be redirected back to you with the player name "*yourself*". Use for testing only.
-|-
-| ENABLE_TRANSACTION_LOGS
-| true, false
-| If true, will output additional logging for Repository transactions. &lt;br/&gt;You will also need to lower the logging level of the appropriate logger(s) to "trace" in the Logging settings. (extremely verbose, enable for debugging only)
-|-
-| FEATURE_PET_KILLS
-| true, false
-| If true, additional checks will be performed to count your pet's contribution toward any [[kill]] objective.
-|-
-| FILTER_OFFLINE_MESSAGE
-| true, false
-| PMQ needs to put a special chat filter in place to hide all messages that say `No player named '*' is currently playing.`&lt;br/&gt;If this causes you trouble for some reason, change this setting to false to disable that filter.
-|-
-| GLOBAL_LOG_FILTER
-| silent, fatal, error, info, debug, trace
-| Indicates the lowest level of log that should be output to the game console by default. Logging can be further configured in the Logging menu.
-|-
-| ITEM_SCAN_LOG_INTERVAL
-| # items/message
-| How often the addon should inform you of item scanning progress. A lower number will print chat messages more often.
-|-
-| ITEM_SCAN_TIMEOUT
-| # seconds
-| How long to wait for the server to response when scanning for items. A lower number will scan faster, but could miss items.
-|-
-| NOTIFY_COMPLETE_AUTHOR
-| true, false
-| If true, you will be notified when any player completes a quest that you wrote.
-|-
-| NOTIFY_COMPLETE_BULK
-| true, false
-| If true, you will be notified when any player in your party or raid completes a PMQ quest.
-|-
-| NOTIFY_COMPLETE_SHARER
-| true, false
-| If true, you will be notified when any player completes a quest that you shared with them.
-|-
-| NOTIFY_VERSION_UPDATE
-| true, false
-| If true, you will be notified once per game session when there is a known PMQ update available.
-|-
-| PLAYER_LOCATION_INTERVAL
-| # of seconds
-| Indicates how frequently the addon should check your location when required for [[coords]] conditions.
-|-
-| PLAYER_LOCATION_TTL
-| # of seconds
-| Indicates how long the addon should cache your position in game before checking again.
-|-
-| SPELL_SCAN_INTENSITY
-| # spells/frame
-| How many spells to scan for on each frame when scanning for spells. A higher number will scan faster, but will hurt game performance.
-|-
-| SPELL_SCAN_LOG_INTERVAL
-| # spells/message
-| How often the addon should inform you of spell scanning progress. A lower number will print chat messages more often.
-|-
-| START_MENU
-| menu ID
-| Specify a menu to open when the addon loads. Useful for GUI development. Get the menu IDs from the value properties in [https://github.com/runeberry/PlayerMadeQuests/blob/master/src/gui/MainMenu.lua#L10 MainMenu.lua].
-|-
-| VERSION_INFO_TTL
-| # of seconds
-| Indicates how long PMQ should remember that addon versions are available and to prompt you to update. (default is 3 days)
-|}</text>
+| Setting | Expected Value | Description |
+|---|---|---|
+| ENABLE_GUI | true, false | If false, some GUI elements will not be created on startup. Use for troubleshooting only. |
+| ENABLE_SELF_MESSAGING | true, false | If true, any outgoing messages (such as quest sharing) will be redirected back to you with the player name "*yourself*". Use for testing only. |
+| ENABLE_TRANSACTION_LOGS | true, false | If true, will output additional logging for Repository transactions. <br/>You will also need to lower the logging level of the appropriate logger(s) to "trace" in the Logging settings. (extremely verbose, enable for debugging only) |
+| FEATURE_PET_KILLS | true, false | If true, additional checks will be performed to count your pet's contribution toward any [[kill]] objective. |
+| FILTER_OFFLINE_MESSAGE | true, false | PMQ needs to put a special chat filter in place to hide all messages that say `No player named '*' is currently playing.`<br/>If this causes you trouble for some reason, change this setting to false to disable that filter. |
+| GLOBAL_LOG_FILTER | silent, fatal, error, info, debug, trace | Indicates the lowest level of log that should be output to the game console by default. Logging can be further configured in the Logging menu. |
+| ITEM_SCAN_LOG_INTERVAL | # items/message | How often the addon should inform you of item scanning progress. A lower number will print chat messages more often. |
+| ITEM_SCAN_TIMEOUT | # seconds | How long to wait for the server to response when scanning for items. A lower number will scan faster, but could miss items. |
+| NOTIFY_COMPLETE_AUTHOR | true, false | If true, you will be notified when any player completes a quest that you wrote. |
+| NOTIFY_COMPLETE_BULK | true, false | If true, you will be notified when any player in your party or raid completes a PMQ quest. |
+| NOTIFY_COMPLETE_SHARER | true, false | If true, you will be notified when any player completes a quest that you shared with them. |
+| NOTIFY_VERSION_UPDATE | true, false | If true, you will be notified once per game session when there is a known PMQ update available. |
+| PLAYER_LOCATION_INTERVAL | # of seconds | Indicates how frequently the addon should check your location when required for [[coords]] conditions. |
+| PLAYER_LOCATION_TTL | # of seconds | Indicates how long the addon should cache your position in game before checking again. |
+| SPELL_SCAN_INTENSITY | # spells/frame | How many spells to scan for on each frame when scanning for spells. A higher number will scan faster, but will hurt game performance. |
+| SPELL_SCAN_LOG_INTERVAL | # spells/message | How often the addon should inform you of spell scanning progress. A lower number will print chat messages more often. |
+| START_MENU | menu ID | Specify a menu to open when the addon loads. Useful for GUI development. Get the menu IDs from the value properties in [https://github.com/runeberry/PlayerMadeQuests/blob/master/src/gui/MainMenu.lua#L10 MainMenu.lua]. |
+| VERSION_INFO_TTL | # of seconds | Indicates how long PMQ should remember that addon versions are available and to prompt you to update. (default is 3 days) |
+</text>
       <sha1>79c7aj6l7vnztf8vij4e88kog8kmbjq</sha1>
     </revision>
   </page>
@@ -500,34 +384,16 @@ The player must enter the box bounded by the top-left coordinate (37.2, 46.5) an
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[equip-item]]
-| The coordinates you must be near when equipping the item
-|-
-| [[explore]]
-| The coordinates you must be near in order to complete the objective
-|-
-| [[gain-aura]]
-| The coordinates where you must gain the aura
-|-
-| [[kill]]
-| The coordinates where you must kill the target
-|-
-| [[loot-item]]
-| The coordinates where you must loot the item
-|-
-| [[say]]
-| The coordinates where you must say the message
-|-
-| [[talk-to]]
-| The coordinates where you must talk to the target
-|-
-| [[use-emote]]
-| The coordinates where you must use the emote
-|}
+| Objective | How it's used |
+|---|---|
+| [[equip-item]] | The coordinates you must be near when equipping the item |
+| [[explore]] | The coordinates you must be near in order to complete the objective |
+| [[gain-aura]] | The coordinates where you must gain the aura |
+| [[kill]] | The coordinates where you must kill the target |
+| [[loot-item]] | The coordinates where you must loot the item |
+| [[say]] | The coordinates where you must say the message |
+| [[talk-to]] | The coordinates where you must talk to the target |
+| [[use-emote]] | The coordinates where you must use the emote |
 
 This parameter can also be used as a [[Start &amp; Complete Objectives|start or complete condition]].
 
@@ -563,37 +429,17 @@ This parameter can also be used as a [[Start &amp; Complete Objectives|start or 
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| Custom display text
-|-
-| [[equip-item]]
-| Custom display text
-|-
-| [[gain-aura]]
-| Custom display text
-|-
-| [[explore]]
-| Custom display text
-|-
-| [[kill]]
-| Custom display text
-|-
-| [[loot-item]]
-| Custom display text
-|-
-| [[say]]
-| Custom display text
-|-
-| [[talk-to]]
-| Custom display text
-|-
-| [[use-emote]]
-| Custom display text
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | Custom display text |
+| [[equip-item]] | Custom display text |
+| [[gain-aura]] | Custom display text |
+| [[explore]] | Custom display text |
+| [[kill]] | Custom display text |
+| [[loot-item]] | Custom display text |
+| [[say]] | Custom display text |
+| [[talk-to]] | Custom display text |
+| [[use-emote]] | Custom display text |
 
 Custom display text can also be used with a [[Start &amp; Complete Objectives|start and complete conditions]] as well as [[Requirements|quest requirements]].
 
@@ -629,77 +475,31 @@ You may also notice the use of `%z` in the text above. This will get populated w
 
 You can use special variables in your display text string to show the value of different parameters for that objective.
 
-{| class="wikitable boldlinks"
-! colspan=2|Parameter values
-|-
-| **%a**
-| [[aura]]
-|-
-| **%co**
-| [[coords]]
-|-
-| **%ch**
-| [[channel]]
-|-
-| **%e**
-| [[equip]]
-|-
-| **%em**
-| [[emote]]
-|-
-| **%g**
-| [[goal]]
-|-
-| **%i**
-| [[item]]
-|-
-| **%lang**
-| [[language]]
-|-
-| **%msg**
-| [[message]]
-|-
-| **%p**
-| [[goal|progress]]
-|-
-| **%t**
-| [[target]] or [[recipient]]
-|-
-| **%sz**
-| [[zone|subzone]]
-|-
-| **%z**
-| [[zone]]
-|-
-! colspan=2|Derived Values
-|-
-| **%g2**
-| prints **goal** only if goal &gt; 1
-|-
-| **%p2**
-| prints **progress** only if progress &lt; goal
-|-
-| **%r**
-| radius of **coords**
-|-
-| **%x**
-| x-coordinate of **coords**
-|-
-| **%xy**
-| **coords** formatted as: `(x, y)`
-|-
-| **%xyr**
-| **coords** formatted as: `(x, y) +/- radius`
-|-
-| **%xyz**
-| location formatted as: `(x, y) in zone in subzone`
-|-
-| **%y**
-| y-coordinate of **coords**
-|-
-| **%z2**
-| location formatted as: `zone in subzone`
-|}
+| Parameter values |
+|---|
+| **%a**, [[aura]] |
+| **%co**, [[coords]] |
+| **%ch**, [[channel]] |
+| **%e**, [[equip]] |
+| **%em**, [[emote]] |
+| **%g**, [[goal]] |
+| **%i**, [[item]] |
+| **%lang**, [[language]] |
+| **%msg**, [[message]] |
+| **%p**, [[goal | progress]] |
+| **%t**, [[target]] or [[recipient]] |
+| **%sz**, [[zone | subzone]] |
+| **%z**, [[zone]] |
+| **Derived Values** |
+| **%g2**, prints **goal** only if goal > 1 |
+| **%p2**, prints **progress** only if progress < goal |
+| **%r**, radius of **coords** |
+| **%x**, x-coordinate of **coords** |
+| **%xy**, **coords** formatted as: `(x, y)` |
+| **%xyr**, **coords** formatted as: `(x, y) +/- radius` |
+| **%xyz**, location formatted as: `(x, y) in zone in subzone` |
+| **%y**, y-coordinate of **coords** |
+| **%z2**, location formatted as: `zone in subzone` |
 
 ### Quest-level variables
 
@@ -714,37 +514,18 @@ quest:
   completion: Well I'll be, you actually did it! Not bad for a %class. Glad to have a [%gen:guy{{!```gal] like you on our team.
 }}
 
-{| class="wikitable boldlinks"
-! colspan=2|Player Info
-|-
-| **%name**
-| The player's name
-|-
-| **%class**
-| The player's class (e.g. "Mage")
-|-
-| **%race**
-| The player's race (e.g. "Tauren")
-|-
-| **%gen**
-| The player's gender flag (see example above)
-|-
-! colspan=2|Quest Info
-|-
-| **%author**
-| The name of the player who wrote the quest
-|-
-| **%giver**
-| The name of the player who shared the quest (changes every time the quest is shared)
-|-
-! colspan=2|Formatting
-|-
-| **%n**
-| newline for [[YAML|long strings]]
-|-
-| **%br**
-| line-break (double newline) for [[YAML|long strings]]
-|}
+| Player Info |
+|---|
+| **%name**, The player's name |
+| **%class**, The player's class (e.g. "Mage") |
+| **%race**, The player's race (e.g. "Tauren") |
+| **%gen**, The player's gender flag (see example above) |
+| **Quest Info** |
+| **%author**, The name of the player who wrote the quest |
+| **%giver**, The name of the player who shared the quest (changes every time the quest is shared) |
+| **Formatting** |
+| **%n**, newline for [[YAML | long strings]] |
+| **%br**, line-break (double newline) for [[YAML | long strings]] |
 
 [[Category:Quest Objective Parameters]]</text>
       <sha1>tcaybg2ql6tgwlt9aitg0w8yzxspqtf</sha1>
@@ -772,13 +553,9 @@ quest:
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[use-emote]]
-| The name of the emote to use
-|}
+| Objective | How it's used |
+|---|---|
+| [[use-emote]] | The name of the emote to use |
 
 ### Usage notes
 
@@ -810,37 +587,17 @@ quest:
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The item you must have equipped when casting the spell
-|-
-| [[equip-item]]
-| The item you must equip to complete the objective
-|-
-| [[explore]]
-| An item you must have equipped when entering the area to be explored
-|-
-| [[gain-aura]]
-| An item you must have equipped when gaining the aura
-|-
-| [[kill]]
-| An item you must have equipped when killing the target enemy
-|-
-| [[loot-item]]
-| An item you must have equipped when looting the target item
-|-
-| [[say]]
-| An item you must have equipped when saying the message
-|-
-| [[talk-to]]
-| An item you must have equipped when talking to the target NPC
-|-
-| [[use-emote]]
-| An item you must have equipped when using the emote
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The item you must have equipped when casting the spell |
+| [[equip-item]] | The item you must equip to complete the objective |
+| [[explore]] | An item you must have equipped when entering the area to be explored |
+| [[gain-aura]] | An item you must have equipped when gaining the aura |
+| [[kill]] | An item you must have equipped when killing the target enemy |
+| [[loot-item]] | An item you must have equipped when looting the target item |
+| [[say]] | An item you must have equipped when saying the message |
+| [[talk-to]] | An item you must have equipped when talking to the target NPC |
+| [[use-emote]] | An item you must have equipped when using the emote |
 
 ### Usage notes
 
@@ -891,25 +648,13 @@ objectives:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[aura]]
-| The name of the aura you must have when equipping the item
-|-
-| [[equip]]
-| The name of the item you must equip
-|-
-| [[item]]
-| The name of another item you must have in your bags when you equip this item
-|-
-| [[Display Text|text]]
-| Custom display text for this objective
-|-
-| [[zone]]&lt;br/&gt;[[zone|subzone]]&lt;br/&gt;[[coords]]
-| The location you must be in when equipping this item
-|}
+| Parameter | How it's used |
+|---|---|
+| [[aura]] | The name of the aura you must have when equipping the item |
+| [[equip]] | The name of the item you must equip |
+| [[item]] | The name of another item you must have in your bags when you equip this item |
+| [[Display Text | text]] | Custom display text for this objective |
+| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when equipping this item |
 
 [[Category:Quest Objectives]]</text>
       <sha1>tev9li190rcrstm795hw8jbpye3rn9v</sha1>
@@ -958,25 +703,13 @@ objectives:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[aura]]
-| The aura you must have when exploring this area
-|-
-| [[equip]]
-| An item you must have equipped when exploring this area
-|-
-| [[item]]
-| An item you must have in your bags when exploring this area
-|-
-| [[Display Text|text]]
-| Custom display text for this objective
-|-
-| [[zone]]&lt;br/&gt;[[zone|subzone]]&lt;br/&gt;[[coords]]
-| The location that must be visited to complete this objective
-|}
+| Parameter | How it's used |
+|---|---|
+| [[aura]] | The aura you must have when exploring this area |
+| [[equip]] | An item you must have equipped when exploring this area |
+| [[item]] | An item you must have in your bags when exploring this area |
+| [[Display Text | text]] | Custom display text for this objective |
+| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location that must be visited to complete this objective |
 
 [[Category:Quest Objectives]]</text>
       <sha1>kgdjr5rb017778dozs9en7ixzf3zgvy</sha1>
@@ -1004,19 +737,11 @@ objectives:
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The spellcast target must be a player or NPC of this faction
-|-
-| [[kill]]
-| The kill target must be a player or NPC of this faction
-|-
-| [[use-emote]]
-| The emote target must be a player or NPC of this faction
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The spellcast target must be a player or NPC of this faction |
+| [[kill]] | The kill target must be a player or NPC of this faction |
+| [[use-emote]] | The emote target must be a player or NPC of this faction |
 
 This parameter can also be used as a [[Requirements|quest requirement or recommendation]].
 
@@ -1069,25 +794,13 @@ objectives:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[aura]]
-| The name of the aura you must gain to complete this objective
-|-
-| [[equip]]
-| An item you must have equipped when gaining this aura
-|-
-| [[item]]
-| An item you must have in your bags when gaining this aura
-|-
-| [[Display Text|text]]
-| Custom display text for this objective
-|-
-| [[zone]]&lt;br/&gt;[[zone|subzone]]&lt;br/&gt;[[coords]]
-| The location you must be in when gaining the aura
-|}
+| Parameter | How it's used |
+|---|---|
+| [[aura]] | The name of the aura you must gain to complete this objective |
+| [[equip]] | An item you must have equipped when gaining this aura |
+| [[item]] | An item you must have in your bags when gaining this aura |
+| [[Display Text | text]] | Custom display text for this objective |
+| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when gaining the aura |
 
 [[Category:Quest Objectives]]</text>
       <sha1>g71x965903549id8wb92xjhezay3w4x</sha1>
@@ -1117,25 +830,13 @@ Some objectives do not support a goal parameter because it doesn't make sense to
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The number of times you must cast the spell
-|-
-| [[kill]]
-| The number of times the target must be killed
-|-
-| [[loot-item]]
-| The number of items you must loot
-|-
-| [[talk-to]]
-| The number of times the target must be talked to
-|-
-| [[use-emote]]
-| The number of times the emote must be used
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The number of times you must cast the spell |
+| [[kill]] | The number of times the target must be killed |
+| [[loot-item]] | The number of items you must loot |
+| [[talk-to]] | The number of times the target must be talked to |
+| [[use-emote]] | The number of times the emote must be used |
 
 ### Usage notes
 
@@ -1261,19 +962,11 @@ Want to see how it works? Feel free to copy-paste this quest into your own draft
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The spellcast target must be a player in this guild
-|-
-| [[kill]]
-| The kill target must be a player in this guild
-|-
-| [[use-emote]]
-| The emote target must be a player in this guild
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The spellcast target must be a player in this guild |
+| [[kill]] | The kill target must be a player in this guild |
+| [[use-emote]] | The emote target must be a player in this guild |
 
 ### Usage notes
 
@@ -1307,37 +1000,17 @@ The **item** parameter allows you to specify an item that the player must have i
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| An item you must have in your bags when casting the spell
-|-
-| [[equip-item]]
-| An item you must have in your bags when equipping the item specified with the [[equip]] parameter
-|-
-| [[explore]]
-| An item you must have in your bags when entering the area to be explored
-|-
-| [[gain-aura]]
-| An item you must have in your bags when gaining the aura
-|-
-| [[kill]]
-| An item you must have in your bags when killing the target enemy
-|-
-| [[loot-item]]
-| The item you must loot
-|-
-| [[say]]
-| An item you must have in your bags when saying the message
-|-
-| [[talk-to]]
-| An item you must have in your bags when talking to the target NPC
-|-
-| [[use-emote]]
-| An item you must have in your bags when using the emote
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | An item you must have in your bags when casting the spell |
+| [[equip-item]] | An item you must have in your bags when equipping the item specified with the [[equip]] parameter |
+| [[explore]] | An item you must have in your bags when entering the area to be explored |
+| [[gain-aura]] | An item you must have in your bags when gaining the aura |
+| [[kill]] | An item you must have in your bags when killing the target enemy |
+| [[loot-item]] | The item you must loot |
+| [[say]] | An item you must have in your bags when saying the message |
+| [[talk-to]] | An item you must have in your bags when talking to the target NPC |
+| [[use-emote]] | An item you must have in your bags when using the emote |
 
 ### Usage notes
 
@@ -1474,43 +1147,19 @@ objectives:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[aura]]
-| The name of the aura you must have when killing the target
-|-
-| [[class]]
-| The kill target must be a player of this class
-|-
-| [[equip]]
-| An item you must have equipped when killing the target
-|-
-| [[faction]]
-| The kill target must be a player or NPC of this faction (Alliance or Horde)
-|-
-| [[goal]]
-| The number of enemies to kill
-|-
-| [[guild]]
-| The kill target must be a player in this guild
-|-
-| [[item]]
-| An item you must have in your bags when killing the target
-|-
-| [[level]]
-| The kill target must be this level or higher
-|-
-| [[target]]
-| The name of the NPC or player to kill
-|-
-| [[Display Text|text]]
-| Custom display text for this objective
-|-
-| [[zone]]&lt;br/&gt;[[zone|subzone]]&lt;br/&gt;[[coords]]
-| The location you must be in when killing the target
-|}
+| Parameter | How it's used |
+|---|---|
+| [[aura]] | The name of the aura you must have when killing the target |
+| [[class]] | The kill target must be a player of this class |
+| [[equip]] | An item you must have equipped when killing the target |
+| [[faction]] | The kill target must be a player or NPC of this faction (Alliance or Horde) |
+| [[goal]] | The number of enemies to kill |
+| [[guild]] | The kill target must be a player in this guild |
+| [[item]] | An item you must have in your bags when killing the target |
+| [[level]] | The kill target must be this level or higher |
+| [[target]] | The name of the NPC or player to kill |
+| [[Display Text | text]] | Custom display text for this objective |
+| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when killing the target |
 
 ### Notes
 
@@ -1548,13 +1197,9 @@ In order to speak in a special language other than Common (Alliance default) or 
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[say]]
-| The language(s) that the message must be spoken in
-|}
+| Objective | How it's used |
+|---|---|
+| [[say]] | The language(s) that the message must be spoken in |
 
 ### Usage notes
 
@@ -1597,19 +1242,11 @@ Currently, this number must be from 1-73 (the maximum visible level for monsters
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The spellcast target must be this level or higher
-|-
-| [[kill]]
-| The kill target must be this level or higher
-|-
-| [[use-emote]]
-| The emote target must be this level or higher
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The spellcast target must be this level or higher |
+| [[kill]] | The kill target must be this level or higher |
+| [[use-emote]] | The emote target must be this level or higher |
 
 This parameter can also be used as a [[Requirements|quest requirement or recommendation]].
 
@@ -1667,28 +1304,14 @@ objectives:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[aura]]
-| The name of the aura you must have when looting
-|-
-| [[equip]]
-| The name of an item you must have equipped when looting
-|-
-| [[goal]]
-| The number of items you must loot
-|-
-| [[item]]
-| The name of the item you must loot
-|-
-| [[Display Text|text]]
-| Custom display text for this objective
-|-
-| [[zone]]&lt;br/&gt;[[zone|subzone]]&lt;br/&gt;[[coords]]
-| The location you must be in when looting this item
-|}
+| Parameter | How it's used |
+|---|---|
+| [[aura]] | The name of the aura you must have when looting |
+| [[equip]] | The name of an item you must have equipped when looting |
+| [[goal]] | The number of items you must loot |
+| [[item]] | The name of the item you must loot |
+| [[Display Text | text]] | Custom display text for this objective |
+| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when looting this item |
 
 [[Category:Quest Objectives]]</text>
       <sha1>dv9vilh05flfnxto94zjtlgqf00qkit</sha1>
@@ -1775,32 +1398,18 @@ The full range of [https://riptutorial.com/lua/example/20315/lua-pattern-matchin
 
 Note that all values for message are **case-insensitive**, meaning that "happy birthday" and "Happy Birthday" would both work in the first example.
 
-{| class="wikitable"
-! Value
-! Result
-|-
-| "happy birthday"
-| The message must contain the phrase "happy birthday" somewhere inside it
-|-
-| "^happy b"
-| The message must start with the phrase "happy b"
-|-
-| "birthday$"
-| The message must end with the word "birthday"
-|-
-| "^happy bar mitzvah!$"
-| The message must be exactly the phrase "happy bar mitzvah!" with nothing else before or after it
-|}
+| Value | Result |
+|---|---|
+| "happy birthday" | The message must contain the phrase "happy birthday" somewhere inside it |
+| "^happy b" | The message must start with the phrase "happy b" |
+| "birthday$" | The message must end with the word "birthday" |
+| "^happy bar mitzvah!$" | The message must be exactly the phrase "happy bar mitzvah | " with nothing else before or after it |
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[say]]
-| The message which the player must say in order to complete the objective
-|}
+| Objective | How it's used |
+|---|---|
+| [[say]] | The message which the player must say in order to complete the objective |
 
 ### Usage notes
 
@@ -1987,13 +1596,9 @@ File:Questlog1.png|Quest objectives are tracked and updated in real-time as you 
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[say]]
-| The player character(s) which you must whisper in order to complete the objective
-|}
+| Objective | How it's used |
+|---|---|
+| [[say]] | The player character(s) which you must whisper in order to complete the objective |
 
 ### Usage notes
 
@@ -2048,19 +1653,13 @@ Both of these properties support all the same parameters and are evaluated in th
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[class]]
-| The name of the class allowed to start this quest
-|-
-| [[faction]]
-| Either "Horde" or "Alliance"
-|-
-| [[level]]
-| The minimum level to start the quest
-|}</text>
+| Parameter | How it's used |
+|---|---|
+| [[class]] | The name of the class allowed to start this quest |
+| [[faction]] | Either "Horde" or "Alliance" |
+| [[level]] | The minimum level to start the quest |
+
+</text>
       <sha1>m34zswcqcg38kymtbgl4kyzvoy144j1</sha1>
     </revision>
   </page>
@@ -2121,22 +1720,13 @@ rewards:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| **player**
-| The player(s) who are responsible for giving out the rewards.&lt;br/&gt;You may also use the variables **%author** and **%giver** instead of a player's name.
-|-
-| **money**
-| The amount of money awarded for completing the quest.&lt;br/&gt;This can be written as an amount of copper (such as: 24153) or a string with g/s/c (such as: 2g 41s 53c)
-|-
-| **choose**
-| Set to **true** if the player should choose only *one item* from the list.&lt;br/&gt;Otherwise, it's implied that the player will receive *all* of the listed rewards.
-|-
-| [[Item (Rewards)|item]]
-| The item(s) awarded for completing the quest.
-|}
+| Parameter | How it's used |
+|---|---|
+| **player** | The player(s) who are responsible for giving out the rewards.<br/>You may also use the variables **%author** and **%giver** instead of a player's name. |
+| **money** | The amount of money awarded for completing the quest.<br/>This can be written as an amount of copper (such as: 24153) or a string with g/s/c (such as: 2g 41s 53c) |
+| **choose** | Set to **true** if the player should choose only *one item* from the list.<br/>Otherwise, it's implied that the player will receive *all* of the listed rewards. |
+| [[Item (Rewards) | item]] | The item(s) awarded for completing the quest. |
+
 
 ### Examples
 
@@ -2306,37 +1896,17 @@ objectives:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[aura]]
-| The name of the aura you must have when saying the message
-|-
-| [[channel]]
-| The channel(s) you must say the message through (see linked page for options)
-|-
-| [[equip]]
-| An item you must have equipped when saying the message
-|-
-| [[item]]
-| An item you must have in your bags when saying the message
-|-
-| [[language]]
-| The RP language(s) that the message must be spoken in
-|-
-| [[message]]
-| The phrase or pattern that must be present within the message
-|-
-| [[recipient]]
-| The name of the player(s) you must send the message to (only applicable to whispers)
-|-
-| [[Display Text|text]]
-| Custom display text for this objective
-|-
-| [[zone]]&lt;br/&gt;[[zone|subzone]]&lt;br/&gt;[[coords]]
-| The location you must be in when saying the message
-|}
+| Parameter | How it's used |
+|---|---|
+| [[aura]] | The name of the aura you must have when saying the message |
+| [[channel]] | The channel(s) you must say the message through (see linked page for options) |
+| [[equip]] | An item you must have equipped when saying the message |
+| [[item]] | An item you must have in your bags when saying the message |
+| [[language]] | The RP language(s) that the message must be spoken in |
+| [[message]] | The phrase or pattern that must be present within the message |
+| [[recipient]] | The name of the player(s) you must send the message to (only applicable to whispers) |
+| [[Display Text | text]] | Custom display text for this objective |
+| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when saying the message |
 
 ### Examples
 
@@ -2412,13 +1982,9 @@ See the guide below for more info on how to get spells by name to use in your qu
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The spell you must cast
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The spell you must cast |
 
 ### Getting spells by name
 
@@ -2489,56 +2055,28 @@ Both properties support all the same parameters and are evaluated in the same wa
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[coords]]
-| The coordinates you must be at in order to start or complete the quest
-|-
-| [[target]]
-| The NPC that must be targeted in order to start or complete the quest
-|-
-| [[Display Text|text]]
-| Custom display text for the start or complete condition
-|-
-| [[zone|zone&lt;br/&gt;subzone]]
-| The name of the zone and/or subzone where the quest starts or ends
-|}
+| Parameter | How it's used |
+|---|---|
+| [[coords]] | The coordinates you must be at in order to start or complete the quest |
+| [[target]] | The NPC that must be targeted in order to start or complete the quest |
+| [[Display Text | text]] | Custom display text for the start or complete condition |
+| [[zone | zone<br/>subzone]] | The name of the zone and/or subzone where the quest starts or ends |
 
 ### [[Display Text]] variables
 
-{| class="wikitable"
-! Variable
-! Parameter
-|-
-| **%t**
-| target
-|-
-| **%z**
-| zone
-|-
-| **%sz**
-| subzone
-|-
-| **%co**
-| coords
-|-
-| **%x**
-| x-coordinate of coords
-|-
-| **%y**
-| y-coordinate of coords
-|-
-| **%r**
-| radius of coords
-|-
-| **%xy**
-| coords formatted as: `(x, y)`
-|-
-| **%xyr**
-| coords formatted as: `(x, y) +/- radius`
-|}</text>
+| Variable | Parameter |
+|---|---|
+| **%t** | target |
+| **%z** | zone |
+| **%sz** | subzone |
+| **%co** | coords |
+| **%x** | x-coordinate of coords |
+| **%y** | y-coordinate of coords |
+| **%r** | radius of coords |
+| **%xy** | coords formatted as: `(x, y)` |
+| **%xyr** | coords formatted as: `(x, y) +/- radius` |
+
+</text>
       <sha1>6ighyhcol4qtic42bwguavg0ltjtf8d</sha1>
     </revision>
   </page>
@@ -2589,31 +2127,15 @@ objectives:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[aura]]
-| The name of the aura you must have when talking to the target
-|-
-| [[equip]]
-| An item you must have equipped when talking to the target
-|-
-| [[goal]]
-| The number of times you must talk to the target
-|-
-| [[item]]
-| An item you must have in your bags when talking to the target
-|-
-| [[target]]
-| The name of the NPC to talk to
-|-
-| [[Display Text|text]]
-| Custom display text for this objective
-|-
-| [[zone]]&lt;br/&gt;[[zone|subzone]]&lt;br/&gt;[[coords]]
-| The location you must be in when talking to this target
-|}
+| Parameter | How it's used |
+|---|---|
+| [[aura]] | The name of the aura you must have when talking to the target |
+| [[equip]] | An item you must have equipped when talking to the target |
+| [[goal]] | The number of times you must talk to the target |
+| [[item]] | An item you must have in your bags when talking to the target |
+| [[target]] | The name of the NPC to talk to |
+| [[Display Text | text]] | Custom display text for this objective |
+| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when talking to this target |
 
 [[Category:Quest Objectives]]</text>
       <sha1>3isoex7zlwogqzjox6ssttpxqr70dzw</sha1>
@@ -2640,22 +2162,12 @@ objectives:
 
 ### Supported objectives
 
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The target that you must cast a spell on
-|-
-| [[kill]]
-| The target that must be killed
-|-
-| [[talk-to]]
-| The target that must be talked to
-|-
-| [[use-emote]]
-| The target which the emote must be used on
-|}
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The target that you must cast a spell on |
+| [[kill]] | The target that must be killed |
+| [[talk-to]] | The target that must be talked to |
+| [[use-emote]] | The target which the emote must be used on |
 
 This parameter can also be used as a [[Start &amp; Complete Objectives|start or complete condition]].
 
@@ -2725,46 +2237,20 @@ objectives:
 
 ### Supported parameters
 
-{| class="wikitable boldlinks"
-! Parameter
-! How it's used
-|-
-| [[aura]]
-| The name of the aura you must have when using the emote
-|-
-| [[class]]
-| The emote target must be a player of this class
-|-
-| [[emote]]
-| The name of the emote you must use
-|-
-| [[equip]]
-| An item you must have equipped when using the emote
-|-
-| [[faction]]
-| The emote target must be a player or NPC of this faction (Alliance or Horde)
-|-
-| [[goal]]
-| The number of times you must use the emote
-|-
-| [[guild]]
-| The emote target must be a player in this guild
-|-
-| [[item]]
-| An item you must have in your bags when using the emote
-|-
-| [[level]]
-| The emote target must be this level or higher
-|-
-| [[target]]
-| The name of the monster or NPC to use the emote on
-|-
-| [[Display Text|text]]
-| Custom display text for this objective
-|-
-| [[zone]]&lt;br/&gt;[[zone|subzone]]&lt;br/&gt;[[coords]]
-| The location you must be in when using the emote
-|}
+| Parameter | How it's used |
+|---|---|
+| [[aura]] | The name of the aura you must have when using the emote |
+| [[class]] | The emote target must be a player of this class |
+| [[emote]] | The name of the emote you must use |
+| [[equip]] | An item you must have equipped when using the emote |
+| [[faction]] | The emote target must be a player or NPC of this faction (Alliance or Horde) |
+| [[goal]] | The number of times you must use the emote |
+| [[guild]] | The emote target must be a player in this guild |
+| [[item]] | An item you must have in your bags when using the emote |
+| [[level]] | The emote target must be this level or higher |
+| [[target]] | The name of the monster or NPC to use the emote on |
+| [[Display Text | text]] | Custom display text for this objective |
+| [[zone]]<br/>[[zone | subzone]]<br/>[[coords]] | The location you must be in when using the emote |
 
 [[Category:Quest Objectives]]</text>
       <sha1>007jlyzy8juehuuvni5n10pe2fe3u5l</sha1>
@@ -2921,37 +2407,18 @@ objectives:
 * String - the name of a zone or subzone as it appears in-game
 
 ### Supported objectives
-{| class="wikitable boldlinks"
-! Objective
-! How it's used
-|-
-| [[cast-spell]]
-| The zone where you must be when casting the spell
-|-
-| [[equip-item]]
-| The zone where you must be when equipping the item
-|-
-| [[explore]]
-| The zone where you must be in order to complete the objective
-|-
-| [[gain-aura]]
-| The zone where you must gain the aura
-|-
-| [[kill]]
-| The zone where you must kill the target
-|-
-| [[loot-item]]
-| The zone where you must loot the item
-|-
-| [[say]]
-| The zone you must be in when saying the message
-|-
-| [[talk-to]]
-| The zone where you must talk to the target
-|-
-| [[use-emote]]
-| The zone where you must use the emote
-|}
+
+| Objective | How it's used |
+|---|---|
+| [[cast-spell]] | The zone where you must be when casting the spell |
+| [[equip-item]] | The zone where you must be when equipping the item |
+| [[explore]] | The zone where you must be in order to complete the objective |
+| [[gain-aura]] | The zone where you must gain the aura |
+| [[kill]] | The zone where you must kill the target |
+| [[loot-item]] | The zone where you must loot the item |
+| [[say]] | The zone you must be in when saying the message |
+| [[talk-to]] | The zone where you must talk to the target |
+| [[use-emote]] | The zone where you must use the emote |
 
 This parameter can also be used as a [[Start &amp; Complete Objectives|start or complete condition]].
 
