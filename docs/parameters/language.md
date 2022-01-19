@@ -9,7 +9,7 @@ In order to speak in a special language other than Common (Alliance default) or 
 
 ### Value type
 
-* String - the name of the language as it appears in-game. See the [https://wow.gamepedia.com/Language Language page on Wowpedia] for all available options.
+* String - the name of the language as it appears in-game. See the [Language page on Wowpedia](https://wow.gamepedia.com/Language) for all available options.
 
 ### Supported objectives
 

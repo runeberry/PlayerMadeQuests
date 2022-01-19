@@ -46,7 +46,7 @@ objectives:
       coords: 38.2, 47.5, 1
 ```
 
-The player must enter the box bounded by the top-left coordinate (37.2, 46.5) and the bottom-right coordinate (39.2, 48.5) in [https://wow.gamepedia.com/Elwynn_Forest Elwynn Forest] order to complete the objective.
+The player must enter the box bounded by the top-left coordinate (37.2, 46.5) and the bottom-right coordinate (39.2, 48.5) in [Elwynn Forest](https://wow.gamepedia.com/Elwynn_Forest) order to complete the objective.
 
 ### Supported objectives
 

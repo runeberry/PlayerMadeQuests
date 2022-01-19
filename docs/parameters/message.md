@@ -6,7 +6,7 @@ The **message** parameter allows you to specify a phrase or pattern that must be
 
 * String - the phrase or pattern that the player must say.
 
-The full range of [https://riptutorial.com/lua/example/20315/lua-pattern-matching Lua patterns] are supported for this parameter, but you can use the following examples to get started.
+The full range of [Lua patterns](https://riptutorial.com/lua/example/20315/lua-pattern-matching) are supported for this parameter, but you can use the following examples to get started.
 
 Note that all values for message are **case-insensitive**, meaning that "happy birthday" and "Happy Birthday" would both work in the first example.
 
@@ -26,7 +26,7 @@ Note that all values for message are **case-insensitive**, meaning that "happy b
 ### Usage notes
 
 * While Lua patterns are case-sensitive, the value for this message parameter is intentionally **not case-sensitive**, meaning that you cannot force a player to say something in a specific casing style. For example, if you specify the pattern "Happy Birthday", then a player will be able to say "happy birthday" to satisfy the condition. As such, it's recommended to keep your patterns for message to all lowercase letters, for simplicity.
-* It can be somewhat tedious to test complex message patterns in-game, so until there is a better testing method included with PMQ, consider using this [https://rextester.com/l/lua_online_compiler Online Lua Compiler] to test which phrases will or will not work with your message pattern. Simply copy/paste the following code into the editor linked, and click **Run it (F8)** to print the results below the code editor. Of course, you'll want to change out the pattern and chat messages in the below code to suit your needs.
+* It can be somewhat tedious to test complex message patterns in-game, so until there is a better testing method included with PMQ, consider using this [Online Lua Compiler](https://rextester.com/l/lua_online_compiler) to test which phrases will or will not work with your message pattern. Simply copy/paste the following code into the editor linked, and click **Run it (F8)** to print the results below the code editor. Of course, you'll want to change out the pattern and chat messages in the below code to suit your needs.
 
 ```lua
 -- Change this pattern to the "message" pattern value you want to test

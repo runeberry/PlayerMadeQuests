@@ -31,5 +31,5 @@ This page outlines the settings you can configure in PMQ.
 | PLAYER_LOCATION_TTL | # of seconds | Indicates how long the addon should cache your position in game before checking again. |
 | SPELL_SCAN_INTENSITY | # spells/frame | How many spells to scan for on each frame when scanning for spells. A higher number will scan faster, but will hurt game performance. |
 | SPELL_SCAN_LOG_INTERVAL | # spells/message | How often the addon should inform you of spell scanning progress. A lower number will print chat messages more often. |
-| START_MENU | menu ID | Specify a menu to open when the addon loads. Useful for GUI development. Get the menu IDs from the value properties in [https://github.com/runeberry/PlayerMadeQuests/blob/master/src/gui/MainMenu.lua#L10 MainMenu.lua]. |
+| START_MENU | menu ID | Specify a menu to open when the addon loads. Useful for GUI development. Get the menu IDs from the value properties in [MainMenu.lua](https://github.com/runeberry/PlayerMadeQuests/blob/master/src/gui/MainMenu.lua#L10). |
 | VERSION_INFO_TTL | # of seconds | Indicates how long PMQ should remember that addon versions are available and to prompt you to update. (default is 3 days) |

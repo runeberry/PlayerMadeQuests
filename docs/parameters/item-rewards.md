@@ -56,7 +56,7 @@ PMQ requires that all item names must be valid in-game item names so that the ic
 But because it's not a perfect system, you may run into issues when trying to set an item reward by name that you don't actually own. There are, however, some ways to work around this:
 
 * If possible, simply obtain the item and hover over it in your bags. You should now be able to refer to this item by name.
-* Search for the item on [https://classic.wowhead.com/ Wowhead] and grab the item's ID from the URL, such as `item=1234`, where 1234 is the ID. Then, do one of two things:
+* Search for the item on [Wowhead](https://classic.wowhead.com/) and grab the item's ID from the URL, such as `item=1234`, where 1234 is the ID. Then, do one of two things:
   * Use the item by ID in your quest, following the examples above
   * Use the chat command `/pmq lookup-item 1234`, where 1234 is your item ID. If this is a valid item ID, then the item will be linked back to you, and you can now refer to this item by name in any quest you write.
 * If you want to avoid this problem in the future, run the command `/pmq scan-items`. This kicks off a process that will check for **every known item ID in the game** and cache them all for future use in any quest draft on any character. However this takes about 20 minutes to run (for an estimated 25k items in Classic) and will be interrupted if you log out or `/reload` your UI. This process is throttled so you won't suffer any performance issues or get kicked offline as a result of scanning for items.

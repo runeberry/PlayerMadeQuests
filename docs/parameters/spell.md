@@ -7,7 +7,7 @@ The **spell** parameter lets you specify which spell(s) must be cast in order to
 * String - The name of the spell (case-insensitive)
 * Number - The ID of the spell
 
-Note that regardless of whether you specify the name or ID of a spell in your quests, **all spells with the same name** will count towards objective completion. For example, whether you use name "Frostbolt" or the number [https://classic.wowhead.com/spell=7322/frostbolt 7322] as the spell in your quest, all ranks of Frostbolt will count towards objectives.
+Note that regardless of whether you specify the name or ID of a spell in your quests, **all spells with the same name** will count towards objective completion. For example, whether you use name "Frostbolt" or the number [7322](https://classic.wowhead.com/spell=7322/frostbolt) as the spell in your quest, all ranks of Frostbolt will count towards objectives.
 
 ```yaml
 objectives:
@@ -32,7 +32,7 @@ PMQ requires you to provide valid in-game spells in all your quests; your quests
 
 Fortunately, PMQ offers some solutions to work around this limitation so that you can reference any spells by name on any character.
 
-* You can search for the spell on [https://classic.wowhead.com/ Wowhead] and grab the spell's ID from the URL, such as `spell=1234`, where 1234 is the ID. Then, do one of two things:
+* You can search for the spell on [Wowhead](https://classic.wowhead.com/) and grab the spell's ID from the URL, such as `spell=1234`, where 1234 is the ID. Then, do one of two things:
   * Use the spell by ID in your quest, following the examples above. Keep in mind that **any spell with the same name** will count towards your objective, so you don't need to worry about getting the ID of a specific rank of a spell. Any rank will work.
   * You can also use the chat command `/pmq lookup-spell 1234`, where 1234 is your spell ID. PMQ will now remember that spell's name and you can reference it by name in your quests.
 * If you want to avoid this problem in the future, run the command `/pmq scan-spells`. This kicks off a process that will check for **every known spell in the game** and cache their names for future use in any quest draft on any character.
@@ -44,7 +44,7 @@ Finally, you can erase all cached spell names from PMQ with the chat command `/p
 
 [[File:SpellWatch.PNG|thumb|Toggle this feature on or off with: &lt;br/&gt;`/pmq watch-spells`]]
 
-Many actions that your character performs in game are considered "spells" for the sake of gameplay and will work with this quest condition. Beyond your spellbook, things like Skinning, [https://classic.wowhead.com/spell=18517/pattern-mooncloth-bag learning patterns], or using your [https://classic.wowhead.com/spell=8690/hearthstone Hearthstone] are all considered spell casts.
+Many actions that your character performs in game are considered "spells" for the sake of gameplay and will work with this quest condition. Beyond your spellbook, things like Skinning, [learning patterns](https://classic.wowhead.com/spell=18517/pattern-mooncloth-bag), or using your [Hearthstone](https://classic.wowhead.com/spell=8690/hearthstone) are all considered spell casts.
 
 Since it can be difficult to figure out exactly which spells you should put in your quests, PMQ provides a **spell-watching tool** that you can activate with the chat command `/pmq watch-spells`. When enabled, this will print a message containing the spell name, spell ID, and (if applicable) target name for every successful spell that your character casts. Simply enable scanning and then perform whatever action(s) you want to be part of your quest, and take note of the spells that it reports.
 
