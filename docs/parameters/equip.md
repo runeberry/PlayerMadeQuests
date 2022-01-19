@@ -1,3 +1,5 @@
+# equip
+
 The **equip** parameter allows you to specify an item that the player must have equipped order to complete an objective.
 
 ### Value type

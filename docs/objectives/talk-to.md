@@ -1,3 +1,5 @@
+# talk-to
+
 The **talk-to** objective is triggered whenever you talk to an NPC, which includes opening their gossip frame, shop window, stable window, or any other window that causes the NPC to face you.
 
 If your goal is to talk to more than 1 of a target NPC, you must talk to different instances of that NPC (e.g. 3 different "Stormwind Guard" NPCs) in order to complete the objective.

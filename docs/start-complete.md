@@ -1,3 +1,5 @@
+# Start & Complete Objectives
+
 [[File:startcomplete1.png|thumb|300px|Quest **description** text and **start** block rendered as quest info]]
 [[File:startcomplete2.png|thumb|300px|Quest **completion** text and **complete** block rendered as quest info]]
 

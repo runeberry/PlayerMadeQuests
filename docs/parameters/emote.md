@@ -1,3 +1,5 @@
+# emote
+
 The **emote** parameter is only available for use with the [[use-emote]] objective. It allows you to specify which emote should trigger the objective.
 
 ### Value type

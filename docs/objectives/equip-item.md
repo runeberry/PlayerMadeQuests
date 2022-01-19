@@ -1,3 +1,5 @@
+# equip-item
+
 The **equip-item** objective is triggered whenever you equip an item.
 
 ### Shorthand

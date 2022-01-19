@@ -1,3 +1,5 @@
+# channel
+
 The **channel** parameter allows you to specify the channel through which a [[message]] must be sent in order to satisfy an objective.
 
 ### Value type

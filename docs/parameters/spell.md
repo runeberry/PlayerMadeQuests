@@ -1,3 +1,5 @@
+# spell
+
 The **spell** parameter lets you specify which spell(s) must be cast in order to complete an objective.
 
 ### Value type

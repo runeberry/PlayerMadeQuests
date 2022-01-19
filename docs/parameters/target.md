@@ -1,3 +1,5 @@
+# target
+
 The **target** parameter is used in a variety of ways, but in general it is used to specify the monster, NPC, or player that must be targeted in order to progress an objective.
 
 ### Value type

@@ -1,3 +1,5 @@
+# Requirements
+
 [[File:Requirements.png|thumb|300px|Example of how quest requirements are rendered]]
 [[File:RecommendedWarning.png|thumb|300px|Warning if a player chooses to accept a quest which they don't meet the **recommendations** for]]
 

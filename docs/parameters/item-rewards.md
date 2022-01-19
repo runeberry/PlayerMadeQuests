@@ -1,3 +1,5 @@
+# item-rewards
+
 {{About|This page refers to items as they are used with [[Rewards|quest rewards]]. For items used in quest objectives, see [[Item]].}}
 
 The **item** parameter of a quest reward allows you to specify one or more items that will be rewarded upon completion of a quest. You can also declare that a player must **choose** one item from the list rather than receive all of them - see [[Rewards]] for more info.

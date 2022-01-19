@@ -1,3 +1,5 @@
+# use-emote
+
 The **use-emote** objective is triggered whenever you use an emote, such as `/dance` or `/glare`. This objective cannot be triggered by custom emotes sent with the `/e` command.
 
 If your goal is to use an emote more than 1 time on a target NPC, you must use the emote on different instances of that NPC (e.g. 3 different "Stormwind Guard" NPCs) in order to complete the objective.

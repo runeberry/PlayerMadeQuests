@@ -1,3 +1,5 @@
+# cast-spell
+
 The **cast-spell** objective is triggered whenever the player successfully casts a spell. It will not be triggered when a spell or action fails or is interrupted.
 
 This objective is not limited to just magical spells; it can be invoked by a variety of in-game actions related to abilities, items, or interactions within the world. PMQ includes features to help you find the right names and IDs for spells in the game - see the [[spell]] condition page for more information.

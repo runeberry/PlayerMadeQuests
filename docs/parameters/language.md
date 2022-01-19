@@ -1,3 +1,5 @@
+# langauge
+
 [[File:Language_select.png|thumb|300px|Left-click the speech bubble to select your spoken language]]
 [[File:Language_skill.png|thumb|300px|A character's language skills as listed in WoW: Classic]]
 

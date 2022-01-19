@@ -1,3 +1,5 @@
+# gain-aura
+
 The **gain-aura** objective is triggered whenever you gain a buff or debuff.
 
 ### Shorthand

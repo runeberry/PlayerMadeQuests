@@ -1,3 +1,5 @@
+# Rewards
+
 [[File:Rewards-menu.PNG|thumb|300px|The Quest Rewards menu, and rewards as shown upon completion of a quest.]]
 [[File:Quest-verification-menu.PNG|thumb|300px|The Quest Verification menu, which can be accessed for any quest in your Quest Log.]]
 

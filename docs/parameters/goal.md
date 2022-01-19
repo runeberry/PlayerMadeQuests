@@ -1,3 +1,5 @@
+# goal
+
 The **goal** parameter is available to most objectives to specify how many times that objective must be triggered in order to be marked "complete". For example, in the objective "kill 5 Chicken", `5` is considered the goal.
 
 Some objectives do not support a goal parameter because it doesn't make sense to complete them more than once in the same quest. For example, the **explore** objective does not support a goal - why would you need to explore the same area twice?
