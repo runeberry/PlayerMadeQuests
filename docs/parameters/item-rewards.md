@@ -1,6 +1,6 @@
 # item-rewards
 
-{{About|This page refers to items as they are used with [[Rewards|quest rewards]]. For items used in quest objectives, see [Item](../parameters/item.md).}}
+> _This page refers to items as they are used with [quest rewards](../rewards.md). For items used in quest objectives, see [Item](../parameters/item.md)._
 
 The **item** parameter of a quest reward allows you to specify one or more items that will be rewarded upon completion of a quest. You can also declare that a player must **choose** one item from the list rather than receive all of them - see [Rewards](../rewards.md) for more info.
 

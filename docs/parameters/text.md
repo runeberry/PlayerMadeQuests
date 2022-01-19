@@ -20,7 +20,7 @@ The **text** parameter allows you to precisely define how your quest information
 | [talk-to](../objectives/talk-to.md) | Custom display text |
 | [use-emote](../objectives/use-emote.md) | Custom display text |
 
-Custom display text can also be used with a [[Start &amp; Complete Objectives|start and complete conditions]] as well as [[Requirements|quest requirements]].
+Custom display text can also be used with a [start and complete conditions](../start-complete.md) as well as [quest requirements](../requirements.md).
 
 ### Usage notes
 
@@ -65,7 +65,7 @@ You can use special variables in your display text string to show the value of d
 | **%i**, [item](../parameters/item.md) |
 | **%lang**, [language](../parameters/language.md) |
 | **%msg**, [message](../parameters/message.md) |
-| **%p**, [[goal | progress]] |
+| **%p**, [progress](../parameters/goal.md) |
 | **%t**, [target](../parameters/target.md) or [recipient](../parameters/recipient.md) |
 | **%sz**, [subzone](../parameters/zone.md) |
 | **%z**, [zone](../parameters/zone.md) |
@@ -92,6 +92,7 @@ quest:
   description: So you're the infamous %name, huh? Aren't you kinda short for a %race?
   completion: Well I'll be, you actually did it! Not bad for a %class. Glad to have a [%gen:guy{{!```gal] like you on our team.
 }}
+```
 
 | Player Info |
 |---|
@@ -103,5 +104,5 @@ quest:
 | **%author**, The name of the player who wrote the quest |
 | **%giver**, The name of the player who shared the quest (changes every time the quest is shared) |
 | **Formatting** |
-| **%n**, newline for [[YAML | long strings]] |
-| **%br**, line-break (double newline) for [[YAML | long strings]] |
+| **%n**, newline for [long strings](../guides/yaml-crash-course.md) |
+| **%br**, line-break (double newline) for [long strings](../guides/yaml-crash-course.md) |

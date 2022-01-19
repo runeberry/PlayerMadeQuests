@@ -16,7 +16,7 @@ Currently, this number must be from 1-73 (the maximum visible level for monsters
 | [kill](../objectives/kill.md) | The kill target must be this level or higher |
 | [use-emote](../objectives/use-emote.md) | The emote target must be this level or higher |
 
-This parameter can also be used as a [[Requirements|quest requirement or recommendation]].
+This parameter can also be used as a [quest requirement or recommendation](../requirements.md).
 
 ### Usage notes
 

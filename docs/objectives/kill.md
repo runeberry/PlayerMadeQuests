@@ -50,4 +50,4 @@ objectives:
 ### Notes
 
 * This objective contains additional logic to count players' pet contributions as kills. In short, when your pet attacks any target, you will get kill credit for that target when it dies. This behavior can be toggled off with the FEATURE_PET_KILLS setting in the [Configuration](../guides/Configuration.md) menu. If this behavior is inaccurate or causing problems, let us known on Discord!
-* This objective relies on caching player/NPC data while you're playing the game. For more information, see [[Save Data &amp; Cache]].
+* This objective relies on caching player/NPC data while you're playing the game. For more information, see [Save Data & Cache](../guides/save-data.md).

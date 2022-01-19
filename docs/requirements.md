@@ -1,7 +1,7 @@
 # Requirements
 
-[[File:Requirements.png|thumb|300px|Example of how quest requirements are rendered]]
-[[File:RecommendedWarning.png|thumb|300px|Warning if a player chooses to accept a quest which they don't meet the **recommendations** for]]
+[File:Requirements.png|thumb|300px|Example of how quest requirements are rendered]
+[File:RecommendedWarning.png|thumb|300px|Warning if a player chooses to accept a quest which they don't meet the **recommendations** for]
 
 By default, quests written in PMQ can be started by any player character without restriction. However, you may want to place some restrictions on who is able to take on your quest. PMQ supports this through the **recommended** and **required** properties on a quest.
 

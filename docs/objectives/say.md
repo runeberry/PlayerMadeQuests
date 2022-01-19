@@ -64,7 +64,7 @@ objectives:
 
 In this hypothetical example, the player would need to /say or /yell a message with the phrase "mellon", while standing in front of the Doors of Durin, in order to progress the quest objective. However, the quest log would simply read the riddle: "Speak, friend, and enter."
 
-Note that this will print the same text to the quest log, quest info frame, and quest progress message (the yellow text that pops up when you progress). See the [[Display text]] page for details on how to configure these individually.
+Note that this will print the same text to the quest log, quest info frame, and quest progress message (the yellow text that pops up when you progress). See the [Display text](../parameters/text.md) page for details on how to configure these individually.
 
 Here's another take on this old classic:
 

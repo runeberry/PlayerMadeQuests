@@ -4,7 +4,7 @@ The **Save Data &amp; Cache** menu allows you to manage various pieces of save d
 
 ### Overview
 
-[[File:SaveDataMenu.png|thumb|300px|The Save Data &amp; Cache menu screen]]
+[File:SaveDataMenu.png|thumb|300px|The Save Data &amp; Cache menu screen]
 
 The World of Warcraft API is very selective about some of the information that it makes available to addons. Because of this, it's difficult to answer some questions that PMQ needs to ask when determining whether or not the player has just completed a quest objective. For example, these questions cannot be answered strictly through the WoW API:
 

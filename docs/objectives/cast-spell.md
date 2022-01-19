@@ -60,4 +60,4 @@ _*required_
 
 ### Usage notes
 
-* This objective relies on caching player/NPC data while you're playing the game. For more information, see [[Save Data &amp; Cache]].
+* This objective relies on caching player/NPC data while you're playing the game. For more information, see [Save Data & Cache](../guides/save-data.md).

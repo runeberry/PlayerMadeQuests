@@ -1,6 +1,6 @@
 # item
 
-{{About|This page refers to items as they are used with [[Objective|quest objectives]]. For items used as quest rewards, see [[Item (Rewards)]].}}
+> _This page refers to items as they are used with [quest objectives](../objectives.md). For items used as quest rewards, see [Item (Rewards)](../parameters/item-rewards.md)._
 
 The **item** parameter allows you to specify an item that the player must have in their bags in order to complete an objective.
 

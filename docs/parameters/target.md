@@ -15,7 +15,7 @@ The **target** parameter is used in a variety of ways, but in general it is used
 | [talk-to](../objectives/talk-to.md) | The target that must be talked to |
 | [use-emote](../objectives/use-emote.md) | The target which the emote must be used on |
 
-This parameter can also be used as a [[Start &amp; Complete Objectives|start or complete condition]].
+This parameter can also be used as a [start or complete condition](../start-complete.md).
 
 ### Unique Targets
 

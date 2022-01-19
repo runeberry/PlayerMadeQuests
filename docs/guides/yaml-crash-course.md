@@ -32,7 +32,7 @@ name: "Lesson 1: Tutorial"   # Easy fix
 name: 'Lesson 1: Tutorial'   # Also fine
 ```
 
-PMQ also includes a special rule for writing shorthand quest [[objective|objectives]]. When you are writing strings that contain multiple words, you *must* include quotes in order to group these words together.
+PMQ also includes a special rule for writing shorthand quest [objectives](../objectives.md). When you are writing strings that contain multiple words, you *must* include quotes in order to group these words together.
 
 ```yaml
 objectives:
@@ -44,8 +44,8 @@ When in doubt, include quotes anyway!
 
 ### Long strings
 
-[[File:line-break-before.png|thumb|300px|Before line breaks are added]]
-[[File:line-break-after.png|thumb|300px|After line breaks are added with %br]]
+[File:line-break-before.png|thumb|300px|Before line breaks are added]
+[File:line-break-after.png|thumb|300px|After line breaks are added with %br]
 
 You can spread a long string over multiple lines by prefixing it with the `&amp;gt;` character, like this:
 

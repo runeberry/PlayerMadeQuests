@@ -1,6 +1,6 @@
 # Configuration
 
-[[File:config-menu.png|thumb|The configuration menu in-game]]
+[File:config-menu.png|thumb|The configuration menu in-game]
 
 This page outlines the settings you can configure in PMQ.
 
