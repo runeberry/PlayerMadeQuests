@@ -1,37 +1,37 @@
-## Welcome to GitHub Pages
+**PlayerMadeQuests (PMQ)** is an addon for [https://worldofwarcraft.com/en-us/wowclassic World of Warcraft: Classic] that allows you to write your own custom quests, play them in-game, and share them with other players.
 
-You can use the [editor on GitHub](https://github.com/runeberry/PlayerMadeQuests/edit/master/docs/index.md) to maintain and preview the content for your website in Markdown files.
+Ready to try it out? You can get it here:
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+* Download PMQ from [https://www.curseforge.com/wow/addons/pmq CurseForge] (can be installed through the [https://curseforge.overwolf.com/ CurseForge app])
+* Download the latest release in a zip file directly from [https://github.com/runeberry/PlayerMadeQuests/releases Github]
 
-### Markdown
+Several playable demo quests are provided with PMQ to help you learn how to write your own quests. Additional help and even more examples can be found on this Wiki.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+You can contribute to PMQ by giving us feedback during the Beta Test - join us on [https://discord.gg/gHMjCgs Discord]!
 
-```markdown
-Syntax highlighted code block
+### Latest News
 
-# Header 1
-## Header 2
-### Header 3
+* A new menu has been added to search your **[[Save Data &amp; Cache]]** with v0.6.0-beta (24-Jul-2021)
+* New parameters have been added to these objectives with v0.6.0-beta: (24-Jul-2021)
+  * **[[kill]]** targets by **[[class]]**, **[[faction]]**, **[[guild]]**, or **[[level]]**
+  * **[[cast-spell]]** on targets by **[[class]]**, **[[faction]]**, **[[guild]]**, or **[[level]]**
+  * **[[use-emote]]** on targets by **[[class]]**, **[[faction]]**, **[[guild]]**, or **[[level]]**
+* The **[[Cast-spell]]** objective has been added in v0.5.0-beta (23-Jan-2021)
+* You can now offer **[[Rewards]]** for completing your quests as of v0.4.0-beta (31-Dec-2020)
+* The **[[Say]]** objective has been added in v0.3.4-beta (30-Nov-2020)
+* **[[:News:The Road Ahead (25-Nov-2020)]]**
 
-- Bulleted
-- List
+### Helpful Pages
 
-1. Numbered
-2. List
+* [[Guides/Writing Quests]]
+* [[Guides/YAML Crash Course]]
+* [[:Category:Quest Objectives|List of all quest objectives]]
 
-**Bold** and _Italic_ and `Code` text
+### Screenshots
 
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/runeberry/PlayerMadeQuests/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+&lt;gallery&gt;
+File:Demo1.png|Several demo quests are included to help you learn how to write quests for PMQ.
+File:Demo2.png|You can play these demo quests directly, or you can save a copy to your Drafts and make some changes, then try it out!
+File:Draft1.png|Write your own quests in game with just a few lines of script. You can even share your quests with other PMQ users in your party with just the click of a button!
+File:Questlog1.png|Quest objectives are tracked and updated in real-time as you complete them.
+&lt;/gallery&gt;
