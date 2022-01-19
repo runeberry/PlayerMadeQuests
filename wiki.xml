@@ -42,7 +42,7 @@
       <comment>/* Supported objectives */</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1378">The '''aura''' parameter allows you to specify any aura (buff or debuff) that the player must have in order to trigger an objective.
+      <text xml:space="preserve" bytes="1378">The **aura** parameter allows you to specify any aura (buff or debuff) that the player must have in order to trigger an objective.
 
 ### Value type
 
@@ -124,7 +124,7 @@
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2632">The '''cast-spell''' objective is triggered whenever the player successfully casts a spell. It will not be triggered when a spell or action fails or is interrupted.
+      <text xml:space="preserve" bytes="2632">The **cast-spell** objective is triggered whenever the player successfully casts a spell. It will not be triggered when a spell or action fails or is interrupted.
 
 This objective is not limited to just magical spells; it can be invoked by a variety of in-game actions related to abilities, items, or interactions within the world. PMQ includes features to help you find the right names and IDs for spells in the game - see the [[spell]] condition page for more information.
 
@@ -162,7 +162,7 @@ objectives:
       text: "Custom display text"
 }}
 
-''&lt;nowiki&gt;*required&lt;/nowiki&gt;''
+*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Supported parameters
 
@@ -194,7 +194,7 @@ objectives:
 | [[level]]
 | The spellcast target must be this level or higher
 |-
-| '''sametarget'''
+| **sametarget**
 | If true, then multiple casts on the same target will count toward the objective (default: false)
 |-
 | [[spell]]
@@ -229,10 +229,10 @@ objectives:
         <username>Dolphinspired</username>
         <id>3</id>
       </contributor>
-      <comment>Created page with "The '''channel''' parameter allows you to specify the channel through which a [[message]] must be sent in order to satisfy an objective.  ### Value type  * String - the na..."</comment>
+      <comment>Created page with "The **channel** parameter allows you to specify the channel through which a [[message]] must be sent in order to satisfy an objective.  ### Value type  * String - the na..."</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="906">The '''channel''' parameter allows you to specify the channel through which a [[message]] must be sent in order to satisfy an objective.
+      <text xml:space="preserve" bytes="906">The **channel** parameter allows you to specify the channel through which a [[message]] must be sent in order to satisfy an objective.
 
 ### Value type
 
@@ -257,7 +257,7 @@ objectives:
 ### Usage notes
 
 * The value for channel is case-insensitive, meaning both "yell" and "YELL" will work.
-* You can specify multiple channels, which means that sending the message in ''any one'' of these channels will satisfy the objective. For example:
+* You can specify multiple channels, which means that sending the message in *any one* of these channels will satisfy the objective. For example:
 
 {{code-yaml|c=
 objectives:
@@ -284,7 +284,7 @@ objectives:
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="777">The '''class''' parameter allows you to specify the class that a player target must be in order to complete an objective.
+      <text xml:space="preserve" bytes="777">The **class** parameter allows you to specify the class that a player target must be in order to complete an objective.
 
 ### Value type
 
@@ -450,15 +450,15 @@ This page outlines the settings you can configure in PMQ.
       <comment>/* Supported objectives */</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3613">The '''coords''' parameter allow you to specify the &lt;code&gt;x,y&lt;/code&gt; coordinates that need to be visited within a zone, as well as the &lt;code&gt;radius&lt;/code&gt; you must be from those coordinates in order to progress an objective.
+      <text xml:space="preserve" bytes="3613">The **coords** parameter allow you to specify the &lt;code&gt;x,y&lt;/code&gt; coordinates that need to be visited within a zone, as well as the &lt;code&gt;radius&lt;/code&gt; you must be from those coordinates in order to progress an objective.
 
 ### Value type
 
-* String - The '''coords''' value is expressed as a comma-separated string that is parsed into &lt;code&gt;x&lt;/code&gt;, &lt;code&gt;y&lt;/code&gt;, and &lt;code&gt;radius&lt;/code&gt; values at runtime. The values must be in the following ranges:
+* String - The **coords** value is expressed as a comma-separated string that is parsed into &lt;code&gt;x&lt;/code&gt;, &lt;code&gt;y&lt;/code&gt;, and &lt;code&gt;radius&lt;/code&gt; values at runtime. The values must be in the following ranges:
 * &lt;code&gt;x&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt; must be between 0.00 and 100.00, representing coordinate values on the map
-* &lt;code&gt;radius&lt;/code&gt; must be between 0.00 and 100.00, representing a distance in coordinate units - '''not yards!''' PMQ will use a default radius of 0.5 units if no radius is specified.
+* &lt;code&gt;radius&lt;/code&gt; must be between 0.00 and 100.00, representing a distance in coordinate units - **not yards!** PMQ will use a default radius of 0.5 units if no radius is specified.
 
-See the following examples showing how '''coords''' can be written.
+See the following examples showing how **coords** can be written.
 
 {{code-yaml|c=
 objectives:
@@ -476,7 +476,7 @@ objectives:
       coords: 38.51, 72.64, 0.8   # A little space is fine, as a treat
 }}
 
-Note that when using '''coords''' in a shorthand objective, the string must not contain any spaces. However, if you want to include spaces, you can do so safely by wrapping the value in quotes.
+Note that when using **coords** in a shorthand objective, the string must not contain any spaces. However, if you want to include spaces, you can do so safely by wrapping the value in quotes.
 
 {{code-yaml|c=
 objectives:
@@ -535,7 +535,7 @@ This parameter can also be used as a [[Start &amp; Complete Objectives|start or 
 
 * A distance of one "coordinate value" is vastly different between zones, since all map coordinates are normalized to 100 x 100 units. This means that a radius of 0.5 units is much larger in the Barrens compared to Deadwind Pass, since the Barrens is a much larger map.
 * The coordinates + radius currently form a square in which the player must explore. This may change to a circle in a future release.
-* Unfortunately, the WoW client does not expose a way to read a player's &lt;code&gt;z&lt;/code&gt; (height) coordinate, so it is not possible to include this in the '''coords''' parameter.
+* Unfortunately, the WoW client does not expose a way to read a player's &lt;code&gt;z&lt;/code&gt; (height) coordinate, so it is not possible to include this in the **coords** parameter.
 
 [[Category:Quest Objective Parameters]]</text>
       <sha1>lsy7bjp4h6s9sm4xmsgggxd5xy2te4g</sha1>
@@ -555,7 +555,7 @@ This parameter can also be used as a [[Start &amp; Complete Objectives|start or 
       <comment>/* Supported objectives */</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4963">The '''text''' parameter allows you to precisely define how your quest information will be displayed when it's presented to players. PMQ will automatically generate text for your quest objectives, requirements, and more based on the information that you provide, but overriding this with the '''text''' parameter will allow you to give your quests a little more personality beyond the standard text.
+      <text xml:space="preserve" bytes="4963">The **text** parameter allows you to precisely define how your quest information will be displayed when it's presented to players. PMQ will automatically generate text for your quest objectives, requirements, and more based on the information that you provide, but overriding this with the **text** parameter will allow you to give your quests a little more personality beyond the standard text.
 
 ### Value type
 
@@ -632,72 +632,72 @@ You can use special variables in your display text string to show the value of d
 {| class="wikitable boldlinks"
 ! colspan=2|Parameter values
 |-
-| '''%a'''
+| **%a**
 | [[aura]]
 |-
-| '''%co'''
+| **%co**
 | [[coords]]
 |-
-| '''%ch'''
+| **%ch**
 | [[channel]]
 |-
-| '''%e'''
+| **%e**
 | [[equip]]
 |-
-| '''%em'''
+| **%em**
 | [[emote]]
 |-
-| '''%g'''
+| **%g**
 | [[goal]]
 |-
-| '''%i'''
+| **%i**
 | [[item]]
 |-
-| '''%lang'''
+| **%lang**
 | [[language]]
 |-
-| '''%msg'''
+| **%msg**
 | [[message]]
 |-
-| '''%p'''
+| **%p**
 | [[goal|progress]]
 |-
-| '''%t'''
+| **%t**
 | [[target]] or [[recipient]]
 |-
-| '''%sz'''
+| **%sz**
 | [[zone|subzone]]
 |-
-| '''%z'''
+| **%z**
 | [[zone]]
 |-
 ! colspan=2|Derived Values
 |-
-| '''%g2'''
-| prints '''goal''' only if goal &gt; 1
+| **%g2**
+| prints **goal** only if goal &gt; 1
 |-
-| '''%p2'''
-| prints '''progress''' only if progress &lt; goal
+| **%p2**
+| prints **progress** only if progress &lt; goal
 |-
-| '''%r'''
-| radius of '''coords'''
+| **%r**
+| radius of **coords**
 |-
-| '''%x'''
-| x-coordinate of '''coords'''
+| **%x**
+| x-coordinate of **coords**
 |-
-| '''%xy'''
-| '''coords''' formatted as: &lt;code&gt;(x, y)&lt;/code&gt;
+| **%xy**
+| **coords** formatted as: &lt;code&gt;(x, y)&lt;/code&gt;
 |-
-| '''%xyr'''
-| '''coords''' formatted as: &lt;code&gt;(x, y) +/- radius&lt;/code&gt;
+| **%xyr**
+| **coords** formatted as: &lt;code&gt;(x, y) +/- radius&lt;/code&gt;
 |-
-| '''%xyz'''
+| **%xyz**
 | location formatted as: &lt;code&gt;(x, y) in zone in subzone&lt;/code&gt;
 |-
-| '''%y'''
-| y-coordinate of '''coords'''
+| **%y**
+| y-coordinate of **coords**
 |-
-| '''%z2'''
+| **%z2**
 | location formatted as: &lt;code&gt;zone in subzone&lt;/code&gt;
 |}
 
@@ -717,32 +717,32 @@ quest:
 {| class="wikitable boldlinks"
 ! colspan=2|Player Info
 |-
-| '''%name'''
+| **%name**
 | The player's name
 |-
-| '''%class'''
+| **%class**
 | The player's class (e.g. "Mage")
 |-
-| '''%race'''
+| **%race**
 | The player's race (e.g. "Tauren")
 |-
-| '''%gen'''
+| **%gen**
 | The player's gender flag (see example above)
 |-
 ! colspan=2|Quest Info
 |-
-| '''%author'''
+| **%author**
 | The name of the player who wrote the quest
 |-
-| '''%giver'''
+| **%giver**
 | The name of the player who shared the quest (changes every time the quest is shared)
 |-
 ! colspan=2|Formatting
 |-
-| '''%n'''
+| **%n**
 | newline for [[YAML|long strings]]
 |-
-| '''%br'''
+| **%br**
 | line-break (double newline) for [[YAML|long strings]]
 |}
 
@@ -764,7 +764,7 @@ quest:
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="655">The '''emote''' parameter is only available for use with the [[use-emote]] objective. It allows you to specify which emote should trigger the objective.
+      <text xml:space="preserve" bytes="655">The **emote** parameter is only available for use with the [[use-emote]] objective. It allows you to specify which emote should trigger the objective.
 
 ### Value type
 
@@ -802,7 +802,7 @@ quest:
       <comment>/* Supported objectives */</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1346">The '''equip''' parameter allows you to specify an item that the player must have equipped order to complete an objective.
+      <text xml:space="preserve" bytes="1346">The **equip** parameter allows you to specify an item that the player must have equipped order to complete an objective.
 
 ### Value type
 
@@ -861,10 +861,10 @@ quest:
         <username>Dolphinspired</username>
         <id>3</id>
       </contributor>
-      <comment>Created page with "The '''equip-item''' objective is triggered whenever you equip an item.  ### Shorthand  {{code-yaml|c= objectives:   - equip-item "equip*" }}  ''&lt;nowiki&gt;*required&lt;/nowiki&gt;..."</comment>
+      <comment>Created page with "The **equip-item** objective is triggered whenever you equip an item.  ### Shorthand  {{code-yaml|c= objectives:   - equip-item "equip*" }}  ''&lt;nowiki&gt;*required&lt;/nowiki&gt;..."</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="981">The '''equip-item''' objective is triggered whenever you equip an item.
+      <text xml:space="preserve" bytes="981">The **equip-item** objective is triggered whenever you equip an item.
 
 ### Shorthand
 
@@ -873,7 +873,7 @@ objectives:
   - equip-item "equip*"
 }}
 
-''&lt;nowiki&gt;*required&lt;/nowiki&gt;''
+*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
@@ -929,7 +929,7 @@ objectives:
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1384">The '''explore''' objective is used to direct a player to go to a specific area for a quest. This objective is triggered whenever you change zones or subzones.
+      <text xml:space="preserve" bytes="1384">The **explore** objective is used to direct a player to go to a specific area for a quest. This objective is triggered whenever you change zones or subzones.
 
 When you enter a zone or subzone in which you have an objective to explore certain coordinates, PMQ will begin polling on an interval to see if you're within the designated radius of those coordinates. PMQ will stop polling for your location when you leave the area of that objective or complete that objective.
 
@@ -940,7 +940,7 @@ objectives:
   - explore "zone*" "coords"
 }}
 
-''&lt;nowiki&gt;*required&lt;/nowiki&gt;''
+*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
@@ -996,11 +996,11 @@ objectives:
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="721">The '''faction''' parameter allows you to specify that a target player or NPC must be a member of either the Alliance or the Horde in order to complete an objective.
+      <text xml:space="preserve" bytes="721">The **faction** parameter allows you to specify that a target player or NPC must be a member of either the Alliance or the Horde in order to complete an objective.
 
 ### Value type
 
-* String - either '''Alliance''' or '''Horde'''
+* String - either **Alliance** or **Horde**
 
 ### Supported objectives
 
@@ -1042,7 +1042,7 @@ This parameter can also be used as a [[Requirements|quest requirement or recomme
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="984">The '''gain-aura''' objective is triggered whenever you gain a buff or debuff.
+      <text xml:space="preserve" bytes="984">The **gain-aura** objective is triggered whenever you gain a buff or debuff.
 
 ### Shorthand
 
@@ -1051,7 +1051,7 @@ objectives:
   - gain-aura "aura*"
 }}
 
-''&lt;nowiki&gt;*required&lt;/nowiki&gt;''
+*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
@@ -1107,9 +1107,9 @@ objectives:
       <comment>/* Supported objectives */</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1098">The '''goal''' parameter is available to most objectives to specify how many times that objective must be triggered in order to be marked "complete". For example, in the objective "kill 5 Chicken", &lt;code&gt;5&lt;/code&gt; is considered the goal.
+      <text xml:space="preserve" bytes="1098">The **goal** parameter is available to most objectives to specify how many times that objective must be triggered in order to be marked "complete". For example, in the objective "kill 5 Chicken", &lt;code&gt;5&lt;/code&gt; is considered the goal.
 
-Some objectives do not support a goal parameter because it doesn't make sense to complete them more than once in the same quest. For example, the '''explore''' objective does not support a goal - why would you need to explore the same area twice?
+Some objectives do not support a goal parameter because it doesn't make sense to complete them more than once in the same quest. For example, the **explore** objective does not support a goal - why would you need to explore the same area twice?
 
 ### Value type
 
@@ -1165,23 +1165,23 @@ PMQ was designed to emulate the look and feel of WoW: Classic quests as closely 
 
 That said, there are some differences between PMQ and WoW that you will likely encounter. Let's go over the general gameplay loop for PMQ quests:
 
-# '''Accepting a quest.''' You'll be prompted to start a quest when another character shares one with you, when you're testing out a draft that you've written, or when you want to play one of the demo quests packaged with PMQ. Many quests can be started anywhere in the world by any character, but some quests may have additional restrictions:
-#* Quests can have additional '''[[Requirements]]''' you will need to meet in order to accept the quest, such as level or class requirements.
-#* Quests may require you to be in a certain area, near a certain NPC or meet some other '''[[Start &amp; Complete Objectives|start condition]]''' in order to accept the quest.
-# '''Completing objectives.''' Most quests will have one or more '''[[Objective|Objectives]]''' to complete. Objectives can include killing monsters, talking to NPCs, exploring areas, and much more. Some objectives only need to be completed once, such as exploring an area. But other objectives must be completed multiple times, such as killing 5 of a monster. This number is known as the '''[[Goal]]''' for this objective, and the objective is considered complete when your '''progress''' is greater than or equal to the goal.
-# '''Turning in a quest.''' After you've completed all objectives for a quest, the quest itself is considered complete. But you will still need to turn in the quest to consider it "finished". Like when accepting a quest, many quests can be finished anywhere at anytime, but some quests may impose additional rules:
-#* Quests may require you to be in a certain area, near a certain NPC or meet some other '''[[Start &amp; Complete Objectives|complete condition]]''' in order to finish the quest.
+# **Accepting a quest.** You'll be prompted to start a quest when another character shares one with you, when you're testing out a draft that you've written, or when you want to play one of the demo quests packaged with PMQ. Many quests can be started anywhere in the world by any character, but some quests may have additional restrictions:
+#* Quests can have additional **[[Requirements]]** you will need to meet in order to accept the quest, such as level or class requirements.
+#* Quests may require you to be in a certain area, near a certain NPC or meet some other **[[Start &amp; Complete Objectives|start condition]]** in order to accept the quest.
+# **Completing objectives.** Most quests will have one or more **[[Objective|Objectives]]** to complete. Objectives can include killing monsters, talking to NPCs, exploring areas, and much more. Some objectives only need to be completed once, such as exploring an area. But other objectives must be completed multiple times, such as killing 5 of a monster. This number is known as the **[[Goal]]** for this objective, and the objective is considered complete when your **progress** is greater than or equal to the goal.
+# **Turning in a quest.** After you've completed all objectives for a quest, the quest itself is considered complete. But you will still need to turn in the quest to consider it "finished". Like when accepting a quest, many quests can be finished anywhere at anytime, but some quests may impose additional rules:
+#* Quests may require you to be in a certain area, near a certain NPC or meet some other **[[Start &amp; Complete Objectives|complete condition]]** in order to finish the quest.
 
 ## How to write quests
 
-[[File:ogre1.png|thumb|Example rendering of the '''start''' block and quest '''description''' text]]
-[[File:ogre2.png|thumb|Example rendering of the '''complete''' block and quest '''completion''' text]]
+[[File:ogre1.png|thumb|Example rendering of the **start** block and quest **description** text]]
+[[File:ogre2.png|thumb|Example rendering of the **complete** block and quest **completion** text]]
 
 PMQ quests are written in-game with a short YAML script. If you're not familiar with YAML, consider reading up on this short [[Guides/YAML Crash Course|YAML Crash Course]] to learn everything you need to know for writing quests in PMQ. If you're comfortable writing simple macros in WoW, then you should have no problem picking up the basics of YAML.
 
-When you're ready to start writing your own quests, start by checking out the '''Demo Quests''' provided by PMQ (Main Menu &gt; Quests &gt; Demo Quests). You can view the code used write these demos, and you can even copy them directly to your Drafts and start modifying them yourself.
+When you're ready to start writing your own quests, start by checking out the **Demo Quests** provided by PMQ (Main Menu &gt; Quests &gt; Demo Quests). You can view the code used write these demos, and you can even copy them directly to your Drafts and start modifying them yourself.
 
-You can also create a new quest from scratch by going to the '''My Drafts''' menu and selecting New. Be sure to '''Save''' your changes often, and click '''Validate''' to see if your quest can be played as it's written. You can start playing your custom quest by selecting the quest, then clicking '''Start Quest''' on the My Drafts menu.
+You can also create a new quest from scratch by going to the **My Drafts** menu and selecting New. Be sure to **Save** your changes often, and click **Validate** to see if your quest can be played as it's written. You can start playing your custom quest by selecting the quest, then clicking **Start Quest** on the My Drafts menu.
 
 Ready to learn more? Or just want to see all the options available for PMQ quests? Check out the following guides:
 
@@ -1248,16 +1248,16 @@ Want to see how it works? Feel free to copy-paste this quest into your own draft
         <username>Dolphinspired</username>
         <id>3</id>
       </contributor>
-      <comment>Created page with "The '''guild''' parameter allows you to specify the name of a guild that a target player must be a part of in order to complete an objective.  ### Value type  * String - t..."</comment>
+      <comment>Created page with "The **guild** parameter allows you to specify the name of a guild that a target player must be a part of in order to complete an objective.  ### Value type  * String - t..."</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="675">The '''guild''' parameter allows you to specify the name of a guild that a target player must be a part of in order to complete an objective.
+      <text xml:space="preserve" bytes="675">The **guild** parameter allows you to specify the name of a guild that a target player must be a part of in order to complete an objective.
 
 ### Value type
 
 * String - the name of the guild.
 
-'''Note:''' The guild name is case-sensitive and must match exactly as it appears in game, accents and all!
+**Note:** The guild name is case-sensitive and must match exactly as it appears in game, accents and all!
 
 ### Supported objectives
 
@@ -1299,7 +1299,7 @@ Want to see how it works? Feel free to copy-paste this quest into your own draft
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="1703">{{About|This page refers to items as they are used with [[Objective|quest objectives]]. For items used as quest rewards, see [[Item (Rewards)]].}}
 
-The '''item''' parameter allows you to specify an item that the player must have in their bags in order to complete an objective.
+The **item** parameter allows you to specify an item that the player must have in their bags in order to complete an objective.
 
 ### Value type
 
@@ -1364,7 +1364,7 @@ The '''item''' parameter allows you to specify an item that the player must have
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="3363">{{About|This page refers to items as they are used with [[Rewards|quest rewards]]. For items used in quest objectives, see [[Item]].}}
 
-The '''item''' parameter of a quest reward allows you to specify one or more items that will be rewarded upon completion of a quest. You can also declare that a player must '''choose''' one item from the list rather than receive all of them - see [[Rewards]] for more info.
+The **item** parameter of a quest reward allows you to specify one or more items that will be rewarded upon completion of a quest. You can also declare that a player must **choose** one item from the list rather than receive all of them - see [[Rewards]] for more info.
 
 ### Value type
 
@@ -1413,7 +1413,7 @@ The '''item''' parameter of a quest reward allows you to specify one or more ite
 
 ### Getting items by name
 
-PMQ requires that all item names must be valid in-game item names so that the icon, tooltip, etc. can be retrieving using the WoW API. However, one of the limitation of the WoW API is that some of this information cannot be retrieved by name unless you have '''encountered that item during your current game session''', meaning you've seen that item in your bags, bank, etc. PMQ adds an extra layer of functionality so that items that you have encountered will be written to a save file shared by all of your characters - meaning that if you encounter an item once on any character, you can then refer to it by name on all characters as, even between sessions.
+PMQ requires that all item names must be valid in-game item names so that the icon, tooltip, etc. can be retrieving using the WoW API. However, one of the limitation of the WoW API is that some of this information cannot be retrieved by name unless you have **encountered that item during your current game session**, meaning you've seen that item in your bags, bank, etc. PMQ adds an extra layer of functionality so that items that you have encountered will be written to a save file shared by all of your characters - meaning that if you encounter an item once on any character, you can then refer to it by name on all characters as, even between sessions.
 
 But because it's not a perfect system, you may run into issues when trying to set an item reward by name that you don't actually own. There are, however, some ways to work around this:
 
@@ -1421,7 +1421,7 @@ But because it's not a perfect system, you may run into issues when trying to se
 * Search for the item on [https://classic.wowhead.com/ Wowhead] and grab the item's ID from the URL, such as &lt;code&gt;item=1234&lt;/code&gt;, where 1234 is the ID. Then, do one of two things:
 ** Use the item by ID in your quest, following the examples above
 ** Use the chat command &lt;code&gt;/pmq lookup-item 1234&lt;/code&gt;, where 1234 is your item ID. If this is a valid item ID, then the item will be linked back to you, and you can now refer to this item by name in any quest you write.
-* If you want to avoid this problem in the future, run the command &lt;code&gt;/pmq scan-items&lt;/code&gt;. This kicks off a process that will check for '''every known item ID in the game''' and cache them all for future use in any quest draft on any character. However this takes about 20 minutes to run (for an estimated 25k items in Classic) and will be interrupted if you log out or &lt;code&gt;/reload&lt;/code&gt; your UI. This process is throttled so you won't suffer any performance issues or get kicked offline as a result of scanning for items.
+* If you want to avoid this problem in the future, run the command &lt;code&gt;/pmq scan-items&lt;/code&gt;. This kicks off a process that will check for **every known item ID in the game** and cache them all for future use in any quest draft on any character. However this takes about 20 minutes to run (for an estimated 25k items in Classic) and will be interrupted if you log out or &lt;code&gt;/reload&lt;/code&gt; your UI. This process is throttled so you won't suffer any performance issues or get kicked offline as a result of scanning for items.
 
 [[Category:Quest Objective Parameters]]</text>
       <sha1>5nqnbwupoidd7ryrd9q8ovrxbzobyke</sha1>
@@ -1441,7 +1441,7 @@ But because it's not a perfect system, you may run into issues when trying to se
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2105">The '''kill''' objective is triggered whenever you or someone in your party kills a monster or NPC in combat. Your party must have the tag on an enemy when it dies in order to gain progress.
+      <text xml:space="preserve" bytes="2105">The **kill** objective is triggered whenever you or someone in your party kills a monster or NPC in combat. Your party must have the tag on an enemy when it dies in order to gain progress.
 
 ### Shorthand
 
@@ -1450,7 +1450,7 @@ objectives:
   - kill goal "target*"
 }}
 
-''&lt;nowiki&gt;*required&lt;/nowiki&gt;''
+*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
@@ -1538,7 +1538,7 @@ objectives:
       <text xml:space="preserve" bytes="1848">[[File:Language_select.png|thumb|300px|Left-click the speech bubble to select your spoken language]]
 [[File:Language_skill.png|thumb|300px|A character's language skills as listed in WoW: Classic]]
 
-The '''language''' parameter allows you to specify a Role-Playing language that a [[message]] must be spoken in when completing an objective.
+The **language** parameter allows you to specify a Role-Playing language that a [[message]] must be spoken in when completing an objective.
 
 In order to speak in a special language other than Common (Alliance default) or Orcish (Horde default), you must left-click the chat bubble icon on your chat frame, go to Languages, and select the language you want to speak in. Your character must have proficiency in a language in order to speak it. In WoW: Classic, you can see your character's proficient languages under the Skills tab of the Character Info screen (default hotkey: K).
 
@@ -1560,7 +1560,7 @@ In order to speak in a special language other than Common (Alliance default) or 
 
 * The language value is case-sensitive, meaning that it must matching the casing as it appears in-game. For example, "Dwarvish" will work, but "dwarvish" and "DWARVISH" will not work.
 * You cannot whisper another player in a different language, so don't specify a language if the objective's [[channel]] is "whisper", or if you specify a message [[recipient]].
-* You can specify multiple languages, which means that sending the message in ''any one'' of these languages will satisfy the objective. For example:
+* You can specify multiple languages, which means that sending the message in *any one* of these languages will satisfy the objective. For example:
 
 {{code-yaml|c=
 objectives:
@@ -1587,7 +1587,7 @@ objectives:
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="731">The '''level''' parameter allows you to specify the minimum level that a target must be in order to complete an objective.
+      <text xml:space="preserve" bytes="731">The **level** parameter allows you to specify the minimum level that a target must be in order to complete an objective.
 
 ### Value type
 
@@ -1635,7 +1635,7 @@ This parameter can also be used as a [[Requirements|quest requirement or recomme
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1265">The '''loot-item''' objective is triggered whenever you loot an item from any source. Specifically, this is triggered by any event that can write a loot message to the chatbox. This includes:
+      <text xml:space="preserve" bytes="1265">The **loot-item** objective is triggered whenever you loot an item from any source. Specifically, this is triggered by any event that can write a loot message to the chatbox. This includes:
 
 * Looting items from bodies
 * Harvesting items with gathering skills
@@ -1648,7 +1648,7 @@ objectives:
   - loot-item goal "item*"
 }}
 
-''&lt;nowiki&gt;*required&lt;/nowiki&gt;''
+*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
@@ -1762,10 +1762,10 @@ addon:ClearTargetExclusions()
         <username>Dolphinspired</username>
         <id>3</id>
       </contributor>
-      <comment>Created page with "The '''message''' parameter allows you to specify a phrase or pattern that must be spoken by the player in order to complete an objective.  ### Value type  * String - the..."</comment>
+      <comment>Created page with "The **message** parameter allows you to specify a phrase or pattern that must be spoken by the player in order to complete an objective.  ### Value type  * String - the..."</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2773">The '''message''' parameter allows you to specify a phrase or pattern that must be spoken by the player in order to complete an objective.
+      <text xml:space="preserve" bytes="2773">The **message** parameter allows you to specify a phrase or pattern that must be spoken by the player in order to complete an objective.
 
 ### Value type
 
@@ -1773,7 +1773,7 @@ addon:ClearTargetExclusions()
 
 The full range of [https://riptutorial.com/lua/example/20315/lua-pattern-matching Lua patterns] are supported for this parameter, but you can use the following examples to get started.
 
-Note that all values for message are '''case-insensitive''', meaning that "happy birthday" and "Happy Birthday" would both work in the first example.
+Note that all values for message are **case-insensitive**, meaning that "happy birthday" and "Happy Birthday" would both work in the first example.
 
 {| class="wikitable"
 ! Value
@@ -1804,8 +1804,8 @@ Note that all values for message are '''case-insensitive''', meaning that "happy
 
 ### Usage notes
 
-* While Lua patterns are case-sensitive, the value for this message parameter is intentionally '''not case-sensitive''', meaning that you cannot force a player to say something in a specific casing style. For example, if you specify the pattern "Happy Birthday", then a player will be able to say "happy birthday" to satisfy the condition. As such, it's recommended to keep your patterns for message to all lowercase letters, for simplicity.
-* It can be somewhat tedious to test complex message patterns in-game, so until there is a better testing method included with PMQ, consider using this [https://rextester.com/l/lua_online_compiler Online Lua Compiler] to test which phrases will or will not work with your message pattern. Simply copy/paste the following code into the editor linked, and click '''Run it (F8)''' to print the results below the code editor. Of course, you'll want to change out the pattern and chat messages in the below code to suit your needs.
+* While Lua patterns are case-sensitive, the value for this message parameter is intentionally **not case-sensitive**, meaning that you cannot force a player to say something in a specific casing style. For example, if you specify the pattern "Happy Birthday", then a player will be able to say "happy birthday" to satisfy the condition. As such, it's recommended to keep your patterns for message to all lowercase letters, for simplicity.
+* It can be somewhat tedious to test complex message patterns in-game, so until there is a better testing method included with PMQ, consider using this [https://rextester.com/l/lua_online_compiler Online Lua Compiler] to test which phrases will or will not work with your message pattern. Simply copy/paste the following code into the editor linked, and click **Run it (F8)** to print the results below the code editor. Of course, you'll want to change out the pattern and chat messages in the below code to suit your needs.
 
 {{code-lua|c=
 -- Change this pattern to the "message" pattern value you want to test
@@ -1846,7 +1846,7 @@ testPattern("this message should not pass")
       <comment>/* List of objectives */</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2193">A quest '''objective''' is an action you must take in order to make progress toward completing a quest.
+      <text xml:space="preserve" bytes="2193">A quest **objective** is an action you must take in order to make progress toward completing a quest.
 
 ## Writing Objectives
 
@@ -1886,9 +1886,9 @@ objectives:
 
 When compiled into a quest, this line gets broken apart into the following properties:
 
-* '''objective:''' kill
-* '''goal:''' 5 ''(optional, number of times this objective must be performed)''
-* '''target:''' "Mangy Wolf" ''(name of the monster which must be killed)''
+* **objective:** kill
+* **goal:** 5 *(optional, number of times this objective must be performed)*
+* **target:** "Mangy Wolf" *(name of the monster which must be killed)*
 
 Note that multi-word phrases like "Mangy Wolf" must be written with quotes in order to be recognized as a single parameter value in the shorthand form. For single-word phrases, quotes are optional.
 
@@ -1925,7 +1925,7 @@ You can view a list of all currently supported quest objectives at [[:Category:Q
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2348">'''PlayerMadeQuests (PMQ)''' is an addon for [https://worldofwarcraft.com/en-us/wowclassic World of Warcraft: Classic] that allows you to write your own custom quests, play them in-game, and share them with other players.
+      <text xml:space="preserve" bytes="2348">**PlayerMadeQuests (PMQ)** is an addon for [https://worldofwarcraft.com/en-us/wowclassic World of Warcraft: Classic] that allows you to write your own custom quests, play them in-game, and share them with other players.
 
 Ready to try it out? You can get it here:
 
@@ -1938,15 +1938,15 @@ You can contribute to PMQ by giving us feedback during the Beta Test - join us o
 
 ### Latest News
 
-* A new menu has been added to search your '''[[Save Data &amp; Cache]]''' with v0.6.0-beta (24-Jul-2021)
+* A new menu has been added to search your **[[Save Data &amp; Cache]]** with v0.6.0-beta (24-Jul-2021)
 * New parameters have been added to these objectives with v0.6.0-beta: (24-Jul-2021)
-** '''[[kill]]''' targets by '''[[class]]''', '''[[faction]]''', '''[[guild]]''', or '''[[level]]'''
-** '''[[cast-spell]]''' on targets by '''[[class]]''', '''[[faction]]''', '''[[guild]]''', or '''[[level]]'''
-** '''[[use-emote]]''' on targets by '''[[class]]''', '''[[faction]]''', '''[[guild]]''', or '''[[level]]'''
-* The '''[[Cast-spell]]''' objective has been added in v0.5.0-beta (23-Jan-2021)
-* You can now offer '''[[Rewards]]''' for completing your quests as of v0.4.0-beta (31-Dec-2020)
-* The '''[[Say]]''' objective has been added in v0.3.4-beta (30-Nov-2020)
-* '''[[:News:The Road Ahead (25-Nov-2020)]]'''
+** **[[kill]]** targets by **[[class]]**, **[[faction]]**, **[[guild]]**, or **[[level]]**
+** **[[cast-spell]]** on targets by **[[class]]**, **[[faction]]**, **[[guild]]**, or **[[level]]**
+** **[[use-emote]]** on targets by **[[class]]**, **[[faction]]**, **[[guild]]**, or **[[level]]**
+* The **[[Cast-spell]]** objective has been added in v0.5.0-beta (23-Jan-2021)
+* You can now offer **[[Rewards]]** for completing your quests as of v0.4.0-beta (31-Dec-2020)
+* The **[[Say]]** objective has been added in v0.3.4-beta (30-Nov-2020)
+* **[[:News:The Road Ahead (25-Nov-2020)]]**
 
 ### Helpful Pages
 
@@ -1976,10 +1976,10 @@ File:Questlog1.png|Quest objectives are tracked and updated in real-time as you 
         <username>Dolphinspired</username>
         <id>3</id>
       </contributor>
-      <comment>Created page with "The '''recipient''' parameter allows you to specify the name of a player which must receive an objective in order for it to be completed.  ### Value type  * String - the p..."</comment>
+      <comment>Created page with "The **recipient** parameter allows you to specify the name of a player which must receive an objective in order for it to be completed.  ### Value type  * String - the p..."</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1205">The '''recipient''' parameter allows you to specify the name of a player which must receive an objective in order for it to be completed.
+      <text xml:space="preserve" bytes="1205">The **recipient** parameter allows you to specify the name of a player which must receive an objective in order for it to be completed.
 
 ### Value type
 
@@ -1999,7 +1999,7 @@ File:Questlog1.png|Quest objectives are tracked and updated in real-time as you 
 
 * Player names are case-sensitive, so make sure you capitalize the first letter of the player's name!
 * You do not need to specify &lt;code&gt;channel: whisper&lt;/code&gt; on a [[Say]] objective if you specify a recipient. Since whispers are the only channel that are targeted toward a specific player, the whisper channel is implied by specifying a recipient.
-* You can specify multiple recipients, which means that interacting with ''any one'' of these recipients will satisfy the objective. For example:
+* You can specify multiple recipients, which means that interacting with *any one* of these recipients will satisfy the objective. For example:
 
 {{code-yaml|c=
 objectives:
@@ -2027,9 +2027,9 @@ objectives:
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="1386">[[File:Requirements.png|thumb|300px|Example of how quest requirements are rendered]]
-[[File:RecommendedWarning.png|thumb|300px|Warning if a player chooses to accept a quest which they don't meet the '''recommendations''' for]]
+[[File:RecommendedWarning.png|thumb|300px|Warning if a player chooses to accept a quest which they don't meet the **recommendations** for]]
 
-By default, quests written in PMQ can be started by any player character without restriction. However, you may want to place some restrictions on who is able to take on your quest. PMQ supports this through the '''recommended''' and '''required''' properties on a quest.
+By default, quests written in PMQ can be started by any player character without restriction. However, you may want to place some restrictions on who is able to take on your quest. PMQ supports this through the **recommended** and **required** properties on a quest.
 
 {{code-yaml|c=
 required:
@@ -2043,8 +2043,8 @@ recommended:
 
 Both of these properties support all the same parameters and are evaluated in the same way. The only difference is in how they are presented to players when they attempt to start your quest.
 
-* '''required''' - Players will not be allowed to start your quest if they do not meet the required parameters.
-* '''recommended''' - Players will be prompted with an additional warning dialog when they try to start a quest without the recommended parameters, during which they can choose to start the quest anyway.
+* **required** - Players will not be allowed to start your quest if they do not meet the required parameters.
+* **recommended** - Players will be prompted with an additional warning dialog when they try to start a quest without the recommended parameters, during which they can choose to start the quest anyway.
 
 ### Supported parameters
 
@@ -2081,7 +2081,7 @@ Both of these properties support all the same parameters and are evaluated in th
       <text xml:space="preserve" bytes="5567">[[File:Rewards-menu.PNG|thumb|300px|The Quest Rewards menu, and rewards as shown upon completion of a quest.]]
 [[File:Quest-verification-menu.PNG|thumb|300px|The Quest Verification menu, which can be accessed for any quest in your Quest Log.]]
 
-As an option to make your quests more enticing to players, you can specify '''rewards''' that will be given to players on quest completion. These rewards can take the form of money or items.
+As an option to make your quests more enticing to players, you can specify **rewards** that will be given to players on quest completion. These rewards can take the form of money or items.
 
 The rewards are not generated by PMQ - of course, addons can't simply generate items out of thin air! However, the player will be notified that they can contact a certain player (or group of players) and trade them in order to receive their quest rewards. In addition, PMQ will track which rewards a player is eligible for, and reward-givers will be able to verify that players have actually completed a quest, along with which rewards players are eligible for.
 
@@ -2091,15 +2091,15 @@ The rewards are not generated by PMQ - of course, addons can't simply generate i
 
 When you complete a quest that offers rewards, you will see the rewards listed below the completion text for a quest. If the quest asks you to choose a reward, you will need to click one of the items before you're able to complete the quest.
 
-After completing the quest, you can visit the '''Quest Rewards''' menu (part of the PMQ main menu) anytime to see which rewards you're eligible for, and which players you can claim them from. The players providing the rewards ''may not have been notified'' that you completed the quest, so you may need to message them and ask about receiving your rewards. This menu exists to help you keep track of which rewards you've earned and will not have any impact on your ability to perform other quests, so you can delete items from the list at any time.
+After completing the quest, you can visit the **Quest Rewards** menu (part of the PMQ main menu) anytime to see which rewards you're eligible for, and which players you can claim them from. The players providing the rewards *may not have been notified* that you completed the quest, so you may need to message them and ask about receiving your rewards. This menu exists to help you keep track of which rewards you've earned and will not have any impact on your ability to perform other quests, so you can delete items from the list at any time.
 
-If a reward-giver trades you an item or an amount of money that you're eligible for, then that reward will automatically be marked as "Traded" from that player. However, you can manually mark any reward as "Claimed" by selecting it in the list and clicking '''Mark Claimed'''. You may want to do this if you got the reward in a trade from a different player than who was listed, or if you received your reward in the mail (mail support may be added in a future update).
+If a reward-giver trades you an item or an amount of money that you're eligible for, then that reward will automatically be marked as "Traded" from that player. However, you can manually mark any reward as "Claimed" by selecting it in the list and clicking **Mark Claimed**. You may want to do this if you got the reward in a trade from a different player than who was listed, or if you received your reward in the mail (mail support may be added in a future update).
 
 =### Distributing Rewards=
 
-As a reward-giver, you can verify that a player has completed that quest, as well as see which item rewards they're eligible for. Open the '''Quest Log''' menu and select the quest you want to verify completion for, then click the '''Verify Others''' option.
+As a reward-giver, you can verify that a player has completed that quest, as well as see which item rewards they're eligible for. Open the **Quest Log** menu and select the quest you want to verify completion for, then click the **Verify Others** option.
 
-From the Quest Verification menu, you'll be able to verify that either the targeted player, the players in your party, or the players in your raid group have completed a quest. Note that ''anyone'' can perform verification for any quest, whether or not they shared the quest, and whether or not the quest has rewards.
+From the Quest Verification menu, you'll be able to verify that either the targeted player, the players in your party, or the players in your raid group have completed a quest. Note that *anyone* can perform verification for any quest, whether or not they shared the quest, and whether or not the quest has rewards.
 
 However, if a quest has rewards and you're a reward-giver for that quest, then the items and money that each player is eligible for will be linked in your chat window. This allows you to quickly scan a group of players for rewards without needing to message each player individually.
 
@@ -2116,8 +2116,8 @@ rewards:
     - 10 Greater Nature Protection Potion
 }}
 
-* You must specify either '''money''' or at least one '''item''' in your rewards.
-* If you specify '''choose: true''', then you must specify at least 2 '''item''' rewards.
+* You must specify either **money** or at least one **item** in your rewards.
+* If you specify **choose: true**, then you must specify at least 2 **item** rewards.
 
 ### Supported parameters
 
@@ -2125,14 +2125,14 @@ rewards:
 ! Parameter
 ! How it's used
 |-
-| '''player'''
-| The player(s) who are responsible for giving out the rewards.&lt;br/&gt;You may also use the variables '''%author''' and '''%giver''' instead of a player's name.
+| **player**
+| The player(s) who are responsible for giving out the rewards.&lt;br/&gt;You may also use the variables **%author** and **%giver** instead of a player's name.
 |-
-| '''money'''
+| **money**
 | The amount of money awarded for completing the quest.&lt;br/&gt;This can be written as an amount of copper (such as: 24153) or a string with g/s/c (such as: 2g 41s 53c)
 |-
-| '''choose'''
-| Set to '''true''' if the player should choose only ''one item'' from the list.&lt;br/&gt;Otherwise, it's implied that the player will receive ''all'' of the listed rewards.
+| **choose**
+| Set to **true** if the player should choose only *one item* from the list.&lt;br/&gt;Otherwise, it's implied that the player will receive *all* of the listed rewards.
 |-
 | [[Item (Rewards)|item]]
 | The item(s) awarded for completing the quest.
@@ -2152,7 +2152,7 @@ rewards:
 
 =### Quest giver as the reward giver=
 
-If you specify '''%giver''' as the player under rewards, then the person who shares the quest will always be responsible for distributing the reward. This way, you can write a quest that provides rewards but doesn't necessarily have to relate back to a specific player or group of players.
+If you specify **%giver** as the player under rewards, then the person who shares the quest will always be responsible for distributing the reward. This way, you can write a quest that provides rewards but doesn't necessarily have to relate back to a specific player or group of players.
 
 {{code-yaml|c=
 rewards:
@@ -2160,7 +2160,7 @@ rewards:
   money: 5g
 }}
 
-If you would like, you can also specify '''%author''' as the reward giver, and the person who originally drafted the quest will always be responsible for distributing rewards.
+If you would like, you can also specify **%author** as the reward giver, and the person who originally drafted the quest will always be responsible for distributing rewards.
 
 {{code-yaml|c=
 rewards:
@@ -2192,7 +2192,7 @@ See [[Item (Rewards)]] for examples of how to define reward items.
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="5462">The '''Save Data &amp; Cache''' menu allows you to manage various pieces of save data that PMQ generates while you use the addon.
+      <text xml:space="preserve" bytes="5462">The **Save Data &amp; Cache** menu allows you to manage various pieces of save data that PMQ generates while you use the addon.
 
 ### Overview
 
@@ -2203,12 +2203,12 @@ The World of Warcraft API is very selective about some of the information that i
 * You just killed a "Stonetusk Boar". What level was it?
 * You just cast Frostbolt on a player named "Questborther". What guild were they in?
 
-To work around this, PMQ '''caches''', or stores a copy of, data about the game world whenever it becomes available through the API. This way, PMQ can take a "best guess" at answering questions like these anytime the addon needs to do so, such as during quest objective completion. PMQ might answer the above questions like this:
+To work around this, PMQ **caches**, or stores a copy of, data about the game world whenever it becomes available through the API. This way, PMQ can take a "best guess" at answering questions like these anytime the addon needs to do so, such as during quest objective completion. PMQ might answer the above questions like this:
 
 * You targeted a monster named "Stonetusk Boar" earlier, and it was Level 5.
 * You grouped with a player named "Questborther" a couple of days ago, and they were in the guild &lt;code&gt;&lt;Pals for Life&gt;&lt;/code&gt;.
 
-Cached data is shared across '''all characters''' on your Battle.net account.
+Cached data is shared across **all characters** on your Battle.net account.
 
 ### Player Data Cache
 
@@ -2218,44 +2218,44 @@ PMQ caches data about other players whenever you target a player, mouseover a pl
 * You may not get credit for kills or spellcasts performed with AOE spells, if you happen to have never moused over the target.
 * Targets with level "??"/"Skull" may not count towards objectives with a [[level]] condition, because WoW does not make the target's true level available to addons
 
-If you think you should have gotten credit for a kill, try confirming the target's info with '''Print All''', and let us know in Discord if it's not working like you'd expect.
+If you think you should have gotten credit for a kill, try confirming the target's info with **Print All**, and let us know in Discord if it's not working like you'd expect.
 
 Menu options:
 
-* '''Print All''': Prints all cached player data to your chat window, including the name, guild, faction, level, sex, and race for each player you've seen. If your cache is large, then you may not see all entries in the chat window.
-* '''Delete All''': Deletes all cached information about players that you've seen.
+* **Print All**: Prints all cached player data to your chat window, including the name, guild, faction, level, sex, and race for each player you've seen. If your cache is large, then you may not see all entries in the chat window.
+* **Delete All**: Deletes all cached information about players that you've seen.
 
 ### NPC Data Cache
 
 PMQ caches data about NPCs whenever you target or mouseover them. The same rules that applies to Player data also apply to NPCs, with the exception that some data points are exclusive to players and unavailable (or not reliable) from NPCs (such as class, race, sex, or guild).
 
-If you think you should have gotten credit for a kill, try confirming the target's info with '''Print All''', and let us know in Discord if it's not working like you'd expect.
+If you think you should have gotten credit for a kill, try confirming the target's info with **Print All**, and let us know in Discord if it's not working like you'd expect.
 
 Menu options:
 
-* '''Print All''': Prints all cached NPC data to your chat window, including the name, faction, and level range for each NPC you've seen. If your cache is large, then you may not see all entries in the chat window.
-* '''Delete All''': Deletes all cached information about NPCs that you've seen.
+* **Print All**: Prints all cached NPC data to your chat window, including the name, faction, and level range for each NPC you've seen. If your cache is large, then you may not see all entries in the chat window.
+* **Delete All**: Deletes all cached information about NPCs that you've seen.
 
 ### Item Data Cache
 
 Menu options:
 
-* '''Search''': Provide any item name or ID in the search field. If the item is found in your cache, it will be linked to you in the chat window.
-* '''Begin Scan''': Starts looking for valid item IDs from 1 to 184K, and caches any item information found with those IDs. This scan takes around '''20-30 minutes''' and should find just under 30K items in TBC. You can let this run in the background while you play, but encountering any loading screen may interrupt the scan.
-* '''Delete All''': Deletes all item information in the cache. You'll need to scan again to restore a full database of items.
+* **Search**: Provide any item name or ID in the search field. If the item is found in your cache, it will be linked to you in the chat window.
+* **Begin Scan**: Starts looking for valid item IDs from 1 to 184K, and caches any item information found with those IDs. This scan takes around **20-30 minutes** and should find just under 30K items in TBC. You can let this run in the background while you play, but encountering any loading screen may interrupt the scan.
+* **Delete All**: Deletes all item information in the cache. You'll need to scan again to restore a full database of items.
 
 ### Spell Data Cache
 
 Menu options:
 
-* '''Search''': Provide any spell name or ID in the search field. If the spell is found in your cache, then the spell's name and ID will printed in the chat window.
-* '''Begin Scan''': Starts looking for valid spell IDs from 1 to 50K, and caches any spell information found with those IDs. This scan takes around '''2-3 minutes''' and should find around 15K spells in TBC. You can let this run in the background while you play, but encountering any loading screen may interrupt the scan.
-* '''Delete All''': Deletes all spell information in the cache. You'll need to scan again to restore a full database of spells.
+* **Search**: Provide any spell name or ID in the search field. If the spell is found in your cache, then the spell's name and ID will printed in the chat window.
+* **Begin Scan**: Starts looking for valid spell IDs from 1 to 50K, and caches any spell information found with those IDs. This scan takes around **2-3 minutes** and should find around 15K spells in TBC. You can let this run in the background while you play, but encountering any loading screen may interrupt the scan.
+* **Delete All**: Deletes all spell information in the cache. You'll need to scan again to restore a full database of spells.
 
 ### Other Menu Options
 
-* '''Reset Frame Positions''': This will delete the saved position of any popout menus within PMQ (such as the Quest Log or Location Finder). Menus should immediately return to their default positions when this is run. Click this if you ever lose a popout menu by accidentally dragging it off screen.
-* '''Reset All Save Data''': This will delete all of the save data managed by PMQ, including data caches, frame positions, as well as '''quest drafts and quest completions'''. Use this as an absolute last resort in case your PMQ save data gets somehow corrupted.</text>
+* **Reset Frame Positions**: This will delete the saved position of any popout menus within PMQ (such as the Quest Log or Location Finder). Menus should immediately return to their default positions when this is run. Click this if you ever lose a popout menu by accidentally dragging it off screen.
+* **Reset All Save Data**: This will delete all of the save data managed by PMQ, including data caches, frame positions, as well as **quest drafts and quest completions**. Use this as an absolute last resort in case your PMQ save data gets somehow corrupted.</text>
       <sha1>0ggmu86iwqcushvfggkbrjvmn2wmt6n</sha1>
     </revision>
   </page>
@@ -2273,7 +2273,7 @@ Menu options:
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="3217">The '''say''' objective is triggered whenever you send a message to a chat channel. This objective requires you to send a message that meets a message containing a certain phrase, along with meeting any of the conditions outlined below.
+      <text xml:space="preserve" bytes="3217">The **say** objective is triggered whenever you send a message to a chat channel. This objective requires you to send a message that meets a message containing a certain phrase, along with meeting any of the conditions outlined below.
 
 ### Shorthand
 
@@ -2282,7 +2282,7 @@ objectives:
   - say "message*"
 }}
 
-''&lt;nowiki&gt;*required&lt;/nowiki&gt;''
+*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 Note that this shorthand form is not recommended for real quest objectives, only for quickly testing phrases. Use the long form better quest objectives.
 
@@ -2390,14 +2390,14 @@ In this example, the player would need to /say or /yell exactly the word "friend
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4105">The '''spell''' parameter lets you specify which spell(s) must be cast in order to complete an objective.
+      <text xml:space="preserve" bytes="4105">The **spell** parameter lets you specify which spell(s) must be cast in order to complete an objective.
 
 ### Value type
 
 * String - The name of the spell (case-insensitive)
 * Number - The ID of the spell
 
-Note that regardless of whether you specify the name or ID of a spell in your quests, '''all spells with the same name''' will count towards objective completion. For example, whether you use name "Frostbolt" or the number [https://classic.wowhead.com/spell=7322/frostbolt 7322] as the spell in your quest, all ranks of Frostbolt will count towards objectives.
+Note that regardless of whether you specify the name or ID of a spell in your quests, **all spells with the same name** will count towards objective completion. For example, whether you use name "Frostbolt" or the number [https://classic.wowhead.com/spell=7322/frostbolt 7322] as the spell in your quest, all ranks of Frostbolt will count towards objectives.
 
 {{code-yaml|c=
 objectives:
@@ -2422,14 +2422,14 @@ See the guide below for more info on how to get spells by name to use in your qu
 
 ### Getting spells by name
 
-PMQ requires you to provide valid in-game spells in all your quests; your quests will fail validation if any spell names or IDs cannot be found in-game. If you use valid spell IDs (numbers), then you should encounter no problems with looking up your spells. However, the WoW API has a peculiar limitation: you can only get spells by ''name'' if that spell is '''in your current spellbook'''. For example, if you try to reference the spell "Blessing of Might" by name while on a Hunter, the WoW API will tell you that this spell does not exist.
+PMQ requires you to provide valid in-game spells in all your quests; your quests will fail validation if any spell names or IDs cannot be found in-game. If you use valid spell IDs (numbers), then you should encounter no problems with looking up your spells. However, the WoW API has a peculiar limitation: you can only get spells by *name* if that spell is **in your current spellbook**. For example, if you try to reference the spell "Blessing of Might" by name while on a Hunter, the WoW API will tell you that this spell does not exist.
 
 Fortunately, PMQ offers some solutions to work around this limitation so that you can reference any spells by name on any character.
 
 * You can search for the spell on [https://classic.wowhead.com/ Wowhead] and grab the spell's ID from the URL, such as &lt;code&gt;spell=1234&lt;/code&gt;, where 1234 is the ID. Then, do one of two things:
-** Use the spell by ID in your quest, following the examples above. Keep in mind that '''any spell with the same name''' will count towards your objective, so you don't need to worry about getting the ID of a specific rank of a spell. Any rank will work.
+** Use the spell by ID in your quest, following the examples above. Keep in mind that **any spell with the same name** will count towards your objective, so you don't need to worry about getting the ID of a specific rank of a spell. Any rank will work.
 ** You can also use the chat command &lt;code&gt;/pmq lookup-spell 1234&lt;/code&gt;, where 1234 is your spell ID. PMQ will now remember that spell's name and you can reference it by name in your quests.
-* If you want to avoid this problem in the future, run the command &lt;code&gt;/pmq scan-spells&lt;/code&gt;. This kicks off a process that will check for '''every known spell in the game''' and cache their names for future use in any quest draft on any character.
+* If you want to avoid this problem in the future, run the command &lt;code&gt;/pmq scan-spells&lt;/code&gt;. This kicks off a process that will check for **every known spell in the game** and cache their names for future use in any quest draft on any character.
 ** This process only takes about 2-3 minutes to run and may have a small effect on your game's performance while it's running. See [[Configuration]] for info on how to configure this scan.
 
 Finally, you can erase all cached spell names from PMQ with the chat command &lt;code&gt;/pmq clear-spells&lt;/code&gt;.
@@ -2440,7 +2440,7 @@ Finally, you can erase all cached spell names from PMQ with the chat command &lt
 
 Many actions that your character performs in game are considered "spells" for the sake of gameplay and will work with this quest condition. Beyond your spellbook, things like Skinning, [https://classic.wowhead.com/spell=18517/pattern-mooncloth-bag learning patterns], or using your [https://classic.wowhead.com/spell=8690/hearthstone Hearthstone] are all considered spell casts.
 
-Since it can be difficult to figure out exactly which spells you should put in your quests, PMQ provides a '''spell-watching tool''' that you can activate with the chat command &lt;code&gt;/pmq watch-spells&lt;/code&gt;. When enabled, this will print a message containing the spell name, spell ID, and (if applicable) target name for every successful spell that your character casts. Simply enable scanning and then perform whatever action(s) you want to be part of your quest, and take note of the spells that it reports.
+Since it can be difficult to figure out exactly which spells you should put in your quests, PMQ provides a **spell-watching tool** that you can activate with the chat command &lt;code&gt;/pmq watch-spells&lt;/code&gt;. When enabled, this will print a message containing the spell name, spell ID, and (if applicable) target name for every successful spell that your character casts. Simply enable scanning and then perform whatever action(s) you want to be part of your quest, and take note of the spells that it reports.
 
 Spell watching only lasts for the current session and is turned off whenever you /reload or log out. To disable it yourself, simply enter the chat command again.
 
@@ -2464,12 +2464,12 @@ Spell watching only lasts for the current session and is turned off whenever you
       <comment>Update table class</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2239">[[File:startcomplete1.png|thumb|300px|Quest '''description''' text and '''start''' block rendered as quest info]]
-[[File:startcomplete2.png|thumb|300px|Quest '''completion''' text and '''complete''' block rendered as quest info]]
+      <text xml:space="preserve" bytes="2239">[[File:startcomplete1.png|thumb|300px|Quest **description** text and **start** block rendered as quest info]]
+[[File:startcomplete2.png|thumb|300px|Quest **completion** text and **complete** block rendered as quest info]]
 
 By default, quests written in PMQ can be started anywhere in the world at any time, simply by selecting the quest from the catalog or by being invited from another player. Similarly, quests can be completed from anywhere by simply opening the quest once all objectives are completed and clicking "Complete Quest".
 
-But quests in WoW generally don't operate this way - you're usually required to talk to an NPC or interact with an object in order to start or complete a quest. To support this flow of gameplay, PMQ provides the '''start''' and '''complete''' conditions for quests.
+But quests in WoW generally don't operate this way - you're usually required to talk to an NPC or interact with an object in order to start or complete a quest. To support this flow of gameplay, PMQ provides the **start** and **complete** conditions for quests.
 
 {{code-yaml|c=
 start:
@@ -2484,8 +2484,8 @@ complete:
 
 Both properties support all the same parameters and are evaluated in the same way. The only difference is when they're evaluated during a quest.
 
-* '''start''' - What conditions are required before the player can accept the quest (click the "Accept" button)?
-* '''complete''' - What conditions are required in order for the player to turn in the quest (click the "Complete Quest" button)?
+* **start** - What conditions are required before the player can accept the quest (click the "Accept" button)?
+* **complete** - What conditions are required in order for the player to turn in the quest (click the "Complete Quest" button)?
 
 ### Supported parameters
 
@@ -2512,31 +2512,31 @@ Both properties support all the same parameters and are evaluated in the same wa
 ! Variable
 ! Parameter
 |-
-| '''%t'''
+| **%t**
 | target
 |-
-| '''%z'''
+| **%z**
 | zone
 |-
-| '''%sz'''
+| **%sz**
 | subzone
 |-
-| '''%co'''
+| **%co**
 | coords
 |-
-| '''%x'''
+| **%x**
 | x-coordinate of coords
 |-
-| '''%y'''
+| **%y**
 | y-coordinate of coords
 |-
-| '''%r'''
+| **%r**
 | radius of coords
 |-
-| '''%xy'''
+| **%xy**
 | coords formatted as: &lt;code&gt;(x, y)&lt;/code&gt;
 |-
-| '''%xyr'''
+| **%xyr**
 | coords formatted as: &lt;code&gt;(x, y) +/- radius&lt;/code&gt;
 |}</text>
       <sha1>6ighyhcol4qtic42bwguavg0ltjtf8d</sha1>
@@ -2556,11 +2556,11 @@ Both properties support all the same parameters and are evaluated in the same wa
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1783">The '''talk-to''' objective is triggered whenever you talk to an NPC, which includes opening their gossip frame, shop window, stable window, or any other window that causes the NPC to face you.
+      <text xml:space="preserve" bytes="1783">The **talk-to** objective is triggered whenever you talk to an NPC, which includes opening their gossip frame, shop window, stable window, or any other window that causes the NPC to face you.
 
 If your goal is to talk to more than 1 of a target NPC, you must talk to different instances of that NPC (e.g. 3 different "Stormwind Guard" NPCs) in order to complete the objective.
 
-In case you cannot talk to the target NPC in game (for example, if you've finished all of their quests and they no longer have any dialogue), then PMQ allows you to use the '''/talk''' emote on the NPC in order to progress this objective. You must be near the NPC (within approximately 10 yards) in order for this to work.
+In case you cannot talk to the target NPC in game (for example, if you've finished all of their quests and they no longer have any dialogue), then PMQ allows you to use the **/talk** emote on the NPC in order to progress this objective. You must be near the NPC (within approximately 10 yards) in order for this to work.
 
 ### Shorthand
 
@@ -2569,7 +2569,7 @@ objectives:
   - talk-to goal "target*"
 }}
 
-''&lt;nowiki&gt;*required&lt;/nowiki&gt;''
+*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
@@ -2632,7 +2632,7 @@ objectives:
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1768">The '''target''' parameter is used in a variety of ways, but in general it is used to specify the monster, NPC, or player that must be targeted in order to progress an objective.
+      <text xml:space="preserve" bytes="1768">The **target** parameter is used in a variety of ways, but in general it is used to specify the monster, NPC, or player that must be targeted in order to progress an objective.
 
 ### Value type
 
@@ -2661,7 +2661,7 @@ This parameter can also be used as a [[Start &amp; Complete Objectives|start or 
 
 ### Unique Targets
 
-For objectives requiring you to act on the same target multiple times (i.e. with a goal &gt; 1), you must target "unique instances" of a monster or NPC in order to progress the objective. However, this unique-target restriction '''does not apply to players'''. Consider the following example:
+For objectives requiring you to act on the same target multiple times (i.e. with a goal &gt; 1), you must target "unique instances" of a monster or NPC in order to progress the objective. However, this unique-target restriction **does not apply to players**. Consider the following example:
 
 * &lt;code&gt;use-emote salute 5 "Stormwind Guard"&lt;/code&gt; - You must salute 5 _different_ Stormwind Guards to complete this objective.
 * &lt;code&gt;use-emote salute 5 Questborther&lt;/code&gt; - Assuming Questborther is a player's name, you can salute that same player 5 times to complete this objective.
@@ -2689,7 +2689,7 @@ For objectives requiring you to act on the same target multiple times (i.e. with
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1945">The '''use-emote''' objective is triggered whenever you use an emote, such as &lt;code&gt;/dance&lt;/code&gt; or &lt;code&gt;/glare&lt;/code&gt;. This objective cannot be triggered by custom emotes sent with the &lt;code&gt;/e&lt;/code&gt; command.
+      <text xml:space="preserve" bytes="1945">The **use-emote** objective is triggered whenever you use an emote, such as &lt;code&gt;/dance&lt;/code&gt; or &lt;code&gt;/glare&lt;/code&gt;. This objective cannot be triggered by custom emotes sent with the &lt;code&gt;/e&lt;/code&gt; command.
 
 If your goal is to use an emote more than 1 time on a target NPC, you must use the emote on different instances of that NPC (e.g. 3 different "Stormwind Guard" NPCs) in order to complete the objective.
 
@@ -2700,7 +2700,7 @@ objectives:
   - use-emote "emote*" goal "target"
 }}
 
-''&lt;nowiki&gt;*required&lt;/nowiki&gt;''
+*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
 
 ### Long form
 
@@ -2784,7 +2784,7 @@ objectives:
       </contributor>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="4439">'''YAML''' (which stands for "YAML Ain't Markup Language" - yes, really) is a simple language intended for writing configuration files that can be easily read and understood by humans, but also easily parsed by computers. This guide will give you a brief rundown on everything you need to know about YAML to write quests in PMQ.
+      <text xml:space="preserve" bytes="4439">**YAML** (which stands for "YAML Ain't Markup Language" - yes, really) is a simple language intended for writing configuration files that can be easily read and understood by humans, but also easily parsed by computers. This guide will give you a brief rundown on everything you need to know about YAML to write quests in PMQ.
 
 ### Properties and values
 
@@ -2808,7 +2808,7 @@ zone: "Elwynn Forest"        # Will print as: Elwynn Forest
 subzone: 'Crystal Lake'      # Will print as: Crystal lake
 }}
 
-However, if you are using any YAML special characters in your string, then you ''must'' include quotes. Either single or double quotes are fine.
+However, if you are using any YAML special characters in your string, then you *must* include quotes. Either single or double quotes are fine.
 
 {{code-yaml|c=
 name: Lesson 1: Tutorial     # BAD! YAML gets confused by the extra colon
@@ -2816,7 +2816,7 @@ name: "Lesson 1: Tutorial"   # Easy fix
 name: 'Lesson 1: Tutorial'   # Also fine
 }}
 
-PMQ also includes a special rule for writing shorthand quest [[objective|objectives]]. When you are writing strings that contain multiple words, you ''must'' include quotes in order to group these words together.
+PMQ also includes a special rule for writing shorthand quest [[objective|objectives]]. When you are writing strings that contain multiple words, you *must* include quotes in order to group these words together.
 
 {{code-yaml|c=
 objectives:
@@ -2914,7 +2914,7 @@ objectives:
       <comment>/* Supported objectives */</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1621">The '''zone''' and '''subzone''' parameters are used to specify the names of in-game areas where an objective must be completed.
+      <text xml:space="preserve" bytes="1621">The **zone** and **subzone** parameters are used to specify the names of in-game areas where an objective must be completed.
 
 ### Value type
 
