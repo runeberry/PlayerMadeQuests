@@ -142,7 +142,7 @@ objectives:
       text: "Custom display text"
 ```
 
-*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
+_*required_
 
 ### Supported parameters
 
@@ -630,7 +630,7 @@ objectives:
   - equip-item "equip*"
 ```
 
-*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
+_*required_
 
 ### Long form
 
@@ -685,7 +685,7 @@ objectives:
   - explore "zone*" "coords"
 ```
 
-*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
+_*required_
 
 ### Long form
 
@@ -776,7 +776,7 @@ objectives:
   - gain-aura "aura*"
 ```
 
-*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
+_*required_
 
 ### Long form
 
@@ -1123,7 +1123,7 @@ objectives:
   - kill goal "target*"
 ```
 
-*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
+_*required_
 
 ### Long form
 
@@ -1285,7 +1285,7 @@ objectives:
   - loot-item goal "item*"
 ```
 
-*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
+_*required_
 
 ### Long form
 
@@ -1872,7 +1872,7 @@ objectives:
   - say "message*"
 ```
 
-*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
+_*required_
 
 Note that this shorthand form is not recommended for real quest objectives, only for quickly testing phrases. Use the long form better quest objectives.
 
@@ -2107,7 +2107,7 @@ objectives:
   - talk-to goal "target*"
 ```
 
-*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
+_*required_
 
 ### Long form
 
@@ -2212,7 +2212,7 @@ objectives:
   - use-emote "emote*" goal "target"
 ```
 
-*&lt;nowiki&gt;*required&lt;/nowiki&gt;*
+_*required_
 
 ### Long form
 
