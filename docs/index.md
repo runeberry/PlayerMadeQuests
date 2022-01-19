@@ -11,23 +11,6 @@ Several playable demo quests are provided with PMQ to help you learn how to writ
 
 You can contribute to PMQ by giving us feedback during the Beta Test - join us on [Discord](https://discord.gg/gHMjCgs)!
 
-### Latest News
-
-* A new menu has been added to search your **[Save Data & Cache](guides/save-data.md)** with v0.6.0-beta (24-Jul-2021)
-* New parameters have been added to these objectives with v0.6.0-beta: (24-Jul-2021)
-  * **[kill](objectives/kill.md)** targets by **[class](parameters/class.md)**, **[faction](parameters/faction.md)**, **[guild](parameters/guild.md)**, or **[level](parameters/level.md)**
-  * **[cast-spell](objectives/cast-spell.md)** on targets by **[class](parameters/class.md)**, **[faction](parameters/faction.md)**, **[guild](parameters/guild.md)**, or **[level](parameters/level.md)**
-  * **[use-emote](objectives/use-emote.md)** on targets by **[class](parameters/class.md)**, **[faction](parameters/faction.md)**, **[guild](parameters/guild.md)**, or **[level](parameters/level.md)**
-* The **[Cast-spell](objectives/cast-spell.md)** objective has been added in v0.5.0-beta (23-Jan-2021)
-* You can now offer **[Rewards](rewards.md)** for completing your quests as of v0.4.0-beta (31-Dec-2020)
-* The **[Say](objectives/say.md)** objective has been added in v0.3.4-beta (30-Nov-2020)
-
-### Helpful Pages
-
-* [Writing Quests](guides/writing-quests.md)
-* [YAML Crash Course](guides/yaml-crash-course.md)
-* [:Category:Quest Objectives|List of all quest objectives]
-
 ### Screenshots
 
 &lt;gallery&gt;
@@ -36,3 +19,7 @@ File:Demo2.png|You can play these demo quests directly, or you can save a copy t
 File:Draft1.png|Write your own quests in game with just a few lines of script. You can even share your quests with other PMQ users in your party with just the click of a button!
 File:Questlog1.png|Quest objectives are tracked and updated in real-time as you complete them.
 &lt;/gallery&gt;
+
+# Docs
+
+{:toc}
