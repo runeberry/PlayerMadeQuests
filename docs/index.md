@@ -22,4 +22,5 @@ File:Questlog1.png|Quest objectives are tracked and updated in real-time as you 
 
 # Docs
 
+* Table of Contents
 {:toc}
