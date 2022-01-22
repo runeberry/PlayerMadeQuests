@@ -57,7 +57,7 @@ You can spread a long string over multiple lines by prefixing it with the `&amp;
 
 ```yaml
 quest:
-  description: &gt;
+  description: >
     Get up on the floor
     Dancin' all night long
     Get up on the floor
@@ -68,7 +68,7 @@ However, the above example will still print out as one long line when displayed 
 
 ```yaml
 quest:
-  description: &gt;
+  description: >
     Get up on the floor%br
     Dancin' all night long%br
     Get up on the floor%br

@@ -17,7 +17,7 @@ The World of Warcraft API is very selective about some of the information that i
 To work around this, PMQ **caches**, or stores a copy of, data about the game world whenever it becomes available through the API. This way, PMQ can take a "best guess" at answering questions like these anytime the addon needs to do so, such as during quest objective completion. PMQ might answer the above questions like this:
 
 * You targeted a monster named "Stonetusk Boar" earlier, and it was Level 5.
-* You grouped with a player named "Questborther" a couple of days ago, and they were in the guild `&lt;Pals for Life&gt;`.
+* You grouped with a player named "Questborther" a couple of days ago, and they were in the guild `<Pals for Life>`.
 
 Cached data is shared across **all characters** on your Battle.net account.
 

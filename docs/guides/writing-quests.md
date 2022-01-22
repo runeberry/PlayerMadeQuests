@@ -41,7 +41,7 @@ Here's an example of what a fully-featured quest might look like:
 ```yaml
 quest:
   name: It's All Ogre Now
-  description: &gt;
+  description: >
     Look kid, I ain't got time to explain. The ogres got somethin'
     dangerous and they're comin' after me with it. I need you distract
     'em for a bit, then wait for me at the end of the pier in
