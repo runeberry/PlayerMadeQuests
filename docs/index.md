@@ -11,16 +11,27 @@ Several playable demo quests are provided with PMQ to help you learn how to writ
 
 You can contribute to PMQ by giving us feedback during the Beta Test - join us on [Discord](https://discord.gg/gHMjCgs)!
 
-### Screenshots
-
-&lt;gallery&gt;
-File:Demo1.png|Several demo quests are included to help you learn how to write quests for PMQ.
-File:Demo2.png|You can play these demo quests directly, or you can save a copy to your Drafts and make some changes, then try it out!
-File:Draft1.png|Write your own quests in game with just a few lines of script. You can even share your quests with other PMQ users in your party with just the click of a button!
-File:Questlog1.png|Quest objectives are tracked and updated in real-time as you complete them.
-&lt;/gallery&gt;
-
 # Docs
 
 * Table of Contents
 {:toc}
+
+# Screenshots
+
+<p align="center">
+  <a href="img/Demo1.png"><img src="img/Demo1.png"/></a><br/>
+  <i>|Several demo quests are included to help you learn how to write quests for PMQ.</i>
+</p>
+<p align="center">
+  <a href="img/Demo2.png"><img src="img/Demo2.png"/></a><br/>
+  <i>|You can play these demo quests directly, or you can save a copy to your Drafts and make some changes, then try it out!</i>
+</p>
+<p align="center">
+  <a href="img/Draft1.png"><img src="img/Draft1.png"/></a><br/>
+  <i>|Write your own quests in game with just a few lines of script. You can even share your quests with other PMQ users in your party with just the click of a button!</i>
+</p>
+<p align="center">
+  <a href="img/Questlog1.png"><img src="img/Questlog1.png"/></a><br/>
+  <i>|Quest objectives are tracked and updated in real-time as you complete them.</i>
+</p>
+

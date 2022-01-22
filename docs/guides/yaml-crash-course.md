@@ -44,8 +44,14 @@ When in doubt, include quotes anyway!
 
 ### Long strings
 
-[File:line-break-before.png|thumb|300px|Before line breaks are added]
-[File:line-break-after.png|thumb|300px|After line breaks are added with %br]
+<p align="center">
+  <a href="../img/line-break-before.png"><img src="../img/line-break-before.png"/></a><br/>
+  <i>|thumb|300px|Before line breaks are added</i>
+</p>
+<p align="center">
+  <a href="../img/line-break-after.png"><img src="../img/line-break-after.png"/></a><br/>
+  <i>|thumb|300px|After line breaks are added with %br</i>
+</p>
 
 You can spread a long string over multiple lines by prefixing it with the `&amp;gt;` character, like this:
 

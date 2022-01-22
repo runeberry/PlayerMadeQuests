@@ -15,8 +15,14 @@ That said, there are some differences between PMQ and WoW that you will likely e
 
 ## How to write quests
 
-[File:ogre1.png|thumb|Example rendering of the **start** block and quest **description** text]
-[File:ogre2.png|thumb|Example rendering of the **complete** block and quest **completion** text]
+<p align="center">
+  <a href="../img/ogre1.png"><img src="../img/ogre1.png"/></a><br/>
+  <i>|thumb|Example rendering of the **start** block and quest **description** text</i>
+</p>
+<p align="center">
+  <a href="../img/ogre2.png"><img src="../img/ogre2.png"/></a><br/>
+  <i>|thumb|Example rendering of the **complete** block and quest **completion** text</i>
+</p>
 
 PMQ quests are written in-game with a short YAML script. If you're not familiar with YAML, consider reading up on this short [YAML Crash Course](../guides/yaml-crash-course.md) to learn everything you need to know for writing quests in PMQ. If you're comfortable writing simple macros in WoW, then you should have no problem picking up the basics of YAML.
 

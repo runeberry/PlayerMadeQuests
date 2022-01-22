@@ -4,8 +4,14 @@ A quest **objective** is an action you must take in order to make progress towar
 
 ## Writing Objectives
 
-[File:Objectives1.png|thumb|300px|Quest objectives as shown in quest info]
-[File:QuestLog2.png|thumb|300px|Quest objectives as shown in the quest log]
+<p align="center">
+  <a href="img/Objectives1.png"><img src="img/Objectives1.png"/></a><br/>
+  <i>|thumb|300px|Quest objectives as shown in quest info</i>
+</p>
+<p align="center">
+  <a href="img/QuestLog2.png"><img src="img/QuestLog2.png"/></a><br/>
+  <i>|thumb|300px|Quest objectives as shown in the quest log</i>
+</p>
 
 All objectives are written under the `objectives` property in QuestScript, and each objective must be preceded by a `-`. Here are some formatting examples:
 

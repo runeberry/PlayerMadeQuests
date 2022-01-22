@@ -1,7 +1,13 @@
 # Start & Complete Objectives
 
-[File:startcomplete1.png|thumb|300px|Quest **description** text and **start** block rendered as quest info]
-[File:startcomplete2.png|thumb|300px|Quest **completion** text and **complete** block rendered as quest info]
+<p align="center">
+  <a href="img/startcomplete1.png"><img src="img/startcomplete1.png"/></a><br/>
+  <i>|thumb|300px|Quest **description** text and **start** block rendered as quest info</i>
+</p>
+<p align="center">
+  <a href="img/startcomplete2.png"><img src="img/startcomplete2.png"/></a><br/>
+  <i>|thumb|300px|Quest **completion** text and **complete** block rendered as quest info</i>
+</p>
 
 By default, quests written in PMQ can be started anywhere in the world at any time, simply by selecting the quest from the catalog or by being invited from another player. Similarly, quests can be completed from anywhere by simply opening the quest once all objectives are completed and clicking "Complete Quest".
 
