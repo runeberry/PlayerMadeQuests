@@ -56,31 +56,30 @@ You may also notice the use of `%z` in the text above. This will get populated w
 
 You can use special variables in your display text string to show the value of different parameters for that objective.
 
-| Parameter values |
-|---|
-| **%a**, [aura](../parameters/aura.md) |
-| **%co**, [coords](../parameters/coords.md) |
-| **%ch**, [channel](../parameters/channel.md) |
-| **%e**, [equip](../parameters/equip.md) |
-| **%em**, [emote](../parameters/emote.md) |
-| **%g**, [goal](../parameters/goal.md) |
-| **%i**, [item](../parameters/item.md) |
-| **%lang**, [language](../parameters/language.md) |
-| **%msg**, [message](../parameters/message.md) |
-| **%p**, [progress](../parameters/goal.md) |
-| **%t**, [target](../parameters/target.md) or [recipient](../parameters/recipient.md) |
-| **%sz**, [subzone](../parameters/zone.md) |
-| **%z**, [zone](../parameters/zone.md) |
-| **Derived Values** |
-| **%g2**, prints **goal** only if goal > 1 |
-| **%p2**, prints **progress** only if progress < goal |
-| **%r**, radius of **coords** |
-| **%x**, x-coordinate of **coords** |
-| **%xy**, **coords** formatted as: `(x, y)` |
-| **%xyr**, **coords** formatted as: `(x, y) +/- radius` |
-| **%xyz**, location formatted as: `(x, y) in zone in subzone` |
-| **%y**, y-coordinate of **coords** |
-| **%z2**, location formatted as: `zone in subzone` |
+| Variable | Description |
+|---|---|
+| **%a** | [aura](../parameters/aura.md) |
+| **%co** | [coords](../parameters/coords.md) |
+| **%ch** | [channel](../parameters/channel.md) |
+| **%e** | [equip](../parameters/equip.md) |
+| **%em** | [emote](../parameters/emote.md) |
+| **%g** | [goal](../parameters/goal.md) |
+| **%i** | [item](../parameters/item.md) |
+| **%lang** | [language](../parameters/language.md) |
+| **%msg** | [message](../parameters/message.md) |
+| **%p** | [progress](../parameters/goal.md) |
+| **%t** | [target](../parameters/target.md) or [recipient](../parameters/recipient.md) |
+| **%sz** | [subzone](../parameters/zone.md) |
+| **%z** | [zone](../parameters/zone.md) |
+| **%g2** | prints **goal** only if goal > 1 |
+| **%p2** | prints **progress** only if progress < goal |
+| **%r** | radius of **coords** |
+| **%x** | x-coordinate of **coords** |
+| **%xy** | **coords** formatted as: `(x, y)` |
+| **%xyr** | **coords** formatted as: `(x, y) +/- radius` |
+| **%xyz** | location formatted as: `(x, y) in zone in subzone` |
+| **%y** | y-coordinate of **coords** |
+| **%z2** | location formatted as: `zone in subzone` |
 
 ## Quest-level variables
 
@@ -92,19 +91,16 @@ The `%gen` variable is intended to be used as a flag that can result in differen
 quest:
   name: Joining the Team
   description: So you're the infamous %name, huh? Aren't you kinda short for a %race?
-  completion: Well I'll be, you actually did it! Not bad for a %class. Glad to have a [%gen:guy{{!```gal] like you on our team.
-}}
+  completion: Well I'll be, you actually did it! Not bad for a %class. Glad to have a [%gen:guy|gal] like you on our team.
 ```
 
-| Player Info |
-|---|
-| **%name**, The player's name |
-| **%class**, The player's class (e.g. "Mage") |
-| **%race**, The player's race (e.g. "Tauren") |
-| **%gen**, The player's gender flag (see example above) |
-| **Quest Info** |
-| **%author**, The name of the player who wrote the quest |
-| **%giver**, The name of the player who shared the quest (changes every time the quest is shared) |
-| **Formatting** |
-| **%n**, newline for [long strings](../guides/yaml-crash-course.md) |
-| **%br**, line-break (double newline) for [long strings](../guides/yaml-crash-course.md) |
+| Variable | Description
+|---|---|
+| **%name** | The player's name |
+| **%class** | The player's class (e.g. "Mage") |
+| **%race** | The player's race (e.g. "Tauren") |
+| **%gen** | The player's gender flag (see example above) |
+| **%author** | The name of the player who wrote the quest |
+| **%giver** | The name of the player who shared the quest (changes every time the quest is shared) |
+| **%n** | newline for [long strings](../guides/yaml-crash-course.md) |
+| **%br** | line-break (double newline) for [long strings](../guides/yaml-crash-course.md) |
