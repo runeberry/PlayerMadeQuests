@@ -6,7 +6,7 @@ The **cast-spell** objective is triggered whenever the player successfully casts
 
 This objective is not limited to just magical spells; it can be invoked by a variety of in-game actions related to abilities, items, or interactions within the world. PMQ includes features to help you find the right names and IDs for spells in the game - see the [spell](../parameters/spell.md) condition page for more information.
 
-### Shorthand
+## Shorthand
 
 ```yaml
 objectives:
@@ -18,7 +18,7 @@ objectives:
   - cast-spell 5 Frostbolt "Stonetusk Boar" # Cast Frostbolt on 3 different Stonetusk Boars
 ```
 
-### Long form
+## Long form
 
 ```yaml
 objectives:
@@ -42,7 +42,7 @@ objectives:
 
 _*required_
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|
@@ -60,6 +60,6 @@ _*required_
 | [text](../parameters/text.md) | Custom display text for this objective |
 | [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md)<br/>[coords](../parameters/coords.md) | The location you must be in when casting the spell |
 
-### Usage notes
+## Usage notes
 
 * This objective relies on caching player/NPC data while you're playing the game. For more information, see [Save Data & Cache](../guides/save-data.md).

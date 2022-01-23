@@ -6,7 +6,7 @@ The **use-emote** objective is triggered whenever you use an emote, such as `/da
 
 If your goal is to use an emote more than 1 time on a target NPC, you must use the emote on different instances of that NPC (e.g. 3 different "Stormwind Guard" NPCs) in order to complete the objective.
 
-### Shorthand
+## Shorthand
 
 ```yaml
 objectives:
@@ -15,7 +15,7 @@ objectives:
 
 _*required_
 
-### Long form
+## Long form
 
 ```yaml
 objectives:
@@ -36,7 +36,7 @@ objectives:
       text: "Custom display text"
 ```
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|

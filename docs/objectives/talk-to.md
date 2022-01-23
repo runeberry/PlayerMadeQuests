@@ -8,7 +8,7 @@ If your goal is to talk to more than 1 of a target NPC, you must talk to differe
 
 In case you cannot talk to the target NPC in game (for example, if you've finished all of their quests and they no longer have any dialogue), then PMQ allows you to use the **/talk** emote on the NPC in order to progress this objective. You must be near the NPC (within approximately 10 yards) in order for this to work.
 
-### Shorthand
+## Shorthand
 
 ```yaml
 objectives:
@@ -17,7 +17,7 @@ objectives:
 
 _*required_
 
-### Long form
+## Long form
 
 ```yaml
 objectives:
@@ -33,7 +33,7 @@ objectives:
       text: "Custom display text"
 ```
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|

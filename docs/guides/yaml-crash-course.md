@@ -4,7 +4,7 @@
 
 **YAML** (which stands for "YAML Ain't Markup Language" - yes, really) is a simple language intended for writing configuration files that can be easily read and understood by humans, but also easily parsed by computers. This guide will give you a brief rundown on everything you need to know about YAML to write quests in PMQ.
 
-### Properties and values
+## Properties and values
 
 ```yaml
 name: Ragnaros    # this is a string - a line of text
@@ -16,7 +16,7 @@ In this example, we have a simple YAML document with 3 properties: `name`, `leve
 
 In addition, everything after a `#` character is a comment, which means it will not be interpreted as YAML. I've added some comments explaining what type each value is.
 
-### String quotation
+## String quotation
 
 When writing out simple string values in YAML, quotes are generally optional. The following values will all be interpreted in the same way:
 
@@ -44,7 +44,7 @@ objectives:
 
 When in doubt, include quotes anyway!
 
-### Long strings
+## Long strings
 
 <table>
   <tr>
@@ -81,7 +81,7 @@ quest:
     Dancin' till the break of dawn
 ```
 
-### Block indentation
+## Block indentation
 
 ```yaml
 name: Malfurion
@@ -98,7 +98,7 @@ pet: { name: Tricky, species: Raptor, level: 35 }
 
 You can nest properties inside other properties to form a block. This is achieved by simply indenting a line more. It doesn't matter how much you indent the line, as long as you are consistent throughout your YAML document. We recommend indenting with 2 or 4 spaces per level.
 
-### Sequences
+## Sequences
 
 ```yaml
 name: Malfurion
@@ -121,7 +121,7 @@ objectives:
       subzone: Goldshire
 ```
 
-### More information
+## More information
 
 * [YAML cheatsheet](https://cheat.readthedocs.io/en/latest/yaml.html) - a short cheatsheet with just the basics of YAML.
 * [lua-tinyyaml](https://github.com/peposso/lua-tinyyaml) - the YAML parser library used in PMQ. Not all features of YAML are supported by this library, so you may want to poke around here if you're trying to use more advanced YAML features and they're not working.

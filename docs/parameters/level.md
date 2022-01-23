@@ -4,13 +4,13 @@
 
 The **level** parameter allows you to specify the minimum level that a target must be in order to complete an objective.
 
-### Value type
+## Value type
 
 * Number - the minimum level of the target
 
 Currently, this number must be from 1-73 (the maximum visible level for monsters in TBC).
 
-### Supported objectives
+## Supported objectives
 
 | Objective | How it's used |
 |---|---|
@@ -20,6 +20,6 @@ Currently, this number must be from 1-73 (the maximum visible level for monsters
 
 This parameter can also be used as a [quest requirement or recommendation](../guides/requirements.md).
 
-### Usage notes
+## Usage notes
 
 * TBD

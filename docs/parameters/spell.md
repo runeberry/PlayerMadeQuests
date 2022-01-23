@@ -4,7 +4,7 @@
 
 The **spell** parameter lets you specify which spell(s) must be cast in order to complete an objective.
 
-### Value type
+## Value type
 
 * String - The name of the spell (case-insensitive)
 * Number - The ID of the spell
@@ -22,13 +22,13 @@ objectives:
 
 See the guide below for more info on how to get spells by name to use in your quests.
 
-### Supported objectives
+## Supported objectives
 
 | Objective | How it's used |
 |---|---|
 | [cast-spell](../objectives/cast-spell.md) | The spell you must cast |
 
-### Getting spells by name
+## Getting spells by name
 
 PMQ requires you to provide valid in-game spells in all your quests; your quests will fail validation if any spell names or IDs cannot be found in-game. If you use valid spell IDs (numbers), then you should encounter no problems with looking up your spells. However, the WoW API has a peculiar limitation: you can only get spells by *name* if that spell is **in your current spellbook**. For example, if you try to reference the spell "Blessing of Might" by name while on a Hunter, the WoW API will tell you that this spell does not exist.
 
@@ -42,7 +42,7 @@ Fortunately, PMQ offers some solutions to work around this limitation so that yo
 
 Finally, you can erase all cached spell names from PMQ with the chat command `/pmq clear-spells`.
 
-### Discovering spells
+## Discovering spells
 
 <p align="center">
   <a href="../assets/images/spell-watch.png"><img src="../assets/images/spell-watch.png"/></a><br/>

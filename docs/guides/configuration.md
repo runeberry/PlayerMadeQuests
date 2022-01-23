@@ -9,14 +9,14 @@
 
 This page outlines the settings you can configure in PMQ.
 
-### Notes
+## Notes
 
 * Settings outlined in gray are set to PMQ's default values, while settings in yellow have been modified by the player. You can reset individual settings or all settings using the buttons in the Configuration menu.
 * All settings are currently character-bound, not account-bound.
 * You must `/reload` your UI in order for (most) configuration changes to take effect. This may change in a future release, but for now the settings are fixed in place when the addon loads.
 * There are plans for a more robust configuration UI to be developed in the future. However, for now this is the quickest way to add new settings without adding additional UI work.
 
-### Settings
+## Settings
 
 | Setting | Expected Value | Description |
 |---|---|---|

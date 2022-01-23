@@ -4,11 +4,11 @@
 
 The **zone** and **subzone** parameters are used to specify the names of in-game areas where an objective must be completed.
 
-### Value type
+## Value type
 
 * String - the name of a zone or subzone as it appears in-game
 
-### Supported objectives
+## Supported objectives
 
 | Objective | How it's used |
 |---|---|
@@ -24,7 +24,7 @@ The **zone** and **subzone** parameters are used to specify the names of in-game
 
 This parameter can also be used as a [start or complete condition](../guides/start-complete.md).
 
-### Usage notes
+## Usage notes
 
 * Zone and subzone are completely interchangeable - both parameters will look at both your current zone and subzone for a match when evaluating objectives.
 * The zone's name must be spelled and capitalized exactly as it is in-game in order for the objective to progress.

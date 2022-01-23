@@ -4,11 +4,11 @@
 
 The **text** parameter allows you to precisely define how your quest information will be displayed when it's presented to players. PMQ will automatically generate text for your quest objectives, requirements, and more based on the information that you provide, but overriding this with the **text** parameter will allow you to give your quests a little more personality beyond the standard text.
 
-### Value type
+## Value type
 
 * String or table - you can specify a single text string that will be used for all use cases, or you can specify different strings for each use case. See the examples below.
 
-### Supported objectives
+## Supported objectives
 
 | Objective | How it's used |
 |---|---|
@@ -24,7 +24,7 @@ The **text** parameter allows you to precisely define how your quest information
 
 Custom display text can also be used with a [start and complete conditions](../guides/start-complete.md) as well as [quest requirements](../guides/requirements.md).
 
-### Usage notes
+## Usage notes
 
 ```yaml
 start:
@@ -52,7 +52,7 @@ With this configuration, you will see different custom text displayed in the que
 
 You may also notice the use of `%z` in the text above. This will get populated with the value of `zone` when the text is displayed. Each objective supports a set of these variables for custom text to reduce the amount of repetition in your script - these variables are listed below.
 
-### Display text variables
+## Display text variables
 
 You can use special variables in your display text string to show the value of different parameters for that objective.
 
@@ -82,7 +82,7 @@ You can use special variables in your display text string to show the value of d
 | **%y**, y-coordinate of **coords** |
 | **%z2**, location formatted as: `zone in subzone` |
 
-### Quest-level variables
+## Quest-level variables
 
 The following variables can be used in the quest's `description` or `completion` fields to provide some dynamic flair to your quest text. The Player Info variables will change based on the player who's currently playing the quest.
 

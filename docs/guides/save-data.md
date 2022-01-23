@@ -4,7 +4,7 @@
 
 The **Save Data & Cache** menu allows you to manage various pieces of save data that PMQ generates while you use the addon.
 
-### Overview
+## Overview
 
 <p align="center">
   <a href="../assets/images/save-data-menu.png"><img src="../assets/images/save-data-menu.png" width="50%"/></a><br/>
@@ -23,7 +23,7 @@ To work around this, PMQ **caches**, or stores a copy of, data about the game wo
 
 Cached data is shared across **all characters** on your Battle.net account.
 
-### Player Data Cache
+## Player Data Cache
 
 PMQ caches data about other players whenever you target a player, mouseover a player, or join a party or raid group. Any player that you have "seen" in one of these ways should be an eligible target for quest objective completion. For example, in order to get credit for killing a level 30+ player, you must have targeted, moused over, or grouped with that player at some point, so PMQ can know what level they were before you killed them. With that in mind, there are some edge cases to watch out for:
 
@@ -38,7 +38,7 @@ Menu options:
 * **Print All**: Prints all cached player data to your chat window, including the name, guild, faction, level, sex, and race for each player you've seen. If your cache is large, then you may not see all entries in the chat window.
 * **Delete All**: Deletes all cached information about players that you've seen.
 
-### NPC Data Cache
+## NPC Data Cache
 
 PMQ caches data about NPCs whenever you target or mouseover them. The same rules that applies to Player data also apply to NPCs, with the exception that some data points are exclusive to players and unavailable (or not reliable) from NPCs (such as class, race, sex, or guild).
 
@@ -49,7 +49,7 @@ Menu options:
 * **Print All**: Prints all cached NPC data to your chat window, including the name, faction, and level range for each NPC you've seen. If your cache is large, then you may not see all entries in the chat window.
 * **Delete All**: Deletes all cached information about NPCs that you've seen.
 
-### Item Data Cache
+## Item Data Cache
 
 Menu options:
 
@@ -57,7 +57,7 @@ Menu options:
 * **Begin Scan**: Starts looking for valid item IDs from 1 to 184K, and caches any item information found with those IDs. This scan takes around **20-30 minutes** and should find just under 30K items in TBC. You can let this run in the background while you play, but encountering any loading screen may interrupt the scan.
 * **Delete All**: Deletes all item information in the cache. You'll need to scan again to restore a full database of items.
 
-### Spell Data Cache
+## Spell Data Cache
 
 Menu options:
 
@@ -65,7 +65,7 @@ Menu options:
 * **Begin Scan**: Starts looking for valid spell IDs from 1 to 50K, and caches any spell information found with those IDs. This scan takes around **2-3 minutes** and should find around 15K spells in TBC. You can let this run in the background while you play, but encountering any loading screen may interrupt the scan.
 * **Delete All**: Deletes all spell information in the cache. You'll need to scan again to restore a full database of spells.
 
-### Other Menu Options
+## Other Menu Options
 
 * **Reset Frame Positions**: This will delete the saved position of any popout menus within PMQ (such as the Quest Log or Location Finder). Menus should immediately return to their default positions when this is run. Click this if you ever lose a popout menu by accidentally dragging it off screen.
 * **Reset All Save Data**: This will delete all of the save data managed by PMQ, including data caches, frame positions, as well as **quest drafts and quest completions**. Use this as an absolute last resort in case your PMQ save data gets somehow corrupted.

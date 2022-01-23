@@ -4,11 +4,11 @@
 
 The **aura** parameter allows you to specify any aura (buff or debuff) that the player must have in order to trigger an objective.
 
-### Value type
+## Value type
 
 * String - the name of the aura as it appears in-game
 
-### Supported objectives
+## Supported objectives
 
 | Objective | How it's used |
 |---|---|
@@ -22,7 +22,7 @@ The **aura** parameter allows you to specify any aura (buff or debuff) that the 
 | [talk-to](../objectives/talk-to.md) | The aura you must have when talking to the target NPC |
 | [use-emote](../objectives/use-emote.md) | The aura you must have when performing the emote |
 
-### Usage notes
+## Usage notes
 
 * The aura's name must be spelled and capitalized exactly as it is in-game in order for the objective to progress.
 * Currently, there is no localization implemented in the addon, so players using a client in a different language (where the aura has a different name) will not be able to progress the objective. The initial release of PMQ is targeting English-language clients only, with localization to come later.

@@ -4,7 +4,7 @@
 
 The **message** parameter allows you to specify a phrase or pattern that must be spoken by the player in order to complete an objective.
 
-### Value type
+## Value type
 
 * String - the phrase or pattern that the player must say.
 
@@ -19,13 +19,13 @@ Note that all values for message are **case-insensitive**, meaning that "happy b
 | "birthday$" | The message must end with the word "birthday" |
 | "^happy bar mitzvah!$" | The message must be exactly the phrase "happy bar mitzvah | " with nothing else before or after it |
 
-### Supported objectives
+## Supported objectives
 
 | Objective | How it's used |
 |---|---|
 | [say](../objectives/say.md) | The message which the player must say in order to complete the objective |
 
-### Usage notes
+## Usage notes
 
 * While Lua patterns are case-sensitive, the value for this message parameter is intentionally **not case-sensitive**, meaning that you cannot force a player to say something in a specific casing style. For example, if you specify the pattern "Happy Birthday", then a player will be able to say "happy birthday" to satisfy the condition. As such, it's recommended to keep your patterns for message to all lowercase letters, for simplicity.
 * It can be somewhat tedious to test complex message patterns in-game, so until there is a better testing method included with PMQ, consider using this [Online Lua Compiler](https://rextester.com/l/lua_online_compiler) to test which phrases will or will not work with your message pattern. Simply copy/paste the following code into the editor linked, and click **Run it (F8)** to print the results below the code editor. Of course, you'll want to change out the pattern and chat messages in the below code to suit your needs.

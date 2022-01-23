@@ -4,7 +4,7 @@
 
 The **class** parameter allows you to specify the class that a player target must be in order to complete an objective.
 
-### Value type
+## Value type
 
 * String - the name of a playable class
 
@@ -20,7 +20,7 @@ The following class values are supported for TBC:
 * Warlock
 * Warrior
 
-### Supported objectives
+## Supported objectives
 
 | Objective | How it's used |
 |---|---|
@@ -30,6 +30,6 @@ The following class values are supported for TBC:
 
 This parameter can also be used as a [quest requirement or recommendation](../guides/requirements.md).
 
-### Usage notes
+## Usage notes
 
 * TBD

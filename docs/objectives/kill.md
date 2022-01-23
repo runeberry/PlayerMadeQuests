@@ -4,7 +4,7 @@
 
 The **kill** objective is triggered whenever you or someone in your party kills a monster or NPC in combat. Your party must have the tag on an enemy when it dies in order to gain progress.
 
-### Shorthand
+## Shorthand
 
 ```yaml
 objectives:
@@ -13,7 +13,7 @@ objectives:
 
 _*required_
 
-### Long form
+## Long form
 
 ```yaml
 objectives:
@@ -33,7 +33,7 @@ objectives:
       text: "Custom display text"
 ```
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|
@@ -49,7 +49,7 @@ objectives:
 | [text](../parameters/text.md) | Custom display text for this objective |
 | [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md)<br/>[coords](../parameters/coords.md) | The location you must be in when killing the target |
 
-### Notes
+## Notes
 
 * This objective contains additional logic to count players' pet contributions as kills. In short, when your pet attacks any target, you will get kill credit for that target when it dies. This behavior can be toggled off with the FEATURE_PET_KILLS setting in the [Configuration](../guides/Configuration.md) menu. If this behavior is inaccurate or causing problems, let us known on Discord!
 * This objective relies on caching player/NPC data while you're playing the game. For more information, see [Save Data & Cache](../guides/save-data.md).

@@ -4,7 +4,7 @@
 
 The **equip-item** objective is triggered whenever you equip an item.
 
-### Shorthand
+## Shorthand
 
 ```yaml
 objectives:
@@ -13,7 +13,7 @@ objectives:
 
 _*required_
 
-### Long form
+## Long form
 
 ```yaml
 objectives:
@@ -27,7 +27,7 @@ objectives:
       text: "Custom display text"
 ```
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|

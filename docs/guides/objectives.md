@@ -39,7 +39,7 @@ objectives:
     - kill 5 "Mangy Wolf"   # indented too far
 ```
 
-### Shorthand
+## Shorthand
 
 Each objective supports a "shorthand" format, which lets you quickly write an objective with only the most basic parameters in a single line. The parameters supported by the shorthand form are different for each objective.
 
@@ -60,7 +60,7 @@ Note that multi-word phrases like "Mangy Wolf" must be written with quotes in or
 
 The help page for each objective (linked below) will outline the parameters supported by that objective's shorthand form.
 
-### Long-form
+## Long-form
 
 If you want to access the full set of parameters for an objective, you can write it out in its complete form, where each parameter of the objective is defined explicitly. For example, the last example would be written in long-form as:
 

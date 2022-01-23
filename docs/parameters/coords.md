@@ -4,7 +4,7 @@
 
 The **coords** parameter allow you to specify the `x,y` coordinates that need to be visited within a zone, as well as the `radius` you must be from those coordinates in order to progress an objective.
 
-### Value type
+## Value type
 
 * String - The **coords** value is expressed as a comma-separated string that is parsed into `x`, `y`, and `radius` values at runtime. The values must be in the following ranges:
 * `x` and `y` must be between 0.00 and 100.00, representing coordinate values on the map
@@ -50,7 +50,7 @@ objectives:
 
 The player must enter the box bounded by the top-left coordinate (37.2, 46.5) and the bottom-right coordinate (39.2, 48.5) in [Elwynn Forest](https://wow.gamepedia.com/Elwynn_Forest) order to complete the objective.
 
-### Supported objectives
+## Supported objectives
 
 | Objective | How it's used |
 |---|---|
@@ -65,7 +65,7 @@ The player must enter the box bounded by the top-left coordinate (37.2, 46.5) an
 
 This parameter can also be used as a [start or complete condition](../guides/start-complete.md).
 
-### Usage notes
+## Usage notes
 
 * A distance of one "coordinate value" is vastly different between zones, since all map coordinates are normalized to 100 x 100 units. This means that a radius of 0.5 units is much larger in the Barrens compared to Deadwind Pass, since the Barrens is a much larger map.
 * The coordinates + radius currently form a square in which the player must explore. This may change to a circle in a future release.

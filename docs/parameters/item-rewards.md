@@ -6,7 +6,7 @@
 
 The **item** parameter of a quest reward allows you to specify one or more items that will be rewarded upon completion of a quest. You can also declare that a player must **choose** one item from the list rather than receive all of them - see [Rewards](../guides/rewards.md) for more info.
 
-### Value type
+## Value type
 
 * String - the name of the item as it appears in game, along with an optional quantity
 
@@ -51,7 +51,7 @@ The **item** parameter of a quest reward allows you to specify one or more items
       quantity: 5
 ```
 
-### Getting items by name
+## Getting items by name
 
 PMQ requires that all item names must be valid in-game item names so that the icon, tooltip, etc. can be retrieving using the WoW API. However, one of the limitation of the WoW API is that some of this information cannot be retrieved by name unless you have **encountered that item during your current game session**, meaning you've seen that item in your bags, bank, etc. PMQ adds an extra layer of functionality so that items that you have encountered will be written to a save file shared by all of your characters - meaning that if you encounter an item once on any character, you can then refer to it by name on all characters as, even between sessions.
 

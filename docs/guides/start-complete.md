@@ -28,14 +28,14 @@ complete:
   target: Innkeeper Farley
 ```
 
-### What's the difference?
+## What's the difference?
 
 Both properties support all the same parameters and are evaluated in the same way. The only difference is when they're evaluated during a quest.
 
 * **start** - What conditions are required before the player can accept the quest (click the "Accept" button)?
 * **complete** - What conditions are required in order for the player to turn in the quest (click the "Complete Quest" button)?
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|
@@ -44,7 +44,7 @@ Both properties support all the same parameters and are evaluated in the same wa
 | [text](../parameters/text.md) | Custom display text for the start or complete condition |
 | [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md) | The name of the zone and/or subzone where the quest starts or ends |
 
-### [Display Text](../parameters/text.md) variables
+## [Display Text](../parameters/text.md) variables
 
 | Variable | Parameter |
 |---|---|

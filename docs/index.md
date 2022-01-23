@@ -65,7 +65,7 @@ Several playable demo quests are provided with PMQ to help you learn how to writ
 * [text](parameters/text.md)
 * [zone](parameters/zone.md)
 
-# Screenshots
+## Screenshots
 
 <table>
   <tr>

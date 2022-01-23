@@ -6,7 +6,7 @@ The **explore** objective is used to direct a player to go to a specific area fo
 
 When you enter a zone or subzone in which you have an objective to explore certain coordinates, PMQ will begin polling on an interval to see if you're within the designated radius of those coordinates. PMQ will stop polling for your location when you leave the area of that objective or complete that objective.
 
-### Shorthand
+## Shorthand
 
 ```yaml
 objectives:
@@ -15,7 +15,7 @@ objectives:
 
 _*required_
 
-### Long form
+## Long form
 
 ```yaml
 objectives:
@@ -29,7 +29,7 @@ objectives:
       text: "Custom display text"
 ```
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|

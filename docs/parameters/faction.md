@@ -4,11 +4,11 @@
 
 The **faction** parameter allows you to specify that a target player or NPC must be a member of either the Alliance or the Horde in order to complete an objective.
 
-### Value type
+## Value type
 
 * String - either **Alliance** or **Horde**
 
-### Supported objectives
+## Supported objectives
 
 | Objective | How it's used |
 |---|---|
@@ -18,6 +18,6 @@ The **faction** parameter allows you to specify that a target player or NPC must
 
 This parameter can also be used as a [quest requirement or recommendation](../guides/requirements.md).
 
-### Usage notes
+## Usage notes
 
 * TBD

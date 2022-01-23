@@ -25,14 +25,14 @@ recommended:
   faction: Horde
 ```
 
-### What's the difference?
+## What's the difference?
 
 Both of these properties support all the same parameters and are evaluated in the same way. The only difference is in how they are presented to players when they attempt to start your quest.
 
 * **required** - Players will not be allowed to start your quest if they do not meet the required parameters.
 * **recommended** - Players will be prompted with an additional warning dialog when they try to start a quest without the recommended parameters, during which they can choose to start the quest anyway.
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|

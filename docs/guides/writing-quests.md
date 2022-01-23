@@ -1,25 +1,23 @@
-# Writing Quests
+# How quests are played in PMQ
 
 <a href="../index.md"><sub>← Home</sub></a>
-
-## How quests are played in PMQ
 
 PMQ was designed to emulate the look and feel of WoW: Classic quests as closely as possible, while still offering enough features and flexibility for players to design truly unique quests that stand apart from those in game. So if you've ever done any questing in WoW: Classic, you will quickly understand how quests are played in PMQ.
 
 That said, there are some differences between PMQ and WoW that you will likely encounter. Let's go over the general gameplay loop for PMQ quests:
 
-### Accepting a quest
+## Accepting a quest
 
 You'll be prompted to start a quest when another character shares one with you, when you're testing out a draft that you've written, or when you want to play one of the demo quests packaged with PMQ. Many quests can be started anywhere in the world by any character, but some quests may have additional restrictions:
 
 * Quests can have additional **[Requirements](../guides/requirements.md)** you will need to meet in order to accept the quest, such as level or class requirements.
 * Quests may require you to be in a certain area, near a certain NPC or meet some other **[start condition](../guides/start-complete.md)** in order to accept the quest.
 
-### Completing objectives
+## Completing objectives
 
 Most quests will have one or more **[Objectives](../guides/objectives.md)** to complete. Objectives can include killing monsters, talking to NPCs, exploring areas, and much more. Some objectives only need to be completed once, such as exploring an area. But other objectives must be completed multiple times, such as killing 5 of a monster. This number is known as the **[Goal](../parameters/goal.md)** for this objective, and the objective is considered complete when your **progress** is greater than or equal to the goal.
 
-### Turning in a quest
+## Turning in a quest
 
 After you've completed all objectives for a quest, the quest itself is considered complete. But you will still need to turn in the quest to consider it "finished". Like when accepting a quest, many quests can be finished anywhere at anytime, but some quests may impose additional rules:
 #* Quests may require you to be in a certain area, near a certain NPC or meet some other **[complete condition](../guides/start-complete.md)** in order to finish the quest.

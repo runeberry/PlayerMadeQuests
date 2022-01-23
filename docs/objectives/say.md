@@ -4,7 +4,7 @@
 
 The **say** objective is triggered whenever you send a message to a chat channel. This objective requires you to send a message that meets a message containing a certain phrase, along with meeting any of the conditions outlined below.
 
-### Shorthand
+## Shorthand
 
 ```yaml
 objectives:
@@ -15,7 +15,7 @@ _*required_
 
 Note that this shorthand form is not recommended for real quest objectives, only for quickly testing phrases. Use the long form better quest objectives.
 
-### Long form
+## Long form
 
 ```yaml
 objectives:
@@ -33,7 +33,7 @@ objectives:
       text: "Custom display text"
 ```
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|
@@ -47,9 +47,9 @@ objectives:
 | [text](../parameters/text.md) | Custom display text for this objective |
 | [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md)<br/>[coords](../parameters/coords.md) | The location you must be in when saying the message |
 
-### Examples
+## Examples
 
-#### Secret messages
+### Secret messages
 
 You will likely want to change the default display text of the objective so that it doesn't reveal the exact text that the player should speak in order to progress. Consider the following example:
 

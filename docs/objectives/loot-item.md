@@ -8,7 +8,7 @@ The **loot-item** objective is triggered whenever you loot an item from any sour
 * Harvesting items with gathering skills
 * Looting items from containers (like lockboxes, world chests)
 
-### Shorthand
+## Shorthand
 
 ```yaml
 objectives:
@@ -17,7 +17,7 @@ objectives:
 
 _*required_
 
-### Long form
+## Long form
 
 ```yaml
 objectives:
@@ -32,7 +32,7 @@ objectives:
       text: "Custom display text"
 ```
 
-### Supported parameters
+## Supported parameters
 
 | Parameter | How it's used |
 |---|---|
