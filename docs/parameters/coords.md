@@ -1,3 +1,5 @@
+<a href="../index.md"><sub>← Home</sub></a>
+
 # coords
 
 The **coords** parameter allow you to specify the `x,y` coordinates that need to be visited within a zone, as well as the `radius` you must be from those coordinates in order to progress an objective.

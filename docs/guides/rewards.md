@@ -1,3 +1,5 @@
+<a href="../index.md"><sub>← Home</sub></a>
+
 # Rewards
 
 <table>

@@ -1,3 +1,5 @@
+<a href="../index.md"><sub>← Home</sub></a>
+
 # loot-item
 
 The **loot-item** objective is triggered whenever you loot an item from any source. Specifically, this is triggered by any event that can write a loot message to the chatbox. This includes:

@@ -1,3 +1,5 @@
+<a href="../index.md"><sub>← Home</sub></a>
+
 # Objectives
 
 A quest **objective** is an action you must take in order to make progress toward completing a quest.

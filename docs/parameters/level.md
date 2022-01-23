@@ -1,3 +1,5 @@
+<a href="../index.md"><sub>← Home</sub></a>
+
 # level
 
 The **level** parameter allows you to specify the minimum level that a target must be in order to complete an objective.

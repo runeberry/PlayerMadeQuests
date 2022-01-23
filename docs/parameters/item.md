@@ -1,3 +1,5 @@
+<a href="../index.md"><sub>← Home</sub></a>
+
 # item
 
 > _This page refers to items as they are used with [quest objectives](../guides/objectives.md). For items used as quest rewards, see [Item (Rewards)](../parameters/item-rewards.md)._
