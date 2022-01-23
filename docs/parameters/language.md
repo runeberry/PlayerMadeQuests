@@ -1,13 +1,13 @@
-# langauge
+# language
 
 <table>
   <tr>
     <td>
-      <a href="../img/Language_select.png"><img src="../img/Language_select.png"/></a><br/>
+      <a href="../assets/images/Language_select.png"><img src="../assets/images/Language_select.png"/></a><br/>
       <i>Left-click the speech bubble to select your spoken language</i>
     </td>
     <td>
-      <a href="../img/Language_skill.png"><img src="../img/Language_skill.png"/></a><br/>
+      <a href="../assets/images/Language_skill.png"><img src="../assets/images/Language_skill.png"/></a><br/>
       <i>A character's language skills as listed in WoW: Classic</i>
     </td>
   </tr>

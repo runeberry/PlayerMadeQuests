@@ -1,7 +1,7 @@
 # Configuration
 
 <p align="center">
-  <a href="../img/config-menu.png"><img src="../img/config-menu.png" width="50%"/></a><br/>
+  <a href="../assets/images/config-menu.png"><img src="../assets/images/config-menu.png" width="50%"/></a><br/>
   <i>The configuration menu in-game</i>
 </p>
 

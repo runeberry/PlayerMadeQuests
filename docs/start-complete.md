@@ -3,11 +3,11 @@
 <table>
   <tr>
     <td>
-      <a href="img/startcomplete1.png"><img src="img/startcomplete1.png"/></a><br/>
+      <a href="assets/images/startcomplete1.png"><img src="assets/images/startcomplete1.png"/></a><br/>
       <i>Quest description text and start block rendered as quest info</i>
     </td>
     <td>
-      <a href="img/startcomplete2.png"><img src="img/startcomplete2.png"/></a><br/>
+      <a href="assets/images/startcomplete2.png"><img src="assets/images/startcomplete2.png"/></a><br/>
       <i>Quest completion text and complete block rendered as quest info</i>
     </td>
   </tr>

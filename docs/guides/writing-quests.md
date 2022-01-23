@@ -27,11 +27,11 @@ After you've completed all objectives for a quest, the quest itself is considere
 <table>
   <tr>
     <td>
-      <a href="../img/ogre1.png"><img src="../img/ogre1.png"/></a><br/>
+      <a href="../assets/images/ogre1.png"><img src="../assets/images/ogre1.png"/></a><br/>
       <i>Example rendering of the start block and quest description text</i>
     </td>
     <td>
-      <a href="../img/ogre2.png"><img src="../img/ogre2.png"/></a><br/>
+      <a href="../assets/images/ogre2.png"><img src="../assets/images/ogre2.png"/></a><br/>
       <i>Example rendering of the complete block and quest completion text</i>
     </td>
   </tr>

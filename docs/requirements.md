@@ -3,11 +3,11 @@
 <table>
   <tr>
     <td>
-      <a href="img/Requirements.png"><img src="img/Requirements.png"/></a><br/>
+      <a href="assets/images/Requirements.png"><img src="assets/images/Requirements.png"/></a><br/>
       <i>Example of how quest requirements are rendered</i>
     </td>
     <td>
-      <a href="img/RecommendedWarning.png"><img src="img/RecommendedWarning.png"/></a><br/>
+      <a href="assets/images/RecommendedWarning.png"><img src="assets/images/RecommendedWarning.png"/></a><br/>
       <i>Warning if a player chooses to accept a quest which they don't meet the recommendations for</i>
     </td>
   </tr>

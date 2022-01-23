@@ -47,11 +47,11 @@ When in doubt, include quotes anyway!
 <table>
   <tr>
     <td>
-      <a href="../img/line-break-before.png"><img src="../img/line-break-before.png"/></a><br/>
+      <a href="../assets/images/line-break-before.png"><img src="../assets/images/line-break-before.png"/></a><br/>
       <i>Before line breaks are added</i>
     </td>
     <td>
-      <a href="../img/line-break-after.png"><img src="../img/line-break-after.png"/></a><br/>
+      <a href="../assets/images/line-break-after.png"><img src="../assets/images/line-break-after.png"/></a><br/>
       <i>After line breaks are added with %br</i>
     </td>
   </tr>
