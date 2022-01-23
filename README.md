@@ -4,33 +4,14 @@
 
 <h1 align="center">PlayerMadeQuests</h1>
 
-**PMQ is looking for contributors!**<br/>
-**Have experience developing WoW addons, and want to help? Message Dolphinspired on [Discord](https://discord.gg/U9cDAQg)!**
+> PlayerMadeQuests is **no longer being maintained**. You can download the final release from the links below. The contents of the wiki have been copied to this site for your reference.
+>
+> If you have questions, our [Discord](https://discord.gg/gHMjCgs) server is still open - feel free to stop by! If you're interested in continuing to develop PMQ, you can:
+> * Submit a [pull request](https://github.com/runeberry/PlayerMadeQuests/pulls), and reach out to Dolphinspired on Discord for review, or
+> * Fork the [repository](https://github.com/runeberry/PlayerMadeQuests) on GitHub, and publish your own version(s) of the addon
+>
+> To everyone out there who enjoyed the addon, thank you for your support!
 
-Create and share your own custom quests in World of Warcraft: Classic!
-
-* Download links:
-  * [**CurseForge**](https://www.curseforge.com/wow/addons/pmq) - Can be installed using the [CurseForge app](https://curseforge.overwolf.com/)
-  * [**Releases**](https://github.com/runeberry/PlayerMadeQuests/releases) - Download and install the PlayerMadeQuests.zip file manually.
-* [**PMQ Wiki**](https://pmq.runeberry.com) - Everything you need to know about writing quests
-* [**Discord**](https://discord.gg/U9cDAQg) - Ask questions, offer suggestions, report bugs, and share quest ideas here
-* [**Contributing Guidelines**](CONTRIBUTING.md) - For developers interesting in helping out with PMQ
-
-### Features
-
-* Write out your own custom quest with just a few lines of YAML script
-* **Demo Quests** - short quests provided with the addon to help you learn how to write your own
-* **Real-time Objective Tracking** - plays just like a World of Warcraft quest
-* **Quest Sharing** - share your quest with party members with the click of a button*
-* **Highly Customizable** - any and all quest text to tell the story (or joke) you want to tell
-* **Quest Replay** - you can replay any quests that you've finished previously
-
-*Party members must also have PMQ installed in order to receive shared quests
-
-### Upcoming plans for PMQ
-
-* **Quest Chains** - link multiple quests together to form a larger story
-* **Localization** - share quests reliably between different-language game clients
-* **Quest Builder UI** - build your quest with a friendlier user interface instead of writing script
-
-Check out the [Issues](https://github.com/runeberry/PlayerMadeQuests/issues) page for a big list of features in the works for PMQ.
+* Download PMQ from [CurseForge](https://www.curseforge.com/wow/addons/pmq) (can be installed through the [WowUp](https://wowup.io/) addon manager)
+* Download the latest release in a zip file directly from [Github](https://github.com/runeberry/PlayerMadeQuests/releases)
+* Read the docs [here](https://www.runeberry.com/PlayerMadeQuests)

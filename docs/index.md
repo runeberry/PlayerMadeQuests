@@ -1,15 +1,21 @@
 # PlayerMadeQuests
 
+> PlayerMadeQuests is **no longer being maintained**. You can download the final release from the links below. The contents of the wiki have been copied to this site for your reference.
+>
+> If you have questions, our [Discord](https://discord.gg/gHMjCgs) server is still open - feel free to stop by! If you're interested in continuing to develop PMQ, you can:
+> * Submit a [pull request](https://github.com/runeberry/PlayerMadeQuests/pulls), and reach out to Dolphinspired on Discord for review, or
+> * Fork the [repository](https://github.com/runeberry/PlayerMadeQuests) on GitHub, and publish your own version(s) of the addon
+>
+> To everyone out there who enjoyed the addon, thank you for your support!
+
 **PlayerMadeQuests (PMQ)** is an addon for [World of Warcraft: Classic](https://worldofwarcraft.com/en-us/wowclassic) that allows you to write your own custom quests, play them in-game, and share them with other players.
 
 Ready to try it out? You can get it here:
 
-* Download PMQ from [CurseForge](https://www.curseforge.com/wow/addons/pmq) (can be installed through the [CurseForge app](https://curseforge.overwolf.com/))
+* Download PMQ from [CurseForge](https://www.curseforge.com/wow/addons/pmq) (can be installed through the [WowUp](https://wowup.io/) addon manager)
 * Download the latest release in a zip file directly from [Github](https://github.com/runeberry/PlayerMadeQuests/releases)
 
 Several playable demo quests are provided with PMQ to help you learn how to write your own quests. Additional help and even more examples can be found on this Wiki.
-
-You can contribute to PMQ by giving us feedback during the Beta Test - join us on [Discord](https://discord.gg/gHMjCgs)!
 
 # Docs
 
