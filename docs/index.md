@@ -46,3 +46,7 @@ Several playable demo quests are provided with PMQ to help you learn how to writ
     </td>
   </tr>
 </table>
+
+### Testing an image
+
+![](assets/images/demo1.png)
