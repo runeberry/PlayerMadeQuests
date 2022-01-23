@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/pmq_logo_dark_256.png" />
+  <img src="docs/assets/images/pmq_logo_dark_256.png" />
 </div>
 
 <h1 align="center">PlayerMadeQuests</h1>
