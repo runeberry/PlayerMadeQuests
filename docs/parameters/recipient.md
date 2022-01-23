@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # recipient
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **recipient** parameter allows you to specify the name of a player which must receive an objective in order for it to be completed.
 

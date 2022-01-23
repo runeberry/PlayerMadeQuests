@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # language
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 <table>
   <tr>

@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # class
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **class** parameter allows you to specify the class that a player target must be in order to complete an objective.
 

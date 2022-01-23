@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # kill
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **kill** objective is triggered whenever you or someone in your party kills a monster or NPC in combat. Your party must have the tag on an enemy when it dies in order to gain progress.
 

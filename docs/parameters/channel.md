@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # channel
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **channel** parameter allows you to specify the channel through which a [message](../parameters/message.md) must be sent in order to satisfy an objective.
 

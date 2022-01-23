@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # spell
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **spell** parameter lets you specify which spell(s) must be cast in order to complete an objective.
 

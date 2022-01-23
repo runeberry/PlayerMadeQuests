@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # Writing Quests
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 ## How quests are played in PMQ
 

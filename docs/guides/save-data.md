@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # Save Data & Cache
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **Save Data & Cache** menu allows you to manage various pieces of save data that PMQ generates while you use the addon.
 

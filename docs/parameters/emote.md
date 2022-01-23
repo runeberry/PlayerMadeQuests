@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # emote
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **emote** parameter is only available for use with the [use-emote](../objectives/use-emote.md) objective. It allows you to specify which emote should trigger the objective.
 

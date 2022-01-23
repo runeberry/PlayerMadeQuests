@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # zone
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **zone** and **subzone** parameters are used to specify the names of in-game areas where an objective must be completed.
 

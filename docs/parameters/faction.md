@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # faction
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **faction** parameter allows you to specify that a target player or NPC must be a member of either the Alliance or the Horde in order to complete an objective.
 

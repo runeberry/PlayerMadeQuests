@@ -1,6 +1,6 @@
-<a href="../index.md"><sub>← Home</sub></a>
-
 # gain-aura
+
+<a href="../index.md"><sub>← Home</sub></a>
 
 The **gain-aura** objective is triggered whenever you gain a buff or debuff.
 
