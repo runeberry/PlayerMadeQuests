@@ -1,6 +1,6 @@
 # Configuration
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 <p align="center">
   <a href="../assets/images/config-menu.png"><img src="../assets/images/config-menu.png" width="50%"/></a><br/>

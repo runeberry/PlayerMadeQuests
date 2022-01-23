@@ -1,6 +1,6 @@
 # goal
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **goal** parameter is available to most objectives to specify how many times that objective must be triggered in order to be marked "complete". For example, in the objective "kill 5 Chicken", `5` is considered the goal.
 

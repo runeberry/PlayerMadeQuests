@@ -1,6 +1,6 @@
 # Rewards
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 <table>
   <tr>

@@ -1,6 +1,6 @@
 # aura
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **aura** parameter allows you to specify any aura (buff or debuff) that the player must have in order to trigger an objective.
 

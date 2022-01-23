@@ -1,6 +1,6 @@
 # guild
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **guild** parameter allows you to specify the name of a guild that a target player must be a part of in order to complete an objective.
 

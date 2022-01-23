@@ -1,6 +1,6 @@
 # use-emote
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **use-emote** objective is triggered whenever you use an emote, such as `/dance` or `/glare`. This objective cannot be triggered by custom emotes sent with the `/e` command.
 

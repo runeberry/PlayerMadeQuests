@@ -1,6 +1,6 @@
 # level
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **level** parameter allows you to specify the minimum level that a target must be in order to complete an objective.
 

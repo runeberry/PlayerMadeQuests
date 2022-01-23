@@ -1,6 +1,6 @@
 # message
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **message** parameter allows you to specify a phrase or pattern that must be spoken by the player in order to complete an objective.
 

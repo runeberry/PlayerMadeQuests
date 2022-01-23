@@ -1,6 +1,6 @@
 # text
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **text** parameter allows you to precisely define how your quest information will be displayed when it's presented to players. PMQ will automatically generate text for your quest objectives, requirements, and more based on the information that you provide, but overriding this with the **text** parameter will allow you to give your quests a little more personality beyond the standard text.
 

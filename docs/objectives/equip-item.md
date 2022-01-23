@@ -1,6 +1,6 @@
 # equip-item
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **equip-item** objective is triggered whenever you equip an item.
 

@@ -1,6 +1,6 @@
 # talk-to
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **talk-to** objective is triggered whenever you talk to an NPC, which includes opening their gossip frame, shop window, stable window, or any other window that causes the NPC to face you.
 

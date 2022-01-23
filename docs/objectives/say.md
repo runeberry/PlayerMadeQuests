@@ -1,6 +1,6 @@
 # say
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 The **say** objective is triggered whenever you send a message to a chat channel. This objective requires you to send a message that meets a message containing a certain phrase, along with meeting any of the conditions outlined below.
 

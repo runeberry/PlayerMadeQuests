@@ -1,6 +1,6 @@
 # How quests are played in PMQ
 
-<a href="../index.md"><sub>← Home</sub></a>
+[<sub>← Home</sub>](../index.md)
 
 PMQ was designed to emulate the look and feel of WoW: Classic quests as closely as possible, while still offering enough features and flexibility for players to design truly unique quests that stand apart from those in game. So if you've ever done any questing in WoW: Classic, you will quickly understand how quests are played in PMQ.
 
