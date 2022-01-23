@@ -66,4 +66,4 @@ Menu options:
 ### Other Menu Options
 
 * **Reset Frame Positions**: This will delete the saved position of any popout menus within PMQ (such as the Quest Log or Location Finder). Menus should immediately return to their default positions when this is run. Click this if you ever lose a popout menu by accidentally dragging it off screen.
-* **Reset All Save Data**: This will delete all of the save data managed by PMQ, including data caches, frame positions, as well as **quest drafts and quest completions**. Use this as an absolute last resort in case your PMQ save data gets somehow corrupted.</text>
+* **Reset All Save Data**: This will delete all of the save data managed by PMQ, including data caches, frame positions, as well as **quest drafts and quest completions**. Use this as an absolute last resort in case your PMQ save data gets somehow corrupted.

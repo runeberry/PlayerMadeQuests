@@ -93,4 +93,4 @@ See [Item (Rewards)](parameters/item-rewards.md) for examples of how to define r
 
 ### Usage Notes
 
-* In order to specify a valid game item by name, you must have encountered it in-game at some point during your current play session. For more information about this behavior and how you can work around it, see [Item (Rewards)](parameters/item-rewards.md).</text>
+* In order to specify a valid game item by name, you must have encountered it in-game at some point during your current play session. For more information about this behavior and how you can work around it, see [Item (Rewards)](parameters/item-rewards.md).

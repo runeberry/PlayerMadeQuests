@@ -70,4 +70,4 @@ complete:
   coords: 68.24,22.95
 ```
 
-Want to see how it works? Feel free to copy-paste this quest into your own draft in-game. Try changing some of the values and see how the quest is changed as a result.</text>
+Want to see how it works? Feel free to copy-paste this quest into your own draft in-game. Try changing some of the values and see how the quest is changed as a result.
