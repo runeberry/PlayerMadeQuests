@@ -1,13 +1,17 @@
 # langauge
 
-<p align="center">
-  <a href="../img/Language_select.png"><img src="../img/Language_select.png"/></a><br/>
-  <i>|thumb|300px|Left-click the speech bubble to select your spoken language</i>
-</p>
-<p align="center">
-  <a href="../img/Language_skill.png"><img src="../img/Language_skill.png"/></a><br/>
-  <i>|thumb|300px|A character's language skills as listed in WoW: Classic</i>
-</p>
+<table>
+  <tr>
+    <td>
+      <a href="../img/Language_select.png"><img src="../img/Language_select.png"/></a><br/>
+      <i>Left-click the speech bubble to select your spoken language</i>
+    </td>
+    <td>
+      <a href="../img/Language_skill.png"><img src="../img/Language_skill.png"/></a><br/>
+      <i>A character's language skills as listed in WoW: Classic</i>
+    </td>
+  </tr>
+</table>
 
 The **language** parameter allows you to specify a Role-Playing language that a [message](../parameters/message.md) must be spoken in when completing an objective.
 

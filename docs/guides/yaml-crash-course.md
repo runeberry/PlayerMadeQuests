@@ -44,16 +44,20 @@ When in doubt, include quotes anyway!
 
 ### Long strings
 
-<p align="center">
-  <a href="../img/line-break-before.png"><img src="../img/line-break-before.png"/></a><br/>
-  <i>|thumb|300px|Before line breaks are added</i>
-</p>
-<p align="center">
-  <a href="../img/line-break-after.png"><img src="../img/line-break-after.png"/></a><br/>
-  <i>|thumb|300px|After line breaks are added with %br</i>
-</p>
+<table>
+  <tr>
+    <td>
+      <a href="../img/line-break-before.png"><img src="../img/line-break-before.png"/></a><br/>
+      <i>Before line breaks are added</i>
+    </td>
+    <td>
+      <a href="../img/line-break-after.png"><img src="../img/line-break-after.png"/></a><br/>
+      <i>After line breaks are added with %br</i>
+    </td>
+  </tr>
+</table>
 
-You can spread a long string over multiple lines by prefixing it with the `&amp;gt;` character, like this:
+You can spread a long string over multiple lines by prefixing it with the `>` character, like this:
 
 ```yaml
 quest:

@@ -1,13 +1,17 @@
 # Rewards
 
-<p align="center">
-  <a href="img/Rewards-menu.png"><img src="img/Rewards-menu.png"/></a><br/>
-  <i>|thumb|300px|The Quest Rewards menu, and rewards as shown upon completion of a quest.</i>
-</p>
-<p align="center">
-  <a href="img/Quest-verification-menu.png"><img src="img/Quest-verification-menu.png"/></a><br/>
-  <i>|thumb|300px|The Quest Verification menu, which can be accessed for any quest in your Quest Log.</i>
-</p>
+<table>
+  <tr>
+    <td>
+      <a href="img/Rewards-menu.png"><img src="img/Rewards-menu.png"/></a><br/>
+      <i>The Quest Rewards menu, and rewards as shown upon completion of a quest.</i>
+    </td>
+    <td>
+      <a href="img/Quest-verification-menu.png"><img src="img/Quest-verification-menu.png"/></a><br/>
+      <i>The Quest Verification menu, which can be accessed for any quest in your Quest Log.</i>
+    </td>
+  </tr>
+</table>
 
 As an option to make your quests more enticing to players, you can specify **rewards** that will be given to players on quest completion. These rewards can take the form of money or items.
 

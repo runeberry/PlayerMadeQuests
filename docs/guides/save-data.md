@@ -1,12 +1,12 @@
 # Save Data & Cache
 
-The **Save Data &amp; Cache** menu allows you to manage various pieces of save data that PMQ generates while you use the addon.
+The **Save Data & Cache** menu allows you to manage various pieces of save data that PMQ generates while you use the addon.
 
 ### Overview
 
 <p align="center">
-  <a href="../img/SaveDataMenu.png"><img src="../img/SaveDataMenu.png"/></a><br/>
-  <i>|thumb|300px|The Save Data &amp; Cache menu screen</i>
+  <a href="../img/SaveDataMenu.png"><img src="../img/SaveDataMenu.png" width="50%"/></a><br/>
+  <i>The Save Data & Cache menu screen</i>
 </p>
 
 The World of Warcraft API is very selective about some of the information that it makes available to addons. Because of this, it's difficult to answer some questions that PMQ needs to ask when determining whether or not the player has just completed a quest objective. For example, these questions cannot be answered strictly through the WoW API:

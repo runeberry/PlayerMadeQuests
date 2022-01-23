@@ -44,7 +44,7 @@ Finally, you can erase all cached spell names from PMQ with the chat command `/p
 
 <p align="center">
   <a href="../img/SpellWatch.png"><img src="../img/SpellWatch.png"/></a><br/>
-  <i>|thumb|Toggle this feature on or off with: `/pmq watch-spells`</i>
+  <i>Toggle this feature on or off with: `/pmq watch-spells`</i>
 </p>
 
 Many actions that your character performs in game are considered "spells" for the sake of gameplay and will work with this quest condition. Beyond your spellbook, things like Skinning, [learning patterns](https://classic.wowhead.com/spell=18517/pattern-mooncloth-bag), or using your [Hearthstone](https://classic.wowhead.com/spell=8690/hearthstone) are all considered spell casts.

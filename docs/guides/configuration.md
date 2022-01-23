@@ -1,8 +1,8 @@
 # Configuration
 
 <p align="center">
-  <a href="../img/config-menu.png"><img src="../img/config-menu.png"/></a><br/>
-  <i>|thumb|The configuration menu in-game</i>
+  <a href="../img/config-menu.png"><img src="../img/config-menu.png" width="50%"/></a><br/>
+  <i>The configuration menu in-game</i>
 </p>
 
 This page outlines the settings you can configure in PMQ.
