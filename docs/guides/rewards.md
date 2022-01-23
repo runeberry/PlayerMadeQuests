@@ -3,11 +3,11 @@
 <table>
   <tr>
     <td>
-      <a href="assets/images/rewards-menu.png"><img src="assets/images/rewards-menu.png"/></a><br/>
+      <a href="../assets/images/rewards-menu.png"><img src="../assets/images/rewards-menu.png"/></a><br/>
       <i>The Quest Rewards menu, and rewards as shown upon completion of a quest.</i>
     </td>
     <td>
-      <a href="assets/images/quest-verification-menu.png"><img src="assets/images/quest-verification-menu.png"/></a><br/>
+      <a href="../assets/images/quest-verification-menu.png"><img src="../assets/images/quest-verification-menu.png"/></a><br/>
       <i>The Quest Verification menu, which can be accessed for any quest in your Quest Log.</i>
     </td>
   </tr>
@@ -58,7 +58,7 @@ rewards:
 | **player** | The player(s) who are responsible for giving out the rewards.<br/>You may also use the variables **%author** and **%giver** instead of a player's name. |
 | **money** | The amount of money awarded for completing the quest.<br/>This can be written as an amount of copper (such as: 24153) or a string with g/s/c (such as: 2g 41s 53c) |
 | **choose** | Set to **true** if the player should choose only *one item* from the list.<br/>Otherwise, it's implied that the player will receive *all* of the listed rewards. |
-| [item](parameters/item-rewards.md) | The item(s) awarded for completing the quest. |
+| [item](../parameters/item-rewards.md) | The item(s) awarded for completing the quest. |
 
 
 ### Examples
@@ -93,8 +93,8 @@ rewards:
 
 #### Single/Multiple item rewards
 
-See [Item (Rewards)](parameters/item-rewards.md) for examples of how to define reward items.
+See [Item (Rewards)](../parameters/item-rewards.md) for examples of how to define reward items.
 
 ### Usage Notes
 
-* In order to specify a valid game item by name, you must have encountered it in-game at some point during your current play session. For more information about this behavior and how you can work around it, see [Item (Rewards)](parameters/item-rewards.md).
+* In order to specify a valid game item by name, you must have encountered it in-game at some point during your current play session. For more information about this behavior and how you can work around it, see [Item (Rewards)](../parameters/item-rewards.md).

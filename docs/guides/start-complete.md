@@ -3,11 +3,11 @@
 <table>
   <tr>
     <td>
-      <a href="assets/images/start-complete1.png"><img src="assets/images/start-complete1.png"/></a><br/>
+      <a href="../assets/images/start-complete1.png"><img src="../assets/images/start-complete1.png"/></a><br/>
       <i>Quest description text and start block rendered as quest info</i>
     </td>
     <td>
-      <a href="assets/images/start-complete2.png"><img src="assets/images/start-complete2.png"/></a><br/>
+      <a href="../assets/images/start-complete2.png"><img src="../assets/images/start-complete2.png"/></a><br/>
       <i>Quest completion text and complete block rendered as quest info</i>
     </td>
   </tr>
@@ -37,12 +37,12 @@ Both properties support all the same parameters and are evaluated in the same wa
 
 | Parameter | How it's used |
 |---|---|
-| [coords](parameters/coords.md) | The coordinates you must be at in order to start or complete the quest |
-| [target](parameters/target.md) | The NPC that must be targeted in order to start or complete the quest |
-| [text](parameters/text.md) | Custom display text for the start or complete condition |
-| [zone](parameters/zone.md)<br/>[subzone](parameters/zone.md) | The name of the zone and/or subzone where the quest starts or ends |
+| [coords](../parameters/coords.md) | The coordinates you must be at in order to start or complete the quest |
+| [target](../parameters/target.md) | The NPC that must be targeted in order to start or complete the quest |
+| [text](../parameters/text.md) | Custom display text for the start or complete condition |
+| [zone](../parameters/zone.md)<br/>[subzone](../parameters/zone.md) | The name of the zone and/or subzone where the quest starts or ends |
 
-### [Display Text](parameters/text.md) variables
+### [Display Text](../parameters/text.md) variables
 
 | Variable | Parameter |
 |---|---|

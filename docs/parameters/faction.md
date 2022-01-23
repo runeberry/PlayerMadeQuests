@@ -14,7 +14,7 @@ The **faction** parameter allows you to specify that a target player or NPC must
 | [kill](../objectives/kill.md) | The kill target must be a player or NPC of this faction |
 | [use-emote](../objectives/use-emote.md) | The emote target must be a player or NPC of this faction |
 
-This parameter can also be used as a [quest requirement or recommendation](../requirements.md).
+This parameter can also be used as a [quest requirement or recommendation](../guides/requirements.md).
 
 ### Usage notes
 

@@ -3,11 +3,11 @@
 <table>
   <tr>
     <td>
-      <a href="assets/images/requirements.png"><img src="assets/images/requirements.png"/></a><br/>
+      <a href="../assets/images/requirements.png"><img src="../assets/images/requirements.png"/></a><br/>
       <i>Example of how quest requirements are rendered</i>
     </td>
     <td>
-      <a href="assets/images/recommended-warning.png"><img src="assets/images/recommended-warning.png"/></a><br/>
+      <a href="../assets/images/recommended-warning.png"><img src="../assets/images/recommended-warning.png"/></a><br/>
       <i>Warning if a player chooses to accept a quest which they don't meet the recommendations for</i>
     </td>
   </tr>
@@ -34,6 +34,6 @@ Both of these properties support all the same parameters and are evaluated in th
 
 | Parameter | How it's used |
 |---|---|
-| [class](parameters/class.md) | The name of the class allowed to start this quest |
-| [faction](parameters/faction.md) | Either "Horde" or "Alliance" |
-| [level](parameters/level.md) | The minimum level to start the quest |
+| [class](../parameters/class.md) | The name of the class allowed to start this quest |
+| [faction](../parameters/faction.md) | Either "Horde" or "Alliance" |
+| [level](../parameters/level.md) | The minimum level to start the quest |

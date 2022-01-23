@@ -21,10 +21,10 @@ Several playable demo quests are provided with PMQ to help you learn how to writ
 
 * [How to Write Quests](guides/writing-quests.md)
 * [YAML Crash Course](guides/yaml-crash-course.md) - Quickly learn the language used to write PMQ quests
-* [Quest Objectives](objectives.md)
-* [Start & Complete Objectives](start-complete.md)
-* [Quest Requirements](requirements.md)
-* [Quest Rewards](rewards.md)
+* [Quest Objectives](guides/objectives.md)
+* [Start & Complete Objectives](guides/start-complete.md)
+* [Quest Requirements](guides/requirements.md)
+* [Quest Rewards](guides/rewards.md)
 
 ## Advanced Guides
 

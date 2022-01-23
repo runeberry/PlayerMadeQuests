@@ -7,11 +7,11 @@ A quest **objective** is an action you must take in order to make progress towar
 <table>
   <tr>
     <td>
-      <a href="assets/images/objectives1.png"><img src="assets/images/objectives1.png"/></a><br/>
+      <a href="../assets/images/objectives1.png"><img src="../assets/images/objectives1.png"/></a><br/>
       <i>Quest objectives as shown in quest info</i>
     </td>
     <td>
-      <a href="assets/images/quest-log2.png"><img src="assets/images/quest-log2.png"/></a><br/>
+      <a href="../assets/images/quest-log2.png"><img src="../assets/images/quest-log2.png"/></a><br/>
       <i>Quest objectives as shown in the quest log</i>
     </td>
   </tr>
@@ -71,4 +71,4 @@ objectives:
 
 ## List of Quest Objectives
 
-You can see a list of all available quest objectives on the [home page](index.md).
+You can see a list of all available quest objectives on the [home page](../index.md).

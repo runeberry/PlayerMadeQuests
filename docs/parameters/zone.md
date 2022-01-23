@@ -20,7 +20,7 @@ The **zone** and **subzone** parameters are used to specify the names of in-game
 | [talk-to](../objectives/talk-to.md) | The zone where you must talk to the target |
 | [use-emote](../objectives/use-emote.md) | The zone where you must use the emote |
 
-This parameter can also be used as a [start or complete condition](../start-complete.md).
+This parameter can also be used as a [start or complete condition](../guides/start-complete.md).
 
 ### Usage notes
 

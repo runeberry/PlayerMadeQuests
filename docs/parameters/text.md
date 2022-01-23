@@ -20,7 +20,7 @@ The **text** parameter allows you to precisely define how your quest information
 | [talk-to](../objectives/talk-to.md) | Custom display text |
 | [use-emote](../objectives/use-emote.md) | Custom display text |
 
-Custom display text can also be used with a [start and complete conditions](../start-complete.md) as well as [quest requirements](../requirements.md).
+Custom display text can also be used with a [start and complete conditions](../guides/start-complete.md) as well as [quest requirements](../guides/requirements.md).
 
 ### Usage notes
 

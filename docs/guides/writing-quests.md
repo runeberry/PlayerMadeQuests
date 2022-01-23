@@ -10,17 +10,17 @@ That said, there are some differences between PMQ and WoW that you will likely e
 
 You'll be prompted to start a quest when another character shares one with you, when you're testing out a draft that you've written, or when you want to play one of the demo quests packaged with PMQ. Many quests can be started anywhere in the world by any character, but some quests may have additional restrictions:
 
-* Quests can have additional **[Requirements](../requirements.md)** you will need to meet in order to accept the quest, such as level or class requirements.
-* Quests may require you to be in a certain area, near a certain NPC or meet some other **[start condition](../start-complete.md)** in order to accept the quest.
+* Quests can have additional **[Requirements](../guides/requirements.md)** you will need to meet in order to accept the quest, such as level or class requirements.
+* Quests may require you to be in a certain area, near a certain NPC or meet some other **[start condition](../guides/start-complete.md)** in order to accept the quest.
 
 ### Completing objectives
 
-Most quests will have one or more **[Objectives](../objectives.md)** to complete. Objectives can include killing monsters, talking to NPCs, exploring areas, and much more. Some objectives only need to be completed once, such as exploring an area. But other objectives must be completed multiple times, such as killing 5 of a monster. This number is known as the **[Goal](../parameters/goal.md)** for this objective, and the objective is considered complete when your **progress** is greater than or equal to the goal.
+Most quests will have one or more **[Objectives](../guides/objectives.md)** to complete. Objectives can include killing monsters, talking to NPCs, exploring areas, and much more. Some objectives only need to be completed once, such as exploring an area. But other objectives must be completed multiple times, such as killing 5 of a monster. This number is known as the **[Goal](../parameters/goal.md)** for this objective, and the objective is considered complete when your **progress** is greater than or equal to the goal.
 
 ### Turning in a quest
 
 After you've completed all objectives for a quest, the quest itself is considered complete. But you will still need to turn in the quest to consider it "finished". Like when accepting a quest, many quests can be finished anywhere at anytime, but some quests may impose additional rules:
-#* Quests may require you to be in a certain area, near a certain NPC or meet some other **[complete condition](../start-complete.md)** in order to finish the quest.
+#* Quests may require you to be in a certain area, near a certain NPC or meet some other **[complete condition](../guides/start-complete.md)** in order to finish the quest.
 
 ## How to write quests
 
@@ -45,10 +45,10 @@ You can also create a new quest from scratch by going to the **My Drafts** menu 
 
 Ready to learn more? Or just want to see all the options available for PMQ quests? Check out the following guides:
 
-* [Quest recommendations & requirements](../requirements.md)
-* [Quest start & complete conditions](../start-complete.md)
-* [Quest objectives](../objectives.md)
-* [Quest rewards](../rewards.md)
+* [Quest recommendations & requirements](../guides/requirements.md)
+* [Quest start & complete conditions](../guides/start-complete.md)
+* [Quest objectives](../guides/objectives.md)
+* [Quest rewards](../guides/rewards.md)
 
 Here's an example of what a fully-featured quest might look like:
 

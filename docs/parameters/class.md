@@ -26,7 +26,7 @@ The following class values are supported for TBC:
 | [kill](../objectives/kill.md) | The kill target must be a player of this class |
 | [use-emote](../objectives/use-emote.md) | The emote target must be a player of this class |
 
-This parameter can also be used as a [quest requirement or recommendation](../requirements.md).
+This parameter can also be used as a [quest requirement or recommendation](../guides/requirements.md).
 
 ### Usage notes
 

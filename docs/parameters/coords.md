@@ -61,7 +61,7 @@ The player must enter the box bounded by the top-left coordinate (37.2, 46.5) an
 | [talk-to](../objectives/talk-to.md) | The coordinates where you must talk to the target |
 | [use-emote](../objectives/use-emote.md) | The coordinates where you must use the emote |
 
-This parameter can also be used as a [start or complete condition](../start-complete.md).
+This parameter can also be used as a [start or complete condition](../guides/start-complete.md).
 
 ### Usage notes
 

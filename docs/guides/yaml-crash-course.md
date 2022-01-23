@@ -32,7 +32,7 @@ name: "Lesson 1: Tutorial"   # Easy fix
 name: 'Lesson 1: Tutorial'   # Also fine
 ```
 
-PMQ also includes a special rule for writing shorthand quest [objectives](../objectives.md). When you are writing strings that contain multiple words, you *must* include quotes in order to group these words together.
+PMQ also includes a special rule for writing shorthand quest [objectives](../guides/objectives.md). When you are writing strings that contain multiple words, you *must* include quotes in order to group these words together.
 
 ```yaml
 objectives:
