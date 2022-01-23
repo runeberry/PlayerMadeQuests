@@ -43,7 +43,7 @@ Finally, you can erase all cached spell names from PMQ with the chat command `/p
 ### Discovering spells
 
 <p align="center">
-  <a href="../assets/images/SpellWatch.png"><img src="../assets/images/SpellWatch.png"/></a><br/>
+  <a href="../assets/images/spell-watch.png"><img src="../assets/images/spell-watch.png"/></a><br/>
   <i>Toggle this feature on or off with: `/pmq watch-spells`</i>
 </p>
 

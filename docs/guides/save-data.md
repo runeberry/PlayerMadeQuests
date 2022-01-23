@@ -5,7 +5,7 @@ The **Save Data & Cache** menu allows you to manage various pieces of save data 
 ### Overview
 
 <p align="center">
-  <a href="../assets/images/SaveDataMenu.png"><img src="../assets/images/SaveDataMenu.png" width="50%"/></a><br/>
+  <a href="../assets/images/save-data-menu.png"><img src="../assets/images/save-data-menu.png" width="50%"/></a><br/>
   <i>The Save Data & Cache menu screen</i>
 </p>
 

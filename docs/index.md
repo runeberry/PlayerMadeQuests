@@ -27,26 +27,22 @@ Several playable demo quests are provided with PMQ to help you learn how to writ
 <table>
   <tr>
     <td>
-      <a href="assets/images/Demo1.png"><img src="assets/images/Demo1.png"/></a><br/>
+      <a href="assets/images/demo1.png"><img src="assets/images/demo1.png"/></a><br/>
       <i>Several demo quests are included to help you learn how to write quests for PMQ.</i>
     </td>
     <td>
-      <a href="assets/images/Demo2.png"><img src="assets/images/Demo2.png"/></a><br/>
+      <a href="assets/images/demo2.png"><img src="assets/images/demo2.png"/></a><br/>
       <i>You can play these demo quests directly, or you can save a copy to your Drafts and make some changes, then try it out!</i>
     </td>
   </tr>
   <tr>
     <td>
-      <a href="assets/images/Draft1.png"><img src="assets/images/Draft1.png"/></a><br/>
+      <a href="assets/images/draft1.png"><img src="assets/images/draft1.png"/></a><br/>
       <i>Write your own quests in game with just a few lines of script. You can even share your quests with other PMQ users in your party with just the click of a button!</i>
     </td>
     <td>
-      <a href="assets/images/Questlog1.png"><img src="assets/images/Questlog1.png"/></a><br/>
+      <a href="assets/images/quest-log1.png"><img src="assets/images/quest-log1.png"/></a><br/>
       <i>Quest objectives are tracked and updated in real-time as you complete them.</i>
     </td>
   </tr>
 </table>
-
-### Testing an image
-
-![](assets/images/demo1.png)

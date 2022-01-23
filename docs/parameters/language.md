@@ -3,11 +3,11 @@
 <table>
   <tr>
     <td>
-      <a href="../assets/images/Language_select.png"><img src="../assets/images/Language_select.png"/></a><br/>
+      <a href="../assets/images/language-select.png"><img src="../assets/images/language-select.png"/></a><br/>
       <i>Left-click the speech bubble to select your spoken language</i>
     </td>
     <td>
-      <a href="../assets/images/Language_skill.png"><img src="../assets/images/Language_skill.png"/></a><br/>
+      <a href="../assets/images/language-skill.png"><img src="../assets/images/language-skill.png"/></a><br/>
       <i>A character's language skills as listed in WoW: Classic</i>
     </td>
   </tr>

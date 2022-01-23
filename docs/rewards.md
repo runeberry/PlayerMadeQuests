@@ -3,11 +3,11 @@
 <table>
   <tr>
     <td>
-      <a href="assets/images/Rewards-menu.png"><img src="assets/images/Rewards-menu.png"/></a><br/>
+      <a href="assets/images/rewards-menu.png"><img src="assets/images/rewards-menu.png"/></a><br/>
       <i>The Quest Rewards menu, and rewards as shown upon completion of a quest.</i>
     </td>
     <td>
-      <a href="assets/images/Quest-verification-menu.png"><img src="assets/images/Quest-verification-menu.png"/></a><br/>
+      <a href="assets/images/quest-verification-menu.png"><img src="assets/images/quest-verification-menu.png"/></a><br/>
       <i>The Quest Verification menu, which can be accessed for any quest in your Quest Log.</i>
     </td>
   </tr>
