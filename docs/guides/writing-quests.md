@@ -48,6 +48,7 @@ Ready to learn more? Or just want to see all the options available for PMQ quest
 * [Quest recommendations & requirements](../requirements.md)
 * [Quest start & complete conditions](../start-complete.md)
 * [Quest objectives](../objectives.md)
+* [Quest rewards](../rewards.md)
 
 Here's an example of what a fully-featured quest might look like:
 

@@ -69,6 +69,6 @@ objectives:
       target: Mangy Wolf
 ```
 
-## List of objectives
+## List of Quest Objectives
 
-You can view a list of all currently supported quest objectives at [:Category:Quest Objectives].
+You can see a list of all available quest objectives on the [home page](index.md).

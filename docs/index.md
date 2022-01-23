@@ -17,10 +17,53 @@ Ready to try it out? You can get it here:
 
 Several playable demo quests are provided with PMQ to help you learn how to write your own quests. Additional help and even more examples can be found on this Wiki.
 
-# Docs
+## Getting Started
 
-* Table of Contents
-{:toc}
+* [How to Write Quests](guides/writing-quests.md)
+* [YAML Crash Course](guides/yaml-crash-course.md) - Quickly learn the language used to write PMQ quests
+* [Quest Objectives](objectives.md)
+* [Start & Complete Objectives](start-complete.md)
+* [Quest Requirements](requirements.md)
+* [Quest Rewards](rewards.md)
+
+## Advanced Guides
+
+* [Save Data & Cache](guides/save-data.md)
+* [Configuration Reference](guides/configuration.md)
+
+## List of Quest Objectives
+
+* [cast-spell](objectives/cast-spell.md)
+* [equip-item](objectives/equip-item.md)
+* [explore](objectives/explore.md)
+* [gain-aura](objectives/gain-aura.md)
+* [kill](objectives/kill.md)
+* [loot-item](objectives/loot-item.md)
+* [say](objectives/say.md)
+* [talk-to](objectives/talk-to.md)
+* [use-emote](objectives/use-emote.md)
+
+## List of Quest Objective Parameters
+
+* [aura](parameters/aura.md)
+* [channel](parameters/channel.md)
+* [class](parameters/class.md)
+* [coords](parameters/coords.md)
+* [emote](parameters/emote.md)
+* [equip](parameters/equip.md)
+* [faction](parameters/faction.md)
+* [goal](parameters/goal.md)
+* [guild](parameters/guild.md)
+* [item](parameters/item.md)
+* [item (for rewards)](parameters/item-rewards.md)
+* [language](parameters/language.md)
+* [level](parameters/level.md)
+* [message](parameters/message.md)
+* [recipient](parameters/recipient.md)
+* [spell](parameters/spell.md)
+* [target](parameters/target.md)
+* [text](parameters/text.md)
+* [zone](parameters/zone.md)
 
 # Screenshots
 
