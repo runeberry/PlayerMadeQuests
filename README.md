@@ -14,4 +14,4 @@
 
 * Download PMQ from [CurseForge](https://www.curseforge.com/wow/addons/pmq) (can be installed through the [WowUp](https://wowup.io/) addon manager)
 * Download the latest release in a zip file directly from [Github](https://github.com/runeberry/PlayerMadeQuests/releases)
-* Read the docs [here](https://www.runeberry.com/PlayerMadeQuests)
+* Read the docs [here](https://runeberry.github.io/PlayerMadeQuests)
